@@ -1,15 +1,30 @@
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
-import Vue from 'vue';
-import App from './App.vue';
+import "core-js/stable";
+import "regenerator-runtime/runtime";
+import Vue from "vue";
+import App from "./App.vue";
+import VueRouter from "vue-router";
+import * as Wails from "@wailsapp/runtime";
 
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 
-import * as Wails from '@wailsapp/runtime';
+Vue.use(VueRouter);
+
+const Foo = { template: "<div>foo</div>" };
+const Bar = { template: "<div>bar</div>" };
+
+const routes = [
+  { path: "/foo", component: Foo },
+  { path: "/bar", component: Bar },
+];
+
+const router = new VueRouter({
+  routes,
+});
 
 Wails.Init(() => {
-	new Vue({
-		render: h => h(App)
-	}).$mount('#app');
+  new Vue({
+    router,
+    render: (h) => h(App),
+  }).$mount("#app");
 });

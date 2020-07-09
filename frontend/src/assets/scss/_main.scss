@@ -1,12 +1,20 @@
+@import "../css/reset.css";
+
+body {
+  background: $background;
+}
+
 .main {
-  background: $base;
   height: $app-height;
   width: $app-width;
   margin: 0 auto;
+  box-shadow: $shadow-1;
+  border-radius: $app-br;
 
   &__wrapper {
     background: $primary;
     border-radius: $app-br;
     height: 100%;
+    position: relative;
   }
 }

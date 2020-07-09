@@ -2,6 +2,7 @@
 $html-font-size: 16px;
 
 // Colors
+$background: #02a794;
 $base: #fcfcfc;
 $primary: #02d2b3;
 $secondary: #fff505;
@@ -26,6 +27,9 @@ $fz-llg: 1.5rem !default; // 24px;
 $transition-1: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 $transition-2: 0.3s ease all;
 
+// Shadows
+$shadow-1: 0px 8px 32px rgba(36, 36, 36, 0.12);
+
 // App Spacing
 $padding-micro: 8px;
 $padding-small: 12px;
@@ -40,3 +44,7 @@ $padding-max: 64px;
 $app-br: 36px;
 $app-width: 1080px;
 $app-height: 768px;
+
+$card-br: 8px;
+$sidebar-width: 80px;
+$nav-size: 30px;
