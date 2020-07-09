@@ -1,0 +1,29 @@
+h1 {
+  margin-top: 2em;
+  position: relative;
+  min-height: 5rem;
+  width: 100%;
+  color: $base;
+}
+a {
+  font-size: 1.7em;
+  border-color: white;
+  background-color: #121212;
+  color: white;
+  border: 3px solid white;
+  border-radius: 10px;
+  padding: 9px;
+  cursor: pointer;
+
+  &:hover{
+    font-size: 1.7em;
+    border-color: blue;
+    background-color: blue;
+    color: white;
+    border: 3px solid white;
+    border-radius: 10px;
+    padding: 9px;
+    cursor: pointer;
+    transition: 500ms;
+  }
+}

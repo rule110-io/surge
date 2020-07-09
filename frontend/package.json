@@ -21,6 +21,8 @@
     "eslint": "^6.8.0",
     "eslint-plugin-vue": "^6.2.1",
     "eventsource-polyfill": "^0.9.6",
+    "node-sass": "^4.14.1",
+    "sass-loader": "^7.1.0",
     "vue-template-compiler": "^2.6.11",
     "webpack-hot-middleware": "^2.25.0"
   },

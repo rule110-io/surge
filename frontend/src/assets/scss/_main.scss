@@ -1,0 +1,12 @@
+.main {
+  background: $base;
+  height: $app-height;
+  width: $app-width;
+  margin: 0 auto;
+
+  &__wrapper {
+    background: $primary;
+    border-radius: $app-br;
+    height: 100%;
+  }
+}
