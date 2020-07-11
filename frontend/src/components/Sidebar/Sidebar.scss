@@ -2,19 +2,60 @@
   width: $sidebar-width;
   position: absolute;
   left: 0;
-  height: 100%;
+  top: 0;
+  height: calc(100% - #{$padding-normal}* 2);
   border-top-left-radius: $app-br;
   border-bottom-left-radius: $app-br;
   flex-flow: column wrap;
   align-items: center;
   justify-content: space-between;
   display: flex;
-  padding-top: $padding-normal;
+  padding: $padding-normal 0;
 
   &__logo {
     height: $nav-size;
     width: $nav-size;
     background: $secondary;
     border-radius: $card-br;
+  }
+
+  &__item {
+    height: $nav-size;
+    width: $nav-size;
+    display: block;
+    background: $primary-dark;
+    border-radius: $card-br;
+    transition: $transition-1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:hover & {
+      &-icon {
+        color: $primary;
+      }
+    }
+
+    &-icon {
+      height: 18px;
+      color: white;
+      transition: $transition-1;
+    }
+
+    &.router-link-exact-active {
+      background: white;
+
+      i {
+        color: $primary;
+      }
+    }
+
+    &:not(:last-child) {
+      margin-bottom: $padding-medium;
+    }
+
+    &:hover {
+      background: white;
+    }
   }
 }

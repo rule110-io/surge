@@ -10,8 +10,10 @@
   "dependencies": {
     "@wailsapp/runtime": "^1.0.10",
     "core-js": "^3.6.4",
+    "feather-icons": "^4.28.0",
     "regenerator-runtime": "^0.13.3",
     "vue": "^2.6.11",
+    "vue-feather": "^1.0.1",
     "vue-router": "^3.3.4"
   },
   "devDependencies": {
