@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	pb "github.com/rule110/surge-ui/payloads"
+	pb "github.com/rule110-io/surge-ui/tree/development/payloads"
 	nkn "github.com/nknorg/nkn-sdk-go"
 	"google.golang.org/protobuf/proto"
 )
