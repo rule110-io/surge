@@ -1,7 +1,8 @@
 .dashboard {
   background: $base;
-  height: 100%;
+  height: calc(100% - #{$padding-big} * 2);
   width: 100%;
   margin-left: $sidebar-width;
   border-radius: $app-br;
+  padding: $padding-big;
 }

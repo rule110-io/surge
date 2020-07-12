@@ -1,0 +1,116 @@
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: $padding-big;
+
+  &__search {
+    display: flex;
+    align-items: center;
+    position: relative;
+    padding: $padding-micro 0;
+
+    &:after {
+      display: block;
+      content: "";
+      height: 1px;
+      width: 100%;
+      background: $grey;
+      transform: scaleX(0);
+      transition: $transition-1;
+      position: absolute;
+      bottom: 0;
+    }
+
+    &_active {
+      &:after {
+        transform: scaleX(1);
+      }
+    }
+
+    &-icon {
+      height: 18px;
+      color: $grey;
+      transition: $transition-1;
+      margin-right: $padding-default;
+    }
+
+    &-input {
+      transition: $transition-1;
+      appearance: none;
+      border: unset;
+      font-family: "Source Code Pro";
+      width: 250px;
+      font-size: $fz-md;
+      padding: 0;
+      color: $grey;
+      outline: none;
+
+      &::placeholder {
+        opacity: 0.6;
+      }
+
+      &:focus {
+        border: none;
+      }
+    }
+  }
+
+  &__avatar {
+    height: 40px;
+    width: 40px;
+    border-radius: 100%;
+    background: $grey;
+    margin-left: $padding-big;
+    position: relative;
+  }
+
+  &__status {
+    height: 12px;
+    width: 12px;
+    border-radius: 100%;
+    position: absolute;
+    transition: $transition-1;
+    right: 0;
+    bottom: 0;
+
+    &_active {
+      background: $primary;
+    }
+
+    &_inactive {
+      color: $error;
+    }
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  &__item {
+    color: $grey;
+
+    &:not(:last-child) {
+      margin-right: $padding-default;
+    }
+
+    &-icon {
+      height: 18px;
+      transition: $transition-1;
+    }
+
+    &:hover & {
+      &-icon {
+        color: $primary;
+      }
+    }
+
+    &:active & {
+      &-icon {
+        color: $primary-dark;
+      }
+    }
+  }
+}

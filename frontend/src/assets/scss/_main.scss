@@ -1,7 +1,10 @@
 @import "../css/reset.css";
+@import "./fonts";
 
 body {
   background: $background;
+  font-family: "Source Code Pro";
+  font-weight: 400;
 }
 
 .main {
