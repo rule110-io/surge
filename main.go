@@ -14,7 +14,7 @@ func getSessions() []SurgeSession {
 }
 
 func main() {
-  SurgeStart()
+  go SurgeStart()
 
   js := mewn.String("./frontend/dist/app.js")
   css := mewn.String("./frontend/dist/app.css")
@@ -32,3 +32,4 @@ func main() {
   
   app.Run()
 }
+
