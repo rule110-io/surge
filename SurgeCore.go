@@ -14,8 +14,7 @@ import (
 	"strings"
 	"time"
 
-	pb "nsurge/proto/SurgeMessage"
-	pbq "nsurge/proto/SurgeQuery"
+	pb "github.com/rule110/surge-ui/payloads"
 	nkn "github.com/nknorg/nkn-sdk-go"
 	"google.golang.org/protobuf/proto"
 )
@@ -111,7 +110,7 @@ func SurgeSendQueryRequest(Addr string, Query string) {
 	}
 	go initiateSession(surgeSession)
 
-	msg := &pbq.SurgeQuery{
+	msg := &pb.SurgeQuery{
 		Query: Query,
 	}
 	msgSerialized, err := proto.Marshal(msg)
