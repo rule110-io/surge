@@ -94,14 +94,19 @@ func SurgeSendQueryRequest(Addr string, Query string) {
 	//Create session
 	sessionConfing := nkn.GetDefaultSessionConfig()
 	sessionConfing.MTU = 16384
+	
 	dialConfig := &nkn.DialConfig{
 		SessionConfig: sessionConfing,
+		DialTimeout: 5000,
 	}
 
 	downloadSession, err := client.DialWithConfig(Addr, dialConfig)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Peer with address %s is not online, stopped trying after 5000ms\n", Addr)
+		return
 	}
+	log.Printf("Connected to peer %s requesting file listings\n", Addr)
+	
 	downloadReader := bufio.NewReader(downloadSession)
 
 	surgeSession := SurgeSession{
