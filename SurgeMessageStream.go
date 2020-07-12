@@ -1,0 +1,63 @@
+package main
+
+import (
+	"encoding/binary"
+	"io"
+	"log"
+)
+
+func surgeSessionWrite(Session SurgeSession, Data []byte, ID byte) (err error) {
+
+	//Package identifier to know what we are sending
+	packID := make([]byte, 1)
+	packID[0] = ID
+
+	//Create buffer of 4 bytes to put the size of the package
+	buff := make([]byte, 4)
+	binary.LittleEndian.PutUint32(buff, uint32(len(Data)))
+
+	//append pack and buff
+	buff = append(packID, buff...)
+
+	//Write data
+	buff = append(buff, Data...)
+	_, err = Session.Session.Write(buff)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return err
+}
+
+func surgeSessionRead(Session SurgeSession) (data []byte, ID byte, err error) {
+	headerBuffer := make([]byte, 5) //int32 size of header + 1 for packid
+
+	// the header of 4 bytes + 1 for packid
+	_, err = io.ReadFull(Session.Reader, headerBuffer)
+	if err != nil {
+		if err.Error() == "session closed" {
+			log.Println(err)
+			return nil, 0x0, err
+		}
+		log.Panicln(err)
+	}
+
+	//Get the packid
+	packID := headerBuffer[0]
+	log.Println(packID)
+
+	//Get the size from the bytes
+	sizeBytes := append(headerBuffer[:0], headerBuffer[1:]...)
+
+	size := binary.LittleEndian.Uint32(sizeBytes)
+
+	data = make([]byte, size)
+
+	// read the full message, or return an error
+	_, err = io.ReadFull(Session.Reader, data[:int(size)])
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	return data, packID, err
+}
