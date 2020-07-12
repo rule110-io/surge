@@ -1,11 +1,11 @@
-module surge-ui
+module github.com/rule110-io/surge-ui
 
 go 1.14
 
 require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/fatih/color v1.9.0 // indirect
-	github.com/golang/protobuf v1.4.2 // indirect
+	github.com/golang/protobuf v1.4.2
 	github.com/leaanthony/mewn v0.10.7
 	github.com/leaanthony/slicer v1.4.1 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect

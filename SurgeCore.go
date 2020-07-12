@@ -14,7 +14,7 @@ import (
 	"strings"
 	"time"
 
-	pb "github.com/rule110-io/surge-ui/tree/development/payloads"
+	pb "github.com/rule110-io/surge-ui/payloads"
 	nkn "github.com/nknorg/nkn-sdk-go"
 	"google.golang.org/protobuf/proto"
 )
@@ -234,7 +234,7 @@ func processChunk(Session SurgeSession, Data []byte) {
 
 func processQueryRequest(Session SurgeSession, Data []byte) {
 	//Try to parse SurgeMessage
-	surgeQuery := &pbq.SurgeQuery{}
+	surgeQuery := &pb.SurgeQuery{}
 	if err := proto.Unmarshal(Data, surgeQuery); err != nil {
 		log.Fatalln("Failed to parse surge message:", err)
 	}
