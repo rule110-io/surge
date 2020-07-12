@@ -56,6 +56,7 @@ type SurgeSession struct {
 }
 
 var listedFiles []SurgeFile
+var localFiles []SurgeFile
 
 // SurgeStart initializes surge
 func SurgeStart() {

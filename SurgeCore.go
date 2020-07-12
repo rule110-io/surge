@@ -106,7 +106,7 @@ func SurgeSendQueryRequest(Addr string, Query string) {
 		return
 	}
 	log.Printf("Connected to peer %s requesting file listings\n", Addr)
-	
+
 	downloadReader := bufio.NewReader(downloadSession)
 
 	surgeSession := SurgeSession{
@@ -311,6 +311,11 @@ func surgeTopicEncode(topic string) string {
 func surgeGenerateTopicPayload(fileName string, sizeInBytes int64, md5 string) string {
 	//Example payload
 	//surge://|file|The_Two_Towers-The_Purist_Edit-Trailer.avi|14997504|965c013e991ee246d63d45ea71954c4d|/
+
+	//Append to local files
+	localFile := SurgeFile{fileName, sizeInBytes, md5, "local"}
+	localFiles = append(localFiles, localFile)
+
 	return "surge://|file|" + fileName + "|" + strconv.FormatInt(sizeInBytes, 10) + "|" + md5 + "|/"
 }
 
@@ -379,6 +384,8 @@ func surgeScanLocal() {
 			log.Panicln(err)
 			continue
 		}
+
+
 		payload := surgeGenerateTopicPayload(filepath.Base(file), surgeGetFileSize(file), md5)
 
 		queryPayload += payload
