@@ -41,6 +41,7 @@ func main() {
   app.Bind(getLocalFiles)
   app.Bind(getRemoteFiles)
   app.Bind(getSessions)
+  app.Bind(downloadFile)
   
   app.Run()
 }
