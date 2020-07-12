@@ -3,8 +3,6 @@ package main
 import (
   "github.com/leaanthony/mewn"
   "github.com/wailsapp/wails"
-  "time"
-  "fmt"
 )
 
 func getLocalFiles() []SurgeFile {
@@ -19,14 +17,18 @@ func getSessions() []SurgeSession {
   return sessions
 }
 
+func fetchRemoteFiles() {
+  topicEncoded := surgeTopicEncode(testTopic)
+  go getSubscriptions(topicEncoded)
+}
+
+func scanLocalFiles() {
+  go surgeScanLocal()
+}
+
 func main() {
   go SurgeStart()
 
-
-  time.Sleep(time.Second * 10)
-  fmt.Println(localFiles)
-  fmt.Println(listedFiles)
-  
   js := mewn.String("./frontend/dist/app.js")
   css := mewn.String("./frontend/dist/app.css")
 
@@ -42,6 +44,8 @@ func main() {
   app.Bind(getRemoteFiles)
   app.Bind(getSessions)
   app.Bind(downloadFile)
+  app.Bind(fetchRemoteFiles)
+  app.Bind(scanLocalFiles)
   
   app.Run()
 }
