@@ -5,11 +5,16 @@ import (
   "github.com/wailsapp/wails"
 )
 
-func basic() string {
-  return "Hello World!"
+func getLocalFilesTestString() string {
+  return queryPayload
+}
+
+func getSessions() []SurgeSession {
+  return sessions
 }
 
 func main() {
+  SurgeStart()
 
   js := mewn.String("./frontend/dist/app.js")
   css := mewn.String("./frontend/dist/app.css")
@@ -22,6 +27,8 @@ func main() {
     CSS:    css,
     Colour: "#131313",
   })
-  app.Bind(basic)
+  app.Bind(getLocalFilesTestString)
+  app.Bind(getSessions)
+  
   app.Run()
 }
