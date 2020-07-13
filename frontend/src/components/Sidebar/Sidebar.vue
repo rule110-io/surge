@@ -26,37 +26,5 @@
 </style>
 
 <script>
-export default {
-  data() {
-    return { message: " " };
-  },
-  mounted() {
-    this.getMessage();
-  },
-  methods: {
-    getMessage: function() {
-      // window.backend.getLocalFiles().then((result) => {
-      //   console.log(result);
-      // });
-
-      window.backend.getRemoteFiles().then((result) => {
-        console.log(result);
-      });
-
-      // window.backend.getSessions().then((result) => {
-      //   console.log(result);
-      // });
-
-      window.backend
-        .downloadFile(
-          "e5579685272ad6d162d263a498da6eda0f35db97626dc2ecff788e9675298b67",
-          166557,
-          "dixonTip.png"
-        )
-        .then((result) => {
-          console.log(result);
-        });
-    },
-  },
-};
+export default {};
 </script>

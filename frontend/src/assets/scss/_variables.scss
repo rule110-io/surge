@@ -9,6 +9,7 @@ $primary-dark: #19bca4;
 $secondary: #fff505;
 $dark: #000;
 $grey: #7d7d7d;
+$grey-light: #ebebeb;
 $error: #d63649;
 
 // Typography
@@ -24,6 +25,7 @@ $fz-md: 0.875rem !default; // 14px
 $fz-base: 1rem !default; // Assumes the browser default, typically `16px`
 $fz-lg: 1.125rem !default; // 18px
 $fz-llg: 1.5rem !default; // 24px;
+$fz-title: 2.25rem !default; // 36px
 
 // Transitions
 $transition-1: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);

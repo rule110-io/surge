@@ -1,0 +1,32 @@
+.file-info {
+  display: flex;
+  align-items: center;
+
+  &__icon {
+    margin-right: $padding-default;
+    height: 40px;
+    transform: scaleX(-1);
+    color: $primary;
+
+    path {
+      fill: $primary;
+    }
+
+    polyline {
+      fill: $primary-dark;
+    }
+  }
+
+  &__title {
+    margin-bottom: $padding-small;
+    font-weight: 600;
+    font-size: $fz-md;
+    color: $dark;
+    max-width: 200px;
+  }
+
+  &__size {
+    color: $grey;
+    font-size: $fz-sm;
+  }
+}
