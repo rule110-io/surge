@@ -44,10 +44,10 @@ var chunksReceived int
 
 // File holds all file listing info of a seeded file
 type File struct {
-	fileName string
-	fileSize int64
-	md5Hash  string
-	seeder   string
+	FileName string
+	FileSize int64
+	MD5Hash  string
+	Seeder   string
 }
 
 // Session is a wrapper for everything needed to maintain a surge session
