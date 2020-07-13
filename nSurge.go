@@ -43,16 +43,16 @@ var chunksReceived int
 
 // SurgeFile holds all file listing info of a seeded file
 type SurgeFile struct {
-	Filename string
-	FileSize int64
-	MD5Hash  string
-	Seeder   string
+	fileName string
+	fileSize int64
+	md5Hash  string
+	seeder   string
 }
 
 // SurgeSession is a wrapper for everything needed to maintain a surge session
 type SurgeSession struct {
-	Session net.Conn
-	Reader  *bufio.Reader
+	session net.Conn
+	reader  *bufio.Reader
 }
 
 var listedFiles []SurgeFile
@@ -215,8 +215,8 @@ func downloadFile(Addr string, Size int64, FileID string) {
 	downloadReader := bufio.NewReader(downloadSession)
 
 	surgeSession := SurgeSession{
-		Reader:  downloadReader,
-		Session: downloadSession,
+		reader:  downloadReader,
+		session: downloadSession,
 	}
 	go initiateSession(surgeSession)
 

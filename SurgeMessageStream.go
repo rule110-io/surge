@@ -21,7 +21,7 @@ func surgeSessionWrite(Session SurgeSession, Data []byte, ID byte) (err error) {
 
 	//Write data
 	buff = append(buff, Data...)
-	_, err = Session.Session.Write(buff)
+	_, err = Session.session.Write(buff)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,7 +33,7 @@ func surgeSessionRead(Session SurgeSession) (data []byte, ID byte, err error) {
 	headerBuffer := make([]byte, 5) //int32 size of header + 1 for packid
 
 	// the header of 4 bytes + 1 for packid
-	_, err = io.ReadFull(Session.Reader, headerBuffer)
+	_, err = io.ReadFull(Session.reader, headerBuffer)
 	if err != nil {
 		if err.Error() == "session closed" {
 			log.Println(err)
@@ -54,7 +54,7 @@ func surgeSessionRead(Session SurgeSession) (data []byte, ID byte, err error) {
 	data = make([]byte, size)
 
 	// read the full message, or return an error
-	_, err = io.ReadFull(Session.Reader, data[:int(size)])
+	_, err = io.ReadFull(Session.reader, data[:int(size)])
 	if err != nil {
 		log.Panicln(err)
 	}
