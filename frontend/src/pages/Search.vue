@@ -6,9 +6,9 @@
         <div class="table__head">Name & size</div>
         <div class="table__head">Seeder</div>
       </div>
-      <div class="table__row" v-for="file in remoteFiles" :key="file.Filename">
+      <div class="table__row" v-for="file in remoteFiles" :key="file.fileName">
         <div class="table__cell"><FileInfo :file="file" /></div>
-        <div class="table__cell">{{ file.Seeder }}</div>
+        <div class="table__cell">{{ file.seeder }}</div>
         <div class="table__cell">
           <feather
             class="table__action"
@@ -55,8 +55,8 @@ export default {
       });
     },
     download(file) {
-      const { Filename, FileSize, Seeder } = file;
-      window.backend.downloadFile(Seeder, FileSize, Filename).then((result) => {
+      const { fileName, fileSize, seeder } = file;
+      window.backend.downloadFile(seeder, fileSize, fileName).then((result) => {
         console.log(result);
       });
     },
