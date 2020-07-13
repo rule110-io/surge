@@ -1,4 +1,4 @@
-package main
+package surge
 
 import (
 	"bufio"
@@ -8,6 +8,7 @@ import (
 	"os"
 	"time"
 	nkn "github.com/nknorg/nkn-sdk-go"
+	"github.com/wailsapp/wails"
 )
 
 // SurgeActive is true when client is operational
@@ -30,8 +31,8 @@ var startTime = time.Now()
 
 var client *nkn.MultiClient
 
-//var testSession net.Conn
-var sessions []SurgeSession
+//Sessions .
+var Sessions []Session
 
 //var testReader *bufio.Reader
 
@@ -41,25 +42,31 @@ var chunksTotal int
 var chunksRequested int
 var chunksReceived int
 
-// SurgeFile holds all file listing info of a seeded file
-type SurgeFile struct {
+// File holds all file listing info of a seeded file
+type File struct {
 	fileName string
 	fileSize int64
 	md5Hash  string
 	seeder   string
 }
 
-// SurgeSession is a wrapper for everything needed to maintain a surge session
-type SurgeSession struct {
+// Session is a wrapper for everything needed to maintain a surge session
+type Session struct {
 	session net.Conn
 	reader  *bufio.Reader
 }
 
-var listedFiles []SurgeFile
-var localFiles []SurgeFile
+//ListedFiles are remote files that can be downloaded
+var ListedFiles []File
+//LocalFiles are files that can be seeded
+var LocalFiles []File
 
-// SurgeStart initializes surge
-func SurgeStart() {
+var wailsRuntime *wails.Runtime
+
+// Start initializes surge
+func Start(runtime *wails.Runtime) {
+	wailsRuntime = runtime
+
 	//Ensure local and remote folders exist
 	if _, err := os.Stat(localPath); os.IsNotExist(err) {
 		os.Mkdir(localPath, os.ModeDir)
@@ -77,6 +84,9 @@ func SurgeStart() {
 		log.Fatal(err)
 	} else {
 		<-client.OnConnect.C
+
+		pushNotification("Client Connected", "Successfully connected to the NKN network")
+
 		client.Listen(nil)
 		SurgeActive = true
 		go Listen()
@@ -115,9 +125,9 @@ func SurgeStart() {
 
 	window.SetContent(contentBox)
 	*/
-	go surgeScanLocal()
-	topicEncoded := surgeTopicEncode(testTopic)
-	getSubscriptions(topicEncoded)
+	go ScanLocal()
+	topicEncoded := TopicEncode(TestTopic)
+	GetSubscriptions(topicEncoded)
 
 	go updateGUI()
 
@@ -173,9 +183,10 @@ func sendSeedSubscription(Topic string, Payload string) {
 	}
 }
 
-func getSubscriptions(Topic string) {
+//GetSubscriptions .
+func GetSubscriptions(Topic string) {
 	//Empty file cache
-	listedFiles = []SurgeFile{}
+	ListedFiles = []File{}
 	//fileBox.Children = []fyne.CanvasObject{}
 
 	subscribers, err := client.GetSubscribers(Topic, 0, 100, true, true)
@@ -189,15 +200,28 @@ func getSubscriptions(Topic string) {
 
 	for k, v := range subscribers.Subscribers.Map {
 		if len(v) > 0 {
-			SurgeSendQueryRequest(k, "Testing query functionality.")
+			SendQueryRequest(k, "Testing query functionality.")
 		}
 	}
 
-	fmt.Println(listedFiles)
+	fmt.Println(ListedFiles)
 
 }
 
-func downloadFile(Addr string, Size int64, FileID string) {
+// Stats .
+type Stats struct {
+	log *wails.CustomLogger
+}
+
+// WailsInit .
+func (s *Stats) WailsInit(runtime *wails.Runtime) error {
+	s.log = runtime.Log.New("Stats")
+	runtime.Events.Emit("notificationEvent", "Backend Init", "just a test")
+	log.Println("TESTING TESTING TESTING");
+	return nil
+}
+//DownloadFile downloads the file
+func DownloadFile(Addr string, Size int64, FileID string) {
 
 	// Create a sessions
 	var err error
@@ -214,10 +238,13 @@ func downloadFile(Addr string, Size int64, FileID string) {
 	}
 	downloadReader := bufio.NewReader(downloadSession)
 
-	surgeSession := SurgeSession{
+	surgeSession := Session{
 		reader:  downloadReader,
 		session: downloadSession,
 	}
+
+	pushNotification("Download Started", "downloading file: " + "'"+FileID+"'")
+
 	go initiateSession(surgeSession)
 
 	// If the file doesn't exist allocate it
@@ -234,7 +261,7 @@ func downloadFile(Addr string, Size int64, FileID string) {
 		for i := uint32(0); i < numChunks; i++ {
 			workerCount++
 			chunksRequested++
-			go SurgeRequestChunk(surgeSession, FileID, int32(i))
+			go RequestChunk(surgeSession, FileID, int32(i))
 
 			for workerCount >= 256 {
 				time.Sleep(time.Millisecond)
@@ -242,4 +269,10 @@ func downloadFile(Addr string, Size int64, FileID string) {
 		}
 	}
 	go downloadJob()
+}
+
+
+func pushNotification(title string, text string) {
+	log.Println("Emitting Event: ", "notificationEvent", title, text)
+	wailsRuntime.Events.Emit("notificationEvent", title, text)
 }

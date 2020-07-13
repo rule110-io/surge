@@ -1,4 +1,4 @@
-package main
+package surge
 
 import (
 	"bufio"
@@ -19,7 +19,8 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
-const testTopic = "poctest"
+//TestTopic only for testing
+const TestTopic = "poctest"
 
 const surgeChunkID byte = 0x001
 const surgeQueryRequestID byte = 0x002
@@ -27,8 +28,8 @@ const surgeQueryResponseID byte = 0x003
 
 var queryPayload = ""
 
-// SurgeRequestChunk sends a request to an address for a specific chunk of a specific file
-func SurgeRequestChunk(Session SurgeSession, FileID string, ChunkID int32) {
+// RequestChunk sends a request to an address for a specific chunk of a specific file
+func RequestChunk(Session Session, FileID string, ChunkID int32) {
 	msg := &pb.SurgeMessage{
 		FileID:  FileID,
 		ChunkID: ChunkID,
@@ -37,15 +38,15 @@ func SurgeRequestChunk(Session SurgeSession, FileID string, ChunkID int32) {
 	if err != nil {
 		log.Fatalln("Failed to encode surge message:", err)
 	} else {
-		err := surgeSessionWrite(Session, msgSerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
+		err := SessionWrite(Session, msgSerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 		if err != nil {
 			log.Fatalln("Failed to send Surge Ruquest:", err)
 		}
 	}
 }
 
-// SurgeTransmitChunk tranmits target file chunk to address
-func SurgeTransmitChunk(Session SurgeSession, FileID string, ChunkID int32) {
+// TransmitChunk tranmits target file chunk to address
+func TransmitChunk(Session Session, FileID string, ChunkID int32) {
 
 	//Open file
 	//fileLocalMutex.Lock()
@@ -80,7 +81,7 @@ func SurgeTransmitChunk(Session SurgeSession, FileID string, ChunkID int32) {
 	}
 
 	//Transmit the chunk
-	err = surgeSessionWrite(Session, dateReplySerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), dateReplySerialized, nil)
+	err = SessionWrite(Session, dateReplySerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), dateReplySerialized, nil)
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -88,8 +89,8 @@ func SurgeTransmitChunk(Session SurgeSession, FileID string, ChunkID int32) {
 	fmt.Println("Chunk transmitted: ", bytesread, " bytes")
 }
 
-// SurgeSendQueryRequest sends a query to a client on session
-func SurgeSendQueryRequest(Addr string, Query string) {
+// SendQueryRequest sends a query to a client on session
+func SendQueryRequest(Addr string, Query string) {
 
 	//Create session
 	sessionConfing := nkn.GetDefaultSessionConfig()
@@ -109,7 +110,7 @@ func SurgeSendQueryRequest(Addr string, Query string) {
 
 	downloadReader := bufio.NewReader(downloadSession)
 
-	surgeSession := SurgeSession{
+	surgeSession := Session{
 		reader:  downloadReader,
 		session: downloadSession,
 	}
@@ -122,17 +123,17 @@ func SurgeSendQueryRequest(Addr string, Query string) {
 	if err != nil {
 		log.Fatalln("Failed to encode surge message:", err)
 	} else {
-		err := surgeSessionWrite(surgeSession, msgSerialized, surgeQueryRequestID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
+		err := SessionWrite(surgeSession, msgSerialized, surgeQueryRequestID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 		if err != nil {
 			log.Fatalln("Failed to send Surge Ruquest:", err)
 		}
 	}
 }
 
-// SurgeSendQueryResponse sends a query to a client on session
-func SurgeSendQueryResponse(Session SurgeSession, Query string) {
+// SendQueryResponse sends a query to a client on session
+func SendQueryResponse(Session Session, Query string) {
 	b := []byte(queryPayload)
-	err := surgeSessionWrite(Session, b, surgeQueryResponseID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
+	err := SessionWrite(Session, b, surgeQueryResponseID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 	if err != nil {
 		log.Fatalln("Failed to send Surge Ruquest:", err)
 	}
@@ -166,7 +167,7 @@ func listenForSession() {
 		}
 		listenReader := bufio.NewReader(listenSession)
 
-		surgeSession := SurgeSession{
+		surgeSession := Session{
 			reader:  listenReader,
 			session: listenSession,
 		}
@@ -196,11 +197,11 @@ func Listen() {
 	}*/
 }
 
-func initiateSession(Session SurgeSession) {
-	sessions = append(sessions, Session)
+func initiateSession(Session Session) {
+	Sessions = append(Sessions, Session)
 
 	for true {
-		data, chunkType, err := surgeSessionRead(Session)
+		data, chunkType, err := SessionRead(Session)
 		if err != nil {
 			if err.Error() == "session closed" {
 				break
@@ -222,7 +223,7 @@ func initiateSession(Session SurgeSession) {
 	}
 }
 
-func processChunk(Session SurgeSession, Data []byte) {
+func processChunk(Session Session, Data []byte) {
 	//Try to parse SurgeMessage
 	surgeMessage := &pb.SurgeMessage{}
 	if err := proto.Unmarshal(Data, surgeMessage); err != nil {
@@ -231,13 +232,13 @@ func processChunk(Session SurgeSession, Data []byte) {
 
 	//Data nill means its a request for data
 	if surgeMessage.Data == nil {
-		go SurgeTransmitChunk(Session, surgeMessage.FileID, surgeMessage.ChunkID)
+		go TransmitChunk(Session, surgeMessage.FileID, surgeMessage.ChunkID)
 	} else { //If data is not nill we are receiving data
-		go surgeWriteChunk(surgeMessage.FileID, surgeMessage.ChunkID, surgeMessage.Data)
+		go WriteChunk(surgeMessage.FileID, surgeMessage.ChunkID, surgeMessage.Data)
 	}
 }
 
-func processQueryRequest(Session SurgeSession, Data []byte) {
+func processQueryRequest(Session Session, Data []byte) {
 	//Try to parse SurgeMessage
 	surgeQuery := &pb.SurgeQuery{}
 	if err := proto.Unmarshal(Data, surgeQuery); err != nil {
@@ -245,10 +246,10 @@ func processQueryRequest(Session SurgeSession, Data []byte) {
 	}
 	log.Println(surgeQuery.Query)
 
-	SurgeSendQueryResponse(Session, surgeQuery.Query)
+	SendQueryResponse(Session, surgeQuery.Query)
 }
 
-func processQueryResponse(Session SurgeSession, Data []byte) {
+func processQueryResponse(Session Session, Data []byte) {
 	//Try to parse SurgeMessage
 	s := string(Data)
 	log.Println("Query Reponse: ", s)
@@ -264,9 +265,9 @@ func processQueryResponse(Session SurgeSession, Data []byte) {
 
 		fileSize, _ := strconv.ParseInt(data[3], 10, 64)
 
-		newListing := SurgeFile{data[2], fileSize, data[4], Session.session.RemoteAddr().String()}
+		newListing := File{data[2], fileSize, data[4], Session.session.RemoteAddr().String()}
 
-		listedFiles = append(listedFiles, newListing)
+		ListedFiles = append(ListedFiles, newListing)
 
 		//Test gui
 		//newButton := widget.NewButton(newListing.Filename+" | "+ByteCountSI(newListing.FileSize), func() {
@@ -276,7 +277,8 @@ func processQueryResponse(Session SurgeSession, Data []byte) {
 	}
 }
 
-func surgeWriteChunk(FileID string, ChunkID int32, Chunk []byte) {
+//WriteChunk writs a chunk to disk
+func WriteChunk(FileID string, ChunkID int32, Chunk []byte) {
 	var path = remotePath + "/" + FileID
 
 	_, err := os.Stat(path)
@@ -304,7 +306,8 @@ func surgeWriteChunk(FileID string, ChunkID int32, Chunk []byte) {
 	chunksReceived++
 }
 
-func surgeTopicEncode(topic string) string {
+//TopicEncode .
+func TopicEncode(topic string) string {
 	return "SRG_" + strings.ReplaceAll(b64.StdEncoding.EncodeToString([]byte(topic)), "=", "-")
 }
 
@@ -313,14 +316,14 @@ func surgeGenerateTopicPayload(fileName string, sizeInBytes int64, md5 string) s
 	//surge://|file|The_Two_Towers-The_Purist_Edit-Trailer.avi|14997504|965c013e991ee246d63d45ea71954c4d|/
 
 	//Append to local files
-	localFile := SurgeFile{fileName, sizeInBytes, md5, "local"}
-	localFiles = append(localFiles, localFile)
+	localFile := File{fileName, sizeInBytes, md5, "local"}
+	LocalFiles = append(LocalFiles, localFile)
 
 	return "surge://|file|" + fileName + "|" + strconv.FormatInt(sizeInBytes, 10) + "|" + md5 + "|/"
 }
 
-// SurgeHashFile generates hash for file given filepath
-func SurgeHashFile(filePath string) (string, error) {
+// HashFile generates hash for file given filepath
+func HashFile(filePath string) (string, error) {
 	//Initialize variable returnMD5String now in case an error has to be returned
 	var returnMD5String string
 
@@ -360,7 +363,8 @@ func surgeGetFileSize(path string) int64 {
 	return fi.Size()
 }
 
-func surgeScanLocal() {
+//ScanLocal scans local files
+func ScanLocal() {
 	var files []string
 
 	root := localPath
@@ -374,12 +378,12 @@ func surgeScanLocal() {
 		panic(err)
 	}
 
-	var topic = testTopic
+	var topic = TestTopic
 	queryPayload = ""
 	for _, file := range files {
 		fmt.Println(file)
 
-		md5, err := SurgeHashFile(file)
+		md5, err := HashFile(file)
 		if err != nil {
 			log.Panicln(err)
 			continue
@@ -391,7 +395,7 @@ func surgeScanLocal() {
 		queryPayload += payload
 
 	}
-	topicEncoded := surgeTopicEncode(topic)
+	topicEncoded := TopicEncode(topic)
 	sendSeedSubscription(topicEncoded, queryPayload)
 	log.Println("Seeding to Topic: ", topicEncoded)
 }
