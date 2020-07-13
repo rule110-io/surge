@@ -6,10 +6,10 @@
   >
     <div class="file-card__header">
       <feather class="file-card__icon" type="folder"></feather>
-      <div class="file-card__size">{{ file.fileSize | prettyBytes(1) }}</div>
+      <div class="file-card__size">{{ file.FileSize | prettyBytes(1) }}</div>
     </div>
     <div class="file-card__footer">
-      <div class="file-card__title text_wrap_none">{{ file.fileName }}</div>
+      <div class="file-card__title text_wrap_none">{{ file.FileName }}</div>
       <div class="file-card__progress">Finished — 100%</div>
     </div>
   </div>
