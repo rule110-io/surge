@@ -93,6 +93,8 @@
 
   &__item {
     color: $grey;
+    cursor: pointer;
+    position: relative;
 
     &:not(:last-child) {
       margin-right: $padding-default;
@@ -113,6 +115,29 @@
       &-icon {
         color: $primary-dark;
       }
+    }
+  }
+
+  &__badge {
+    position: absolute;
+    top: -7px;
+    right: -7px;
+    background: $accent;
+    padding: 4px 6px;
+    border-radius: 19px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-family: "Roboto";
+    font-size: $fz-xss;
+    opacity: 0;
+    visibility: hidden;
+    transition: $transition-1;
+
+    &_visible {
+      visibility: visible;
+      opacity: 1;
     }
   }
 }

@@ -5,6 +5,7 @@ import App from "./App.vue";
 import router from "./router/index";
 import VueFeather from "vue-feather";
 import vueFilterPrettyBytes from "vue-filter-pretty-bytes";
+import { store } from "./store/store.js";
 
 import * as Wails from "@wailsapp/runtime";
 
@@ -17,6 +18,7 @@ Vue.use(vueFilterPrettyBytes);
 Wails.Init(() => {
   new Vue({
     router,
+    store,
     render: (h) => h(App),
   }).$mount("#app");
 });

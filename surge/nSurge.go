@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"time"
+
 	nkn "github.com/nknorg/nkn-sdk-go"
 	"github.com/wailsapp/wails"
 )
@@ -58,6 +59,7 @@ type Session struct {
 
 //ListedFiles are remote files that can be downloaded
 var ListedFiles []File
+
 //LocalFiles are files that can be seeded
 var LocalFiles []File
 
@@ -217,9 +219,10 @@ type Stats struct {
 func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 	s.log = runtime.Log.New("Stats")
 	runtime.Events.Emit("notificationEvent", "Backend Init", "just a test")
-	log.Println("TESTING TESTING TESTING");
+	log.Println("TESTING TESTING TESTING")
 	return nil
 }
+
 //DownloadFile downloads the file
 func DownloadFile(Addr string, Size int64, FileID string) {
 
@@ -243,7 +246,7 @@ func DownloadFile(Addr string, Size int64, FileID string) {
 		session: downloadSession,
 	}
 
-	pushNotification("Download Started", "downloading file: " + "'"+FileID+"'")
+	pushNotification("Download Started", "downloading file: "+FileID)
 
 	go initiateSession(surgeSession)
 
@@ -270,7 +273,6 @@ func DownloadFile(Addr string, Size int64, FileID string) {
 	}
 	go downloadJob()
 }
-
 
 func pushNotification(title string, text string) {
 	log.Println("Emitting Event: ", "notificationEvent", title, text)

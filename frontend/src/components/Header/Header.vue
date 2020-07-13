@@ -16,9 +16,14 @@
       <router-link to="/settings" class="header__item">
         <feather class="header__item-icon" type="settings"></feather
       ></router-link>
-      <router-link to="/notifications" class="header__item">
-        <feather class="header__item-icon" type="bell"></feather
-      ></router-link>
+      <div class="header__item">
+        <span
+          class="header__badge"
+          :class="counter > 0 ? 'header__badge_visible' : ''"
+          >{{ counter }}</span
+        >
+        <feather class="header__item-icon" type="bell"></feather>
+      </div>
       <div class="header__avatar">
         <div
           class="header__status"
@@ -34,6 +39,8 @@
 </style>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   data() {
     return {
@@ -41,6 +48,19 @@ export default {
       focus: false,
     };
   },
-  methods: {},
+  computed: {
+    ...mapState("notifications", ["counter", "open"]),
+  },
+  mounted() {
+    this.enableNotifications();
+  },
+  methods: {
+    enableNotifications() {
+      window.wails.Events.On("notificationEvent", (title, text) => {
+        const notification = { title, text };
+        this.$store.commit("notifications/addNotification", notification);
+      });
+    },
+  },
 };
 </script>

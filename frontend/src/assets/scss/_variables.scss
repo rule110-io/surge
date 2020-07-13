@@ -11,6 +11,7 @@ $dark: #000;
 $grey: #7d7d7d;
 $grey-light: #ebebeb;
 $error: #d63649;
+$accent: #fe030a;
 
 // Typography
 $fw-light: 300;
@@ -19,6 +20,7 @@ $fw-semi-bold: 500;
 $fw-bold: 700;
 
 // Setting for the Typography elements
+$fz-xss: 0.5rem !default; // 8px
 $fz-xs: 0.75rem !default; // 12px
 $fz-sm: 0.8125rem !default; // 13px
 $fz-md: 0.875rem !default; // 14px
