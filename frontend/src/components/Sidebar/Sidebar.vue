@@ -2,6 +2,9 @@
   <div class="sidebar">
     <div class="sidebar__logo" />
     <div class="sidebar__nav">
+      <router-link to="/search" class="sidebar__item">
+        <feather class="sidebar__item-icon" type="search"></feather
+      ></router-link>
       <router-link to="/download" class="sidebar__item">
         <feather class="sidebar__item-icon" type="play"></feather
       ></router-link>
@@ -25,8 +28,35 @@
 <script>
 export default {
   data() {
-    return {};
+    return { message: " " };
   },
-  methods: {},
+  mounted() {
+    this.getMessage();
+  },
+  methods: {
+    getMessage: function() {
+      // window.backend.getLocalFiles().then((result) => {
+      //   console.log(result);
+      // });
+
+      window.backend.getRemoteFiles().then((result) => {
+        console.log(result);
+      });
+
+      // window.backend.getSessions().then((result) => {
+      //   console.log(result);
+      // });
+
+      window.backend
+        .downloadFile(
+          "e5579685272ad6d162d263a498da6eda0f35db97626dc2ecff788e9675298b67",
+          166557,
+          "dixonTip.png"
+        )
+        .then((result) => {
+          console.log(result);
+        });
+    },
+  },
 };
 </script>

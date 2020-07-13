@@ -27,7 +27,8 @@
     "node-sass": "^4.14.1",
     "sass-loader": "^7.1.0",
     "vue-template-compiler": "^2.6.11",
-    "webpack-hot-middleware": "^2.25.0"
+    "webpack-hot-middleware": "^2.25.0",
+    "prerender-spa-plugin": "^3.4.0"
   },
   "eslintConfig": {
     "root": true,

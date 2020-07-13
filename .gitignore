@@ -1,3 +1,5 @@
 ﻿local
+remote
+build
 account.surge
 *.proto
