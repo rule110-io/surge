@@ -6,7 +6,7 @@
         <div class="table__head">Name & size</div>
         <div class="table__head">Seeder</div>
       </div>
-      <div class="table__row" v-for="file in files" :key="file.Filename">
+      <div class="table__row" v-for="file in remoteFiles" :key="file.Filename">
         <div class="table__cell"><FileInfo :file="file" /></div>
         <div class="table__cell">{{ file.Seeder }}</div>
         <div class="table__cell">
@@ -18,27 +18,39 @@
         </div>
       </div>
     </div>
+    <h2 class="page__subtitle">Recent Files</h2>
+    <RecentFiles :files="localFiles" />
   </div>
 </template>
 <script>
 import FileInfo from "@/components/File/FileInfo/FileInfo";
+import RecentFiles from "@/components/File/RecentFiles/RecentFiles";
 
 export default {
   components: {
     FileInfo,
+    RecentFiles,
   },
   data: () => {
     return {
-      files: [],
+      remoteFiles: [],
+      localFiles: [],
     };
   },
   mounted() {
     this.getRemote();
+    this.getLocal();
   },
   methods: {
     getRemote() {
       window.backend.getRemoteFiles().then((result) => {
-        this.files = result;
+        this.remoteFiles = result;
+        console.log(result);
+      });
+    },
+    getLocal() {
+      window.backend.getLocalFiles().then((result) => {
+        this.localFiles = result;
         console.log(result);
       });
     },

@@ -30,11 +30,18 @@ body {
     font-size: $fz-title;
     margin-bottom: $padding-big;
   }
+
+  &__subtitle {
+    font-weight: 700;
+    font-size: $fz-llg;
+    margin-bottom: $padding-normal;
+  }
 }
 
 .table {
   display: table;
   width: 100%;
+  margin-bottom: $padding-max;
 
   &__row {
     display: table-row;
