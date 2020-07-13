@@ -1,33 +1,56 @@
 package main
 
 import (
+	"log"
+	"github.com/rule110-io/surge-ui/surge"
   "github.com/leaanthony/mewn"
   "github.com/wailsapp/wails"
 )
 
-func getLocalFiles() []SurgeFile {
-  return localFiles
+var wailsRuntime *wails.Runtime
+
+func getLocalFiles() []surge.File {
+  return surge.LocalFiles
 }
 
-func getRemoteFiles() []SurgeFile {
-  return listedFiles
+func getRemoteFiles() []surge.File {
+  return surge.ListedFiles
 }
 
-func getSessions() []SurgeSession {
-  return sessions
+func getSessions() []surge.Session {
+  return surge.Sessions
 }
 
 func fetchRemoteFiles() {
-  topicEncoded := surgeTopicEncode(testTopic)
-  go getSubscriptions(topicEncoded)
+  topicEncoded := surge.TopicEncode(surge.TestTopic)
+  go surge.GetSubscriptions(topicEncoded)
 }
 
 func scanLocalFiles() {
-  go surgeScanLocal()
+  go surge.ScanLocal()
+}
+
+func downloadFile(Addr string, Size int64, FileID string) {
+  go surge.DownloadFile(Addr, Size, FileID)
+}
+
+// Stats .
+type Stats struct {
+	log *wails.CustomLogger
+}
+
+// WailsInit .
+func (s *Stats) WailsInit(runtime *wails.Runtime) error {
+	s.log = runtime.Log.New("Stats")
+  go surge.Start(runtime)
+
+	return nil
 }
 
 func main() {
-  go SurgeStart()
+  stats := &Stats{}
+  log.Println(stats)
+
 
   js := mewn.String("./frontend/dist/app.js")
   css := mewn.String("./frontend/dist/app.css")
@@ -46,6 +69,7 @@ func main() {
   app.Bind(downloadFile)
   app.Bind(fetchRemoteFiles)
   app.Bind(scanLocalFiles)
+  app.Bind(stats)
   
   app.Run()
 }
