@@ -110,8 +110,8 @@ func SurgeSendQueryRequest(Addr string, Query string) {
 	downloadReader := bufio.NewReader(downloadSession)
 
 	surgeSession := SurgeSession{
-		Reader:  downloadReader,
-		Session: downloadSession,
+		reader:  downloadReader,
+		session: downloadSession,
 	}
 	go initiateSession(surgeSession)
 
@@ -167,8 +167,8 @@ func listenForSession() {
 		listenReader := bufio.NewReader(listenSession)
 
 		surgeSession := SurgeSession{
-			Reader:  listenReader,
-			Session: listenSession,
+			reader:  listenReader,
+			session: listenSession,
 		}
 		go initiateSession(surgeSession)
 
@@ -264,7 +264,7 @@ func processQueryResponse(Session SurgeSession, Data []byte) {
 
 		fileSize, _ := strconv.ParseInt(data[3], 10, 64)
 
-		newListing := SurgeFile{data[2], fileSize, data[4], Session.Session.RemoteAddr().String()}
+		newListing := SurgeFile{data[2], fileSize, data[4], Session.session.RemoteAddr().String()}
 
 		listedFiles = append(listedFiles, newListing)
 
