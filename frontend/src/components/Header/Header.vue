@@ -16,13 +16,22 @@
       <router-link to="/settings" class="header__item">
         <feather class="header__item-icon" type="settings"></feather
       ></router-link>
-      <div class="header__item">
+      <div
+        class="header__item"
+        @click="toggleNotifications"
+        v-on-clickaway="closeNotifications"
+      >
         <span
           class="header__badge"
           :class="counter > 0 ? 'header__badge_visible' : ''"
           >{{ counter }}</span
         >
-        <feather class="header__item-icon" type="bell"></feather>
+        <feather
+          class="header__item-icon"
+          :class="open > 0 ? 'header__item-icon_active' : ''"
+          type="bell"
+        ></feather>
+        <Notifications @click.native.stop.prevent />
       </div>
       <div class="header__avatar">
         <div
@@ -40,8 +49,13 @@
 
 <script>
 import { mapState } from "vuex";
+import { mixin as clickaway } from "vue-clickaway";
+
+import Notifications from "@/components/Notifications/Notifications";
 
 export default {
+  components: { Notifications },
+  mixins: [clickaway],
   data() {
     return {
       active: true,
@@ -60,6 +74,12 @@ export default {
         const notification = { title, text };
         this.$store.commit("notifications/addNotification", notification);
       });
+    },
+    toggleNotifications() {
+      this.$store.commit("notifications/toggleNotifications", !this.open);
+    },
+    closeNotifications() {
+      this.$store.commit("notifications/toggleNotifications", false);
     },
   },
 };

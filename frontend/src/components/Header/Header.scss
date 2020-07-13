@@ -2,7 +2,6 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: $padding-big;
   padding-right: $padding-big;
 
   &__search {
@@ -103,6 +102,10 @@
     &-icon {
       height: 18px;
       transition: $transition-1;
+
+      &_active {
+        color: $primary;
+      }
     }
 
     &:hover & {

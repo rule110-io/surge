@@ -1,0 +1,95 @@
+.notifications {
+  position: absolute;
+  right: -15px;
+  top: 22px;
+  border-radius: 4px;
+  background-color: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #dfdfdf;
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out,
+    width 0.2s ease-in-out, height 0.2s ease-in-out;
+  pointer-events: none;
+  transform: translate3d(0, -8px, 0);
+  opacity: 0;
+  z-index: 1;
+  cursor: default;
+
+  &__wrapper {
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 119px;
+    padding: 14px;
+    width: 180px;
+  }
+
+  &:before {
+    content: "";
+    position: absolute;
+    right: 15px;
+    border-left: 7px solid transparent;
+    border-right: 7px solid transparent;
+    border-bottom: 7px solid #fff;
+    top: -7px;
+    z-index: 2;
+  }
+
+  &:after {
+    content: "";
+    position: absolute;
+    right: 13px;
+    margin-left: -2px;
+    border-left: 9px solid transparent;
+    border-right: 9px solid transparent;
+    border-bottom: 9px solid #dfdfdf;
+    top: -9px;
+  }
+
+  &_visible {
+    opacity: 1;
+    transform: translate3d(0, 8px, 0);
+    pointer-events: auto;
+  }
+
+  &__item {
+    &:not(:first-of-type) {
+      padding-top: $padding-micro;
+    }
+
+    &:not(:last-child) {
+      padding-bottom: $padding-micro;
+      border-bottom: 1px solid rgba($grey, $alpha: 0.2);
+    }
+  }
+
+  &__title {
+    font-family: "Roboto";
+    color: $dark;
+    font-weight: 500;
+    margin-bottom: $padding-xs;
+    font-size: $fz-md;
+  }
+
+  &__text {
+    font-size: $fz-xs;
+    word-wrap: break-word;
+  }
+
+  &__icon {
+    position: absolute;
+    right: 14px;
+    top: 11px;
+    transition: $transition-1;
+    color: $grey;
+    height: 16px;
+    cursor: pointer;
+    background: white;
+
+    &:hover {
+      color: $primary;
+    }
+
+    &:active {
+      color: $primary-dark;
+    }
+  }
+}
