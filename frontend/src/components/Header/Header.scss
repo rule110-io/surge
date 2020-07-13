@@ -3,6 +3,7 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: $padding-big;
+  padding-right: $padding-big;
 
   &__search {
     display: flex;
@@ -33,7 +34,6 @@
       color: $grey;
       transition: $transition-1;
       margin-right: $padding-default;
-      background: transparent;
     }
 
     &-input {
@@ -46,6 +46,7 @@
       padding: 0;
       color: $grey;
       outline: none;
+      background: transparent;
 
       &::placeholder {
         opacity: 0.6;

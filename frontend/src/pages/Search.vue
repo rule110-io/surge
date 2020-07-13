@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="page">
     <h1 class="page__title">Explore</h1>
     <div class="table">
       <div class="table__row">
