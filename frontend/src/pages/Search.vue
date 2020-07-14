@@ -55,8 +55,8 @@ export default {
       });
     },
     download(file) {
-      const { FileName, FileSize, Seeder } = file;
-      window.backend.downloadFile(Seeder, FileSize, FileName).then((result) => {
+      const { FileHash } = file;
+      window.backend.downloadFile(FileHash).then((result) => {
         console.log(result);
       });
     },
