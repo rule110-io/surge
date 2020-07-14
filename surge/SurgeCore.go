@@ -29,7 +29,7 @@ const surgeQueryResponseID byte = 0x003
 var queryPayload = ""
 
 // RequestChunk sends a request to an address for a specific chunk of a specific file
-func RequestChunk(Session Session, FileID string, ChunkID int32) {
+func RequestChunk(Session *Session, FileID string, ChunkID int32) {
 	msg := &pb.SurgeMessage{
 		FileID:  FileID,
 		ChunkID: ChunkID,
@@ -46,7 +46,7 @@ func RequestChunk(Session Session, FileID string, ChunkID int32) {
 }
 
 // TransmitChunk tranmits target file chunk to address
-func TransmitChunk(Session Session, FileID string, ChunkID int32) {
+func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 
 	//Open file
 	//fileLocalMutex.Lock()
@@ -87,6 +87,7 @@ func TransmitChunk(Session Session, FileID string, ChunkID int32) {
 		return
 	}
 	fmt.Println("Chunk transmitted: ", bytesread, " bytes")
+	Session.Uploaded += int64(bytesread)
 }
 
 // SendQueryRequest sends a query to a client on session
@@ -110,7 +111,7 @@ func SendQueryRequest(Addr string, Query string) {
 
 	downloadReader := bufio.NewReader(downloadSession)
 
-	surgeSession := Session{
+	surgeSession := &Session{
 		reader:  downloadReader,
 		session: downloadSession,
 	}
@@ -131,7 +132,7 @@ func SendQueryRequest(Addr string, Query string) {
 }
 
 // SendQueryResponse sends a query to a client on session
-func SendQueryResponse(Session Session, Query string) {
+func SendQueryResponse(Session *Session, Query string) {
 	b := []byte(queryPayload)
 	err := SessionWrite(Session, b, surgeQueryResponseID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 	if err != nil {
@@ -167,7 +168,7 @@ func listenForSession() {
 		}
 		listenReader := bufio.NewReader(listenSession)
 
-		surgeSession := Session{
+		surgeSession := &Session{
 			reader:  listenReader,
 			session: listenSession,
 		}
@@ -180,24 +181,9 @@ func listenForSession() {
 // Listen will listen to incoming requests for chunks
 func Listen() {
 	go listenForSession()
-
-	//Listen as long as client is alive
-	/*for SurgeActive {
-		for _, session := range sessions {
-
-			//TODO: deal with sessions closing
-			if testSession == nil {
-				time.Sleep(time.Millisecond * 100)
-				continue
-			}
-
-			//msg := <-client.OnMessage.C
-
-		}
-	}*/
 }
 
-func initiateSession(Session Session) {
+func initiateSession(Session *Session) {
 	Sessions = append(Sessions, Session)
 
 	for true {
@@ -208,6 +194,8 @@ func initiateSession(Session Session) {
 			}
 			log.Fatal(err)
 		}
+
+		log.Println(Session)
 
 		switch chunkType {
 		case surgeChunkID:
@@ -223,7 +211,7 @@ func initiateSession(Session Session) {
 	}
 }
 
-func processChunk(Session Session, Data []byte) {
+func processChunk(Session *Session, Data []byte) {
 	//Try to parse SurgeMessage
 	surgeMessage := &pb.SurgeMessage{}
 	if err := proto.Unmarshal(Data, surgeMessage); err != nil {
@@ -234,11 +222,11 @@ func processChunk(Session Session, Data []byte) {
 	if surgeMessage.Data == nil {
 		go TransmitChunk(Session, surgeMessage.FileID, surgeMessage.ChunkID)
 	} else { //If data is not nill we are receiving data
-		go WriteChunk(surgeMessage.FileID, surgeMessage.ChunkID, surgeMessage.Data)
+		go WriteChunk(Session, surgeMessage.FileID, surgeMessage.ChunkID, surgeMessage.Data)
 	}
 }
 
-func processQueryRequest(Session Session, Data []byte) {
+func processQueryRequest(Session *Session, Data []byte) {
 	//Try to parse SurgeMessage
 	surgeQuery := &pb.SurgeQuery{}
 	if err := proto.Unmarshal(Data, surgeQuery); err != nil {
@@ -249,7 +237,7 @@ func processQueryRequest(Session Session, Data []byte) {
 	SendQueryResponse(Session, surgeQuery.Query)
 }
 
-func processQueryResponse(Session Session, Data []byte) {
+func processQueryResponse(Session *Session, Data []byte) {
 	//Try to parse SurgeMessage
 	s := string(Data)
 	log.Println("Query Reponse: ", s)
@@ -278,7 +266,7 @@ func processQueryResponse(Session Session, Data []byte) {
 }
 
 //WriteChunk writs a chunk to disk
-func WriteChunk(FileID string, ChunkID int32, Chunk []byte) {
+func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	var path = remotePath + "/" + FileID
 
 	_, err := os.Stat(path)
@@ -302,6 +290,8 @@ func WriteChunk(FileID string, ChunkID int32, Chunk []byte) {
 	}
 	//Success
 	log.Println("Chunk written to disk: ", bytesWritten, " bytes")
+	Session.Downloaded += int64(bytesWritten)
+
 	workerCount--
 	chunksReceived++
 }

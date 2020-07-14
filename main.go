@@ -17,10 +17,6 @@ func getRemoteFiles() []surge.File {
   return surge.ListedFiles
 }
 
-func getSessions() []surge.Session {
-  return surge.Sessions
-}
-
 func fetchRemoteFiles() {
   topicEncoded := surge.TopicEncode(surge.TestTopic)
   go surge.GetSubscriptions(topicEncoded)
@@ -30,8 +26,8 @@ func scanLocalFiles() {
   go surge.ScanLocal()
 }
 
-func downloadFile(Addr string, Size int64, FileID string) {
-  go surge.DownloadFile(Addr, Size, FileID)
+func downloadFile(Hash string) {
+  go surge.DownloadFile(Hash)
 }
 
 // Stats .
@@ -65,7 +61,6 @@ func main() {
   })
   app.Bind(getLocalFiles)
   app.Bind(getRemoteFiles)
-  app.Bind(getSessions)
   app.Bind(downloadFile)
   app.Bind(fetchRemoteFiles)
   app.Bind(scanLocalFiles)

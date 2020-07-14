@@ -7,7 +7,7 @@ import (
 )
 
 // SessionWrite writes to session
-func SessionWrite(Session Session, Data []byte, ID byte) (err error) {
+func SessionWrite(Session *Session, Data []byte, ID byte) (err error) {
 
 	//Package identifier to know what we are sending
 	packID := make([]byte, 1)
@@ -31,7 +31,7 @@ func SessionWrite(Session Session, Data []byte, ID byte) (err error) {
 }
 
 //SessionRead reads from session
-func SessionRead(Session Session) (data []byte, ID byte, err error) {
+func SessionRead(Session *Session) (data []byte, ID byte, err error) {
 	headerBuffer := make([]byte, 5) //int32 size of header + 1 for packid
 
 	// the header of 4 bytes + 1 for packid
