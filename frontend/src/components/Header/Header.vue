@@ -65,16 +65,8 @@ export default {
   computed: {
     ...mapState("notifications", ["counter", "open"]),
   },
-  mounted() {
-    this.enableNotifications();
-  },
+  mounted() {},
   methods: {
-    enableNotifications() {
-      window.wails.Events.On("notificationEvent", (title, text) => {
-        const notification = { title, text };
-        this.$store.commit("notifications/addNotification", notification);
-      });
-    },
     toggleNotifications() {
       this.$store.commit("notifications/toggleNotifications", !this.open);
     },
