@@ -4,6 +4,7 @@ import Vue from "vue";
 import App from "./App.vue";
 import router from "./router/index";
 import VueFeather from "vue-feather";
+import VueMoment from "vue-moment";
 import vueFilterPrettyBytes from "vue-filter-pretty-bytes";
 import { store } from "./store/store.js";
 
@@ -14,6 +15,7 @@ Vue.config.devtools = true;
 
 Vue.use(VueFeather);
 Vue.use(vueFilterPrettyBytes);
+Vue.use(VueMoment);
 
 Wails.Init(() => {
   new Vue({

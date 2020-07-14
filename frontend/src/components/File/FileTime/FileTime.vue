@@ -1,6 +1,13 @@
 <template>
   <div class="file-time">
-    <div class="file-time__title">11 min</div>
+    <div class="file-time__title">
+      <template v-if="progress === 100">
+        Seeding
+      </template>
+      <template v-else>
+        {{ [seconds, "seconds"] | duration("humanize", true) }}
+      </template>
+    </div>
     <div class="file-time__percent">{{ progress.toFixed(2) }}%</div>
   </div>
 </template>
@@ -23,6 +30,7 @@ export default {
     return {
       progress: 0,
       bandwidth: 0,
+      seconds: 0,
     };
   },
   computed: {
@@ -31,7 +39,8 @@ export default {
   watch: {
     downloadEvent(newEvent) {
       if (this.file.FileHash === newEvent.FileHash) {
-        this.bandwidth = newEvent.Bandwith;
+        this.seconds = this.file.FileSize / newEvent.Bandwidth;
+        this.bandwidth = newEvent.Bandwidth;
         this.progress = newEvent.Progress * 100;
       }
     },

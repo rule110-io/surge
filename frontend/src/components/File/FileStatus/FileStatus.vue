@@ -1,6 +1,6 @@
 <template>
   <div class="file-status">
-    <div class="file-status__speed">{{ bandwith | prettyBytes(1) }}/s</div>
+    <div class="file-status__speed">{{ bandwidth | prettyBytes(1) }}/s</div>
     <div class="file-status__progress">
       <div
         class="file-status__progress-current"
@@ -28,7 +28,7 @@ export default {
   data() {
     return {
       progress: 0,
-      bandwith: 0,
+      bandwidth: 0,
     };
   },
   computed: {
@@ -36,8 +36,9 @@ export default {
   },
   watch: {
     downloadEvent(newEvent) {
+      console.log(newEvent);
       if (this.file.FileHash === newEvent.FileHash) {
-        this.bandwidth = newEvent.Bandwith;
+        this.bandwidth = newEvent.Bandwidth;
         this.progress = newEvent.Progress * 100;
       }
     },
