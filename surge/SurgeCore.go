@@ -209,6 +209,24 @@ func initiateSession(Session *Session) {
 			break
 		}
 	}
+
+	//find index in Sessions
+	var index = -1
+	for i := 0; i < len(Sessions); i++ {
+		if(Sessions[i] == Session) {
+			index = i
+			break
+		}
+	}
+	if index == -1 {
+		log.Panic("Couldnt find session to remove")
+	}
+	//Remove session
+	Sessions[index] = Sessions[len(Sessions)-1]
+	Sessions[len(Sessions)-1] = nil
+	Sessions = Sessions[:len(Sessions)-1]
+
+	log.Println("-=Session closed=-")
 }
 
 func processChunk(Session *Session, Data []byte) {
