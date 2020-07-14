@@ -191,7 +191,7 @@ func updateGUI() {
 			if session.FileSize == 0 {
 				continue
 			}
-			statusEvent := &DownloadStatusEvent{
+			statusEvent := DownloadStatusEvent{
 				FileHash: session.FileHash,
 				Progress: float32(float64(session.Downloaded) / float64(session.FileSize)),
 				Status: "Downloading",
