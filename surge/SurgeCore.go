@@ -2,7 +2,7 @@ package surge
 
 import (
 	"bufio"
-	"crypto/md5"
+	"crypto/sha256"
 	b64 "encoding/base64"
 	"encoding/hex"
 	"fmt"
@@ -311,46 +311,43 @@ func TopicEncode(topic string) string {
 	return "SRG_" + strings.ReplaceAll(b64.StdEncoding.EncodeToString([]byte(topic)), "=", "-")
 }
 
-func surgeGenerateTopicPayload(fileName string, sizeInBytes int64, md5 string) string {
+func surgeGenerateTopicPayload(fileName string, sizeInBytes int64, hash string) string {
 	//Example payload
 	//surge://|file|The_Two_Towers-The_Purist_Edit-Trailer.avi|14997504|965c013e991ee246d63d45ea71954c4d|/
 
 	//Append to local files
-	localFile := File{fileName, sizeInBytes, md5, "local"}
+	localFile := File{fileName, sizeInBytes, hash, "local"}
 	LocalFiles = append(LocalFiles, localFile)
 
-	return "surge://|file|" + fileName + "|" + strconv.FormatInt(sizeInBytes, 10) + "|" + md5 + "|/"
+	return "surge://|file|" + fileName + "|" + strconv.FormatInt(sizeInBytes, 10) + "|" + hash + "|/"
 }
 
 // HashFile generates hash for file given filepath
 func HashFile(filePath string) (string, error) {
-	//Initialize variable returnMD5String now in case an error has to be returned
-	var returnMD5String string
-
 	//Open the passed argument and check for any error
 	file, err := os.Open(filePath)
 	if err != nil {
-		return returnMD5String, err
+		return "", err
 	}
 
 	//Tell the program to call the following function when the current function returns
 	defer file.Close()
 
 	//Open a new hash interface to write to
-	hash := md5.New()
+	hash := sha256.New()
 
 	//Copy the file in the hash interface and check for any error
 	if _, err := io.Copy(hash, file); err != nil {
-		return returnMD5String, err
+		return "", err
 	}
 
 	//Get the 16 bytes hash
-	hashInBytes := hash.Sum(nil)[:16]
+	hashInBytes := hash.Sum(nil)
 
 	//Convert the bytes to a string
-	returnMD5String = hex.EncodeToString(hashInBytes)
+	hashString := hex.EncodeToString(hashInBytes)
 
-	return returnMD5String, nil
+	return hashString, nil
 
 }
 
@@ -370,7 +367,10 @@ func ScanLocal() {
 	root := localPath
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if path != root {
-			files = append(files, path)
+			name := filepath.Base(path)
+			if len(strings.Split(name, ".")[0]) > 0 {
+				files = append(files, path)
+			}
 		}
 		return nil
 	})
@@ -383,14 +383,14 @@ func ScanLocal() {
 	for _, file := range files {
 		fmt.Println(file)
 
-		md5, err := HashFile(file)
+		hashString, err := HashFile(file)
 		if err != nil {
 			log.Panicln(err)
 			continue
 		}
 
 
-		payload := surgeGenerateTopicPayload(filepath.Base(file), surgeGetFileSize(file), md5)
+		payload := surgeGenerateTopicPayload(filepath.Base(file), surgeGetFileSize(file), hashString)
 
 		queryPayload += payload
 

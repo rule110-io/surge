@@ -47,7 +47,7 @@ var chunksReceived int
 type File struct {
 	FileName string
 	FileSize int64
-	MD5Hash  string
+	FileHash  string
 	Seeder   string
 }
 
