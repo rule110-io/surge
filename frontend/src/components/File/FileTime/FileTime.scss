@@ -1,0 +1,12 @@
+.file-time {
+  &__title {
+    margin-bottom: $padding-small;
+    font-size: $fz-md;
+    color: $dark;
+  }
+
+  &__percent {
+    color: $primary;
+    font-size: $fz-sm;
+  }
+}
