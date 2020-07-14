@@ -90,6 +90,7 @@ type Session struct {
 	FileSize int64
 	Downloaded int64
 	Uploaded int64
+	deltaDownloaded int64
 	session net.Conn
 	reader  *bufio.Reader
 }
@@ -99,7 +100,7 @@ type DownloadStatusEvent struct {
 	FileHash string
 	Progress float32
 	Status string
-	Bandwith int
+	Bandwidth int
 }
 
 //ListedFiles are remote files that can be downloaded
@@ -191,10 +192,16 @@ func updateGUI() {
 			if session.FileSize == 0 {
 				continue
 			}
+
+			//Take bandwith delta
+			deltaBandwidth := int(session.Downloaded - session.deltaDownloaded)
+			session.deltaDownloaded = session.Downloaded
+
 			statusEvent := DownloadStatusEvent{
 				FileHash: session.FileHash,
 				Progress: float32(float64(session.Downloaded) / float64(session.FileSize)),
 				Status: "Downloading",
+				Bandwidth: deltaBandwidth,
 			}
 			log.Println("Emitting downloadStatusEvent: ", statusEvent)
 			wailsRuntime.Events.Emit("downloadStatusEvent", statusEvent)
