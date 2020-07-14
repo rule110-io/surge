@@ -1,12 +1,14 @@
 import Vue from "vue";
 import Vuex from "vuex";
 import Notifications from "./modules/notifications";
+import DownloadEvents from "./modules/downloadEvents";
 
 Vue.use(Vuex);
 
 export const store = new Vuex.Store({
   modules: {
     notifications: Notifications,
+    downloadEvents: DownloadEvents,
   },
   getters: {
     runningOnWindows(state) {

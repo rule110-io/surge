@@ -17,6 +17,7 @@
       background: $primary;
       border-radius: $app-br;
       position: absolute;
+      transition: $transition-1;
     }
 
     &-default {

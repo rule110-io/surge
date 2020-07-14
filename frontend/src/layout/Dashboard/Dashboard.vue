@@ -10,5 +10,22 @@ export default {
     Dashboard,
     Sidebar,
   },
+  mounted() {
+    this.enableNotifications();
+    this.enableDownloadEvents();
+  },
+  methods: {
+    enableNotifications() {
+      window.wails.Events.On("notificationEvent", (title, text) => {
+        const notification = { title, text };
+        this.$store.commit("notifications/addNotification", notification);
+      });
+    },
+    enableDownloadEvents() {
+      window.wails.Events.On("downloadStatusEvent", (event) => {
+        this.$store.commit("downloadEvents/addDownloadEvent", event);
+      });
+    },
+  },
 };
 </script>
