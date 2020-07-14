@@ -92,6 +92,10 @@ body {
     font-weight: 500;
     font-size: $fz-md;
     font-family: "Roboto";
+
+    &:first-child {
+      width: 280px;
+    }
   }
 
   &__cell {
@@ -125,6 +129,12 @@ body {
       overflow: hidden;
       white-space: nowrap;
       text-overflow: ellipsis;
+    }
+  }
+
+  &_align {
+    &_right {
+      text-align: right;
     }
   }
 }

@@ -1,0 +1,29 @@
+.file-status {
+  &__speed {
+    margin-bottom: $padding-small;
+    font-size: $fz-md;
+    color: $grey;
+  }
+
+  &__progress {
+    width: 400px;
+    height: 5px;
+    position: relative;
+    display: flex;
+    align-items: center;
+
+    &-current {
+      height: 100%;
+      background: $primary;
+      border-radius: $app-br;
+      position: absolute;
+    }
+
+    &-default {
+      width: 100%;
+      height: 2px;
+      background: #ebebeb;
+      border-radius: $app-br;
+    }
+  }
+}

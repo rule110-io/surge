@@ -1,5 +1,6 @@
 import Dashboard from "@/layout/Dashboard/Dashboard.vue";
 import Search from "@/pages/Search.vue";
+import Download from "@/pages/Download.vue";
 
 const routes = [
   {
@@ -11,6 +12,11 @@ const routes = [
         path: "search",
         name: "search",
         component: Search,
+      },
+      {
+        path: "download",
+        name: "download",
+        component: Download,
       },
     ],
   },
