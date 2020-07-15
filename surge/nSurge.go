@@ -2,12 +2,14 @@ package surge
 
 import (
 	"bufio"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"net"
 	"os"
 	"time"
 
+	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
 	"github.com/wailsapp/wails"
 )
@@ -25,35 +27,35 @@ const localPath = "local"
 const remotePath = "remote"
 
 const (
-	OS_READ = 04
-	OS_WRITE = 02
-	OS_EX = 01
-	OS_USER_SHIFT = 6
+	OS_READ        = 04
+	OS_WRITE       = 02
+	OS_EX          = 01
+	OS_USER_SHIFT  = 6
 	OS_GROUP_SHIFT = 3
-	OS_OTH_SHIFT = 0
+	OS_OTH_SHIFT   = 0
 
-	OS_USER_R = OS_READ<<OS_USER_SHIFT
-	OS_USER_W = OS_WRITE<<OS_USER_SHIFT
-	OS_USER_X = OS_EX<<OS_USER_SHIFT
-	OS_USER_RW = OS_USER_R | OS_USER_W
+	OS_USER_R   = OS_READ << OS_USER_SHIFT
+	OS_USER_W   = OS_WRITE << OS_USER_SHIFT
+	OS_USER_X   = OS_EX << OS_USER_SHIFT
+	OS_USER_RW  = OS_USER_R | OS_USER_W
 	OS_USER_RWX = OS_USER_RW | OS_USER_X
 
-	OS_GROUP_R = OS_READ<<OS_GROUP_SHIFT
-	OS_GROUP_W = OS_WRITE<<OS_GROUP_SHIFT
-	OS_GROUP_X = OS_EX<<OS_GROUP_SHIFT
-	OS_GROUP_RW = OS_GROUP_R | OS_GROUP_W
+	OS_GROUP_R   = OS_READ << OS_GROUP_SHIFT
+	OS_GROUP_W   = OS_WRITE << OS_GROUP_SHIFT
+	OS_GROUP_X   = OS_EX << OS_GROUP_SHIFT
+	OS_GROUP_RW  = OS_GROUP_R | OS_GROUP_W
 	OS_GROUP_RWX = OS_GROUP_RW | OS_GROUP_X
 
-	OS_OTH_R = OS_READ<<OS_OTH_SHIFT
-	OS_OTH_W = OS_WRITE<<OS_OTH_SHIFT
-	OS_OTH_X = OS_EX<<OS_OTH_SHIFT
-	OS_OTH_RW = OS_OTH_R | OS_OTH_W
+	OS_OTH_R   = OS_READ << OS_OTH_SHIFT
+	OS_OTH_W   = OS_WRITE << OS_OTH_SHIFT
+	OS_OTH_X   = OS_EX << OS_OTH_SHIFT
+	OS_OTH_RW  = OS_OTH_R | OS_OTH_W
 	OS_OTH_RWX = OS_OTH_RW | OS_OTH_X
 
-	OS_ALL_R = OS_USER_R | OS_GROUP_R | OS_OTH_R
-	OS_ALL_W = OS_USER_W | OS_GROUP_W | OS_OTH_W
-	OS_ALL_X = OS_USER_X | OS_GROUP_X | OS_OTH_X
-	OS_ALL_RW = OS_ALL_R | OS_ALL_W
+	OS_ALL_R   = OS_USER_R | OS_GROUP_R | OS_OTH_R
+	OS_ALL_W   = OS_USER_W | OS_GROUP_W | OS_OTH_W
+	OS_ALL_X   = OS_USER_X | OS_GROUP_X | OS_OTH_X
+	OS_ALL_RW  = OS_ALL_R | OS_ALL_W
 	OS_ALL_RWX = OS_ALL_RW | OS_GROUP_X
 )
 
@@ -78,30 +80,35 @@ var chunksReceived int
 
 // File holds all file listing info of a seeded file
 type File struct {
-	FileName string
-	FileSize int64
+	FileName  string
+	FileSize  int64
 	FileHash  string
-	Seeder   string
+	Seeder    string
+	Path      string
+	NumChunks int
+	ChunkMap  []byte
 }
 
 // Session is a wrapper for everything needed to maintain a surge session
 type Session struct {
-	FileHash string
-	FileSize int64
-	Downloaded int64
-	Uploaded int64
+	FileHash        string
+	FileSize        int64
+	Downloaded      int64
+	Uploaded        int64
 	deltaDownloaded int64
-	bandwidthQueue []int
-	session net.Conn
-	reader  *bufio.Reader
+	bandwidthQueue  []int
+	session         net.Conn
+	reader          *bufio.Reader
 }
 
 // DownloadStatusEvent holds update info on download progress
 type DownloadStatusEvent struct {
-	FileHash string
-	Progress float32
-	Status string
+	FileHash  string
+	Progress  float32
+	Status    string
 	Bandwidth int
+	NumChunks int
+	ChunkMap  string
 }
 
 //ListedFiles are remote files that can be downloaded
@@ -212,23 +219,29 @@ func updateGUI() {
 			}
 			bandwidthMA10 /= len(session.bandwidthQueue)
 
+			fileInfo, err := dbGetFile(session.FileHash)
+			if err != nil {
+				log.Panicln(err)
+			}
+
 			statusEvent := DownloadStatusEvent{
-				FileHash: session.FileHash,
-				Progress: float32(float64(session.Downloaded) / float64(session.FileSize)),
-				Status: "Downloading",
+				FileHash:  session.FileHash,
+				Progress:  float32(float64(session.Downloaded) / float64(session.FileSize)),
+				Status:    "Downloading",
 				Bandwidth: bandwidthMA10,
+				NumChunks: fileInfo.NumChunks,
+				ChunkMap:  hex.EncodeToString(fileInfo.ChunkMap),
 			}
 			log.Println("Emitting downloadStatusEvent: ", statusEvent)
 			wailsRuntime.Events.Emit("downloadStatusEvent", statusEvent)
 
 			//Download completed
-			if(session.FileSize == session.Downloaded) {
+			if session.FileSize == session.Downloaded {
 				pushNotification("Download Finished", getListedFileByHash(session.FileHash).FileName)
 				session.session.Close()
 			}
 		}
- 
-		
+
 		/*runtime.Events.Emit("notificationEvent", "Backend Init", "just a test")
 		if chunksTotal > 0 && chunksReceived < chunksTotal {
 			remainingChunks := chunksTotal - chunksReceived
@@ -315,7 +328,7 @@ func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 
 func getListedFileByHash(Hash string) *File {
 	for _, file := range ListedFiles {
-		if(file.FileHash == Hash) {
+		if file.FileHash == Hash {
 			return &file
 		}
 	}
@@ -327,10 +340,10 @@ func DownloadFile(Hash string) {
 	//Addr string, Size int64, FileID string
 
 	file := getListedFileByHash(Hash)
-	if(file == nil) {
+	if file == nil {
 		log.Panic("No listed file with hash", Hash)
 	}
-	
+
 	// Create a sessions
 	var err error
 
@@ -347,8 +360,8 @@ func DownloadFile(Hash string) {
 	downloadReader := bufio.NewReader(downloadSession)
 
 	surgeSession := &Session{
-		reader:  downloadReader,
-		session: downloadSession,
+		reader:   downloadReader,
+		session:  downloadSession,
 		FileSize: file.FileSize,
 		FileHash: file.FileHash,
 	}
@@ -360,18 +373,27 @@ func DownloadFile(Hash string) {
 	// If the file doesn't exist allocate it
 	var path = remotePath + "/" + file.FileName
 	AllocateFile(path, file.FileSize)
+	numChunks := int((file.FileSize-1)/int64(ChunkSize)) + 1
+
+	//When downloading from remote enter file into db
+	_, err = dbGetFile(Hash)
+	if err != nil {
+		file.Path = path
+		file.NumChunks = numChunks
+		file.ChunkMap = bitmap.NewSlice(numChunks)
+		dbInsertFile(*file)
+	}
 
 	chunksRequested = 0
 	chunksReceived = 0
 	//Try send request to self
-	var numChunks = uint32((file.FileSize-1)/int64(ChunkSize)) + 1
 	chunksTotal = int(numChunks)
 
 	downloadJob := func() {
-		for i := uint32(0); i < numChunks; i++ {
+		for i := 0; i < numChunks; i++ {
 			workerCount++
 			chunksRequested++
-			go RequestChunk(surgeSession, file.FileName, int32(i))
+			go RequestChunk(surgeSession, file.FileHash, int32(i))
 
 			for workerCount >= 256 {
 				time.Sleep(time.Millisecond)

@@ -14,8 +14,9 @@ import (
 	"strings"
 	"time"
 
-	pb "github.com/rule110-io/surge-ui/payloads"
+	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
+	pb "github.com/rule110-io/surge-ui/payloads"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -47,10 +48,14 @@ func RequestChunk(Session *Session, FileID string, ChunkID int32) {
 
 // TransmitChunk tranmits target file chunk to address
 func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
-
 	//Open file
+	fileInfo, err := dbGetFile(FileID)
+	if err != nil {
+		log.Fatal(err)
+	}
+
 	//fileLocalMutex.Lock()
-	file, err := os.Open(localPath + "/" + FileID)
+	file, err := os.Open(fileInfo.Path)
 
 	if err != nil {
 		log.Fatal(err)
@@ -96,10 +101,10 @@ func SendQueryRequest(Addr string, Query string) {
 	//Create session
 	sessionConfing := nkn.GetDefaultSessionConfig()
 	sessionConfing.MTU = 16384
-	
+
 	dialConfig := &nkn.DialConfig{
 		SessionConfig: sessionConfing,
-		DialTimeout: 5000,
+		DialTimeout:   5000,
 	}
 
 	downloadSession, err := client.DialWithConfig(Addr, dialConfig)
@@ -213,7 +218,7 @@ func initiateSession(Session *Session) {
 	//find index in Sessions
 	var index = -1
 	for i := 0; i < len(Sessions); i++ {
-		if(Sessions[i] == Session) {
+		if Sessions[i] == Session {
 			index = i
 			break
 		}
@@ -271,8 +276,7 @@ func processQueryResponse(Session *Session, Data []byte) {
 
 		fileSize, _ := strconv.ParseInt(data[3], 10, 64)
 
-		newListing := File{data[2], fileSize, data[4], Session.session.RemoteAddr().String()}
-
+		newListing := File{data[2], fileSize, data[4], Session.session.RemoteAddr().String(), "", -1, nil}
 		ListedFiles = append(ListedFiles, newListing)
 
 		//Test gui
@@ -283,11 +287,11 @@ func processQueryResponse(Session *Session, Data []byte) {
 	}
 }
 
-//WriteChunk writs a chunk to disk
+//WriteChunk writes a chunk to disk
 func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
-	var path = remotePath + "/" + FileID
 
-	_, err := os.Stat(path)
+	fileInfo, err := dbGetFile(FileID)
+	var path = "./" + remotePath + "/" + fileInfo.FileName
 
 	//Open file
 	//fileRemoteMutex.Lock()
@@ -310,6 +314,10 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	log.Println("Chunk written to disk: ", bytesWritten, " bytes")
 	Session.Downloaded += int64(bytesWritten)
 
+	//Set chunk to available in the map
+	bitmap.Set(fileInfo.ChunkMap, int(ChunkID), true)
+	dbInsertFile(*fileInfo)
+
 	workerCount--
 	chunksReceived++
 }
@@ -322,10 +330,6 @@ func TopicEncode(topic string) string {
 func surgeGenerateTopicPayload(fileName string, sizeInBytes int64, hash string) string {
 	//Example payload
 	//surge://|file|The_Two_Towers-The_Purist_Edit-Trailer.avi|14997504|965c013e991ee246d63d45ea71954c4d|/
-
-	//Append to local files
-	localFile := File{fileName, sizeInBytes, hash, "local"}
-	LocalFiles = append(LocalFiles, localFile)
 
 	return "surge://|file|" + fileName + "|" + strconv.FormatInt(sizeInBytes, 10) + "|" + hash + "|/"
 }
@@ -389,21 +393,47 @@ func ScanLocal() {
 	var topic = TestTopic
 	queryPayload = ""
 	for _, file := range files {
-		fmt.Println(file)
-
-		hashString, err := HashFile(file)
-		if err != nil {
-			log.Panicln(err)
-			continue
-		}
-
-
-		payload := surgeGenerateTopicPayload(filepath.Base(file), surgeGetFileSize(file), hashString)
-
-		queryPayload += payload
-
+		SeedFile(file)
 	}
 	topicEncoded := TopicEncode(topic)
 	sendSeedSubscription(topicEncoded, queryPayload)
 	log.Println("Seeding to Topic: ", topicEncoded)
+}
+
+//SeedFile generates everything needed to seed a file
+func SeedFile(Path string) {
+	fmt.Println("Seeding file", Path)
+
+	hashString, err := HashFile(Path)
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	fileName := filepath.Base(Path)
+	fileSize := surgeGetFileSize(Path)
+	numChunks := int((fileSize-1)/int64(ChunkSize)) + 1
+	chunkMap := bitmap.NewSlice(numChunks)
+
+	//Local files are always fully available, set all chunks to 1
+	for i := 0; i < numChunks; i++ {
+		bitmap.Set(chunkMap, i, true)
+	}
+
+	//Append to local files
+	localFile := File{
+		FileName:  fileName,
+		FileSize:  fileSize,
+		FileHash:  hashString,
+		Path:      Path,
+		NumChunks: numChunks,
+		ChunkMap:  chunkMap,
+	}
+	//When seeding enter file into db
+	dbInsertFile(localFile)
+	LocalFiles = append(LocalFiles, localFile)
+
+	//Add to payload
+	payload := surgeGenerateTopicPayload(fileName, fileSize, hashString)
+
+	queryPayload += payload
 }

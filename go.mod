@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/Masterminds/semver v1.5.0 // indirect
+	github.com/boljen/go-bitmap v0.0.0-20151001105940-23cd2fb0ce7d
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/golang/protobuf v1.4.2
 	github.com/leaanthony/mewn v0.10.7
@@ -13,6 +14,7 @@ require (
 	github.com/nknorg/nkn-sdk-go v1.3.0
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/wailsapp/wails v1.7.1
+	github.com/xujiajun/nutsdb v0.5.0
 	golang.org/x/image v0.0.0-20200618115811-c13761719519 // indirect
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
 	golang.org/x/sys v0.0.0-20200625212154-ddb9806d33ae // indirect

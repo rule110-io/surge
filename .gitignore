@@ -3,3 +3,4 @@ remote
 build
 account.surge
 *.proto
+db
