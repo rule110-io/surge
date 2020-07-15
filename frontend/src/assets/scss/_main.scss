@@ -7,6 +7,10 @@ body {
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  * {
+    line-height: 1.1em;
+  }
 }
 
 /*========== scroll ==========*/
