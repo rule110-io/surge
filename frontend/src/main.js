@@ -22,5 +22,8 @@ Wails.Init(() => {
     router,
     store,
     render: (h) => h(App),
+    mounted() {
+      this.$router.replace("/");
+    },
   }).$mount("#app");
 });

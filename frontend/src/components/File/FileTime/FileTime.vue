@@ -39,7 +39,9 @@ export default {
   watch: {
     downloadEvent(newEvent) {
       if (this.file.FileHash === newEvent.FileHash) {
-        this.seconds = this.file.FileSize / newEvent.Bandwidth;
+        this.seconds =
+          (this.file.FileSize - this.file.FileSize * newEvent.Progress) /
+          newEvent.Bandwidth;
         this.bandwidth = newEvent.Bandwidth;
         this.progress = newEvent.Progress * 100;
       }
