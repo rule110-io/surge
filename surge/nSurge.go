@@ -205,6 +205,12 @@ func updateGUI() {
 			}
 			log.Println("Emitting downloadStatusEvent: ", statusEvent)
 			wailsRuntime.Events.Emit("downloadStatusEvent", statusEvent)
+
+			//Download completed
+			if(session.FileSize == session.Downloaded) {
+				pushNotification("Download Finished", getListedFileByHash(session.FileHash).FileName)
+				session.session.Close()
+			}
 		}
  
 		
@@ -332,7 +338,7 @@ func DownloadFile(Hash string) {
 		FileHash: file.FileHash,
 	}
 
-	pushNotification("Download Started", "downloading file: "+file.FileName)
+	pushNotification("Download Started", file.FileName)
 
 	go initiateSession(surgeSession)
 
