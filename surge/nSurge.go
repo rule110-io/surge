@@ -91,6 +91,7 @@ type Session struct {
 	Downloaded int64
 	Uploaded int64
 	deltaDownloaded int64
+	bandwidthQueue []int
 	session net.Conn
 	reader  *bufio.Reader
 }
@@ -197,11 +198,25 @@ func updateGUI() {
 			deltaBandwidth := int(session.Downloaded - session.deltaDownloaded)
 			session.deltaDownloaded = session.Downloaded
 
+			//Append to queue
+			session.bandwidthQueue = append(session.bandwidthQueue, deltaBandwidth)
+
+			//Dequeue if queue > 10
+			if len(session.bandwidthQueue) > 10 {
+				session.bandwidthQueue = session.bandwidthQueue[1:]
+			}
+
+			var bandwidthMA10 = 0
+			for i := 0; i < len(session.bandwidthQueue); i++ {
+				bandwidthMA10 += session.bandwidthQueue[i]
+			}
+			bandwidthMA10 /= len(session.bandwidthQueue)
+
 			statusEvent := DownloadStatusEvent{
 				FileHash: session.FileHash,
 				Progress: float32(float64(session.Downloaded) / float64(session.FileSize)),
 				Status: "Downloading",
-				Bandwidth: deltaBandwidth,
+				Bandwidth: bandwidthMA10,
 			}
 			log.Println("Emitting downloadStatusEvent: ", statusEvent)
 			wailsRuntime.Events.Emit("downloadStatusEvent", statusEvent)
