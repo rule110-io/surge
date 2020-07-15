@@ -30,6 +30,17 @@ module.exports = {
 module.exports = {
   chainWebpack: (config) => {
     let limit = 9999999999999999;
+    const svgRule = config.module.rule("svg");
+
+    svgRule.uses.clear();
+
+    svgRule
+      .test(/\.svg$/)
+      .use("babel-loader")
+      .loader("babel-loader")
+      .end()
+      .use("vue-svg-loader")
+      .loader("vue-svg-loader");
     config.module
       .rule("images")
       .test(/\.(png|gif|jpg)(\?.*)?$/i)
@@ -38,7 +49,7 @@ module.exports = {
       .tap((options) => Object.assign(options, { limit: limit }));
     config.module
       .rule("fonts")
-      .test(/\.(woff2?|eot|ttf|otf|svg)(\?.*)?$/i)
+      .test(/\.(woff2?|eot|ttf|otf)(\?.*)?$/i)
       .use("url-loader")
       .loader("url-loader")
       .options({

@@ -15,8 +15,11 @@
   &__logo {
     height: $nav-size;
     width: $nav-size;
-    background: $secondary;
     border-radius: $card-br;
+
+    g {
+      fill: white;
+    }
   }
 
   &__item {

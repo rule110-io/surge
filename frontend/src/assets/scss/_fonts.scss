@@ -5,9 +5,7 @@
       format("embedded-opentype"),
     url("../fonts/SourceCodePro/SourceCodePro-Light.woff2") format("woff2"),
     url("../fonts/SourceCodePro/SourceCodePro-Light.woff") format("woff"),
-    url("../fonts/SourceCodePro/SourceCodePro-Light.ttf") format("truetype"),
-    url("../fonts/SourceCodePro/SourceCodePro-Light.svg#SourceCodePro-Light")
-      format("svg");
+    url("../fonts/SourceCodePro/SourceCodePro-Light.ttf") format("truetype");
   font-weight: 300;
   font-style: normal;
   font-display: swap;
@@ -20,9 +18,7 @@
       format("embedded-opentype"),
     url("../fonts/SourceCodePro/SourceCodePro-Black.woff2") format("woff2"),
     url("../fonts/SourceCodePro/SourceCodePro-Black.woff") format("woff"),
-    url("../fonts/SourceCodePro/SourceCodePro-Black.ttf") format("truetype"),
-    url("../fonts/SourceCodePro/SourceCodePro-Black.svg#SourceCodePro-Black")
-      format("svg");
+    url("../fonts/SourceCodePro/SourceCodePro-Black.ttf") format("truetype");
   font-weight: 900;
   font-style: normal;
   font-display: swap;
@@ -35,9 +31,7 @@
       format("embedded-opentype"),
     url("../fonts/SourceCodePro/SourceCodePro-Semibold.woff2") format("woff2"),
     url("../fonts/SourceCodePro/SourceCodePro-Semibold.woff") format("woff"),
-    url("../fonts/SourceCodePro/SourceCodePro-Semibold.ttf") format("truetype"),
-    url("../fonts/SourceCodePro/SourceCodePro-Semibold.svg#SourceCodePro-Semibold")
-      format("svg");
+    url("../fonts/SourceCodePro/SourceCodePro-Semibold.ttf") format("truetype");
   font-weight: 600;
   font-style: normal;
   font-display: swap;
@@ -50,9 +44,7 @@
       format("embedded-opentype"),
     url("../fonts/SourceCodePro/SourceCodePro-Medium.woff2") format("woff2"),
     url("../fonts/SourceCodePro/SourceCodePro-Medium.woff") format("woff"),
-    url("../fonts/SourceCodePro/SourceCodePro-Medium.ttf") format("truetype"),
-    url("../fonts/SourceCodePro/SourceCodePro-Medium.svg#SourceCodePro-Medium")
-      format("svg");
+    url("../fonts/SourceCodePro/SourceCodePro-Medium.ttf") format("truetype");
   font-weight: 500;
   font-style: normal;
   font-display: swap;
@@ -66,9 +58,7 @@
     url("../fonts/SourceCodePro/SourceCodePro-ExtraLight.woff2") format("woff2"),
     url("../fonts/SourceCodePro/SourceCodePro-ExtraLight.woff") format("woff"),
     url("../fonts/SourceCodePro/SourceCodePro-ExtraLight.ttf")
-      format("truetype"),
-    url("../fonts/SourceCodePro/SourceCodePro-ExtraLight.svg#SourceCodePro-ExtraLight")
-      format("svg");
+      format("truetype");
   font-weight: 200;
   font-style: normal;
   font-display: swap;
@@ -81,9 +71,7 @@
       format("embedded-opentype"),
     url("../fonts/SourceCodePro/SourceCodePro-Bold.woff2") format("woff2"),
     url("../fonts/SourceCodePro/SourceCodePro-Bold.woff") format("woff"),
-    url("../fonts/SourceCodePro/SourceCodePro-Bold.ttf") format("truetype"),
-    url("../fonts/SourceCodePro/SourceCodePro-Bold.svg#SourceCodePro-Bold")
-      format("svg");
+    url("../fonts/SourceCodePro/SourceCodePro-Bold.ttf") format("truetype");
   font-weight: bold;
   font-style: normal;
   font-display: swap;
@@ -96,9 +84,7 @@
       format("embedded-opentype"),
     url("../fonts/SourceCodePro/SourceCodePro-Regular.woff2") format("woff2"),
     url("../fonts/SourceCodePro/SourceCodePro-Regular.woff") format("woff"),
-    url("../fonts/SourceCodePro/SourceCodePro-Regular.ttf") format("truetype"),
-    url("../fonts/SourceCodePro/SourceCodePro-Regular.svg#SourceCodePro-Regular")
-      format("svg");
+    url("../fonts/SourceCodePro/SourceCodePro-Regular.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
   font-display: swap;
@@ -117,7 +103,6 @@
     /* Super Modern Browsers */
       url("../fonts/roboto/roboto-v18-latin-regular.woff") format("woff"),
     /* Modern Browsers */ url("../fonts/roboto/roboto-v18-latin-regular.ttf")
-      format("truetype"),
-    /* Safari, Android, iOS */
-      url("../fonts/roboto/roboto-v18-latin-regular.svg#Roboto") format("svg"); /* Legacy iOS */
+      format("truetype");
+  /* Safari, Android, iOS */
 }

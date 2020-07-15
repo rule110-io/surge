@@ -1,6 +1,6 @@
 <template>
   <div class="sidebar">
-    <div class="sidebar__logo" />
+    <Logo class="sidebar__logo" />
     <div class="sidebar__nav">
       <router-link to="/search" class="sidebar__item">
         <feather class="sidebar__item-icon" type="search"></feather
@@ -26,5 +26,9 @@
 </style>
 
 <script>
-export default {};
+import Logo from "@/assets/images/Logo.svg";
+
+export default {
+  components: { Logo },
+};
 </script>
