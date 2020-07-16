@@ -1,7 +1,9 @@
 <template>
   <div class="dashboard">
     <Header />
-    <router-view v-if="remoteFiles && localFiles"></router-view>
+    <router-view
+      v-if="remoteFiles !== false && localFiles !== false"
+    ></router-view>
     <Preloader v-else />
   </div>
 </template>

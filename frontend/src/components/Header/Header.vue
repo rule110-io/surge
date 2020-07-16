@@ -6,9 +6,11 @@
         <input
           type="text"
           class="header__search-input"
-          placeholder="Search for files and more..."
+          placeholder="Search for remote files..."
           @focus="focus = true"
           @blur="focus = false"
+          v-model.trim="searchQuery"
+          @input="search(searchQuery)"
         />
       </div>
     </div>
@@ -60,10 +62,26 @@ export default {
     return {
       active: true,
       focus: false,
+      searchQuery: "",
+      search: () => {},
     };
   },
   computed: {
     ...mapState("notifications", ["counter", "open"]),
+  },
+  created() {
+    this.search = this._.debounce((search) => {
+      if (this.$router.currentRoute.name !== "search") {
+        this.$router.replace("/search");
+      }
+
+      const payload = {
+        search,
+        skip: 0,
+        get: 5,
+      };
+      this.$store.dispatch("files/fetchRemoteFiles", payload);
+    }, 500);
   },
   mounted() {},
   methods: {

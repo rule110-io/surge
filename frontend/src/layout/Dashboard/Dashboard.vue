@@ -16,15 +16,15 @@ export default {
   mounted() {
     this.enableNotifications();
     this.enableDownloadEvents();
-    this.initLocalFiles();
-    this.initRemoteFiles();
+    this.fetchLocalFiles();
+    this.fetchRemoteFiles();
   },
   methods: {
-    initLocalFiles() {
-      this.$store.dispatch("files/initLocalFiles");
+    fetchLocalFiles() {
+      this.$store.dispatch("files/fetchLocalFiles");
     },
-    initRemoteFiles() {
-      this.$store.dispatch("files/initRemoteFiles");
+    fetchRemoteFiles() {
+      this.$store.dispatch("files/fetchRemoteFiles");
     },
     enableNotifications() {
       window.wails.Events.On("notificationEvent", (title, text) => {

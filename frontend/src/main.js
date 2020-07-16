@@ -6,6 +6,8 @@ import router from "./router/index";
 import VueFeather from "vue-feather";
 import VueMoment from "vue-moment";
 import vueFilterPrettyBytes from "vue-filter-pretty-bytes";
+import VueLodash from "vue-lodash";
+import lodash from "lodash";
 import { store } from "./store/store.js";
 
 import * as Wails from "@wailsapp/runtime";
@@ -16,6 +18,7 @@ Vue.config.devtools = true;
 Vue.use(VueFeather);
 Vue.use(vueFilterPrettyBytes);
 Vue.use(VueMoment);
+Vue.use(VueLodash, { lodash: lodash });
 
 Wails.Init(() => {
   new Vue({

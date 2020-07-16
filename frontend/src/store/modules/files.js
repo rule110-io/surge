@@ -10,24 +10,36 @@ const state = getDefaultState();
 const mutations = {
   setLocalFiles(state, localFiles) {
     state.localFiles = localFiles;
-    console.log(localFiles);
   },
   setRemoteFiles(state, remoteFiles) {
     state.remoteFiles = remoteFiles;
-    console.log(remoteFiles);
   },
 };
 
 const actions = {
-  initLocalFiles({ commit }) {
-    window.backend.getLocalFiles().then((result) => {
-      commit("setLocalFiles", result);
+  fetchLocalFiles({ commit }) {
+    window.backend.getLocalFiles(0, 5).then(({ Result, Count }) => {
+      commit("setLocalFiles", Result);
+      console.log(Result, Count);
     });
   },
-  initRemoteFiles({ commit }) {
-    window.backend.getRemoteFiles().then((result) => {
-      commit("setRemoteFiles", result);
-    });
+  fetchRemoteFiles({ commit }, payload) {
+    let search = "";
+    let skip = 0;
+    let get = 5;
+
+    if (payload) {
+      search = payload.search;
+      skip = payload.skip;
+      get = payload.get;
+    }
+
+    window.backend
+      .getRemoteFiles(search, skip, get)
+      .then(({ Result, Count }) => {
+        commit("setRemoteFiles", Result);
+        console.log(Result, Count);
+      });
   },
 };
 
