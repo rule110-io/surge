@@ -1,5 +1,8 @@
 <template>
-  <div class="main__wrapper"><Sidebar /> <Dashboard /></div>
+  <div class="main__wrapper">
+    <Sidebar />
+    <Dashboard />
+  </div>
 </template>
 <script>
 import Dashboard from "@/components/Dashboard/Dashboard";
@@ -13,8 +16,16 @@ export default {
   mounted() {
     this.enableNotifications();
     this.enableDownloadEvents();
+    this.initLocalFiles();
+    this.initRemoteFiles();
   },
   methods: {
+    initLocalFiles() {
+      this.$store.dispatch("files/initLocalFiles");
+    },
+    initRemoteFiles() {
+      this.$store.dispatch("files/initRemoteFiles");
+    },
     enableNotifications() {
       window.wails.Events.On("notificationEvent", (title, text) => {
         const notification = { title, text };

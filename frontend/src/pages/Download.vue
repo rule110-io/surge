@@ -27,6 +27,8 @@
   </div>
 </template>
 <script>
+import { mapState } from "vuex";
+
 import FileInfo from "@/components/File/FileInfo/FileInfo";
 import FileStatus from "@/components/File/FileStatus/FileStatus";
 import FileTime from "@/components/File/FileTime/FileTime";
@@ -38,20 +40,13 @@ export default {
     FileTime,
   },
   data: () => {
-    return {
-      remoteFiles: [],
-    };
+    return {};
   },
-  mounted() {
-    this.getRemote();
+  computed: {
+    ...mapState("files", ["remoteFiles"]),
   },
+  mounted() {},
   methods: {
-    getRemote() {
-      window.backend.getRemoteFiles().then((result) => {
-        this.remoteFiles = result;
-        console.log(result);
-      });
-    },
     pause(file) {
       console.log(file);
     },

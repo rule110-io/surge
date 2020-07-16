@@ -23,6 +23,8 @@
   </div>
 </template>
 <script>
+import { mapState } from "vuex";
+
 import FileInfo from "@/components/File/FileInfo/FileInfo";
 import RecentFiles from "@/components/File/RecentFiles/RecentFiles";
 
@@ -32,28 +34,13 @@ export default {
     RecentFiles,
   },
   data: () => {
-    return {
-      remoteFiles: [],
-      localFiles: [],
-    };
+    return {};
   },
-  mounted() {
-    this.getRemote();
-    this.getLocal();
+  computed: {
+    ...mapState("files", ["remoteFiles", "localFiles"]),
   },
+  mounted() {},
   methods: {
-    getRemote() {
-      window.backend.getRemoteFiles().then((result) => {
-        this.remoteFiles = result;
-        console.log(result);
-      });
-    },
-    getLocal() {
-      window.backend.getLocalFiles().then((result) => {
-        this.localFiles = result;
-        console.log(result);
-      });
-    },
     download(file) {
       const { FileHash } = file;
       window.backend.downloadFile(FileHash).then((result) => {

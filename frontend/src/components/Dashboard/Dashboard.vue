@@ -1,7 +1,8 @@
 <template>
   <div class="dashboard">
     <Header />
-    <router-view></router-view>
+    <router-view v-if="remoteFiles && localFiles"></router-view>
+    <Preloader v-else />
   </div>
 </template>
 
@@ -10,12 +11,18 @@
 </style>
 
 <script>
+import { mapState } from "vuex";
+
 import Header from "@/components/Header/Header";
+import Preloader from "@/components/Preloader/Preloader";
 
 export default {
-  components: { Header },
+  components: { Header, Preloader },
   data() {
     return {};
+  },
+  computed: {
+    ...mapState("files", ["remoteFiles", "localFiles"]),
   },
   methods: {},
 };

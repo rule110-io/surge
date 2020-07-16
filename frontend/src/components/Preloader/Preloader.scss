@@ -1,0 +1,22 @@
+.preloader {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &__logo {
+    animation: Spin 3s linear infinite;
+    height: 80%;
+
+    g {
+      fill: $primary;
+    }
+  }
+}
+
+@keyframes Spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
