@@ -17,6 +17,7 @@
           ></feather>
         </div>
       </div>
+      <Pagination dispatcher="files/fetchRemoteFiles" />
     </div>
     <h2 class="page__subtitle">Recent Files</h2>
     <RecentFiles :files="localFiles" />
@@ -27,11 +28,13 @@ import { mapState } from "vuex";
 
 import FileInfo from "@/components/File/FileInfo/FileInfo";
 import RecentFiles from "@/components/File/RecentFiles/RecentFiles";
+import Pagination from "@/components/Pagination/Pagination";
 
 export default {
   components: {
     FileInfo,
     RecentFiles,
+    Pagination,
   },
   data: () => {
     return {};

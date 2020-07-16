@@ -81,6 +81,7 @@ body {
   display: table;
   width: 100%;
   margin-bottom: $padding-max;
+  position: relative;
 
   &__row {
     display: table-row;

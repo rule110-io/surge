@@ -1,0 +1,35 @@
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  position: absolute;
+
+  &__button {
+    cursor: pointer;
+    height: 24px;
+    transition: $transition-1;
+
+    &_active {
+      color: $grey;
+      cursor: pointer;
+
+      &:hover {
+        color: $primary;
+      }
+
+      &:active {
+        color: $primary-dark;
+      }
+    }
+
+    &_inactive {
+      color: $grey-light;
+      cursor: not-allowed;
+    }
+
+    &:first-child {
+      margin-right: $padding-default;
+    }
+  }
+}
