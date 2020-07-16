@@ -2,11 +2,11 @@ package surge
 
 import (
 	"bufio"
-	"encoding/hex"
 	"fmt"
 	"log"
 	"net"
 	"os"
+	"strings"
 	"time"
 
 	bitmap "github.com/boljen/go-bitmap"
@@ -21,7 +21,10 @@ var SurgeActive bool = false
 const ChunkSize = 1024 * 256
 
 //NumClients is the number of NKN clients
-const NumClients = 16
+const NumClients = 8
+
+//NumWorkers is the total number of concurrent chunk fetches allowed
+const NumWorkers = 16
 
 const localPath = "local"
 const remotePath = "remote"
@@ -108,7 +111,6 @@ type DownloadStatusEvent struct {
 	Status    string
 	Bandwidth int
 	NumChunks int
-	ChunkMap  string
 }
 
 //ListedFiles are remote files that can be downloaded
@@ -188,7 +190,6 @@ func Start(runtime *wails.Runtime) {
 	GetSubscriptions(topicEncoded)
 
 	go updateGUI()
-
 	//window.ShowAndRun()
 }
 
@@ -230,7 +231,6 @@ func updateGUI() {
 				Status:    "Downloading",
 				Bandwidth: bandwidthMA10,
 				NumChunks: fileInfo.NumChunks,
-				ChunkMap:  hex.EncodeToString(fileInfo.ChunkMap),
 			}
 			log.Println("Emitting downloadStatusEvent: ", statusEvent)
 			wailsRuntime.Events.Emit("downloadStatusEvent", statusEvent)
@@ -395,7 +395,7 @@ func DownloadFile(Hash string) {
 			chunksRequested++
 			go RequestChunk(surgeSession, file.FileHash, int32(i))
 
-			for workerCount >= 256 {
+			for workerCount >= NumWorkers {
 				time.Sleep(time.Millisecond)
 			}
 		}
@@ -406,4 +406,37 @@ func DownloadFile(Hash string) {
 func pushNotification(title string, text string) {
 	log.Println("Emitting Event: ", "notificationEvent", title, text)
 	wailsRuntime.Events.Emit("notificationEvent", title, text)
+}
+
+//SearchQueryResult is a paging query result for file searches
+type SearchQueryResult struct {
+	Result []File
+	Count  int
+}
+
+//SearchFile runs a paged query
+func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
+	var results []File
+
+	for _, file := range ListedFiles {
+		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) {
+			results = append(results, file)
+		}
+	}
+
+	left := Skip
+	right := Skip + Take
+
+	if left > len(results) {
+		left = len(results)
+	}
+
+	if right > len(results) {
+		right = len(results)
+	}
+
+	return SearchQueryResult{
+		Result: results[left:right],
+		Count:  len(results),
+	}
 }

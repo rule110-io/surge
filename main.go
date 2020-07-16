@@ -29,6 +29,10 @@ func downloadFile(Hash string) {
 	go surge.DownloadFile(Hash)
 }
 
+func searchFile(Query string, Skip int, Take int) surge.SearchQueryResult {
+	return surge.SearchFile(Query, Skip, Take)
+}
+
 // Stats .
 type Stats struct {
 	log *wails.CustomLogger
@@ -58,12 +62,13 @@ func main() {
 		CSS:    css,
 		Colour: "#131313",
 	})
+	app.Bind(stats)
 	app.Bind(getLocalFiles)
 	app.Bind(getRemoteFiles)
 	app.Bind(downloadFile)
 	app.Bind(fetchRemoteFiles)
 	app.Bind(scanLocalFiles)
-	app.Bind(stats)
+	app.Bind(searchFile)
 
 	app.Run()
 
