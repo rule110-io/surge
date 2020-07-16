@@ -62,7 +62,9 @@ func dbGetFile(Key string) (*File, error) {
 	return result, nil
 }
 
-func dbGetAllFiles() {
+func dbGetAllFiles() []File {
+	files := []File{}
+
 	if err := db.View(
 		func(tx *nutsdb.Tx) error {
 			entries, err := tx.GetAll(fileBucketName)
@@ -74,13 +76,17 @@ func dbGetAllFiles() {
 
 				newFile := &File{}
 				json.Unmarshal(entry.Value, newFile)
+				files = append(files, *newFile)
 				fmt.Println(string(entry.Key), newFile)
 			}
 
 			return nil
 		}); err != nil {
-		log.Println(err)
+		log.Panicln(err)
+	} else {
+		return files
 	}
+	return files
 }
 
 //CloseDb .
