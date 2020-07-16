@@ -9,20 +9,27 @@ import (
 var wailsRuntime *wails.Runtime
 
 func getLocalFiles(Skip int, Take int) surge.SearchQueryResult {
+
+	trackedFiles := surge.GetTrackedFiles()
+
+	for i := 0; i < len(trackedFiles); i++ {
+		trackedFiles[i].ChunkMap = nil
+	}
+
 	left := Skip
 	right := Skip + Take
 
-	if left > len(surge.LocalFiles) {
-		left = len(surge.LocalFiles)
+	if left > len(trackedFiles) {
+		left = len(trackedFiles)
 	}
 
-	if right > len(surge.LocalFiles) {
-		right = len(surge.LocalFiles)
+	if right > len(trackedFiles) {
+		right = len(trackedFiles)
 	}
 
 	return surge.SearchQueryResult{
-		Result: surge.LocalFiles[left:right],
-		Count:  len(surge.LocalFiles),
+		Result: trackedFiles[left:right],
+		Count:  len(trackedFiles),
 	}
 }
 
@@ -57,6 +64,7 @@ func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 }
 
 func main() {
+
 	stats := &Stats{}
 	surge.InitializeDb()
 	defer surge.CloseDb()

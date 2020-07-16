@@ -275,8 +275,17 @@ func processQueryResponse(Session *Session, Data []byte) {
 		}
 
 		fileSize, _ := strconv.ParseInt(data[3], 10, 64)
+		numChunks := int((fileSize-1)/int64(ChunkSize)) + 1
 
-		newListing := File{data[2], fileSize, data[4], Session.session.RemoteAddr().String(), "", -1, nil}
+		newListing := File{
+			FileName:  data[2],
+			FileSize:  fileSize,
+			FileHash:  data[4],
+			Seeder:    Session.session.RemoteAddr().String(),
+			Path:      "",
+			NumChunks: numChunks,
+			ChunkMap:  nil,
+		}
 		ListedFiles = append(ListedFiles, newListing)
 
 		//Test gui
@@ -421,12 +430,13 @@ func SeedFile(Path string) {
 
 	//Append to local files
 	localFile := File{
-		FileName:  fileName,
-		FileSize:  fileSize,
-		FileHash:  hashString,
-		Path:      Path,
-		NumChunks: numChunks,
-		ChunkMap:  chunkMap,
+		FileName:    fileName,
+		FileSize:    fileSize,
+		FileHash:    hashString,
+		Path:        Path,
+		NumChunks:   numChunks,
+		ChunkMap:    chunkMap,
+		IsUploading: true,
 	}
 	//When seeding enter file into db
 	dbInsertFile(localFile)

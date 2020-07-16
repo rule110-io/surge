@@ -83,13 +83,16 @@ var chunksReceived int
 
 // File holds all file listing info of a seeded file
 type File struct {
-	FileName  string
-	FileSize  int64
-	FileHash  string
-	Seeder    string
-	Path      string
-	NumChunks int
-	ChunkMap  []byte
+	FileName      string
+	FileSize      int64
+	FileHash      string
+	Seeder        string
+	Path          string
+	NumChunks     int
+	IsDownloading bool
+	IsUploading   bool
+	IsPaused      bool
+	ChunkMap      []byte
 }
 
 // Session is a wrapper for everything needed to maintain a surge session
@@ -239,6 +242,13 @@ func updateGUI() {
 			if session.FileSize == session.Downloaded {
 				pushNotification("Download Finished", getListedFileByHash(session.FileHash).FileName)
 				session.session.Close()
+
+				fileEntry, err := dbGetFile(session.FileHash)
+				if err != nil {
+					log.Panicln(err)
+				}
+				fileEntry.IsDownloading = false
+				dbInsertFile(*fileEntry)
 			}
 		}
 
@@ -381,6 +391,7 @@ func DownloadFile(Hash string) {
 		file.Path = path
 		file.NumChunks = numChunks
 		file.ChunkMap = bitmap.NewSlice(numChunks)
+		file.IsDownloading = true
 		dbInsertFile(*file)
 	}
 
@@ -439,4 +450,9 @@ func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
 		Result: results[left:right],
 		Count:  len(results),
 	}
+}
+
+//GetTrackedFiles returns all files tracked in surge client
+func GetTrackedFiles() []File {
+	return dbGetAllFiles()
 }
