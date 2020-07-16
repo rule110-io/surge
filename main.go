@@ -50,6 +50,14 @@ func downloadFile(Hash string) {
 	go surge.DownloadFile(Hash)
 }
 
+func openFile(Hash string) {
+	surge.OpenFileByHash(Hash)
+}
+
+func openFolder(Hash string) {
+	surge.OpenFolderByHash(Hash)
+}
+
 // Stats .
 type Stats struct {
 	log *wails.CustomLogger
@@ -86,6 +94,8 @@ func main() {
 	app.Bind(downloadFile)
 	app.Bind(fetchRemoteFiles)
 	app.Bind(scanLocalFiles)
+	app.Bind(openFile)
+	app.Bind(openFolder)
 
 	app.Run()
 

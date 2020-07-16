@@ -18,6 +18,8 @@ import (
 	nkn "github.com/nknorg/nkn-sdk-go"
 	pb "github.com/rule110-io/surge-ui/payloads"
 	"google.golang.org/protobuf/proto"
+
+	open "github.com/skratchdot/open-golang/open"
 )
 
 //TestTopic only for testing
@@ -28,6 +30,29 @@ const surgeQueryRequestID byte = 0x002
 const surgeQueryResponseID byte = 0x003
 
 var queryPayload = ""
+
+//OpenOSPath Open a file, directory, or URI using the OS's default application for that object type. Don't wait for the open command to complete.
+func OpenOSPath(Path string) {
+	open.Start(Path)
+}
+
+//OpenFileByHash opens a file with OS default application for object type
+func OpenFileByHash(Hash string) {
+	fileInfo, err := dbGetFile(Hash)
+	if err != nil {
+		log.Panicln(err)
+	}
+	OpenOSPath(fileInfo.Path)
+}
+
+//OpenFolderByHash opens the folder containing the file by hash in os
+func OpenFolderByHash(Hash string) {
+	fileInfo, err := dbGetFile(Hash)
+	if err != nil {
+		log.Panicln(err)
+	}
+	OpenOSPath(filepath.Dir(fileInfo.Path))
+}
 
 // RequestChunk sends a request to an address for a specific chunk of a specific file
 func RequestChunk(Session *Session, FileID string, ChunkID int32) {
