@@ -8,12 +8,26 @@ import (
 
 var wailsRuntime *wails.Runtime
 
-func getLocalFiles() []surge.File {
-	return surge.LocalFiles
+func getLocalFiles(Skip int, Take int) surge.SearchQueryResult {
+	left := Skip
+	right := Skip + Take
+
+	if left > len(surge.LocalFiles) {
+		left = len(surge.LocalFiles)
+	}
+
+	if right > len(surge.LocalFiles) {
+		right = len(surge.LocalFiles)
+	}
+
+	return surge.SearchQueryResult{
+		Result: surge.LocalFiles[left:right],
+		Count:  len(surge.LocalFiles),
+	}
 }
 
-func getRemoteFiles() []surge.File {
-	return surge.ListedFiles
+func getRemoteFiles(Query string, Skip int, Take int) surge.SearchQueryResult {
+	return surge.SearchFile(Query, Skip, Take)
 }
 
 func fetchRemoteFiles() {
@@ -27,10 +41,6 @@ func scanLocalFiles() {
 
 func downloadFile(Hash string) {
 	go surge.DownloadFile(Hash)
-}
-
-func searchFile(Query string, Skip int, Take int) surge.SearchQueryResult {
-	return surge.SearchFile(Query, Skip, Take)
 }
 
 // Stats .
@@ -68,7 +78,6 @@ func main() {
 	app.Bind(downloadFile)
 	app.Bind(fetchRemoteFiles)
 	app.Bind(scanLocalFiles)
-	app.Bind(searchFile)
 
 	app.Run()
 
