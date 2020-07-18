@@ -49,16 +49,17 @@ func dbGetFile(Key string) (*File, error) {
 	if err := db.View(
 		func(tx *nutsdb.Tx) error {
 			fileKey := []byte(Key)
-
-			if e, err := tx.Get(fileBucketName, fileKey); err != nil {
-				return err
-			} else {
-				json.Unmarshal(e.Value, result)
+			e, err := tx.Get(fileBucketName, fileKey)
+			if err != nil {
 				return err
 			}
+
+			err = json.Unmarshal(e.Value, result)
+			return err
 		}); err != nil {
 		return nil, err
 	}
+
 	return result, nil
 }
 
@@ -82,7 +83,7 @@ func dbGetAllFiles() []File {
 
 			return nil
 		}); err != nil {
-		log.Panicln(err)
+		log.Println(err)
 	} else {
 		return files
 	}

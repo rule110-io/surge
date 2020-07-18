@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	bitmap "github.com/boljen/go-bitmap"
@@ -321,8 +322,11 @@ func processQueryResponse(Session *Session, Data []byte) {
 	}
 }
 
+var bitMapWriteLock = &sync.Mutex{}
+
 //WriteChunk writes a chunk to disk
 func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
+	bitMapWriteLock.Lock()
 
 	fileInfo, err := dbGetFile(FileID)
 	var path = "./" + remotePath + "/" + fileInfo.FileName
@@ -353,7 +357,7 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	dbInsertFile(*fileInfo)
 
 	workerCount--
-	chunksReceived++
+	bitMapWriteLock.Unlock()
 }
 
 //TopicEncode .
@@ -453,6 +457,14 @@ func SeedFile(Path string) {
 		bitmap.Set(chunkMap, i, true)
 	}
 
+	/*log.Println(chunkMap)
+	log.Println("Bits")
+	for i := 0; i < len(chunkMap)*8; i++ {
+		log.Print(bitmap.Get(chunkMap, i))
+	}
+	log.Println("Bits")
+	log.Println(hex.EncodeToString(chunkMap))*/
+
 	//Append to local files
 	localFile := File{
 		FileName:    fileName,
@@ -471,4 +483,108 @@ func SeedFile(Path string) {
 	payload := surgeGenerateTopicPayload(fileName, fileSize, hashString)
 
 	queryPayload += payload
+}
+
+func restartDownload(Hash string) {
+	file, err := dbGetFile(Hash)
+	if err != nil {
+		log.Panicln(err)
+	}
+
+	//If its not downloading we do not have to do anything
+	//if !file.IsDownloading {
+	//	return
+	//}
+
+	//TODO: Seed discovery?
+
+	//Early out if we have no seeder
+	if len(file.Seeder) == 0 {
+		return
+	}
+
+	//Get missing chunk indices
+	var missingChunks []int32
+	for i := 0; i < file.NumChunks; i++ {
+		if bitmap.Get(file.ChunkMap, i) == false {
+			missingChunks = append(missingChunks, int32(i))
+		}
+	}
+
+	//Nothing more to download
+	if len(missingChunks) == 0 {
+		//TODO: set flag so we dont keep doing this?
+		return
+	}
+
+	log.Println("Restarting Download Creation Session for", file.FileName)
+
+	//Create a session
+	surgeSession, err := createSession(file)
+	if err != nil {
+		log.Println("Restarting Download Failed for", file.FileName)
+		return
+	}
+
+	//Prime the session with known bytes downloaded
+	surgeSession.Downloaded = int64(file.NumChunks-len(missingChunks)) * ChunkSize
+
+	go initiateSession(surgeSession)
+
+	log.Println("Restarting Download for", file.FileName)
+	log.Println("Total Chunks", file.NumChunks)
+	log.Println("Remaining Chunks", len(missingChunks))
+
+	//Download missing chunks
+	for i := 0; i < len(missingChunks); i++ {
+		workerCount++
+		go RequestChunk(surgeSession, file.FileHash, missingChunks[i])
+
+		for workerCount >= NumWorkers {
+			time.Sleep(time.Millisecond)
+		}
+	}
+}
+
+func createSession(File *File) (*Session, error) {
+	//Check if nkn session exists with address
+	var downloadSession *Session
+	/*for i := 0; i < len(Sessions); i++ {
+		if Sessions[i].session.RemoteAddr().String() == File.Seeder {
+			downloadSession = Sessions[i]
+			break
+		}
+	}*/
+
+	//There is no nkn session with this client yet, create a new session
+	if downloadSession == nil {
+		sessionConfing := nkn.GetDefaultSessionConfig()
+		sessionConfing.MTU = 16384
+		dialConfig := &nkn.DialConfig{
+			SessionConfig: sessionConfing,
+			DialTimeout:   60000,
+		}
+
+		downloadSession, err := client.DialWithConfig(File.Seeder, dialConfig)
+		if err != nil {
+			log.Println("Download Session timout for", File.FileName)
+			return nil, err
+		}
+		downloadReader := bufio.NewReader(downloadSession)
+
+		return &Session{
+			reader:   downloadReader,
+			session:  downloadSession,
+			FileSize: File.FileSize,
+			FileHash: File.FileHash,
+		}, nil
+	}
+
+	//nkn session already exists create a new file session and include existing nkn session
+	return &Session{
+		reader:   downloadSession.reader,
+		session:  downloadSession.session,
+		FileSize: File.FileSize,
+		FileHash: File.FileHash,
+	}, nil
 }

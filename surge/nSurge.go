@@ -29,37 +29,38 @@ const NumWorkers = 16
 const localPath = "local"
 const remotePath = "remote"
 
+//OS folder permission bitflags
 const (
-	OS_READ        = 04
-	OS_WRITE       = 02
-	OS_EX          = 01
-	OS_USER_SHIFT  = 6
-	OS_GROUP_SHIFT = 3
-	OS_OTH_SHIFT   = 0
+	osRead       = 04
+	osWrite      = 02
+	osEx         = 01
+	osUserShift  = 6
+	osGroupShift = 3
+	osOthShift   = 0
 
-	OS_USER_R   = OS_READ << OS_USER_SHIFT
-	OS_USER_W   = OS_WRITE << OS_USER_SHIFT
-	OS_USER_X   = OS_EX << OS_USER_SHIFT
-	OS_USER_RW  = OS_USER_R | OS_USER_W
-	OS_USER_RWX = OS_USER_RW | OS_USER_X
+	osUserR   = osRead << osUserShift
+	osUserW   = osWrite << osUserShift
+	osUserX   = osEx << osUserShift
+	osUserRw  = osUserR | osUserW
+	osUserRwx = osUserRw | osUserX
 
-	OS_GROUP_R   = OS_READ << OS_GROUP_SHIFT
-	OS_GROUP_W   = OS_WRITE << OS_GROUP_SHIFT
-	OS_GROUP_X   = OS_EX << OS_GROUP_SHIFT
-	OS_GROUP_RW  = OS_GROUP_R | OS_GROUP_W
-	OS_GROUP_RWX = OS_GROUP_RW | OS_GROUP_X
+	osGroupR   = osRead << osGroupShift
+	osGroupW   = osWrite << osGroupShift
+	osGroupX   = osEx << osGroupShift
+	osGroupRw  = osGroupR | osGroupW
+	osGroupRwx = osGroupRw | osGroupX
 
-	OS_OTH_R   = OS_READ << OS_OTH_SHIFT
-	OS_OTH_W   = OS_WRITE << OS_OTH_SHIFT
-	OS_OTH_X   = OS_EX << OS_OTH_SHIFT
-	OS_OTH_RW  = OS_OTH_R | OS_OTH_W
-	OS_OTH_RWX = OS_OTH_RW | OS_OTH_X
+	osOthR   = osRead << osOthShift
+	osOthW   = osWrite << osOthShift
+	osOthX   = osEx << osOthShift
+	osOthRw  = osOthR | osOthW
+	osOthRwx = osOthRw | osOthX
 
-	OS_ALL_R   = OS_USER_R | OS_GROUP_R | OS_OTH_R
-	OS_ALL_W   = OS_USER_W | OS_GROUP_W | OS_OTH_W
-	OS_ALL_X   = OS_USER_X | OS_GROUP_X | OS_OTH_X
-	OS_ALL_RW  = OS_ALL_R | OS_ALL_W
-	OS_ALL_RWX = OS_ALL_RW | OS_GROUP_X
+	osAllR   = osUserR | osGroupR | osOthR
+	osAllW   = osUserW | osGroupW | osOthW
+	osAllX   = osUserX | osGroupX | osOthX
+	osAllRw  = osAllR | osAllW
+	osAllRwx = osAllRw | osGroupX
 )
 
 var localFileName string
@@ -76,10 +77,6 @@ var Sessions []*Session
 //var testReader *bufio.Reader
 
 var workerCount = 0
-
-var chunksTotal int
-var chunksRequested int
-var chunksReceived int
 
 // File holds all file listing info of a seeded file
 type File struct {
@@ -127,15 +124,15 @@ var wailsRuntime *wails.Runtime
 // Start initializes surge
 func Start(runtime *wails.Runtime) {
 	wailsRuntime = runtime
-	var dir_file_mode os.FileMode
-	dir_file_mode = os.ModeDir | (OS_USER_RWX | OS_ALL_R)
+	var dirFileMode os.FileMode
+	dirFileMode = os.ModeDir | (osUserRwx | osAllR)
 
 	//Ensure local and remote folders exist
 	if _, err := os.Stat(localPath); os.IsNotExist(err) {
-		os.Mkdir(localPath, dir_file_mode)
+		os.Mkdir(localPath, dirFileMode)
 	}
 	if _, err := os.Stat(remotePath); os.IsNotExist(err) {
-		os.Mkdir(remotePath, dir_file_mode)
+		os.Mkdir(remotePath, dirFileMode)
 	}
 
 	account := InitializeAccount()
@@ -155,45 +152,16 @@ func Start(runtime *wails.Runtime) {
 		go Listen()
 	}
 
-	/*app := app.New()
-	window = app.NewWindow("nSurge")
-	window.Resize(fyne.NewSize(800, -1))
-
-	accountLabel = widget.NewEntry()
-	accountLabel.SetText(client.Address())
-	accountLabel.SetReadOnly(true)
-
-	testLabel = widget.NewLabel("- idle - ")
-	progressBar = widget.NewProgressBar()
-
-	fileBox = widget.NewVBox()
-	fileScroller := widget.NewScrollContainer(fileBox)
-	fileScroller.SetMinSize(fyne.NewSize(-1, 300))
-
-	contentBox = widget.NewVBox(
-		widget.NewLabel("Your address"),
-		accountLabel,
-		testLabel,
-		progressBar,
-		widget.NewButton("Fetch Remote Files", func() {
-			topicEncoded := surgeTopicEncode(testTopic)
-			getSubscriptions(topicEncoded)
-		}),
-		widget.NewLabel("- Remote Files -"),
-		fileScroller,
-		widget.NewButton("Quit", func() {
-			app.Quit()
-		}),
-	)
-
-	window.SetContent(contentBox)
-	*/
 	go ScanLocal()
 	topicEncoded := TopicEncode(TestTopic)
 	GetSubscriptions(topicEncoded)
 
+	tracked := GetTrackedFiles()
+	for i := 0; i < len(tracked); i++ {
+		go restartDownload(tracked[i].FileHash)
+	}
+
 	go updateGUI()
-	//window.ShowAndRun()
 }
 
 func updateGUI() {
@@ -239,7 +207,15 @@ func updateGUI() {
 			wailsRuntime.Events.Emit("downloadStatusEvent", statusEvent)
 
 			//Download completed
-			if session.FileSize == session.Downloaded {
+			/*var completed = true
+			for i := 0; i < fileInfo.NumChunks; i++ {
+				if bitmap.Get(fileInfo.ChunkMap, i) == false {
+					completed = false
+					break
+				}
+			}*/
+
+			if session.Downloaded == session.FileSize {
 				pushNotification("Download Finished", getListedFileByHash(session.FileHash).FileName)
 				session.session.Close()
 
@@ -251,17 +227,6 @@ func updateGUI() {
 				dbInsertFile(*fileEntry)
 			}
 		}
-
-		/*runtime.Events.Emit("notificationEvent", "Backend Init", "just a test")
-		if chunksTotal > 0 && chunksReceived < chunksTotal {
-			remainingChunks := chunksTotal - chunksReceived
-			activeWorkers := chunksRequested - chunksReceived
-			testLabel.SetText("Remaining chunks: " + strconv.Itoa(remainingChunks) + " Active Workers: " + strconv.Itoa(activeWorkers))
-			progressBar.SetValue(float64(chunksReceived) / float64(chunksTotal))
-		} else {
-			testLabel.SetText("- idle -")
-			progressBar.SetValue(0)
-		}*/
 	}
 }
 
@@ -355,30 +320,15 @@ func DownloadFile(Hash string) {
 	}
 
 	// Create a sessions
-	var err error
-
-	sessionConfing := nkn.GetDefaultSessionConfig()
-	sessionConfing.MTU = 16384
-	dialConfig := &nkn.DialConfig{
-		SessionConfig: sessionConfing,
-	}
-
-	downloadSession, err := client.DialWithConfig(file.Seeder, dialConfig)
+	surgeSession, err := createSession(file)
 	if err != nil {
-		log.Fatal(err)
+		log.Println("Could not create session for download", Hash)
+		pushNotification("Download Session Failed", file.FileName)
+		return
 	}
-	downloadReader := bufio.NewReader(downloadSession)
-
-	surgeSession := &Session{
-		reader:   downloadReader,
-		session:  downloadSession,
-		FileSize: file.FileSize,
-		FileHash: file.FileHash,
-	}
+	go initiateSession(surgeSession)
 
 	pushNotification("Download Started", file.FileName)
-
-	go initiateSession(surgeSession)
 
 	// If the file doesn't exist allocate it
 	var path = remotePath + "/" + file.FileName
@@ -386,7 +336,8 @@ func DownloadFile(Hash string) {
 	numChunks := int((file.FileSize-1)/int64(ChunkSize)) + 1
 
 	//When downloading from remote enter file into db
-	_, err = dbGetFile(Hash)
+	dbFile, err := dbGetFile(Hash)
+	log.Println(dbFile)
 	if err != nil {
 		file.Path = path
 		file.NumChunks = numChunks
@@ -395,15 +346,9 @@ func DownloadFile(Hash string) {
 		dbInsertFile(*file)
 	}
 
-	chunksRequested = 0
-	chunksReceived = 0
-	//Try send request to self
-	chunksTotal = int(numChunks)
-
 	downloadJob := func() {
 		for i := 0; i < numChunks; i++ {
 			workerCount++
-			chunksRequested++
 			go RequestChunk(surgeSession, file.FileHash, int32(i))
 
 			for workerCount >= NumWorkers {
