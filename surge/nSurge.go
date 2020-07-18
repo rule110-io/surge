@@ -116,9 +116,6 @@ type DownloadStatusEvent struct {
 //ListedFiles are remote files that can be downloaded
 var ListedFiles []File
 
-//LocalFiles are files that can be seeded
-var LocalFiles []File
-
 var wailsRuntime *wails.Runtime
 
 // Start initializes surge
@@ -284,7 +281,7 @@ func GetSubscriptions(Topic string) {
 		}
 	}
 
-	fmt.Println(ListedFiles)
+	log.Println(ListedFiles)
 
 }
 

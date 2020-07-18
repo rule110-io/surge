@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	b64 "encoding/base64"
 	"encoding/hex"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -80,7 +79,6 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 		log.Fatal(err)
 	}
 
-	//fileLocalMutex.Lock()
 	file, err := os.Open(fileInfo.Path)
 
 	if err != nil {
@@ -92,7 +90,6 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	chunkOffset := int64(ChunkID) * ChunkSize
 	buffer := make([]byte, ChunkSize)
 	bytesread, err := file.ReadAt(buffer, chunkOffset)
-	//fileLocalMutex.Unlock()
 
 	if err != nil {
 		if err != io.EOF {
@@ -117,7 +114,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 		log.Fatal(err)
 		return
 	}
-	fmt.Println("Chunk transmitted: ", bytesread, " bytes")
+	log.Println("Chunk transmitted: ", bytesread, " bytes")
 	Session.Uploaded += int64(bytesread)
 }
 
@@ -226,8 +223,6 @@ func initiateSession(Session *Session) {
 			log.Fatal(err)
 		}
 
-		log.Println(Session)
-
 		switch chunkType {
 		case surgeChunkID:
 			processChunk(Session, data)
@@ -281,7 +276,7 @@ func processQueryRequest(Session *Session, Data []byte) {
 	if err := proto.Unmarshal(Data, surgeQuery); err != nil {
 		log.Fatalln("Failed to parse surge message:", err)
 	}
-	log.Println(surgeQuery.Query)
+	log.Println("Query received", surgeQuery.Query)
 
 	SendQueryResponse(Session, surgeQuery.Query)
 }
@@ -289,7 +284,6 @@ func processQueryRequest(Session *Session, Data []byte) {
 func processQueryResponse(Session *Session, Data []byte) {
 	//Try to parse SurgeMessage
 	s := string(Data)
-	log.Println("Query Reponse: ", s)
 
 	//Parse the response
 	payloadSplit := strings.Split(s, "surge://")
@@ -314,6 +308,8 @@ func processQueryResponse(Session *Session, Data []byte) {
 		}
 		ListedFiles = append(ListedFiles, newListing)
 
+		log.Println("Query response new file: ", newListing.FileName, " seeder: ", newListing.Seeder)
+
 		//Test gui
 		//newButton := widget.NewButton(newListing.Filename+" | "+ByteCountSI(newListing.FileSize), func() {
 		//	downloadFile(newListing.Seeder, newListing.FileSize, newListing.Filename)
@@ -331,7 +327,6 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	var path = "./" + remotePath + "/" + fileInfo.FileName
 
 	//Open file
-	//fileRemoteMutex.Lock()
 	file, err := os.OpenFile(path, os.O_RDWR, 0644)
 	if err != nil {
 		log.Fatal(err)
@@ -342,7 +337,6 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	chunkOffset := int64(ChunkID) * ChunkSize
 
 	bytesWritten, err := file.WriteAt(Chunk, chunkOffset)
-	//fileRemoteMutex.Unlock()
 	if err != nil {
 		log.Fatal(err)
 		return
@@ -351,15 +345,21 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	log.Println("Chunk written to disk: ", bytesWritten, " bytes")
 	Session.Downloaded += int64(bytesWritten)
 
-	//Set chunk to available in the map
-	bitMapWriteLock.Lock()
-	fileInfo, err = dbGetFile(FileID)
-	if err != nil {
-		log.Panicln(err)
+	//Update bitmap async as this has a lock in it but does not have to be waited for
+	setBitMap := func() {
+		bitMapWriteLock.Lock()
+
+		//Set chunk to available in the map
+		fileInfo, err = dbGetFile(FileID)
+		if err != nil {
+			log.Panicln(err)
+		}
+		bitmap.Set(fileInfo.ChunkMap, int(ChunkID), true)
+		dbInsertFile(*fileInfo)
+
+		bitMapWriteLock.Unlock()
 	}
-	bitmap.Set(fileInfo.ChunkMap, int(ChunkID), true)
-	dbInsertFile(*fileInfo)
-	bitMapWriteLock.Unlock()
+	go setBitMap()
 
 	workerCount--
 }
@@ -444,7 +444,7 @@ func ScanLocal() {
 
 //SeedFile generates everything needed to seed a file
 func SeedFile(Path string) {
-	fmt.Println("Seeding file", Path)
+	log.Println("Seeding file", Path)
 
 	hashString, err := HashFile(Path)
 	if err != nil {
@@ -481,7 +481,6 @@ func SeedFile(Path string) {
 	}
 	//When seeding enter file into db
 	dbInsertFile(localFile)
-	LocalFiles = append(LocalFiles, localFile)
 
 	//Add to payload
 	payload := surgeGenerateTopicPayload(fileName, fileSize, hashString)
@@ -574,6 +573,7 @@ func createSession(File *File) (*Session, error) {
 			log.Println("Download Session timout for", File.FileName)
 			return nil, err
 		}
+		log.Println("Download Session created for: ", File.FileName)
 		downloadReader := bufio.NewReader(downloadSession)
 
 		return &Session{

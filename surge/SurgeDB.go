@@ -2,7 +2,6 @@ package surge
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 
 	"github.com/xujiajun/nutsdb"
@@ -78,7 +77,7 @@ func dbGetAllFiles() []File {
 				newFile := &File{}
 				json.Unmarshal(entry.Value, newFile)
 				files = append(files, *newFile)
-				fmt.Println(string(entry.Key), newFile)
+				log.Println(string(entry.Key), newFile.FileName)
 			}
 
 			return nil
