@@ -326,7 +326,6 @@ var bitMapWriteLock = &sync.Mutex{}
 
 //WriteChunk writes a chunk to disk
 func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
-	bitMapWriteLock.Lock()
 
 	fileInfo, err := dbGetFile(FileID)
 	var path = "./" + remotePath + "/" + fileInfo.FileName
@@ -353,11 +352,16 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	Session.Downloaded += int64(bytesWritten)
 
 	//Set chunk to available in the map
+	bitMapWriteLock.Lock()
+	fileInfo, err = dbGetFile(FileID)
+	if err != nil {
+		log.Panicln(err)
+	}
 	bitmap.Set(fileInfo.ChunkMap, int(ChunkID), true)
 	dbInsertFile(*fileInfo)
+	bitMapWriteLock.Unlock()
 
 	workerCount--
-	bitMapWriteLock.Unlock()
 }
 
 //TopicEncode .
