@@ -6,6 +6,15 @@ const getDefaultState = () => {
     remoteCount: 0,
     localPages: 0,
     remotePages: 0,
+    localFilesConfig: {
+      skip: 0,
+      get: 5,
+    },
+    remoteFilesConfig: {
+      search: "",
+      skip: 0,
+      get: 5,
+    },
   };
 };
 
@@ -22,26 +31,23 @@ const mutations = {
     const { Result, Count } = payload;
     state.remoteFiles = Result;
     state.remoteCount = Count;
-    state.remotePages = Math.ceil(Count / 5); // 5 is number of displayed items
+    state.remotePages = Math.ceil(Count / state.remoteFilesConfig.get);
+  },
+  setRemoteFilesConfig(state, payload) {
+    state.remoteFilesConfig = payload;
   },
 };
 
 const actions = {
-  fetchLocalFiles({ commit }) {
-    window.backend.getLocalFiles(0, 5).then(({ Result, Count }) => {
+  fetchLocalFiles({ commit, state }) {
+    const { skip, get } = state.localFilesConfig;
+
+    window.backend.getLocalFiles(skip, get).then(({ Result, Count }) => {
       commit("setLocalFiles", { Result, Count });
     });
   },
-  fetchRemoteFiles({ commit }, payload) {
-    let search = "";
-    let skip = 0;
-    let get = 5;
-
-    if (payload) {
-      search = payload.search;
-      skip = payload.skip;
-      get = payload.get;
-    }
+  fetchRemoteFiles({ commit, state }) {
+    const { search, skip, get } = state.remoteFilesConfig;
 
     window.backend
       .getRemoteFiles(search, skip, get)

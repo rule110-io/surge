@@ -17,7 +17,12 @@
           ></feather>
         </div>
       </div>
-      <Pagination dispatcher="files/fetchRemoteFiles" />
+      <Pagination
+        dispatcher="files/fetchRemoteFiles"
+        filesConfig="remoteFilesConfig"
+        filePages="remotePages"
+        commit="files/setRemoteFilesConfig"
+      />
     </div>
     <h2 class="page__subtitle">Recent Files</h2>
     <RecentFiles :files="localFiles" />

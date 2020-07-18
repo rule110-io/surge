@@ -34,44 +34,60 @@ export default {
       default: "",
       required: true,
     },
+    filePages: {
+      type: String,
+      default: "",
+      required: true,
+    },
+    filesConfig: {
+      type: String,
+      default: "",
+      required: true,
+    },
+    commit: {
+      type: String,
+      default: "",
+      required: true,
+    },
   },
   data() {
-    return {
-      current: 1,
-      skip: 0,
-    };
+    return {};
   },
   computed: {
-    ...mapState("files", ["remotePages"]),
+    ...mapState("files", [
+      "remotePages",
+      "remoteFilesConfig",
+      "localFilesConfig",
+      "localPages",
+    ]),
     isPrev() {
-      return this.current > 1;
+      return this.config.skip > 0;
     },
     isNext() {
-      return this.current < this.remotePages;
+      return this.config.skip < this[this.filePages] - this.config.get;
+    },
+    config() {
+      return this[this.filesConfig];
     },
   },
-  watch: {
-    current(current) {
-      console.log(current);
-      const payload = {
-        search: "",
-        skip: this.skip,
-        get: 5,
-      };
-      this.$store.dispatch("files/fetchRemoteFiles", payload);
-    },
-  },
+  watch: {},
   methods: {
     decreasePage() {
-      if (this.current > 1) {
-        this.current -= 1;
-        this.skip -= 5;
+      if (this.isPrev) {
+        let newConfig = Object.assign({}, this.config);
+        newConfig.skip -= newConfig.get;
+
+        this.$store.commit(this.commit, newConfig);
+        this.$store.dispatch(this.dispatcher);
       }
     },
     increasePage() {
-      if (this.current < this.remotePages) {
-        this.current += 1;
-        this.skip += 5;
+      if (this.isNext) {
+        let newConfig = Object.assign({}, this.config);
+        newConfig.skip += newConfig.get;
+
+        this.$store.commit(this.commit, newConfig);
+        this.$store.dispatch(this.dispatcher);
       }
     },
   },

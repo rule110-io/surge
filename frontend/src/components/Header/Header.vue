@@ -68,6 +68,7 @@ export default {
   },
   computed: {
     ...mapState("notifications", ["counter", "open"]),
+    ...mapState("files", ["remoteFilesConfig"]),
   },
   created() {
     this.search = this._.debounce((search) => {
@@ -75,12 +76,12 @@ export default {
         this.$router.replace("/search");
       }
 
-      const payload = {
-        search,
-        skip: 0,
-        get: 5,
-      };
-      this.$store.dispatch("files/fetchRemoteFiles", payload);
+      let newConfig = Object.assign({}, this.remoteFilesConfig);
+      newConfig.skip = 0;
+      newConfig.search = search;
+
+      this.$store.commit("files/setRemoteFilesConfig", newConfig);
+      this.$store.dispatch("files/fetchRemoteFiles");
     }, 500);
   },
   mounted() {},
