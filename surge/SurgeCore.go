@@ -306,7 +306,22 @@ func processQueryResponse(Session *Session, Data []byte) {
 			NumChunks: numChunks,
 			ChunkMap:  nil,
 		}
-		ListedFiles = append(ListedFiles, newListing)
+
+		//Replace existing, or remove.
+		var replace = false
+		for l := 0; l < len(ListedFiles); l++ {
+			if ListedFiles[l].FileHash == newListing.FileHash {
+				//TODO check seeder, if its unique add it as an additional seeder for the file
+				//For now we overwrite
+				ListedFiles[l] = newListing
+				replace = true
+				break
+			}
+		}
+		//Unique listing so we add
+		if replace == false {
+			ListedFiles = append(ListedFiles, newListing)
+		}
 
 		log.Println("Query response new file: ", newListing.FileName, " seeder: ", newListing.Seeder)
 

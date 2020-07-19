@@ -273,9 +273,6 @@ func sendSeedSubscription(Topic string, Payload string) {
 
 //GetSubscriptions .
 func GetSubscriptions(Topic string) {
-	//Empty file cache
-	ListedFiles = []File{}
-	//fileBox.Children = []fyne.CanvasObject{}
 
 	subscribers, err := client.GetSubscribers(Topic, 0, 100, true, true)
 	if err != nil {
