@@ -14,7 +14,7 @@
             v-if="!file.IsTracked"
             class="table__action"
             type="download"
-            @click.native="download(file)"
+            @click.native="download(file.FileHash)"
           ></feather>
           <feather
             v-if="file.IsTracked"
@@ -55,10 +55,9 @@ export default {
   },
   mounted() {},
   methods: {
-    download(file) {
-      const { FileHash } = file;
-      window.backend.downloadFile(FileHash).then((result) => {
-        console.log(result);
+    download(hash) {
+      window.backend.downloadFile(hash).then(() => {
+        this.$store.dispatch("files/fetchLocalFiles");
       });
     },
   },
