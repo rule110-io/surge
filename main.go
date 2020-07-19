@@ -37,8 +37,8 @@ func getRemoteFiles(Query string, Skip int, Take int) surge.SearchQueryResult {
 	return surge.SearchFile(Query, Skip, Take)
 }
 
-func getFileChunkMap(Hash string) {
-	surge.GetFileChunkMapHex(Hash)
+func getFileChunkMap(Hash string) string {
+	return surge.GetFileChunkMapHex(Hash)
 }
 
 func downloadFile(Hash string) {
