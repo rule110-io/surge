@@ -45,6 +45,10 @@ func downloadFile(Hash string) {
 	go surge.DownloadFile(Hash)
 }
 
+func setDownloadPause(Hash string, State bool) {
+	surge.SetFilePause(Hash, State)
+}
+
 func openFile(Hash string) {
 	surge.OpenFileByHash(Hash)
 }

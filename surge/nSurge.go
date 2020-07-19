@@ -374,6 +374,17 @@ func DownloadFile(Hash string) {
 
 	downloadJob := func() {
 		for i := 0; i < numChunks; i++ {
+
+			//Pause if file is paused
+			dbFile, err := dbGetFile(file.FileHash)
+			for err == nil && dbFile.IsPaused {
+				time.Sleep(time.Second * 5)
+				dbFile, err = dbGetFile(file.FileHash)
+				if err != nil {
+					break
+				}
+			}
+
 			workerCount++
 			go RequestChunk(surgeSession, file.FileHash, int32(i))
 
@@ -464,4 +475,23 @@ func GetFileChunkMapHex(Hash string) string {
 		return ""
 	}
 	return hex.EncodeToString(file.ChunkMap)
+}
+
+//SetFilePause sets a file IsPaused state for by file hash
+func SetFilePause(Hash string, State bool) {
+	fileWriteLock.Lock()
+	file, err := dbGetFile(Hash)
+	if err != nil {
+		pushNotification("Failed To Pause", "Could not find the file to pause.")
+		return
+	}
+	file.IsPaused = State
+	dbInsertFile(*file)
+	fileWriteLock.Unlock()
+
+	msg := "Paused"
+	if State == false {
+		msg = "Resumed"
+	}
+	pushNotification("Download "+msg, file.FileName)
 }

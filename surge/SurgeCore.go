@@ -334,7 +334,7 @@ func processQueryResponse(Session *Session, Data []byte) {
 	}
 }
 
-var bitMapWriteLock = &sync.Mutex{}
+var fileWriteLock = &sync.Mutex{}
 
 //WriteChunk writes a chunk to disk
 func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
@@ -363,7 +363,7 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 
 	//Update bitmap async as this has a lock in it but does not have to be waited for
 	setBitMap := func() {
-		bitMapWriteLock.Lock()
+		fileWriteLock.Lock()
 
 		//Set chunk to available in the map
 		fileInfo, err = dbGetFile(FileID)
@@ -373,7 +373,7 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 		bitmap.Set(fileInfo.ChunkMap, int(ChunkID), true)
 		dbInsertFile(*fileInfo)
 
-		bitMapWriteLock.Unlock()
+		fileWriteLock.Unlock()
 	}
 	go setBitMap()
 
@@ -495,12 +495,15 @@ func SeedFile(Path string) {
 		ChunkMap:    chunkMap,
 		IsUploading: true,
 	}
-	//When seeding enter file into db
-	dbInsertFile(localFile)
 
+	//Check if file is already seeded
+	_, err = dbGetFile(localFile.FileHash)
+	if err != nil {
+		//When seeding a new file enter file into db
+		dbInsertFile(localFile)
+	}
 	//Add to payload
 	payload := surgeGenerateTopicPayload(fileName, fileSize, hashString)
-
 	queryPayload += payload
 }
 
@@ -514,6 +517,10 @@ func restartDownload(Hash string) {
 	//if !file.IsDownloading {
 	//	return
 	//}
+
+	if file.IsPaused == true {
+		return
+	}
 
 	//TODO: Seed discovery?
 
@@ -556,6 +563,16 @@ func restartDownload(Hash string) {
 
 	//Download missing chunks
 	for i := 0; i < len(missingChunks); i++ {
+		//Pause if file is paused
+		dbFile, err := dbGetFile(file.FileHash)
+		for err == nil && dbFile.IsPaused {
+			time.Sleep(time.Second * 5)
+			dbFile, err = dbGetFile(file.FileHash)
+			if err != nil {
+				break
+			}
+		}
+
 		workerCount++
 		go RequestChunk(surgeSession, file.FileHash, missingChunks[i])
 
