@@ -60,7 +60,7 @@ body {
   padding-right: $padding-big;
   height: calc(100% - 80px);
   overflow-y: scroll;
-  padding-top: $padding-big;
+  padding-top: calc(#{$padding-big} - #{$padding-default});
 
   &__title {
     font-weight: 700;
@@ -115,6 +115,11 @@ body {
     color: $grey;
     transition: $transition-1;
     cursor: pointer;
+
+    &_active {
+      color: $primary;
+      cursor: default;
+    }
 
     &:hover {
       color: $primary;

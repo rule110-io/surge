@@ -25,7 +25,7 @@ const mutations = {
     const { Result, Count } = payload;
     state.localFiles = Result;
     state.localCount = Count;
-    state.localPages = Math.ceil(Count / 5); // 5 is number of displayed items
+    state.localPages = Math.ceil(Count / state.localFilesConfig.get);
   },
   setRemoteFiles(state, payload) {
     const { Result, Count } = payload;
@@ -36,6 +36,9 @@ const mutations = {
   setRemoteFilesConfig(state, payload) {
     state.remoteFilesConfig = payload;
   },
+  setLocalFilesConfig(state, payload) {
+    state.localFilesConfig = payload;
+  },
 };
 
 const actions = {
@@ -43,6 +46,8 @@ const actions = {
     const { skip, get } = state.localFilesConfig;
 
     window.backend.getLocalFiles(skip, get).then(({ Result, Count }) => {
+      console.log(Result);
+
       commit("setLocalFiles", { Result, Count });
     });
   },

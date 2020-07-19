@@ -38,7 +38,8 @@ export default {
   },
   methods: {
     openFile(file) {
-      console.log(file);
+      const { FileHash } = file;
+      window.backend.openFolder(FileHash).then(() => {});
     },
     getRandomColor() {
       const colors = this.colors;

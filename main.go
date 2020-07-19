@@ -91,6 +91,7 @@ func main() {
 	app.Bind(getLocalFiles)
 	app.Bind(getRemoteFiles)
 	app.Bind(downloadFile)
+	app.Bind(setDownloadPause)
 	app.Bind(openFile)
 	app.Bind(openFolder)
 	app.Bind(getFileChunkMap)

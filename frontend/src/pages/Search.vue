@@ -11,9 +11,15 @@
         <div class="table__cell">{{ file.Seeder }}</div>
         <div class="table__cell">
           <feather
+            v-if="!file.IsTracked"
             class="table__action"
             type="download"
             @click.native="download(file)"
+          ></feather>
+          <feather
+            v-if="file.IsTracked"
+            class="table__action table__action_active"
+            type="check-circle"
           ></feather>
         </div>
       </div>

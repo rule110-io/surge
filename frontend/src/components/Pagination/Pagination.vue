@@ -64,7 +64,10 @@ export default {
       return this.config.skip > 0;
     },
     isNext() {
-      return this.config.skip < this[this.filePages] - this.config.get;
+      return (
+        this.config.skip <
+        this[this.filePages] * this.config.get - this.config.get
+      );
     },
     config() {
       return this[this.filesConfig];

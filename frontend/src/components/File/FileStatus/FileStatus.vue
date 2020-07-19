@@ -43,7 +43,9 @@ export default {
       }
     },
   },
-  mounted() {},
+  mounted() {
+    this.progress = this.file.IsUploading && !this.file.IsDownloading ? 100 : 0;
+  },
   methods: {},
 };
 </script>
