@@ -71,6 +71,9 @@ var startTime = time.Now()
 
 var client *nkn.MultiClient
 
+var remoteSurgeClientsTotal = 0
+var remoteSurgeClientsOnline = 0
+
 //Sessions .
 var Sessions []*Session
 
@@ -162,7 +165,7 @@ func Start(runtime *wails.Runtime) {
 
 	go ScanLocal()
 	topicEncoded := TopicEncode(TestTopic)
-	GetSubscriptions(topicEncoded)
+	go GetSubscriptions(topicEncoded)
 
 	tracked := GetTrackedFiles()
 	for i := 0; i < len(tracked); i++ {
@@ -170,6 +173,16 @@ func Start(runtime *wails.Runtime) {
 	}
 
 	go updateGUI()
+
+	go rescanPeers()
+}
+
+func rescanPeers() {
+	for true {
+		time.Sleep(time.Minute)
+		topicEncoded := TopicEncode(TestTopic)
+		go GetSubscriptions(topicEncoded)
+	}
 }
 
 func updateGUI() {
@@ -283,14 +296,14 @@ func GetSubscriptions(Topic string) {
 		subscribers.Subscribers.Map[k] = v
 	}
 
+	remoteSurgeClientsTotal = 0
+	remoteSurgeClientsOnline = 0
 	for k, v := range subscribers.Subscribers.Map {
 		if len(v) > 0 {
 			SendQueryRequest(k, "Testing query functionality.")
+			incrementRemoteClientsTotal()
 		}
 	}
-
-	log.Println(ListedFiles)
-
 }
 
 // Stats .
@@ -434,4 +447,14 @@ func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
 //GetTrackedFiles returns all files tracked in surge client
 func GetTrackedFiles() []File {
 	return dbGetAllFiles()
+}
+
+func incrementRemoteClientsTotal() {
+	remoteSurgeClientsTotal++
+	wailsRuntime.Events.Emit("remoteClientsUpdate", remoteSurgeClientsTotal, remoteSurgeClientsOnline)
+}
+
+func incrementRemoteClientsOnline() {
+	remoteSurgeClientsOnline++
+	wailsRuntime.Events.Emit("remoteClientsUpdate", remoteSurgeClientsTotal, remoteSurgeClientsOnline)
 }
