@@ -284,7 +284,7 @@ func processQueryRequest(Session *Session, Data []byte) {
 func processQueryResponse(Session *Session, Data []byte) {
 	//Try to parse SurgeMessage
 	s := string(Data)
-	incrementRemoteClientsOnline()
+	clientOnlineMap[Session.session.RemoteAddr().String()] = true
 
 	//Parse the response
 	payloadSplit := strings.Split(s, "surge://")

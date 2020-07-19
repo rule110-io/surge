@@ -2,6 +2,7 @@ package surge
 
 import (
 	"bufio"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"net"
@@ -71,8 +72,7 @@ var startTime = time.Now()
 
 var client *nkn.MultiClient
 
-var remoteSurgeClientsTotal = 0
-var remoteSurgeClientsOnline = 0
+var clientOnlineMap map[string]bool
 
 //Sessions .
 var Sessions []*Session
@@ -161,24 +161,34 @@ func Start(runtime *wails.Runtime) {
 		client.Listen(nil)
 		SurgeActive = true
 		go Listen()
+
+		clientOnlineMap = make(map[string]bool)
+
+		go ScanLocal()
+		topicEncoded := TopicEncode(TestTopic)
+		go GetSubscriptions(topicEncoded)
+
+		tracked := GetTrackedFiles()
+		for i := 0; i < len(tracked); i++ {
+			go restartDownload(tracked[i].FileHash)
+		}
+
+		go updateGUI()
+
+		go rescanPeers()
 	}
-
-	go ScanLocal()
-	topicEncoded := TopicEncode(TestTopic)
-	go GetSubscriptions(topicEncoded)
-
-	tracked := GetTrackedFiles()
-	for i := 0; i < len(tracked); i++ {
-		go restartDownload(tracked[i].FileHash)
-	}
-
-	go updateGUI()
-
-	go rescanPeers()
 }
 
 func rescanPeers() {
 	for true {
+		var numOnline = 0
+		//Count num online clients
+		for _, value := range clientOnlineMap {
+			if value == true {
+				numOnline++
+			}
+		}
+		wailsRuntime.Events.Emit("remoteClientsUpdate", len(clientOnlineMap), numOnline)
 		time.Sleep(time.Minute)
 		topicEncoded := TopicEncode(TestTopic)
 		go GetSubscriptions(topicEncoded)
@@ -296,12 +306,10 @@ func GetSubscriptions(Topic string) {
 		subscribers.Subscribers.Map[k] = v
 	}
 
-	remoteSurgeClientsTotal = 0
-	remoteSurgeClientsOnline = 0
 	for k, v := range subscribers.Subscribers.Map {
 		if len(v) > 0 {
 			SendQueryRequest(k, "Testing query functionality.")
-			incrementRemoteClientsTotal()
+			clientOnlineMap[k] = false
 		}
 	}
 }
@@ -449,12 +457,11 @@ func GetTrackedFiles() []File {
 	return dbGetAllFiles()
 }
 
-func incrementRemoteClientsTotal() {
-	remoteSurgeClientsTotal++
-	wailsRuntime.Events.Emit("remoteClientsUpdate", remoteSurgeClientsTotal, remoteSurgeClientsOnline)
-}
-
-func incrementRemoteClientsOnline() {
-	remoteSurgeClientsOnline++
-	wailsRuntime.Events.Emit("remoteClientsUpdate", remoteSurgeClientsTotal, remoteSurgeClientsOnline)
+//GetFileChunkMapHex returns the chunkmap in hex for a file given by hash
+func GetFileChunkMapHex(Hash string) string {
+	file, err := dbGetFile(Hash)
+	if err != nil {
+		return ""
+	}
+	return hex.EncodeToString(file.ChunkMap)
 }
