@@ -8,7 +8,7 @@ import (
 
 var wailsRuntime *wails.Runtime
 
-func getLocalFiles(Skip int, Take int) surge.SearchQueryResult {
+func getLocalFiles(Skip int, Take int) surge.LocalFilePageResult {
 
 	trackedFiles := surge.GetTrackedFiles()
 
@@ -27,7 +27,7 @@ func getLocalFiles(Skip int, Take int) surge.SearchQueryResult {
 		right = len(trackedFiles)
 	}
 
-	return surge.SearchQueryResult{
+	return surge.LocalFilePageResult{
 		Result: trackedFiles[left:right],
 		Count:  len(trackedFiles),
 	}

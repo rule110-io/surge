@@ -78,7 +78,7 @@ var Sessions []*Session
 
 var workerCount = 0
 
-// File holds all file listing info of a seeded file
+// File holds all info of a tracked file in surge
 type File struct {
 	FileName      string
 	FileSize      int64
@@ -90,6 +90,17 @@ type File struct {
 	IsUploading   bool
 	IsPaused      bool
 	ChunkMap      []byte
+}
+
+// FileListing struct for all frontend file listing props
+type FileListing struct {
+	FileName    string
+	FileSize    int64
+	FileHash    string
+	Seeder      string
+	NumChunks   int
+	IsTracked   bool
+	IsAvailable bool
 }
 
 // Session is a wrapper for everything needed to maintain a surge session
@@ -363,17 +374,46 @@ func pushNotification(title string, text string) {
 
 //SearchQueryResult is a paging query result for file searches
 type SearchQueryResult struct {
+	Result []FileListing
+	Count  int
+}
+
+//LocalFilePageResult is a paging query result for tracked files
+type LocalFilePageResult struct {
 	Result []File
 	Count  int
 }
 
 //SearchFile runs a paged query
 func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
-	var results []File
+	var results []FileListing
 
 	for _, file := range ListedFiles {
 		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) {
-			results = append(results, file)
+
+			result := FileListing{
+				FileName:  file.FileName,
+				FileHash:  file.FileHash,
+				FileSize:  file.FileSize,
+				Seeder:    file.Seeder,
+				NumChunks: file.NumChunks,
+			}
+
+			tracked, err := dbGetFile(result.FileHash)
+			if err == nil && tracked != nil {
+				result.IsTracked = true
+				result.IsAvailable = true
+
+				//If any chunk is missing set available to false
+				for i := 0; i < result.NumChunks; i++ {
+					if bitmap.Get(tracked.ChunkMap, i) == false {
+						result.IsAvailable = false
+						break
+					}
+				}
+			}
+
+			results = append(results, result)
 		}
 	}
 
