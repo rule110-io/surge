@@ -1,6 +1,8 @@
 package main
 
 import (
+	"log"
+
 	"github.com/leaanthony/mewn"
 	"github.com/rule110-io/surge-ui/surge"
 	"github.com/wailsapp/wails"
@@ -38,12 +40,14 @@ func getRemoteFiles(Query string, Skip int, Take int) surge.SearchQueryResult {
 }
 
 func fetchRemoteFiles() {
-	topicEncoded := surge.TopicEncode(surge.TestTopic)
-	go surge.GetSubscriptions(topicEncoded)
+	log.Println("!!! === DEPRECATED FETCH REMOVE FILES HANDLED BY BACKEND === !!!")
+	//topicEncoded := surge.TopicEncode(surge.TestTopic)
+	//go surge.GetSubscriptions(topicEncoded)
 }
 
 func scanLocalFiles() {
-	go surge.ScanLocal()
+	log.Println("!!! === DEPRECATED SCAN LOCAL FILES HANDLED BY BACKEND === !!!")
+	//go surge.ScanLocal()
 }
 
 func downloadFile(Hash string) {
