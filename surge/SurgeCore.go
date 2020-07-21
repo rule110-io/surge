@@ -247,9 +247,16 @@ func initiateSession(Session *Session) {
 	if index == -1 {
 		log.Panic("Couldnt find session to remove")
 	}
-	//Remove session
+	//Close nkn session, nill out the pointers
+	Session.session.Close()
+	Session.session = nil
+	Session.reader = nil
+
+	//Replace index of session to be removed with last element in slice
 	Sessions[index] = Sessions[len(Sessions)-1]
+	//Nul out the pointer to the surge session
 	Sessions[len(Sessions)-1] = nil
+	//Slice off the last element
 	Sessions = Sessions[:len(Sessions)-1]
 
 	log.Println("-=Session closed=-")

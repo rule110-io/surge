@@ -2,7 +2,6 @@ package surge
 
 import (
 	"bufio"
-	"encoding/hex"
 	"fmt"
 	"log"
 	"net"
@@ -125,6 +124,7 @@ type DownloadStatusEvent struct {
 	Status    string
 	Bandwidth int
 	NumChunks int
+	ChunkMap  string
 }
 
 //ListedFiles are remote files that can be downloaded
@@ -233,6 +233,7 @@ func updateGUI() {
 				Status:    "Downloading",
 				Bandwidth: bandwidthMA10,
 				NumChunks: fileInfo.NumChunks,
+				ChunkMap:  GetFileChunkMapString(session.FileHash, 400),
 			}
 			log.Println("Emitting downloadStatusEvent: ", statusEvent)
 			wailsRuntime.Events.Emit("downloadStatusEvent", statusEvent)
@@ -468,13 +469,38 @@ func GetTrackedFiles() []File {
 	return dbGetAllFiles()
 }
 
-//GetFileChunkMapHex returns the chunkmap in hex for a file given by hash
-func GetFileChunkMapHex(Hash string) string {
+//GetFileChunkMapString returns the chunkmap in hex for a file given by hash
+func GetFileChunkMapString(Hash string, Size int) string {
 	file, err := dbGetFile(Hash)
 	if err != nil {
 		return ""
 	}
-	return hex.EncodeToString(file.ChunkMap)
+
+	outputSize := Size
+	inputSize := file.NumChunks
+
+	stepSize := float64(inputSize) / float64(outputSize)
+	stepSizeInt := int(stepSize)
+	var boolBuffer = ""
+	for i := 0; i < outputSize; i++ {
+
+		localCount := 0
+		for j := 0; j < stepSizeInt; j++ {
+			local := bitmap.Get(file.ChunkMap, int(float64(i)*stepSize)+j)
+			if local {
+				localCount++
+			} else {
+				boolBuffer += "0"
+				break
+			}
+		}
+		if localCount == stepSizeInt {
+			boolBuffer += "1"
+		}
+	}
+
+	return boolBuffer
+	//return hex.EncodeToString(file.ChunkMap)
 }
 
 //SetFilePause sets a file IsPaused state for by file hash
