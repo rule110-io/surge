@@ -11,20 +11,6 @@
     position: relative;
     display: flex;
     align-items: center;
-
-    &-current {
-      height: 100%;
-      background: $primary;
-      border-radius: $app-br;
-      position: absolute;
-      transition: $transition-1;
-    }
-
-    &-default {
-      width: 100%;
-      height: 2px;
-      background: #ebebeb;
-      border-radius: $app-br;
-    }
+    border-radius: $app-br;
   }
 }
