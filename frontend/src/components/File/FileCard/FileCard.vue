@@ -10,7 +10,9 @@
     </div>
     <div class="file-card__footer">
       <div class="file-card__title text_wrap_none">{{ file.FileName }}</div>
-      <div class="file-card__progress">Finished — 100%</div>
+      <div class="file-card__progress">
+        Finished — {{ progress.toFixed(2) }}%
+      </div>
     </div>
   </div>
 </template>
@@ -20,6 +22,8 @@
 </style>
 
 <script>
+import { mapState } from "vuex";
+
 export default {
   props: {
     file: {
@@ -27,13 +31,24 @@ export default {
       default: () => {},
     },
   },
-  computed: {},
+  computed: {
+    ...mapState("downloadEvents", ["downloadEvent"]),
+  },
+  watch: {
+    downloadEvent(newEvent) {
+      if (this.file.FileHash === newEvent.FileHash) {
+        this.progress = newEvent.Progress * 100;
+      }
+    },
+  },
   data() {
     return {
       colors: ["#FEC606", "#2CC990", "#03bf7b", "#8870FF"],
+      progress: 0,
     };
   },
   created() {
+    this.progress = this.file.IsUploading && !this.file.IsDownloading ? 100 : 0;
     this.activeColor = this.getRandomColor();
   },
   methods: {

@@ -57,6 +57,8 @@ const actions = {
     window.backend
       .getRemoteFiles(search, skip, get)
       .then(({ Result, Count }) => {
+        console.log(Result);
+
         commit("setRemoteFiles", { Result, Count });
       });
   },

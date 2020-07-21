@@ -58,6 +58,7 @@ export default {
     download(hash) {
       window.backend.downloadFile(hash).then(() => {
         this.$store.dispatch("files/fetchLocalFiles");
+        this.$store.dispatch("files/fetchRemoteFiles");
       });
     },
   },
