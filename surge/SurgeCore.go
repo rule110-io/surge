@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"io"
 	"log"
+	"math/rand"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -76,13 +77,13 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	//Open file
 	fileInfo, err := dbGetFile(FileID)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("If unexpected tell mutsi 0x0006", err)
 	}
 
 	file, err := os.Open(fileInfo.Path)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("If unexpected tell mutsi 0x0007", err)
 	}
 	defer file.Close()
 
@@ -93,7 +94,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 
 	if err != nil {
 		if err != io.EOF {
-			log.Fatal(err)
+			log.Fatal("If unexpected tell mutsi 0x0008", err)
 		}
 	}
 
@@ -111,7 +112,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	//Transmit the chunk
 	err = SessionWrite(Session, dateReplySerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), dateReplySerialized, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("If unexpected tell mutsi 0x0009", err)
 		return
 	}
 	log.Println("Chunk transmitted: ", bytesread, " bytes")
@@ -220,7 +221,7 @@ func initiateSession(Session *Session) {
 			if err.Error() == "session closed" {
 				break
 			}
-			log.Fatal(err)
+			log.Fatal("If unexpected tell mutsi 0x0010", err)
 		}
 
 		switch chunkType {
@@ -352,7 +353,7 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	//Open file
 	file, err := os.OpenFile(path, os.O_RDWR, 0644)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("If unexpected tell mutsi 0x0003", err)
 		return
 	}
 	defer file.Close()
@@ -361,7 +362,7 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 
 	bytesWritten, err := file.WriteAt(Chunk, chunkOffset)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("If unexpected tell mutsi 0x0004", err)
 		return
 	}
 	//Success
@@ -431,7 +432,7 @@ func HashFile(filePath string) (string, error) {
 func surgeGetFileSize(path string) int64 {
 	fi, err := os.Stat(path)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("If unexpected tell mutsi 0x0005", err)
 	}
 	// get the size
 	return fi.Size()
@@ -549,6 +550,9 @@ func restartDownload(Hash string) {
 		//TODO: set flag so we dont keep doing this?
 		return
 	}
+
+	rand.Seed(time.Now().UnixNano())
+	rand.Shuffle(len(missingChunks), func(i, j int) { missingChunks[i], missingChunks[j] = missingChunks[j], missingChunks[i] })
 
 	log.Println("Restarting Download Creation Session for", file.FileName)
 

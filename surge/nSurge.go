@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"log"
+	"math/rand"
 	"net"
 	"os"
 	"strings"
@@ -152,7 +153,7 @@ func Start(runtime *wails.Runtime) {
 
 	client, err = nkn.NewMultiClient(account, "", NumClients, false, nil)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("If unexpected tell mutsi 0x0001", err)
 	} else {
 		<-client.OnConnect.C
 
@@ -300,7 +301,7 @@ func GetSubscriptions(Topic string) {
 
 	subscribers, err := client.GetSubscribers(Topic, 0, 100, true, true)
 	if err != nil {
-		log.Fatal(err)
+		log.Fatal("If unexpected tell mutsi 0x0002", err)
 	}
 
 	for k, v := range subscribers.SubscribersInTxPool.Map {
@@ -338,7 +339,7 @@ func getListedFileByHash(Hash string) *File {
 }
 
 //DownloadFile downloads the file
-func DownloadFile(Hash string) {
+func DownloadFile(Hash string) bool {
 	//Addr string, Size int64, FileID string
 
 	file := getListedFileByHash(Hash)
@@ -351,7 +352,7 @@ func DownloadFile(Hash string) {
 	if err != nil {
 		log.Println("Could not create session for download", Hash)
 		pushNotification("Download Session Failed", file.FileName)
-		return
+		return false
 	}
 	go initiateSession(surgeSession)
 
@@ -373,9 +374,16 @@ func DownloadFile(Hash string) {
 		dbInsertFile(*file)
 	}
 
+	//Create a random fetch sequence
+	randomChunks := make([]int, numChunks)
+	for i := 0; i < numChunks; i++ {
+		randomChunks[i] = i
+	}
+	rand.Seed(time.Now().UnixNano())
+	rand.Shuffle(len(randomChunks), func(i, j int) { randomChunks[i], randomChunks[j] = randomChunks[j], randomChunks[i] })
+
 	downloadJob := func() {
 		for i := 0; i < numChunks; i++ {
-
 			//Pause if file is paused
 			dbFile, err := dbGetFile(file.FileHash)
 			for err == nil && dbFile.IsPaused {
@@ -387,7 +395,7 @@ func DownloadFile(Hash string) {
 			}
 
 			workerCount++
-			go RequestChunk(surgeSession, file.FileHash, int32(i))
+			go RequestChunk(surgeSession, file.FileHash, int32(randomChunks[i]))
 
 			for workerCount >= NumWorkers {
 				time.Sleep(time.Millisecond)
@@ -395,6 +403,8 @@ func DownloadFile(Hash string) {
 		}
 	}
 	go downloadJob()
+
+	return true
 }
 
 func pushNotification(title string, text string) {
@@ -481,24 +491,37 @@ func GetFileChunkMapString(Hash string, Size int) string {
 
 	stepSize := float64(inputSize) / float64(outputSize)
 	stepSizeInt := int(stepSize)
-	var boolBuffer = ""
-	for i := 0; i < outputSize; i++ {
 
-		localCount := 0
-		for j := 0; j < stepSizeInt; j++ {
-			local := bitmap.Get(file.ChunkMap, int(float64(i)*stepSize)+j)
-			if local {
-				localCount++
-			} else {
-				boolBuffer += "0"
-				break
+	var boolBuffer = ""
+	if inputSize >= outputSize {
+
+		for i := 0; i < outputSize; i++ {
+			localCount := 0
+			for j := 0; j < stepSizeInt; j++ {
+				local := bitmap.Get(file.ChunkMap, int(float64(i)*stepSize)+j)
+				if local {
+					localCount++
+				} else {
+					boolBuffer += "0"
+					break
+				}
+			}
+			if localCount == stepSizeInt {
+				boolBuffer += "1"
 			}
 		}
-		if localCount == stepSizeInt {
-			boolBuffer += "1"
+	} else {
+		iter := float64(0)
+		for i := 0; i < outputSize; i++ {
+			local := bitmap.Get(file.ChunkMap, int(iter))
+			if local {
+				boolBuffer += "1"
+			} else {
+				boolBuffer += "0"
+			}
+			iter += stepSize
 		}
 	}
-
 	return boolBuffer
 	//return hex.EncodeToString(file.ChunkMap)
 }
