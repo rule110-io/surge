@@ -60,6 +60,10 @@ func openFolder(Hash string) {
 	surge.OpenFolderByHash(Hash)
 }
 
+func seedFile(Path string) bool {
+	return surge.SeedFile(Path)
+}
+
 // Stats .
 type Stats struct {
 	log *wails.CustomLogger
@@ -98,6 +102,7 @@ func main() {
 	app.Bind(openFile)
 	app.Bind(openFolder)
 	app.Bind(getFileChunkMap)
+	app.Bind(seedFile)
 
 	app.Run()
 

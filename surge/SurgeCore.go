@@ -466,13 +466,46 @@ func ScanLocal() {
 	log.Println("Seeding to Topic: ", topicEncoded)
 }
 
+//BuildSeedString builds a string of seeded files to share with clients
+func BuildSeedString() {
+	var files []string
+
+	root := localPath
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if path != root {
+			name := filepath.Base(path)
+			if len(strings.Split(name, ".")[0]) > 0 {
+				files = append(files, path)
+			}
+		}
+		return nil
+	})
+	if err != nil {
+		panic(err)
+	}
+
+	dbFiles := dbGetAllFiles()
+
+	queryPayload = ""
+	for _, dbFile := range dbFiles {
+
+		if dbFile.IsUploading {
+			//Add to payload
+			payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)
+			queryPayload += payload
+		}
+	}
+}
+
 //SeedFile generates everything needed to seed a file
-func SeedFile(Path string) {
+func SeedFile(Path string) bool {
 	log.Println("Seeding file", Path)
 
 	hashString, err := HashFile(Path)
 	if err != nil {
-		log.Panicln(err)
+		log.Println(err)
+		pushNotification("Seed failed", "Could not hash file at "+Path)
+		return false
 	}
 
 	fileName := filepath.Base(Path)
@@ -484,14 +517,6 @@ func SeedFile(Path string) {
 	for i := 0; i < numChunks; i++ {
 		bitmap.Set(chunkMap, i, true)
 	}
-
-	/*log.Println(chunkMap)
-	log.Println("Bits")
-	for i := 0; i < len(chunkMap)*8; i++ {
-		log.Print(bitmap.Get(chunkMap, i))
-	}
-	log.Println("Bits")
-	log.Println(hex.EncodeToString(chunkMap))*/
 
 	//Append to local files
 	localFile := File{
@@ -506,13 +531,20 @@ func SeedFile(Path string) {
 
 	//Check if file is already seeded
 	_, err = dbGetFile(localFile.FileHash)
-	if err != nil {
-		//When seeding a new file enter file into db
-		dbInsertFile(localFile)
+	if err == nil {
+		//File already seeding
+		pushNotification("Seed failed", fileName+" already seeding.")
+		return false
 	}
+
+	//When seeding a new file enter file into db
+	dbInsertFile(localFile)
+
 	//Add to payload
 	payload := surgeGenerateTopicPayload(fileName, fileSize, hashString)
 	queryPayload += payload
+	pushNotification("Now seeding", fileName)
+	return true
 }
 
 func restartDownload(Hash string) {

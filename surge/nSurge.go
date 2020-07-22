@@ -163,10 +163,15 @@ func Start(runtime *wails.Runtime) {
 		SurgeActive = true
 		go Listen()
 
+		topicEncoded := TopicEncode(TestTopic)
+
 		clientOnlineMap = make(map[string]bool)
 
-		go ScanLocal()
-		topicEncoded := TopicEncode(TestTopic)
+		//go ScanLocal()
+
+		go BuildSeedString()
+
+		sendSeedSubscription(topicEncoded, "Surge File Seeder")
 		go GetSubscriptions(topicEncoded)
 
 		tracked := GetTrackedFiles()
@@ -226,6 +231,10 @@ func updateGUI() {
 			fileInfo, err := dbGetFile(session.FileHash)
 			if err != nil {
 				log.Panicln(err)
+			}
+
+			if fileInfo.IsPaused {
+				continue
 			}
 
 			statusEvent := DownloadStatusEvent{
