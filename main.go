@@ -60,8 +60,12 @@ func openFolder(Hash string) {
 	surge.OpenFolderByHash(Hash)
 }
 
-func seedFile(Path string) bool {
-	return surge.SeedFile(Path)
+func seedFile() bool {
+	path, err := surge.OpenFileDialog()
+	if err != nil {
+		return false
+	}
+	return surge.SeedFile(path)
 }
 
 // Stats .
@@ -78,7 +82,6 @@ func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 }
 
 func main() {
-
 	stats := &Stats{}
 	surge.InitializeDb()
 	defer surge.CloseDb()

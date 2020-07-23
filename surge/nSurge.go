@@ -12,6 +12,7 @@ import (
 
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
+	dialog "github.com/sqweek/dialog"
 	"github.com/wailsapp/wails"
 )
 
@@ -552,4 +553,9 @@ func SetFilePause(Hash string, State bool) {
 		msg = "Resumed"
 	}
 	pushNotification("Download "+msg, file.FileName)
+}
+
+//OpenFileDialog uses platform agnostic package for a file dialog
+func OpenFileDialog() (string, error) {
+	return dialog.File().Load()
 }

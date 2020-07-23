@@ -14,6 +14,7 @@ require (
 	github.com/nknorg/nkn-sdk-go v1.3.0
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
+	github.com/sqweek/dialog v0.0.0-20200601143742-43ea34326190
 	github.com/wailsapp/wails v1.7.1
 	github.com/xujiajun/nutsdb v0.5.0
 	golang.org/x/image v0.0.0-20200618115811-c13761719519 // indirect
