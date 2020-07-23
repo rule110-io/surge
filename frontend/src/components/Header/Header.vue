@@ -96,7 +96,9 @@ export default {
       this.$store.commit("notifications/toggleNotifications", false);
     },
     seedFile() {
-      window.backend.seedFile().then(() => {});
+      window.backend.seedFile().then(() => {
+        this.$store.dispatch("files/fetchRemoteFiles");
+      });
     },
   },
 };
