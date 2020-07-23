@@ -559,3 +559,24 @@ func SetFilePause(Hash string, State bool) {
 func OpenFileDialog() (string, error) {
 	return dialog.File().Load()
 }
+
+//RemoveFile removes file from surge db and optionally from disk
+func RemoveFile(Hash string, FromDisk bool) bool {
+	if FromDisk {
+		file, err := dbGetFile(Hash)
+		if err != nil {
+			return false
+		}
+		err = os.Remove(file.Path)
+		if err != nil {
+			return false
+		}
+	}
+
+	err := dbDeleteFile(Hash)
+	if err != nil {
+		return false
+	}
+
+	return true
+}

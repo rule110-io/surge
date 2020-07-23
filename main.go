@@ -68,6 +68,10 @@ func seedFile() bool {
 	return surge.SeedFile(path)
 }
 
+func removeFile(Hash string, FromDisk bool) bool {
+	return surge.RemoveFile(Hash, FromDisk)
+}
+
 // Stats .
 type Stats struct {
 	log *wails.CustomLogger
@@ -106,6 +110,7 @@ func main() {
 	app.Bind(openFolder)
 	app.Bind(getFileChunkMap)
 	app.Bind(seedFile)
+	app.Bind(removeFile)
 
 	app.Run()
 

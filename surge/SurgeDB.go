@@ -89,6 +89,21 @@ func dbGetAllFiles() []File {
 	return files
 }
 
+func dbDeleteFile(Hash string) error {
+	if err := db.Update(
+		func(tx *nutsdb.Tx) error {
+			key := []byte(Hash)
+			if err := tx.Delete(fileBucketName, key); err != nil {
+				return err
+			}
+			return nil
+		}); err != nil {
+		log.Println(err)
+		return err
+	}
+	return nil
+}
+
 //CloseDb .
 func CloseDb() {
 	db.Close()
