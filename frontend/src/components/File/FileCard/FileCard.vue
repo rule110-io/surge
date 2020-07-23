@@ -48,7 +48,7 @@ export default {
     };
   },
   created() {
-    this.progress = this.file.IsUploading && !this.file.IsDownloading ? 100 : 0;
+    this.progress = !this.file.IsPaused && !this.file.IsDownloading ? 100 : 0;
     this.activeColor = this.getRandomColor();
   },
   methods: {
