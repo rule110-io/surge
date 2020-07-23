@@ -65,7 +65,9 @@ export default {
   computed: {
     ...mapState("files", ["localFiles"]),
   },
-  mounted() {},
+  mounted() {
+    this.$store.dispatch("files/fetchLocalFiles");
+  },
   methods: {
     pause(hash) {
       window.backend.setDownloadPause(hash, true).then(() => {

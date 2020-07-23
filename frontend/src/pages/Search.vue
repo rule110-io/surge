@@ -53,7 +53,9 @@ export default {
   computed: {
     ...mapState("files", ["remoteFiles", "localFiles"]),
   },
-  mounted() {},
+  mounted() {
+    this.$store.dispatch("files/fetchRemoteFiles");
+  },
   methods: {
     download(hash) {
       window.backend.downloadFile(hash).then(() => {

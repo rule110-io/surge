@@ -7,6 +7,7 @@ require (
 	github.com/boljen/go-bitmap v0.0.0-20151001105940-23cd2fb0ce7d
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/golang/protobuf v1.4.2
+	github.com/gotk3/gotk3 v0.4.0 // indirect
 	github.com/leaanthony/mewn v0.10.7
 	github.com/leaanthony/slicer v1.4.1 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect

@@ -35,7 +35,7 @@
         ></feather>
         <Notifications @click.native.stop.prevent />
       </div>
-      <div class="header__file">
+      <div class="header__file" @click="seedFile">
         <feather class="header__file-icon" type="plus"></feather>
       </div>
       <div class="header__avatar">
@@ -95,7 +95,9 @@ export default {
     closeNotifications() {
       this.$store.commit("notifications/toggleNotifications", false);
     },
-    uploadFile() {},
+    seedFile() {
+      window.backend.seedFile().then(() => {});
+    },
   },
 };
 </script>
