@@ -5,6 +5,37 @@
   padding-right: $padding-big;
   padding-bottom: $padding-default;
 
+  &__file {
+    height: 40px;
+    width: 40px;
+    border-radius: 100%;
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: $padding-big;
+    margin-right: $padding-default;
+    border: 1px dashed $grey;
+    transition: $transition-1;
+    cursor: pointer;
+
+    &:hover {
+      border-color: $primary;
+    }
+
+    &:hover & {
+      &-icon {
+        color: $primary;
+      }
+    }
+
+    &-icon {
+      height: 14px;
+      color: $grey;
+      transition: $transition-1;
+    }
+  }
+
   &__search {
     display: flex;
     align-items: center;
@@ -63,7 +94,6 @@
     width: 40px;
     border-radius: 100%;
     background: $grey;
-    margin-left: $padding-big;
     position: relative;
   }
 

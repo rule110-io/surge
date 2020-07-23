@@ -23,7 +23,7 @@
             @click.native="pause(file.FileHash)"
           ></feather>
           <feather
-            v-if="file.IsUploading"
+            v-if="!file.IsDownloading && !file.IsPaused"
             class="table__action table__action_active"
             type="check-circle"
           ></feather>

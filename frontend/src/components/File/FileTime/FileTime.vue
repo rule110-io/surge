@@ -1,7 +1,12 @@
 <template>
   <div class="file-time">
     <div class="file-time__title">
-      <template v-if="progress === 100 || file.IsUploading">
+      <template
+        v-if="!file.IsDownloading && !file.IsUploading && !file.IsPaused"
+      >
+        Ready
+      </template>
+      <template v-else-if="progress === 100 || file.IsUploading">
         Seeding
       </template>
       <template v-else-if="file.IsPaused">
@@ -37,7 +42,7 @@ export default {
     };
   },
   mounted() {
-    this.progress = this.file.IsUploading && !this.file.IsDownloading ? 100 : 0;
+    this.progress = !this.file.IsPaused && !this.file.IsDownloading ? 100 : 0;
   },
   computed: {
     ...mapState("downloadEvents", ["downloadEvent"]),
