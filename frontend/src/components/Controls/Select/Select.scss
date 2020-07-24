@@ -1,0 +1,116 @@
+.select {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &__title {
+    letter-spacing: 0.06em;
+    font-weight: bold;
+    color: $grey-light;
+    text-transform: uppercase;
+    display: none;
+  }
+
+  &__button {
+    cursor: pointer;
+    background-color: transparent;
+    padding: $padding-lg $padding-normal;
+    outline: none;
+    border: 1px solid #e0e0e0;
+    box-sizing: border-box;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    transition: $transition-1;
+    display: flex;
+    justify-content: space-between;
+
+    &_modal{
+      max-height: 49px;
+      border-radius: $card-br;
+      padding: $padding-default;
+      font-weight: $fw-normal;
+    }
+
+    &:hover {
+      border-color: $secondary;
+    }
+
+    &_active {
+      border-color: $secondary;
+      color: $secondary;
+    }
+  }
+
+  &__icon {
+    margin-left: 20px;
+    transition: $transition-1;
+
+    &_open {
+      transform: scaleY(-1);
+      color: $secondary;
+    }
+  }
+
+  &__wrapper {
+    min-width: 140px;
+    box-sizing: border-box;
+    position: relative;
+    font-weight: $fw-normal;
+    color: $dark;
+
+    &_modal{
+      margin-top: $padding-micro;
+    }
+
+  }
+
+  &__list {
+    position: absolute;
+    top: 62px;
+    left: 0;
+    z-index: 3;
+    background: $white;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+    box-sizing: border-box;
+    opacity: 0;
+    transition: $transition-1;
+    width: 100%;
+    max-height: 160PX;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    transition: transform .2s ease-in-out,opacity .2s ease-in-out,width .2s ease-in-out,height .2s ease-in-out;
+    padding: 12px 0;
+    transform: translate3d(0,-10px,0);
+    box-shadow: $shadow-3;
+    pointer-events: none;
+    
+    &_modal{
+      top: 54px;
+      border-radius: $card-br;
+      padding: $padding-default 0;
+      font-weight: $fw-normal;
+    }
+
+    &_open {
+      transform: translateZ(0);
+      opacity: 1;
+      pointer-events: auto;
+    }
+  }
+
+  &__item {
+    padding: $padding-micro $padding-normal;
+    transition: $transition-1;
+    cursor: pointer;
+
+    &_modal{
+      padding: $padding-micro $padding-default;
+    }
+
+    &:hover {
+      color: $secondary;
+    }
+  }
+}

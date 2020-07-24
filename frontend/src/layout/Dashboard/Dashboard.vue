@@ -16,6 +16,7 @@ export default {
   mounted() {
     this.enableNotifications();
     this.enableDownloadEvents();
+    this.enableClientStatusUpdate();
     this.fetchLocalFiles();
     this.fetchRemoteFiles();
   },
@@ -35,6 +36,12 @@ export default {
     enableDownloadEvents() {
       window.wails.Events.On("downloadStatusEvent", (event) => {
         this.$store.commit("downloadEvents/addDownloadEvent", event);
+      });
+    },
+    enableClientStatusUpdate() {
+      window.wails.Events.On("remoteClientsUpdate", (event) => {
+        console.log("e", event);
+        this.$store.commit("clientStatus/addClientStatus", event);
       });
     },
   },

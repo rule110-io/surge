@@ -5,6 +5,7 @@
       v-if="remoteFiles !== false && localFiles !== false"
     ></router-view>
     <Preloader v-else />
+    <NetworkStats />
   </div>
 </template>
 
@@ -17,9 +18,10 @@ import { mapState } from "vuex";
 
 import Header from "@/components/Header/Header";
 import Preloader from "@/components/Preloader/Preloader";
+import NetworkStats from "@/components/NetworkStats/NetworkStats";
 
 export default {
-  components: { Header, Preloader },
+  components: { Header, Preloader, NetworkStats },
   data() {
     return {};
   },

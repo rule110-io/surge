@@ -2,8 +2,18 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding-right: $padding-big;
-  padding-bottom: $padding-default;
+  padding: $padding-default $padding-big $padding-default 0;
+  position: relative;
+
+  &:after {
+    content: "";
+    position: absolute;
+    height: 1px;
+    width: calc(100% + #{$padding-big});
+    bottom: 0;
+    left: -40px;
+    background: $grey-light;
+  }
 
   &__file {
     height: 40px;

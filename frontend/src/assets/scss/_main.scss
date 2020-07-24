@@ -13,6 +13,10 @@ body {
   }
 }
 
+b {
+  font-weight: $fw-bold;
+}
+
 /*========== scroll ==========*/
 
 ::-webkit-scrollbar {
@@ -58,7 +62,7 @@ body {
 
 .page {
   padding-right: $padding-big;
-  height: calc(100% - 80px);
+  height: calc(100% - 98px);
   overflow-y: scroll;
   padding-top: calc(#{$padding-big} - #{$padding-default});
 
@@ -115,18 +119,29 @@ body {
     color: $grey;
     transition: $transition-1;
     cursor: pointer;
-
-    &_active {
-      color: $primary;
-      cursor: default;
-    }
-
     &:hover {
       color: $primary;
     }
 
     &:active {
       color: $primary-dark;
+    }
+
+    &_remove {
+      margin-left: $padding-small;
+
+      &:hover {
+        color: $error;
+      }
+
+      &:active {
+        color: $accent;
+      }
+    }
+
+    &_active {
+      color: $primary;
+      cursor: default;
     }
   }
 }
@@ -145,6 +160,111 @@ body {
   &_align {
     &_right {
       text-align: right;
+    }
+  }
+}
+
+/*========== Modals ==========*/
+
+.modal {
+  width: 592px;
+  margin: 0 auto;
+  z-index: 1;
+  background: white;
+  border-radius: $card-br;
+  box-sizing: border-box;
+  overflow: hidden;
+  position: relative;
+  padding: $padding-big $padding-medium;
+  box-shadow: $shadow-2;
+
+  &__checkbox {
+    margin-top: $padding-normal;
+
+    &_footer {
+      margin-bottom: 0 !important;
+    }
+  }
+
+  &__footer {
+    margin-top: $padding-medium;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+
+    &_end {
+      justify-content: space-between;
+    }
+
+    &-controls {
+      display: flex;
+      align-items: center;
+    }
+
+    .button {
+      &:not(:last-child) {
+        margin-right: $padding-default;
+      }
+    }
+  }
+
+  &__body {
+    &_flex {
+      display: flex;
+      flex-flow: row wrap;
+
+      label {
+        width: 100%;
+      }
+    }
+  }
+
+  &__title {
+    color: $dark;
+    text-align: center;
+    margin-bottom: $padding-normal;
+    line-height: 43px;
+    font-weight: $fw-bold;
+    font-size: $fz-title;
+    font-family: "Roboto";
+  }
+
+  &__descr {
+    margin-bottom: $padding-normal;
+  }
+
+  &__wrapper {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: calc(100% + #{$sidebar-width} + #{$padding-big});
+    border-radius: $app-br;
+    height: 100%;
+    background: rgba(#535461, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: $transition-1;
+    visibility: hidden;
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+
+    .modal {
+      transform: translate(0, -25%);
+      opacity: 0;
+      transition: $transition-2;
+    }
+
+    &_open {
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+
+      .modal {
+        opacity: 1;
+        transform: translate(0, 0);
+      }
     }
   }
 }

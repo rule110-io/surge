@@ -1,0 +1,15 @@
+.network-stats {
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: $padding-big;
+  font-size: $fz-xs;
+  color: $grey;
+
+  &__item {
+    border-left: 1px solid $grey;
+    padding-left: $padding-xs;
+    margin-right: $padding-normal;
+  }
+}

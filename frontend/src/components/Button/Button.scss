@@ -1,0 +1,159 @@
+.button {
+  padding: $padding-lg $padding-big;
+  border-radius: $card-br;
+  text-align: center;
+  transition: $transition-1;
+  cursor: pointer !important;
+  border: none;
+  outline: none;
+  text-decoration: none;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  background: white;
+  font-size: $fz-md;
+  justify-content: center;
+
+  &__icon {
+    margin-right: 10px;
+    height: 18px;
+  }
+
+  &_disabled {
+    cursor: not-allowed !important;
+    color: $grey-darkest !important;
+    background: $base !important;
+
+    &:hover {
+      background: $base !important;
+    }
+
+    &:active {
+      background: $base !important;
+    }
+
+    .button__icon {
+      path {
+        fill: $grey-darkest !important;
+      }
+
+      color: $grey-darkest !important;
+    }
+  }
+
+  &_theme {
+    &_default {
+      color: $grey-darkest;
+
+      &:hover {
+        background: $base;
+      }
+
+      &:active {
+        background: darken($base, 10%);
+      }
+    }
+
+    &_success {
+      color: white;
+      background: $primary;
+
+      &:hover {
+        background: $primary-dark;
+      }
+
+      &:active {
+        background: $background;
+      }
+    }
+
+    &_error {
+      color: white;
+      background: $error;
+
+      &:hover {
+        background: lighten($error, 10%);
+      }
+
+      &:active {
+        background: darken($error, 10%);
+      }
+    }
+
+    &_secondary {
+      color: white;
+      background: $secondary;
+
+      &:hover {
+        background: lighten($secondary, 10%);
+      }
+
+      &:active {
+        background: darken($secondary, 10%);
+      }
+
+      .button__icon {
+        path {
+          fill: white;
+        }
+
+        color: white;
+      }
+    }
+
+    &_text {
+      color: $grey-darkest;
+      border: none;
+      background: transparent;
+      padding: 0;
+
+      &:hover {
+        color: $secondary;
+      }
+
+      &:active {
+        color: $primary;
+      }
+    }
+
+    &_ghost {
+      color: white;
+      border: 2px solid $secondary;
+      background: transparent;
+
+      &:hover {
+        color: $secondary;
+        background: white;
+        border-color: white;
+      }
+
+      &:active {
+        color: $secondary;
+        background: darken(white, 10%);
+        border-color: darken(white, 10%);
+      }
+    }
+
+    &_ghost-secondary {
+      color: $secondary;
+      border: 2px solid $secondary;
+      background: transparent;
+
+      &:hover {
+        color: white;
+        background: $secondary;
+        border-color: $secondary;
+      }
+
+      &:active {
+        color: white;
+        background: darken($secondary, 10%);
+        border-color: darken($secondary, 10%);
+      }
+    }
+  }
+
+  &_full {
+    width: 100%;
+  }
+}

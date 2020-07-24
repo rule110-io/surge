@@ -33,6 +33,11 @@
             type="play-circle"
             @click.native="continueDownload(file.FileHash)"
           ></feather>
+          <feather
+            class="table__action table__action_remove"
+            type="trash-2"
+            @click.native="removeFile(file)"
+          ></feather>
         </div>
       </div>
       <Pagination
@@ -42,6 +47,11 @@
         commit="files/setLocalFilesConfig"
       />
     </div>
+    <RemoveFileModal
+      :open="isRemoveFileModal"
+      :file="activeFile"
+      @toggleRemoveFileModal="toggleRemoveFileModal"
+    />
   </div>
 </template>
 <script>
@@ -51,6 +61,7 @@ import FileInfo from "@/components/File/FileInfo/FileInfo";
 import FileStatus from "@/components/File/FileStatus/FileStatus";
 import FileTime from "@/components/File/FileTime/FileTime";
 import Pagination from "@/components/Pagination/Pagination";
+import RemoveFileModal from "@/components/Modals/RemoveFileModal/RemoveFileModal";
 
 export default {
   components: {
@@ -58,9 +69,13 @@ export default {
     FileStatus,
     FileTime,
     Pagination,
+    RemoveFileModal,
   },
   data: () => {
-    return {};
+    return {
+      isRemoveFileModal: false,
+      activeFile: {},
+    };
   },
   computed: {
     ...mapState("files", ["localFiles"]),
@@ -69,6 +84,13 @@ export default {
     this.$store.dispatch("files/fetchLocalFiles");
   },
   methods: {
+    removeFile(file) {
+      this.activeFile = file;
+      this.toggleRemoveFileModal(true);
+    },
+    toggleRemoveFileModal(bool) {
+      this.isRemoveFileModal = bool;
+    },
     pause(hash) {
       window.backend.setDownloadPause(hash, true).then(() => {
         this.$store.dispatch("files/fetchLocalFiles");
