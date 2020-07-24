@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	bitmap "github.com/boljen/go-bitmap"
@@ -81,6 +82,9 @@ var Sessions []*Session
 //var testReader *bufio.Reader
 
 var workerCount = 0
+
+//Sessions collection lock
+var sessionsWriteLock = &sync.Mutex{}
 
 // File holds all info of a tracked file in surge
 type File struct {
@@ -206,6 +210,7 @@ func updateGUI() {
 	for true {
 		time.Sleep(time.Second)
 
+		sessionsWriteLock.Lock()
 		for _, session := range Sessions {
 			if session.FileSize == 0 {
 				continue
@@ -270,6 +275,7 @@ func updateGUI() {
 				dbInsertFile(*fileEntry)
 			}
 		}
+		sessionsWriteLock.Unlock()
 	}
 }
 
