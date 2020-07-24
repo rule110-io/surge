@@ -31,6 +31,7 @@ const surgeQueryRequestID byte = 0x002
 const surgeQueryResponseID byte = 0x003
 
 var queryPayload = ""
+var fileWriteLock = &sync.Mutex{}
 
 //OpenOSPath Open a file, directory, or URI using the OS's default application for that object type. Don't wait for the open command to complete.
 func OpenOSPath(Path string) {
@@ -238,6 +239,7 @@ func initiateSession(Session *Session) {
 	}
 
 	//find index in Sessions
+	sessionsWriteLock.Lock()
 	var index = -1
 	for i := 0; i < len(Sessions); i++ {
 		if Sessions[i] == Session {
@@ -259,6 +261,7 @@ func initiateSession(Session *Session) {
 	Sessions[len(Sessions)-1] = nil
 	//Slice off the last element
 	Sessions = Sessions[:len(Sessions)-1]
+	sessionsWriteLock.Unlock()
 
 	log.Println("-=Session closed=-")
 }
@@ -341,8 +344,6 @@ func processQueryResponse(Session *Session, Data []byte) {
 		//fileBox.Append(newButton)
 	}
 }
-
-var fileWriteLock = &sync.Mutex{}
 
 //WriteChunk writes a chunk to disk
 func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
