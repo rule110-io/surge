@@ -113,24 +113,27 @@ type FileListing struct {
 
 // Session is a wrapper for everything needed to maintain a surge session
 type Session struct {
-	FileHash        string
-	FileSize        int64
-	Downloaded      int64
-	Uploaded        int64
-	deltaDownloaded int64
-	bandwidthQueue  []int
-	session         net.Conn
-	reader          *bufio.Reader
+	FileHash               string
+	FileSize               int64
+	Downloaded             int64
+	Uploaded               int64
+	deltaDownloaded        int64
+	deltaUploaded          int64
+	bandwidthDownloadQueue []int
+	bandwidthUploadQueue   []int
+	session                net.Conn
+	reader                 *bufio.Reader
 }
 
-// DownloadStatusEvent holds update info on download progress
-type DownloadStatusEvent struct {
-	FileHash  string
-	Progress  float32
-	Status    string
-	Bandwidth int
-	NumChunks int
-	ChunkMap  string
+// FileStatusEvent holds update info on download progress
+type FileStatusEvent struct {
+	FileHash          string
+	Progress          float32
+	Status            string
+	DownloadBandwidth int
+	UploadBandwidth   int
+	NumChunks         int
+	ChunkMap          string
 }
 
 //ListedFiles are remote files that can be downloaded
@@ -210,58 +213,23 @@ func updateGUI() {
 	for true {
 		time.Sleep(time.Second)
 
+		//Create session aggregate maps for file
+		var fileDownloadMap map[string]int
+		var fileUploadMap map[string]int
+		fileDownloadMap = make(map[string]int)
+		fileUploadMap = make(map[string]int)
+		fileProgressMap := make(map[string]float32)
+
 		sessionsWriteLock.Lock()
 		for _, session := range Sessions {
 			if session.FileSize == 0 {
 				continue
 			}
 
-			//Take bandwith delta
-			deltaBandwidth := int(session.Downloaded - session.deltaDownloaded)
-			session.deltaDownloaded = session.Downloaded
-
-			//Append to queue
-			session.bandwidthQueue = append(session.bandwidthQueue, deltaBandwidth)
-
-			//Dequeue if queue > 10
-			if len(session.bandwidthQueue) > 10 {
-				session.bandwidthQueue = session.bandwidthQueue[1:]
-			}
-
-			var bandwidthMA10 = 0
-			for i := 0; i < len(session.bandwidthQueue); i++ {
-				bandwidthMA10 += session.bandwidthQueue[i]
-			}
-			bandwidthMA10 /= len(session.bandwidthQueue)
-
-			fileInfo, err := dbGetFile(session.FileHash)
-			if err != nil {
-				log.Panicln(err)
-			}
-
-			if fileInfo.IsPaused {
-				continue
-			}
-
-			statusEvent := DownloadStatusEvent{
-				FileHash:  session.FileHash,
-				Progress:  float32(float64(session.Downloaded) / float64(session.FileSize)),
-				Status:    "Downloading",
-				Bandwidth: bandwidthMA10,
-				NumChunks: fileInfo.NumChunks,
-				ChunkMap:  GetFileChunkMapString(session.FileHash, 400),
-			}
-			log.Println("Emitting downloadStatusEvent: ", statusEvent)
-			wailsRuntime.Events.Emit("downloadStatusEvent", statusEvent)
-
-			//Download completed
-			/*var completed = true
-			for i := 0; i < fileInfo.NumChunks; i++ {
-				if bitmap.Get(fileInfo.ChunkMap, i) == false {
-					completed = false
-					break
-				}
-			}*/
+			downloadMA10, uploadMA10 := sessionBandwidth(session)
+			fileDownloadMap[session.FileHash] = fileDownloadMap[session.FileHash] + downloadMA10
+			fileUploadMap[session.FileHash] = fileUploadMap[session.FileHash] + uploadMA10
+			fileProgressMap[session.FileHash] = float32(float64(session.Downloaded) / float64(session.FileSize))
 
 			if session.Downloaded == session.FileSize {
 				pushNotification("Download Finished", getListedFileByHash(session.FileHash).FileName)
@@ -276,7 +244,59 @@ func updateGUI() {
 			}
 		}
 		sessionsWriteLock.Unlock()
+
+		//for each file in aggregate maps send out a status event
+		for key := range fileDownloadMap {
+			fileInfo, err := dbGetFile(key)
+			if err != nil {
+				log.Panicln(err)
+			}
+
+			if fileInfo.IsPaused {
+				continue
+			}
+
+			statusEvent := FileStatusEvent{
+				FileHash:          key,
+				Progress:          fileProgressMap[key],
+				DownloadBandwidth: fileDownloadMap[key],
+				UploadBandwidth:   fileUploadMap[key],
+				NumChunks:         fileInfo.NumChunks,
+				ChunkMap:          GetFileChunkMapString(key, 400),
+			}
+			log.Println("Emitting FileStatusEvent: ", statusEvent)
+			wailsRuntime.Events.Emit("fileStatusEvent", statusEvent)
+		}
 	}
+}
+
+func sessionBandwidth(Session *Session) (Download int, Upload int) {
+	//Take bandwith delta
+	deltaDownload := int(Session.Downloaded - Session.deltaDownloaded)
+	Session.deltaDownloaded = Session.Downloaded
+	deltaUpload := int(Session.Uploaded - Session.deltaUploaded)
+	Session.deltaUploaded = Session.Uploaded
+
+	//Append to queue
+	Session.bandwidthDownloadQueue = append(Session.bandwidthDownloadQueue, deltaDownload)
+	Session.bandwidthUploadQueue = append(Session.bandwidthUploadQueue, deltaUpload)
+
+	//Dequeue if queue > 10
+	if len(Session.bandwidthDownloadQueue) > 10 {
+		Session.bandwidthDownloadQueue = Session.bandwidthDownloadQueue[1:]
+		Session.bandwidthUploadQueue = Session.bandwidthUploadQueue[1:]
+	}
+
+	var downloadMA10 = 0
+	var uploadMA10 = 0
+	for i := 0; i < len(Session.bandwidthDownloadQueue); i++ {
+		downloadMA10 += Session.bandwidthDownloadQueue[i]
+		uploadMA10 += Session.bandwidthUploadQueue[i]
+	}
+	downloadMA10 /= len(Session.bandwidthDownloadQueue)
+	uploadMA10 /= len(Session.bandwidthUploadQueue)
+
+	return downloadMA10, uploadMA10
 }
 
 //ByteCountSI converts filesize in bytes to human readable text
