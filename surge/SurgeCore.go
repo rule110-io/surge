@@ -599,6 +599,13 @@ func restartDownload(Hash string) {
 	//Prime the session with known bytes downloaded
 	surgeSession.Downloaded = int64(file.NumChunks-len(missingChunks)) * ChunkSize
 
+	//If the last chunk is set, we want to deduct the missing bytes because its not a complete chunk
+	lastChunkSet := bitmap.Get(file.ChunkMap, file.NumChunks-1)
+	if lastChunkSet {
+		overshotBytes := int64(file.NumChunks)*int64(ChunkSize) - file.FileSize
+		surgeSession.Downloaded -= overshotBytes
+	}
+
 	go initiateSession(surgeSession)
 
 	log.Println("Restarting Download for", file.FileName)
