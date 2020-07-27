@@ -34,7 +34,7 @@ export default {
       });
     },
     enableDownloadEvents() {
-      window.wails.Events.On("FileStatusEvent", (event) => {
+      window.wails.Events.On("fileStatusEvent", (event) => {
         console.log("fileEvent:", event);
         this.$store.commit("downloadEvents/addDownloadEvent", event);
       });
