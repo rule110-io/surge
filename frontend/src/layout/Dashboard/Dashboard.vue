@@ -34,13 +34,14 @@ export default {
       });
     },
     enableDownloadEvents() {
-      window.wails.Events.On("downloadStatusEvent", (event) => {
+      window.wails.Events.On("FileStatusEvent", (event) => {
+        console.log("fileEvent:", event);
         this.$store.commit("downloadEvents/addDownloadEvent", event);
       });
     },
     enableClientStatusUpdate() {
       window.wails.Events.On("remoteClientsUpdate", (event) => {
-        console.log("e", event);
+        console.log("status:", event);
         this.$store.commit("clientStatus/addClientStatus", event);
       });
     },

@@ -1,6 +1,14 @@
 <template>
   <div class="file-status">
-    <div class="file-status__speed">{{ bandwidth | prettyBytes(1) }}/s</div>
+    <div class="file-status__speed">
+      <span class="file-status__speed-item">
+        Down: {{ downloadBandwidth | prettyBytes(1) }}/s</span
+      >
+      <span class="file-status__speed-item"
+        >Up: {{ uploadBandwidth | prettyBytes(1) }}/s</span
+      >
+    </div>
+
     <canvas
       class="file-status__progress"
       ref="canvas"
@@ -26,7 +34,8 @@ export default {
   },
   data() {
     return {
-      bandwidth: 0,
+      downloadBandwidth: 0,
+      uploadBandwidth: 0,
     };
   },
   computed: {
@@ -36,7 +45,8 @@ export default {
     downloadEvent(newEvent) {
       const { FileHash } = this.file;
       if (FileHash === newEvent.FileHash) {
-        this.bandwidth = newEvent.Bandwidth;
+        this.downloadBandwidth = newEvent.DownloadBandwidth;
+        this.uploadBandwidth = newEvent.UploadBandwidth;
         this.drawProgress(newEvent.ChunkMap);
       }
     },

@@ -3,6 +3,13 @@
     margin-bottom: $padding-small;
     font-size: $fz-md;
     color: $grey;
+    display: flex;
+    align-items: center;
+
+    &-item {
+      width: 200px;
+      display: block;
+    }
   }
 
   &__progress {
