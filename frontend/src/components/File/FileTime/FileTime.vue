@@ -37,7 +37,7 @@ export default {
   data() {
     return {
       progress: 0,
-      bandwidth: 0,
+      downloadBandwidth: 0,
       seconds: 0,
     };
   },
@@ -53,8 +53,8 @@ export default {
       if (this.file.FileHash === newEvent.FileHash) {
         this.seconds =
           (this.file.FileSize - this.file.FileSize * newEvent.Progress) /
-          newEvent.Bandwidth;
-        this.bandwidth = newEvent.Bandwidth;
+          newEvent.DownloadBandwidth;
+        this.downloadBandwidth = newEvent.DownloadBandwidth;
         this.progress = newEvent.Progress * 100;
       }
     },
