@@ -13,7 +13,7 @@ import Logo from "@/assets/images/Logo.svg";
 
 export default {
   components: { Logo },
-  data() {
+  data: () => {
     return {};
   },
   methods: {},

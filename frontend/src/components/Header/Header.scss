@@ -16,6 +16,8 @@
   }
 
   &__file {
+    flex: 1 1 40px;
+    box-sizing: border-box;
     height: 40px;
     width: 40px;
     border-radius: 100%;
@@ -47,6 +49,7 @@
   }
 
   &__search {
+    flex: 0 0 284px;
     display: flex;
     align-items: center;
     position: relative;
@@ -61,6 +64,7 @@
       transform: scaleX(0);
       transition: $transition-1;
       position: absolute;
+      left: 0;
       bottom: 0;
     }
 
@@ -71,6 +75,7 @@
     }
 
     &-icon {
+      flex: 0 0 18px;
       height: 18px;
       color: $grey;
       transition: $transition-1;
@@ -78,9 +83,11 @@
     }
 
     &-input {
+      flex: 0 0 250px;
       transition: $transition-1;
       appearance: none;
       border: unset;
+      border: 0;
       font-family: "Source Code Pro";
       width: 250px;
       font-size: $fz-md;
@@ -100,6 +107,7 @@
   }
 
   &__avatar {
+    flex: 1 1 40px;
     height: 40px;
     width: 40px;
     border-radius: 100%;
@@ -125,13 +133,18 @@
     }
   }
 
+  &__left {
+    flex: 1;
+    display: flex;
+  }
+
   &__right {
     display: flex;
     align-items: center;
-    justify-content: center;
   }
 
   &__item {
+    flex: 1 1 18px;
     color: $grey;
     cursor: pointer;
     position: relative;
@@ -142,6 +155,7 @@
 
     &-icon {
       height: 18px;
+      width: 18px;
       transition: $transition-1;
 
       &_active {

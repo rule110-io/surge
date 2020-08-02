@@ -41,7 +41,7 @@ export default {
       }
     },
   },
-  data() {
+  data: () => {
     return {
       colors: ["#FEC606", "#2CC990", "#03bf7b", "#8870FF"],
       progress: 0,

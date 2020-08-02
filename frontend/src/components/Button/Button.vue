@@ -1,8 +1,8 @@
 <template>
   <button
     v-if="type == 'button'"
-    class="button"
     :class="[
+      'button',
       theme ? `button_theme_${theme}` : null,
       full ? `button_full` : null,
       disabled === true ? 'button_disabled' : null,
@@ -15,8 +15,8 @@
     v-else-if="type === 'link'"
     :href="url"
     target="_blank"
-    class="button"
     :class="[
+      'button',
       theme ? `button_theme_${theme}` : null,
       full ? `button_full` : null,
     ]"
@@ -26,8 +26,8 @@
   <nuxt-link
     v-else-if="type === 'router'"
     :to="localePath(url)"
-    class="button"
     :class="[
+      'button',
       theme ? `button_theme_${theme}` : null,
       full ? `button_full` : null,
     ]"

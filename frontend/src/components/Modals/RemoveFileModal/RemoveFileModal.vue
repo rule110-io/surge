@@ -1,5 +1,5 @@
 le i<template>
-  <div class="modal__wrapper" :class="isOpen ? 'modal__wrapper_open' : null">
+  <div :class="['modal__wrapper', isOpen ? 'modal__wrapper_open' : null]">
     <div class="modal">
       <h2 class="modal__title">
         Delete File
@@ -47,7 +47,7 @@ export default {
       default: () => {},
     },
   },
-  data() {
+  data: () => {
     return {
       fromDisk: false,
     };

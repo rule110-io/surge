@@ -20,7 +20,7 @@ export default {
       default: () => {},
     },
   },
-  data() {
+  data: () => {
     return {};
   },
   methods: {},

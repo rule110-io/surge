@@ -1,5 +1,5 @@
 <template>
-  <div class="notifications" :class="open ? 'notifications_visible' : ''">
+  <div :class="['notifications', open ? 'notifications_visible' : '']">
     <div class="notifications__wrapper">
       <template v-if="!notifications.length">
         <div class="notifications__item">

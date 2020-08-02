@@ -64,6 +64,7 @@ import Pagination from "@/components/Pagination/Pagination";
 import RemoveFileModal from "@/components/Modals/RemoveFileModal/RemoveFileModal";
 
 export default {
+  name: "download",
   components: {
     FileInfo,
     FileStatus,

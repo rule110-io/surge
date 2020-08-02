@@ -9,22 +9,12 @@ import Files from "./modules/files";
 Vue.use(Vuex);
 
 export const store = new Vuex.Store({
+  strict: false,
   modules: {
     notifications: Notifications,
     downloadEvents: DownloadEvents,
     clientStatus: ClientStatus,
     files: Files,
-  },
-  getters: {
-    runningOnWindows(state) {
-      return state.OS.windows;
-    },
-    runningOnLinux(state) {
-      return state.OS.linux;
-    },
-    runningOnMacOS(state) {
-      return state.OS.macOS;
-    },
   },
 });
 

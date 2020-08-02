@@ -4,9 +4,8 @@
       v-model="radioButtonValue"
       class="checkbox__control"
       type="checkbox"
-      :checked="value"
       :name="name"
-    >
+    />
     <label class="checkbox__label" />
     <span class="checkbox__text">
       <slot />
@@ -23,26 +22,26 @@ export default {
   props: {
     value: {
       type: Boolean,
-      default: false
+      default: false,
     },
     name: {
       type: String,
-      default: ''
+      default: "",
     },
     label: {
       type: String,
-      default: ''
-    }
+      default: "",
+    },
   },
   computed: {
     radioButtonValue: {
-      get () {
-        return this.value
+      get() {
+        return this.value;
       },
-      set () {
-        this.$emit('change', this.label)
-      }
-    }
-  }
-}
+      set() {
+        this.$emit("change", this.label);
+      },
+    },
+  },
+};
 </script>

@@ -24,7 +24,7 @@ export default {
       return this.files.slice(0, 4);
     },
   },
-  data() {
+  data: () => {
     return {};
   },
   methods: {},

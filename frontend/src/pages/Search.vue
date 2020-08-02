@@ -42,6 +42,7 @@ import RecentFiles from "@/components/File/RecentFiles/RecentFiles";
 import Pagination from "@/components/Pagination/Pagination";
 
 export default {
+  name: "search",
   components: {
     FileInfo,
     RecentFiles,

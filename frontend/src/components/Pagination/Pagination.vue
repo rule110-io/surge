@@ -1,18 +1,18 @@
 <template>
   <div class="pagination">
     <feather
-      class="pagination__button"
-      :class="
-        isPrev ? 'pagination__button_active' : 'pagination__button_inactive'
-      "
+      :class="[
+        'pagination__button',
+        isPrev ? 'pagination__button_active' : 'pagination__button_inactive',
+      ]"
       type="arrow-left-circle"
       @click.native="decreasePage"
     />
     <feather
-      class="pagination__button"
-      :class="
-        isNext ? 'pagination__button_active' : 'pagination__button_inactive'
-      "
+      :class="[
+        'pagination__button',
+        isNext ? 'pagination__button_active' : 'pagination__button_inactive',
+      ]"
       type="arrow-right-circle"
       @click.native="increasePage"
     />
@@ -50,7 +50,7 @@ export default {
       required: true,
     },
   },
-  data() {
+  data: () => {
     return {};
   },
   computed: {

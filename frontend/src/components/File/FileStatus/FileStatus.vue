@@ -32,7 +32,7 @@ export default {
       default: () => {},
     },
   },
-  data() {
+  data: () => {
     return {
       downloadBandwidth: 0,
       uploadBandwidth: 0,

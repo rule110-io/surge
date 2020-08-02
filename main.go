@@ -94,12 +94,13 @@ func main() {
 	css := mewn.String("./frontend/dist/app.css")
 
 	app := wails.CreateApp(&wails.AppConfig{
-		Width:  1024,
-		Height: 768,
-		Title:  "surge-ui",
-		JS:     js,
-		CSS:    css,
-		Colour: "#131313",
+		Width:     1280,
+		Height:    780,
+		Resizable: true,
+		Title:     "surge-ui",
+		JS:        js,
+		CSS:       css,
+		Colour:    "#131313",
 	})
 	app.Bind(stats)
 	app.Bind(getLocalFiles)

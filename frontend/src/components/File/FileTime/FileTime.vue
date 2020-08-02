@@ -34,7 +34,7 @@ export default {
       default: () => {},
     },
   },
-  data() {
+  data: () => {
     return {
       progress: 0,
       downloadBandwidth: 0,

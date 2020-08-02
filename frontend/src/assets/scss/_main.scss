@@ -116,6 +116,8 @@ b {
   }
 
   &__action {
+    height: 24px;
+    width: 24px;
     color: $grey;
     transition: $transition-1;
     cursor: pointer;

@@ -22,7 +22,7 @@ import NetworkStats from "@/components/NetworkStats/NetworkStats";
 
 export default {
   components: { Header, Preloader, NetworkStats },
-  data() {
+  data: () => {
     return {};
   },
   computed: {

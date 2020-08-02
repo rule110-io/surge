@@ -72,6 +72,6 @@ module.exports = {
   },
   devServer: {
     disableHostCheck: true,
+    host: "localhost",
   },
-  runtimeCompiler: true,
 };
