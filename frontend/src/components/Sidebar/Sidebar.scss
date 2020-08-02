@@ -4,8 +4,6 @@
   left: 0;
   top: 0;
   height: calc(100% - #{$padding-normal}* 2);
-  border-top-left-radius: $app-br;
-  border-bottom-left-radius: $app-br;
   flex-flow: column wrap;
   align-items: center;
   justify-content: space-between;
