@@ -123,29 +123,44 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 // SendQueryRequest sends a query to a client on session
 func SendQueryRequest(Addr string, Query string) {
 
-	//Create session
-	sessionConfing := nkn.GetDefaultSessionConfig()
-	sessionConfing.MTU = 16384
+	var surgeSession *Session = nil
 
-	dialConfig := &nkn.DialConfig{
-		SessionConfig: sessionConfing,
-		DialTimeout:   5000,
+	//Check for sessions
+	for i := 0; i < len(Sessions); i++ {
+		if Sessions[i].session.RemoteAddr().String() == Addr {
+			surgeSession = Sessions[i]
+			break
+		}
 	}
 
-	downloadSession, err := client.DialWithConfig(Addr, dialConfig)
-	if err != nil {
-		log.Printf("Peer with address %s is not online, stopped trying after 5000ms\n", Addr)
-		return
-	}
-	log.Printf("Connected to peer %s requesting file listings\n", Addr)
+	if surgeSession == nil {
+		//Create session
+		sessionConfig := nkn.GetDefaultSessionConfig()
+		sessionConfig.MTU = 16384
+		sessionConfig.CheckTimeoutInterval = 1
+		sessionConfig.InitialRetransmissionTimeout = 1
+		sessionConfig.MaxRetransmissionTimeout = 1
 
-	downloadReader := bufio.NewReader(downloadSession)
+		dialConfig := &nkn.DialConfig{
+			SessionConfig: sessionConfig,
+			DialTimeout:   5000,
+		}
 
-	surgeSession := &Session{
-		reader:  downloadReader,
-		session: downloadSession,
+		downloadSession, err := client.DialWithConfig(Addr, dialConfig)
+		if err != nil {
+			log.Printf("Peer with address %s is not online, stopped trying after 5000ms\n", Addr)
+			return
+		}
+		log.Printf("Connected to peer %s requesting file listings\n", Addr)
+
+		downloadReader := bufio.NewReader(downloadSession)
+
+		surgeSession = &Session{
+			reader:  downloadReader,
+			session: downloadSession,
+		}
+		go initiateSession(surgeSession)
 	}
-	go initiateSession(surgeSession)
 
 	msg := &pb.SurgeQuery{
 		Query: Query,
@@ -196,13 +211,22 @@ func listenForSession() {
 		if err != nil {
 			log.Panic(err)
 		}
-		listenReader := bufio.NewReader(listenSession)
 
-		surgeSession := &Session{
-			reader:  listenReader,
-			session: listenSession,
+		var surgeSession *Session = nil
+		//Check for existing sessions that are not for a file
+		for i := 0; i < len(Sessions); i++ {
+			if Sessions[i].session.RemoteAddr().String() == listenSession.RemoteAddr().String() && Sessions[i].FileSize == 0 {
+				closeSession(Sessions[i])
+			}
 		}
-		go initiateSession(surgeSession)
+		if surgeSession == nil {
+			listenReader := bufio.NewReader(listenSession)
+			surgeSession = &Session{
+				reader:  listenReader,
+				session: listenSession,
+			}
+			go initiateSession(surgeSession)
+		}
 
 		time.Sleep(time.Millisecond)
 	}
@@ -214,15 +238,15 @@ func Listen() {
 }
 
 func initiateSession(Session *Session) {
+	sessionsWriteLock.Lock()
 	Sessions = append(Sessions, Session)
+	sessionsWriteLock.Unlock()
 
 	for true {
 		data, chunkType, err := SessionRead(Session)
 		if err != nil {
-			if err.Error() == "session closed" {
-				break
-			}
-			log.Fatal("If unexpected tell mutsi 0x0010", err)
+			log.Println("Session read failed, closing session error:", err)
+			break
 		}
 
 		switch chunkType {
@@ -238,6 +262,10 @@ func initiateSession(Session *Session) {
 		}
 	}
 
+	closeSession(Session)
+}
+
+func closeSession(Session *Session) {
 	//find index in Sessions
 	sessionsWriteLock.Lock()
 	var index = -1
@@ -247,9 +275,13 @@ func initiateSession(Session *Session) {
 			break
 		}
 	}
+
 	if index == -1 {
-		log.Panic("Couldnt find session to remove")
+		log.Println("Session already removed")
+		sessionsWriteLock.Unlock()
+		return
 	}
+
 	//Close nkn session, nill out the pointers
 	Session.session.Close()
 	Session.session = nil
@@ -347,6 +379,7 @@ func processQueryResponse(Session *Session, Data []byte) {
 
 //WriteChunk writes a chunk to disk
 func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
+	workerCount--
 
 	fileInfo, err := dbGetFile(FileID)
 	var path = "./" + remotePath + "/" + fileInfo.FileName
@@ -385,8 +418,6 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 		fileWriteLock.Unlock()
 	}
 	go setBitMap()
-
-	workerCount--
 }
 
 //TopicEncode .

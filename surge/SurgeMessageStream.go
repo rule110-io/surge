@@ -41,7 +41,8 @@ func SessionRead(Session *Session) (data []byte, ID byte, err error) {
 			log.Println(err)
 			return nil, 0x0, err
 		}
-		log.Panicln(err)
+		log.Println(err)
+		return nil, 0x0, err
 	}
 
 	//Get the packid
