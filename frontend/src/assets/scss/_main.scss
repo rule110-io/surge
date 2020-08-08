@@ -88,6 +88,10 @@ b {
 
   &__row {
     display: table-row;
+
+    &:not(:first-child) {
+      height: 76px;
+    }
   }
 
   &__head {
