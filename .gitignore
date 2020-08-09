@@ -4,3 +4,4 @@ build
 account.surge
 *.proto
 db
+.DS_Store
