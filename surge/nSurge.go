@@ -76,6 +76,12 @@ var client *nkn.MultiClient
 
 var clientOnlineMap map[string]bool
 
+var downloadBandwidthMap map[string][]int
+var uploadBandwidthMap map[string][]int
+
+var downloadBandwidthAccumulator map[string]int
+var uploadBandwidthAccumulator map[string]int
+
 //Sessions .
 var Sessions []*Session
 
@@ -113,16 +119,12 @@ type FileListing struct {
 
 // Session is a wrapper for everything needed to maintain a surge session
 type Session struct {
-	FileHash               string
-	FileSize               int64
-	Downloaded             int64
-	Uploaded               int64
-	deltaDownloaded        int64
-	deltaUploaded          int64
-	bandwidthDownloadQueue []int
-	bandwidthUploadQueue   []int
-	session                net.Conn
-	reader                 *bufio.Reader
+	FileHash   string
+	FileSize   int64
+	Downloaded int64
+	Uploaded   int64
+	session    net.Conn
+	reader     *bufio.Reader
 }
 
 // FileStatusEvent holds update info on download progress
@@ -174,6 +176,10 @@ func Start(runtime *wails.Runtime) {
 		topicEncoded := TopicEncode(TestTopic)
 
 		clientOnlineMap = make(map[string]bool)
+		downloadBandwidthMap = make(map[string][]int)
+		uploadBandwidthMap = make(map[string][]int)
+		downloadBandwidthAccumulator = make(map[string]int)
+		uploadBandwidthAccumulator = make(map[string]int)
 
 		//go ScanLocal()
 
@@ -214,21 +220,15 @@ func updateGUI() {
 		time.Sleep(time.Second)
 
 		//Create session aggregate maps for file
-		var fileDownloadMap map[string]int
-		var fileUploadMap map[string]int
-		fileDownloadMap = make(map[string]int)
-		fileUploadMap = make(map[string]int)
 		fileProgressMap := make(map[string]float32)
 
 		sessionsWriteLock.Lock()
 		for _, session := range Sessions {
+			log.Println("Active session:", session.session.RemoteAddr().String())
 			if session.FileSize == 0 {
 				continue
 			}
 
-			downloadMA10, uploadMA10 := sessionBandwidth(session)
-			fileDownloadMap[session.FileHash] = fileDownloadMap[session.FileHash] + downloadMA10
-			fileUploadMap[session.FileHash] = fileUploadMap[session.FileHash] + uploadMA10
 			fileProgressMap[session.FileHash] = float32(float64(session.Downloaded) / float64(session.FileSize))
 
 			if session.Downloaded == session.FileSize {
@@ -245,34 +245,53 @@ func updateGUI() {
 		}
 		sessionsWriteLock.Unlock()
 
+		totalDown := 0
+		totalUp := 0
+
 		//for each file in aggregate maps send out a status event
-		for key := range fileDownloadMap {
+		for key := range fileProgressMap {
 			fileInfo, err := dbGetFile(key)
 			if err != nil {
-				log.Panicln(err)
+				log.Println(err)
+				continue
 			}
 
 			if fileInfo.IsPaused {
 				continue
 			}
 
+			down, up := fileBandwidth(key)
+			totalDown += down
+			totalUp += up
+
 			statusEvent := FileStatusEvent{
 				FileHash:          key,
 				Progress:          fileProgressMap[key],
-				DownloadBandwidth: fileDownloadMap[key],
-				UploadBandwidth:   fileUploadMap[key],
+				DownloadBandwidth: down,
+				UploadBandwidth:   up,
 				NumChunks:         fileInfo.NumChunks,
 				ChunkMap:          GetFileChunkMapString(key, 400),
 			}
 			log.Println("Emitting FileStatusEvent: ", statusEvent)
 			wailsRuntime.Events.Emit("fileStatusEvent", statusEvent)
 		}
+
+		wailsRuntime.Events.Emit("globalBandwidthUpdate", totalDown, totalUp)
 	}
 }
 
-func sessionBandwidth(Session *Session) (Download int, Upload int) {
+func fileBandwidth(FileID string) (Download int, Upload int) {
+	//Get accumulator
+	downAccu := downloadBandwidthAccumulator[FileID]
+	downloadBandwidthAccumulator[FileID] = 0
+
+	upAccu := uploadBandwidthAccumulator[FileID]
+	uploadBandwidthAccumulator[FileID] = 0
+
+	return downAccu, upAccu
+
 	//Take bandwith delta
-	deltaDownload := int(Session.Downloaded - Session.deltaDownloaded)
+	/*deltaDownload := int(Session.Downloaded - Session.deltaDownloaded)
 	Session.deltaDownloaded = Session.Downloaded
 	deltaUpload := int(Session.Uploaded - Session.deltaUploaded)
 	Session.deltaUploaded = Session.Uploaded
@@ -296,7 +315,7 @@ func sessionBandwidth(Session *Session) (Download int, Upload int) {
 	downloadMA10 /= len(Session.bandwidthDownloadQueue)
 	uploadMA10 /= len(Session.bandwidthUploadQueue)
 
-	return downloadMA10, uploadMA10
+	return downloadMA10, uploadMA10*/
 }
 
 //ByteCountSI converts filesize in bytes to human readable text

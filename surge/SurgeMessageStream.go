@@ -27,6 +27,11 @@ func SessionWrite(Session *Session, Data []byte, ID byte) (err error) {
 		log.Fatal(err)
 	}
 
+	//Write add to upload
+	if Session.FileHash != "" {
+		uploadBandwidthAccumulator[Session.FileHash] += len(Data)
+	}
+
 	return err
 }
 
@@ -60,6 +65,11 @@ func SessionRead(Session *Session) (data []byte, ID byte, err error) {
 	_, err = io.ReadFull(Session.reader, data[:int(size)])
 	if err != nil {
 		log.Panicln(err)
+	}
+
+	//Write add to download
+	if Session.FileHash != "" {
+		downloadBandwidthAccumulator[Session.FileHash] += int(size)
 	}
 
 	return data, packID, err
