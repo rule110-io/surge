@@ -3,13 +3,48 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  padding-right: $padding-big;
   font-size: $fz-xs;
   color: $grey;
+  background: #e9eaea;
+  position: relative;
+  bottom: -8px;
+  left: -20px;
+  width: calc(100% - 40px);
+  margin: 0 auto;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
 
   &__item {
-    border-left: 1px solid $grey;
     padding-left: $padding-xs;
     margin-right: $padding-normal;
+  }
+
+  &__file {
+    box-sizing: border-box;
+    height: 50px;
+    width: 50px;
+    border-radius: 100%;
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: $padding-big;
+    margin-right: $padding-default;
+    border: 4px solid white;
+    transition: $transition-1;
+    cursor: pointer;
+    background: $primary;
+    left: 44%;
+    top: -24px;
+
+    &:hover {
+      transform: scale(1.1);
+    }
+
+    &-icon {
+      height: 18px;
+      color: white;
+      transition: $transition-1;
+    }
   }
 }

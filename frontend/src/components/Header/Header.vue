@@ -36,7 +36,7 @@
         ></feather>
         <Notifications @click.native.stop.prevent />
       </div>
-      <div class="header__file" @click="seedFile">
+      <!-- <div class="header__file" @click="seedFile">
         <feather class="header__file-icon" type="plus"></feather>
       </div>
       <div class="header__avatar">
@@ -46,7 +46,7 @@
             active ? 'header__status_active' : 'header__status_inactive',
           ]"
         ></div>
-      </div>
+      </div> -->
     </div>
   </div>
 </template>
@@ -97,11 +97,6 @@ export default {
     },
     closeNotifications() {
       this.$store.commit("notifications/toggleNotifications", false);
-    },
-    seedFile() {
-      window.backend.seedFile().then(() => {
-        this.$store.dispatch("files/fetchRemoteFiles");
-      });
     },
   },
 };
