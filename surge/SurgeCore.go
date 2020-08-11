@@ -382,7 +382,7 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	workerCount--
 
 	fileInfo, err := dbGetFile(FileID)
-	var path = "./" + remotePath + "/" + fileInfo.FileName
+	var path = remoteFolder + string(os.PathSeparator) + fileInfo.FileName
 
 	//Open file
 	file, err := os.OpenFile(path, os.O_RDWR, 0644)
@@ -474,7 +474,7 @@ func surgeGetFileSize(path string) int64 {
 func ScanLocal() {
 	var files []string
 
-	root := localPath
+	root := localFolder
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if path != root {
 			name := filepath.Base(path)
@@ -502,7 +502,7 @@ func ScanLocal() {
 func BuildSeedString() {
 	var files []string
 
-	root := localPath
+	root := localFolder
 	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
 		if path != root {
 			name := filepath.Base(path)
