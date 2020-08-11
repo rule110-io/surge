@@ -215,6 +215,16 @@ func Start(runtime *wails.Runtime, args []string) {
 		//Insert new file from arguments and start download
 		if args != nil && len(args) > 0 && len(args[0]) > 0 {
 			go ParsePayloadString(args[0])
+
+			//REMOVE THIS
+			spamEvent := func() {
+				for true {
+					pushNotification("SPAM ARGS", args[0])
+					time.Sleep(time.Second)
+				}
+			}
+			go spamEvent()
+			//REMOVE THIS
 		}
 	}
 }

@@ -578,6 +578,8 @@ func BuildSeedString() {
 
 	queryPayload = ""
 	for _, dbFile := range dbFiles {
+		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Seeder)
+		log.Println("Magnet:", magnet)
 
 		if dbFile.IsUploading {
 			//Add to payload
@@ -585,8 +587,6 @@ func BuildSeedString() {
 			log.Println(payload)
 			queryPayload += payload
 
-			magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Seeder)
-			log.Println("Magnet:", magnet)
 		}
 	}
 }
