@@ -1,17 +1,17 @@
 const getDefaultState = () => {
   return {
-    total: 0,
-    online: 0,
+    totalDown: 0,
+    totalUp: 0,
   };
 };
 
 const state = getDefaultState();
 
 const mutations = {
-  addClientStatus(state, event) {
-    const { total, online } = event;
-    state.total = total;
-    state.online = online;
+  addGlobalBandwidth(state, event) {
+    const { totalDown, totalUp } = event;
+    state.totalDown = totalDown;
+    state.totalUp = totalUp;
   },
 };
 

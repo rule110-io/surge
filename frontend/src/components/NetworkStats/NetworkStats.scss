@@ -2,7 +2,7 @@
   height: 40px;
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   font-size: $fz-xs;
   color: $grey;
   background: #e9eaea;
@@ -15,8 +15,21 @@
   border-top-right-radius: 18px;
 
   &__item {
-    padding-left: $padding-xs;
-    margin-right: $padding-normal;
+    margin: 0 $padding-normal;
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__status {
+    display: inline-flex;
+    align-items: center;
+  }
+
+  &__loader {
+    margin: 0 4px;
+    animation: spinner 2s linear infinite;
+    height: 14px;
+    width: 14px;
   }
 
   &__file {
@@ -46,5 +59,14 @@
       color: white;
       transition: $transition-1;
     }
+  }
+}
+
+@keyframes spinner {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
   }
 }

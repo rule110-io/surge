@@ -3,6 +3,7 @@ import Vuex from "vuex";
 import Notifications from "./modules/notifications";
 import DownloadEvents from "./modules/downloadEvents";
 import ClientStatus from "./modules/clientStatus";
+import GlobalBandwidth from "./modules/globalBandwidth";
 
 import Files from "./modules/files";
 
@@ -14,6 +15,7 @@ export const store = new Vuex.Store({
     notifications: Notifications,
     downloadEvents: DownloadEvents,
     clientStatus: ClientStatus,
+    globalBandwidth: GlobalBandwidth,
     files: Files,
   },
 });

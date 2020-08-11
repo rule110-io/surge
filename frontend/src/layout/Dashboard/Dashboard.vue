@@ -17,6 +17,8 @@ export default {
     this.enableNotifications();
     this.enableDownloadEvents();
     this.enableClientStatusUpdate();
+    this.enableGlobalBandwidthEvents();
+
     this.fetchLocalFiles();
     this.fetchRemoteFiles();
   },
@@ -39,10 +41,17 @@ export default {
         this.$store.commit("downloadEvents/addDownloadEvent", event);
       });
     },
+    enableGlobalBandwidthEvents() {
+      window.wails.Events.On("globalBandwidthUpdate", (totalDown, totalUp) => {
+        this.$store.commit("globalBandwidth/addGlobalBandwidth", {
+          totalDown,
+          totalUp,
+        });
+      });
+    },
     enableClientStatusUpdate() {
-      window.wails.Events.On("remoteClientsUpdate", (event) => {
-        console.log("status:", event);
-        this.$store.commit("clientStatus/addClientStatus", event);
+      window.wails.Events.On("remoteClientsUpdate", (total, online) => {
+        this.$store.commit("clientStatus/addClientStatus", { total, online });
       });
     },
   },
