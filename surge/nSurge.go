@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"os/user"
 
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
@@ -31,6 +32,9 @@ const NumWorkers = 16
 
 const localPath = "local"
 const remotePath = "remote"
+
+var localFolder = ""
+var remoteFolder = ""
 
 //OS folder permission bitflags
 const (
@@ -145,21 +149,32 @@ var wailsRuntime *wails.Runtime
 
 // Start initializes surge
 func Start(runtime *wails.Runtime) {
+
+	var err error
+
 	wailsRuntime = runtime
 	var dirFileMode os.FileMode
 	dirFileMode = os.ModeDir | (osUserRwx | osAllR)
 
-	//Ensure local and remote folders exist
-	if _, err := os.Stat(localPath); os.IsNotExist(err) {
-		os.Mkdir(localPath, dirFileMode)
+	myself, err := user.Current()
+	if err != nil {
+	  panic(err)
 	}
-	if _, err := os.Stat(remotePath); os.IsNotExist(err) {
-		os.Mkdir(remotePath, dirFileMode)
+	homedir := myself.HomeDir
+	localFolder = homedir + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "surge_" + localPath
+	remoteFolder = homedir + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "surge_" + remotePath
+
+	//Ensure local and remote folders exist
+	if _, err := os.Stat(localFolder); os.IsNotExist(err) {
+		os.Mkdir(localFolder, dirFileMode)
+	}
+	if _, err := os.Stat(remoteFolder); os.IsNotExist(err) {
+		os.Mkdir(remoteFolder, dirFileMode)
 	}
 
 	account := InitializeAccount()
 
-	var err error
+
 
 	client, err = nkn.NewMultiClient(account, "", NumClients, false, nil)
 	if err != nil {
@@ -413,8 +428,12 @@ func DownloadFile(Hash string) bool {
 
 	pushNotification("Download Started", file.FileName)
 
+
 	// If the file doesn't exist allocate it
-	var path = remotePath + "/" + file.FileName
+	var path = remoteFolder + string(os.PathSeparator) + file.FileName
+	fmt.Println(path)
+	fmt.Println(path)
+	fmt.Println(path)
 	AllocateFile(path, file.FileSize)
 	numChunks := int((file.FileSize-1)/int64(ChunkSize)) + 1
 

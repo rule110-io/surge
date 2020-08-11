@@ -3,7 +3,8 @@ package surge
 import (
 	"encoding/json"
 	"log"
-
+	"path/filepath"
+	"os"
 	"github.com/xujiajun/nutsdb"
 )
 
@@ -13,10 +14,17 @@ var db *nutsdb.DB
 
 //InitializeDb initializes db
 func InitializeDb() {
-	opt := nutsdb.DefaultOptions
-	opt.Dir = "./db"
-
 	var err error
+
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+    if err != nil {
+            log.Fatal(err)
+	}
+
+	opt := nutsdb.DefaultOptions
+	opt.Dir = dir + string(os.PathSeparator) + "db"
+
+
 	db, err = nutsdb.Open(opt)
 	if err != nil {
 		log.Fatal(err)

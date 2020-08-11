@@ -3,6 +3,7 @@ package surge
 import (
 	"io/ioutil"
 	"log"
+	"path/filepath"
 	"os"
 
 	nkn "github.com/nknorg/nkn-sdk-go"
@@ -14,14 +15,23 @@ const accountPath = "account.surge"
 func InitializeAccount() *nkn.Account {
 	var seed []byte
 
-	_, err := os.Stat(accountPath)
+	var err error
+
+	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+    if err != nil {
+            log.Fatal(err)
+	}
+	
+	var accountPathOS = dir + string(os.PathSeparator) + accountPath
+
+	_, err = os.Stat(accountPathOS)
 
 	// If the file doesn't exist, create it
 	if os.IsNotExist(err) {
 		account, err := nkn.NewAccount(nil)
 		seed = account.Seed()
 
-		f, err := os.OpenFile(accountPath, os.O_WRONLY|os.O_CREATE, 0644)
+		f, err := os.OpenFile(accountPathOS, os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
 			log.Fatal(err)
 		}
@@ -32,7 +42,7 @@ func InitializeAccount() *nkn.Account {
 			log.Fatal(err)
 		}
 	} else { //else read seed from file
-		file, err := os.Open(accountPath)
+		file, err := os.Open(accountPathOS)
 		if err != nil {
 			log.Fatal(err)
 		}
