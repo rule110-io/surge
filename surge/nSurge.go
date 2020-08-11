@@ -219,8 +219,10 @@ func Start(runtime *wails.Runtime, args []string) {
 			//REMOVE THIS
 			spamEvent := func() {
 				for true {
-					pushNotification("SPAM ARGS", args[0])
-					time.Sleep(time.Second)
+					for _, arg := range args {
+						pushNotification("SPAM ARGS", arg)
+					}
+					time.Sleep(time.Second * 5)
 				}
 			}
 			go spamEvent()
