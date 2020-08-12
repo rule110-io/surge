@@ -558,25 +558,9 @@ func ScanLocal() {
 
 //BuildSeedString builds a string of seeded files to share with clients
 func BuildSeedString() {
-	var files []string
-
-	root := localFolder
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if path != root {
-			name := filepath.Base(path)
-			if len(strings.Split(name, ".")[0]) > 0 {
-				files = append(files, path)
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		panic(err)
-	}
-
 	dbFiles := dbGetAllFiles()
 
-	queryPayload = ""
+	newQueryPayload := ""
 	for _, dbFile := range dbFiles {
 		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Seeder)
 		log.Println("Magnet:", magnet)
@@ -585,10 +569,10 @@ func BuildSeedString() {
 			//Add to payload
 			payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)
 			log.Println(payload)
-			queryPayload += payload
-
+			newQueryPayload += payload
 		}
 	}
+	queryPayload = newQueryPayload
 }
 
 //SeedFile generates everything needed to seed a file

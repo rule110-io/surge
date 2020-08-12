@@ -275,7 +275,9 @@ func updateGUI() {
 					log.Panicln(err)
 				}
 				fileEntry.IsDownloading = false
+				fileEntry.IsUploading = true
 				dbInsertFile(*fileEntry)
+				go BuildSeedString()
 			}
 		}
 		sessionsWriteLock.Unlock()
