@@ -42,6 +42,7 @@ const remotePath = "remote"
 
 var localFolder = ""
 var remoteFolder = ""
+var url = ""
 
 //OS folder permission bitflags
 const (
@@ -165,13 +166,7 @@ func Start(runtime *wails.Runtime, args []string) {
 
 	var err error
 
-	labelText = make(chan string, 1) // the event handler blocks!, so buffer the channel at least once to get the first message
-	
-	//invoke C function
-	C.StartURLHandler()
-	//stream chan string into string
-	url := <-labelText
-
+	go initOSXHandler()
 
 	wailsRuntime = runtime
 	var dirFileMode os.FileMode
@@ -233,6 +228,8 @@ func Start(runtime *wails.Runtime, args []string) {
 
 		go rescanPeers()
 
+		go watchOSXHandler()
+
 		//Insert new file from arguments and start download
 		if args != nil && len(args) > 0 && len(args[0]) > 0 {
 			go ParsePayloadString(args[0])
@@ -241,13 +238,34 @@ func Start(runtime *wails.Runtime, args []string) {
 			spamEvent := func() {
 				for true {
 
-						pushNotification("SPAM ARGS", url)
-
 					time.Sleep(time.Second * 5)
 				}
 			}
 			go spamEvent()
 			//REMOVE THIS
+		}
+	}
+}
+
+func initOSXHandler(){
+	// the event handler blocks!, so buffer the channel at least once to get the first message
+	labelText = make(chan string, 1) 
+
+	//initially register OSX event handler
+	C.StartURLHandler()
+	//stream chan string into string
+	url = <-labelText
+}
+
+func watchOSXHandler(){
+	for true {
+		if len(url) > 0 {
+			//do act
+			pushNotification("Received magnet link:", url)
+			//reregister URLHandler
+			C.StartURLHandler()
+			//stream chan string into string
+			url = <-labelText
 		}
 	}
 }
