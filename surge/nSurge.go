@@ -18,6 +18,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	"net/url"
 
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
@@ -42,7 +43,7 @@ const remotePath = "remote"
 
 var localFolder = ""
 var remoteFolder = ""
-var url = ""
+var magnetstring = ""
 
 //OS folder permission bitflags
 const (
@@ -254,19 +255,26 @@ func initOSXHandler(){
 	//initially register OSX event handler
 	C.StartURLHandler()
 	//stream chan string into string
-	url = <-labelText
+	magnetstring = <-labelText
 }
 
 func watchOSXHandler(){
 	for true {
-		if len(url) > 0 {
+		if len(magnetstring) > 0 {
 			//do act
-			pushNotification("Received magnet link:", url)
+			decodedMagetstring, err := url.QueryUnescape(magnetstring)
+			if err != nil {
+				log.Fatal(err)
+				return
+			}
+			go ParsePayloadString(decodedMagetstring)
+			pushNotification("Received magnet link:", decodedMagetstring)
 			//reregister URLHandler
 			C.StartURLHandler()
 			//stream chan string into string
-			url = <-labelText
+			magnetstring = <-labelText
 		}
+		time.Sleep(time.Second)
 	}
 }
 
