@@ -1,12 +1,16 @@
 package main
 
 import (
+	"log"
+	"os"
+
 	"github.com/leaanthony/mewn"
 	"github.com/rule110-io/surge-ui/surge"
 	"github.com/wailsapp/wails"
 )
 
 var wailsRuntime *wails.Runtime
+var arguments []string
 
 func getLocalFiles(Skip int, Take int) surge.LocalFilePageResult {
 
@@ -80,7 +84,7 @@ type Stats struct {
 // WailsInit .
 func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 	s.log = runtime.Log.New("Stats")
-	go surge.Start(runtime)
+	go surge.Start(runtime, arguments)
 
 	return nil
 }
@@ -89,6 +93,18 @@ func main() {
 	stats := &Stats{}
 	surge.InitializeDb()
 	defer surge.CloseDb()
+
+	argsWithProg := os.Args
+	argsWithoutProg := os.Args[1:]
+	log.Println(argsWithProg)
+	log.Println(argsWithoutProg)
+	//test string
+	//arguments = []string{"surge://|file|Futurama.S07E01.BRRip.x264-ION10.mp4|219091405|cd0731496277102a869dacb0e99b7708c2b708824b647ffeb267de4743b7856e|e5579685272ad6d162d263a498da6eda0f35db97626dc2ecff788e9675298b67|/"}
+
+	//invoked with a download
+	if len(argsWithoutProg) > 0 {
+		arguments = os.Args[1:]
+	}
 
 	js := mewn.String("./frontend/dist/app.js")
 	css := mewn.String("./frontend/dist/app.css")

@@ -7,10 +7,10 @@ import (
 	"math/rand"
 	"net"
 	"os"
+	"os/user"
 	"strings"
 	"sync"
 	"time"
-	"os/user"
 
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
@@ -35,6 +35,7 @@ const remotePath = "remote"
 
 var localFolder = ""
 var remoteFolder = ""
+var magnetstring = ""
 
 //OS folder permission bitflags
 const (
@@ -146,11 +147,14 @@ type FileStatusEvent struct {
 var ListedFiles []File
 
 var wailsRuntime *wails.Runtime
+var labelText chan string
 
 // Start initializes surge
-func Start(runtime *wails.Runtime) {
+func Start(runtime *wails.Runtime, args []string) {
 
 	var err error
+
+	go initOSXHandler()
 
 	wailsRuntime = runtime
 	var dirFileMode os.FileMode
@@ -158,7 +162,7 @@ func Start(runtime *wails.Runtime) {
 
 	myself, err := user.Current()
 	if err != nil {
-	  panic(err)
+		panic(err)
 	}
 	homedir := myself.HomeDir
 	localFolder = homedir + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "surge_" + localPath
@@ -173,10 +177,10 @@ func Start(runtime *wails.Runtime) {
 	}
 
 	account := InitializeAccount()
-
-
-
 	client, err = nkn.NewMultiClient(account, "", NumClients, false, nil)
+
+	log.Println("MY ADDRESS:", client.Addr().String())
+
 	if err != nil {
 		log.Fatal("If unexpected tell mutsi 0x0001", err)
 	} else {
@@ -211,6 +215,13 @@ func Start(runtime *wails.Runtime) {
 		go updateGUI()
 
 		go rescanPeers()
+
+		go watchOSXHandler()
+
+		//Insert new file from arguments and start download
+		if args != nil && len(args) > 0 && len(args[0]) > 0 {
+			go ParsePayloadString(args[0])
+		}
 	}
 }
 
@@ -427,7 +438,6 @@ func DownloadFile(Hash string) bool {
 	go initiateSession(surgeSession)
 
 	pushNotification("Download Started", file.FileName)
-
 
 	// If the file doesn't exist allocate it
 	var path = remoteFolder + string(os.PathSeparator) + file.FileName

@@ -377,6 +377,57 @@ func processQueryResponse(Session *Session, Data []byte) {
 	}
 }
 
+//ParsePayloadString parses payload of files
+func ParsePayloadString(s string) {
+	payloadSplit := strings.Split(s, "surge://")
+	for j := 0; j < len(payloadSplit); j++ {
+		data := strings.Split(payloadSplit[j], "|")
+
+		if len(data) < 3 {
+			continue
+		}
+
+		fileSize, _ := strconv.ParseInt(data[3], 10, 64)
+		numChunks := int((fileSize-1)/int64(ChunkSize)) + 1
+
+		newListing := File{
+			FileName:  data[2],
+			FileSize:  fileSize,
+			FileHash:  data[4],
+			Seeder:    data[5],
+			Path:      "",
+			NumChunks: numChunks,
+			ChunkMap:  nil,
+		}
+
+		//Replace existing, or remove.
+		var replace = false
+		for l := 0; l < len(ListedFiles); l++ {
+			if ListedFiles[l].FileHash == newListing.FileHash {
+				//TODO check seeder, if its unique add it as an additional seeder for the file
+				//For now we overwrite
+				ListedFiles[l] = newListing
+				replace = true
+				break
+			}
+		}
+		//Unique listing so we add
+		if replace == false {
+			ListedFiles = append(ListedFiles, newListing)
+		}
+
+		log.Println("Program paramater new file: ", newListing.FileName, " seeder: ", newListing.Seeder)
+
+		go DownloadFile(newListing.FileHash)
+
+		//Test gui
+		//newButton := widget.NewButton(newListing.Filename+" | "+ByteCountSI(newListing.FileSize), func() {
+		//	downloadFile(newListing.Seeder, newListing.FileSize, newListing.Filename)
+		//})
+		//fileBox.Append(newButton)
+	}
+}
+
 //WriteChunk writes a chunk to disk
 func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	workerCount--
@@ -430,6 +481,13 @@ func surgeGenerateTopicPayload(fileName string, sizeInBytes int64, hash string) 
 	//surge://|file|The_Two_Towers-The_Purist_Edit-Trailer.avi|14997504|965c013e991ee246d63d45ea71954c4d|/
 
 	return "surge://|file|" + fileName + "|" + strconv.FormatInt(sizeInBytes, 10) + "|" + hash + "|/"
+}
+
+func surgeGenerateMagnetLink(fileName string, sizeInBytes int64, hash string, seeder string) string {
+	//Example payload
+	//surge://|file|The_Two_Towers-The_Purist_Edit-Trailer.avi|14997504|965c013e991ee246d63d45ea71954c4d|/
+
+	return "surge://|file|" + fileName + "|" + strconv.FormatInt(sizeInBytes, 10) + "|" + hash + "|" + seeder + "|/"
 }
 
 // HashFile generates hash for file given filepath
@@ -520,11 +578,15 @@ func BuildSeedString() {
 
 	queryPayload = ""
 	for _, dbFile := range dbFiles {
+		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Seeder)
+		log.Println("Magnet:", magnet)
 
 		if dbFile.IsUploading {
 			//Add to payload
 			payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)
+			log.Println(payload)
 			queryPayload += payload
+
 		}
 	}
 }
