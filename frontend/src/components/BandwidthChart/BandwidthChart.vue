@@ -13,6 +13,7 @@
 <script>
 import { mapState } from "vuex";
 import LineChart from "@/components/Charts/Bandwidth.js";
+import "chartjs-plugin-streaming";
 
 export default {
   components: {
@@ -29,17 +30,17 @@ export default {
         datasets: [
           {
             label: "down",
-            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            backgroundColor: "rgba(44, 201, 144, 0.2)",
+            data: [0],
+            backgroundColor: "rgba(44, 201, 144, 0.3)",
             borderColor: "rgba(44, 201, 144, 1)",
-            borderWidth: 0,
+            borderWidth: 1,
           },
           {
             label: "up",
-            data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-            backgroundColor: "rgba(214, 54, 73, 0.1)",
-            borderColor: "rgba(214, 54, 73, 1",
-            borderWidth: 0,
+            data: [0],
+            backgroundColor: "rgba(214, 54, 73, 0.2)",
+            borderColor: "rgba(214, 54, 73, 1)",
+            borderWidth: 1,
           },
         ],
       },
@@ -72,29 +73,27 @@ export default {
           xAxes: [
             {
               display: false,
+              type: "realtime",
             },
           ],
+        },
+        plugins: {
+          streaming: {
+            onRefresh: (chart) => {
+              chart.data.labels.push(Date.now());
+              chart.data.datasets[0].data.push(this.totalDown);
+              chart.data.datasets[1].data.push(this.totalUp);
+            },
+            delay: 2000,
+          },
         },
       },
     };
   },
   mounted() {
-    this.interval = setInterval(this.updateData, 1000);
+    // this.interval = setInterval(this.updateData, 5000);
   },
-  destroyed() {
-    clearInterval(this.interval);
-  },
-  methods: {
-    updateData() {
-      const chartData = Object.assign({}, this.chartData);
-      chartData.datasets[0].data.shift();
-      chartData.datasets[0].data.push(this.totalDown);
-
-      chartData.datasets[1].data.shift();
-      chartData.datasets[1].data.push(this.totalUp);
-
-      this.chartData = chartData;
-    },
-  },
+  destroyed() {},
+  methods: {},
 };
 </script>

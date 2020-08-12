@@ -11,6 +11,7 @@
     "@wailsapp/runtime": "^1.0.11",
     "babel-plugin-transform-remove-strict-mode": "0.0.2",
     "chart.js": "^2.9.3",
+    "chartjs-plugin-streaming": "^1.8.0",
     "core-js": "^3.6.4",
     "feather-icons": "^4.28.0",
     "lodash": "^4.17.19",
