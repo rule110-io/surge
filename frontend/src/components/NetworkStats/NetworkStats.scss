@@ -18,6 +18,11 @@
     margin: 0 $padding-normal;
     display: inline-flex;
     align-items: center;
+    z-index: 1;
+    position: relative;
+  }
+
+  &__avg {
   }
 
   &__status {
@@ -49,6 +54,7 @@
     background: $primary;
     left: 44%;
     top: -24px;
+    z-index: 1;
 
     &:hover {
       transform: scale(1.1);

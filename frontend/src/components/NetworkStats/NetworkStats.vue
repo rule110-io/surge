@@ -11,9 +11,13 @@
     <div class="network-stats__file" @click="seedFile">
       <feather class="network-stats__file-icon" type="plus"></feather>
     </div>
+    <BandwidthChart />
+
     <div class="network-stats__item">
-      Avg Speed: {{ totalDown | prettyBytes(1) }}/s |
-      {{ totalUp | prettyBytes(1) }}/s
+      <span class="network-stats__avg">
+        Avg Speed: {{ totalDown | prettyBytes(1) }}/s |
+        {{ totalUp | prettyBytes(1) }}/s</span
+      >
     </div>
   </div>
 </template>
@@ -23,9 +27,14 @@
 </style>
 
 <script>
+import BandwidthChart from "@/components/BandwidthChart/BandwidthChart";
+
 import { mapState } from "vuex";
 
 export default {
+  components: {
+    BandwidthChart,
+  },
   data: () => {
     return {};
   },
