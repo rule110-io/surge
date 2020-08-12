@@ -3,7 +3,6 @@ package surge
 //#cgo CFLAGS: -x objective-c
 //#cgo LDFLAGS: -framework Foundation
 //#include "handler_darwin.h"
-
 import "C"
 import (
 	"log"
