@@ -1,5 +1,12 @@
 package surge
 
+/*
+#cgo CFLAGS: -x objective-c
+#cgo LDFLAGS: -framework Foundation
+#include "handler.h"
+*/
+import "C"
+
 import (
 	"bufio"
 	"fmt"
@@ -146,11 +153,25 @@ type FileStatusEvent struct {
 var ListedFiles []File
 
 var wailsRuntime *wails.Runtime
+var labelText chan string
+
+//export HandleURL
+func HandleURL(u *C.char) {
+	labelText <- C.GoString(u)
+}
 
 // Start initializes surge
 func Start(runtime *wails.Runtime, args []string) {
 
 	var err error
+
+	labelText = make(chan string, 1) // the event handler blocks!, so buffer the channel at least once to get the first message
+	
+	//invoke C function
+	C.StartURLHandler()
+	//stream chan string into string
+	url := <-labelText
+
 
 	wailsRuntime = runtime
 	var dirFileMode os.FileMode
@@ -219,9 +240,9 @@ func Start(runtime *wails.Runtime, args []string) {
 			//REMOVE THIS
 			spamEvent := func() {
 				for true {
-					for _, arg := range args {
-						pushNotification("SPAM ARGS", arg)
-					}
+
+						pushNotification("SPAM ARGS", url)
+
 					time.Sleep(time.Second * 5)
 				}
 			}
