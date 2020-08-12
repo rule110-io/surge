@@ -6,6 +6,7 @@ import (
 	"path/filepath"
 	"os"
 	"github.com/xujiajun/nutsdb"
+	"runtime"
 )
 
 const fileBucketName = "fileBucket"
@@ -22,7 +23,15 @@ func InitializeDb() {
 	}
 
 	opt := nutsdb.DefaultOptions
-	opt.Dir = dir + string(os.PathSeparator) + "db"
+
+
+	if runtime.GOOS == "darwin" {
+		dir, _ = os.UserHomeDir()
+		dir = dir + string(os.PathSeparator) + ".surge"
+		opt.Dir = dir + string(os.PathSeparator) + "db"
+	} else {
+		opt.Dir = dir + string(os.PathSeparator) + "db"
+	}
 
 
 	db, err = nutsdb.Open(opt)
