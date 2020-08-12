@@ -11,6 +11,7 @@ import (
 	"strings"
 	"sync"
 	"time"
+	runtimelib "runtime"
 
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
@@ -168,6 +169,14 @@ func Start(runtime *wails.Runtime, args []string) {
 	localFolder = homedir + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "surge_" + localPath
 	remoteFolder = homedir + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "surge_" + remotePath
 
+	if runtimelib.GOOS == "darwin" {
+		dir, _ := os.UserHomeDir()
+		dir = dir + string(os.PathSeparator) + ".surge"
+		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			os.Mkdir(dir, dirFileMode)
+		}
+	}
+
 	//Ensure local and remote folders exist
 	if _, err := os.Stat(localFolder); os.IsNotExist(err) {
 		os.Mkdir(localFolder, dirFileMode)
@@ -266,7 +275,9 @@ func updateGUI() {
 					log.Panicln(err)
 				}
 				fileEntry.IsDownloading = false
+				fileEntry.IsUploading = true
 				dbInsertFile(*fileEntry)
+				go BuildSeedString()
 			}
 		}
 		sessionsWriteLock.Unlock()
