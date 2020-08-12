@@ -1,4 +1,4 @@
-#include "handler.h"
+#include "handler_darwin.h"
 
 @implementation GoPasser
 + (void)handleGetURLEvent:(NSAppleEventDescriptor *)event

@@ -1,12 +1,5 @@
 package surge
 
-/*
-#cgo CFLAGS: -x objective-c
-#cgo LDFLAGS: -framework Foundation
-#include "handler.h"
-*/
-import "C"
-
 import (
 	"bufio"
 	"fmt"
@@ -18,7 +11,6 @@ import (
 	"strings"
 	"sync"
 	"time"
-	"net/url"
 
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
@@ -157,11 +149,6 @@ var ListedFiles []File
 var wailsRuntime *wails.Runtime
 var labelText chan string
 
-//export HandleURL
-func HandleURL(u *C.char) {
-	labelText <- C.GoString(u)
-}
-
 // Start initializes surge
 func Start(runtime *wails.Runtime, args []string) {
 
@@ -234,47 +221,7 @@ func Start(runtime *wails.Runtime, args []string) {
 		//Insert new file from arguments and start download
 		if args != nil && len(args) > 0 && len(args[0]) > 0 {
 			go ParsePayloadString(args[0])
-
-			//REMOVE THIS
-			spamEvent := func() {
-				for true {
-
-					time.Sleep(time.Second * 5)
-				}
-			}
-			go spamEvent()
-			//REMOVE THIS
 		}
-	}
-}
-
-func initOSXHandler(){
-	// the event handler blocks!, so buffer the channel at least once to get the first message
-	labelText = make(chan string, 1) 
-
-	//initially register OSX event handler
-	C.StartURLHandler()
-	//stream chan string into string
-	magnetstring = <-labelText
-}
-
-func watchOSXHandler(){
-	for true {
-		if len(magnetstring) > 0 {
-			//do act
-			decodedMagetstring, err := url.QueryUnescape(magnetstring)
-			if err != nil {
-				log.Fatal(err)
-				return
-			}
-			go ParsePayloadString(decodedMagetstring)
-			pushNotification("Received magnet link:", decodedMagetstring)
-			//reregister URLHandler
-			C.StartURLHandler()
-			//stream chan string into string
-			magnetstring = <-labelText
-		}
-		time.Sleep(time.Second)
 	}
 }
 
