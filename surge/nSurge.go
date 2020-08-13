@@ -8,10 +8,10 @@ import (
 	"net"
 	"os"
 	"os/user"
+	runtimelib "runtime"
 	"strings"
 	"sync"
 	"time"
-	runtimelib "runtime"
 
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
@@ -163,7 +163,7 @@ func Start(runtime *wails.Runtime, args []string) {
 
 	myself, err := user.Current()
 	if err != nil {
-		panic(err)
+		pushError("Error on startup", err.Error())
 	}
 	homedir := myself.HomeDir
 	localFolder = homedir + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "surge_" + localPath
@@ -191,7 +191,7 @@ func Start(runtime *wails.Runtime, args []string) {
 	log.Println("MY ADDRESS:", client.Addr().String())
 
 	if err != nil {
-		log.Fatal("If unexpected tell mutsi 0x0001", err)
+		pushError("Error on startup", err.Error())
 	} else {
 		<-client.OnConnect.C
 
@@ -272,7 +272,7 @@ func updateGUI() {
 
 				fileEntry, err := dbGetFile(session.FileHash)
 				if err != nil {
-					log.Panicln(err)
+					pushError("Error on download complete", err.Error())
 				}
 				fileEntry.IsDownloading = false
 				fileEntry.IsUploading = true
@@ -393,7 +393,8 @@ func GetSubscriptions(Topic string) {
 
 	subscribers, err := client.GetSubscribers(Topic, 0, 100, true, true)
 	if err != nil {
-		log.Fatal("If unexpected tell mutsi 0x0002", err)
+		pushError("Error on get subscriptions", err.Error())
+		return
 	}
 
 	for k, v := range subscribers.SubscribersInTxPool.Map {
@@ -436,7 +437,7 @@ func DownloadFile(Hash string) bool {
 
 	file := getListedFileByHash(Hash)
 	if file == nil {
-		log.Panic("No listed file with hash", Hash)
+		pushError("Error on download file", "No listed file with hash: "+Hash)
 	}
 
 	// Create a sessions
@@ -505,6 +506,11 @@ func DownloadFile(Hash string) bool {
 func pushNotification(title string, text string) {
 	log.Println("Emitting Event: ", "notificationEvent", title, text)
 	wailsRuntime.Events.Emit("notificationEvent", title, text)
+}
+
+func pushError(title string, text string) {
+	log.Println("Emitting Event: ", "errorEvent", title, text)
+	wailsRuntime.Events.Emit("errorEvent", title, text)
 }
 
 //SearchQueryResult is a paging query result for file searches

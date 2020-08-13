@@ -42,7 +42,8 @@ func OpenOSPath(Path string) {
 func OpenFileByHash(Hash string) {
 	fileInfo, err := dbGetFile(Hash)
 	if err != nil {
-		log.Panicln(err)
+		pushError("Error on open file", err.Error())
+		return
 	}
 	OpenOSPath(fileInfo.Path)
 }
@@ -51,7 +52,8 @@ func OpenFileByHash(Hash string) {
 func OpenFolderByHash(Hash string) {
 	fileInfo, err := dbGetFile(Hash)
 	if err != nil {
-		log.Panicln(err)
+		pushError("Error on open folder", err.Error())
+		return
 	}
 	OpenOSPath(filepath.Dir(fileInfo.Path))
 }
@@ -78,13 +80,15 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	//Open file
 	fileInfo, err := dbGetFile(FileID)
 	if err != nil {
-		log.Fatal("If unexpected tell mutsi 0x0006", err)
+		pushError("Error on transmit chunk", err.Error())
+		return
 	}
 
 	file, err := os.Open(fileInfo.Path)
 
 	if err != nil {
-		log.Fatal("If unexpected tell mutsi 0x0007", err)
+		pushError("Error on transmit chunk", err.Error())
+		return
 	}
 	defer file.Close()
 
@@ -95,7 +99,8 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 
 	if err != nil {
 		if err != io.EOF {
-			log.Fatal("If unexpected tell mutsi 0x0008", err)
+			pushError("Error on transmit chunk", err.Error())
+			return
 		}
 	}
 
@@ -107,13 +112,14 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	}
 	dateReplySerialized, err := proto.Marshal(dataReply)
 	if err != nil {
-		log.Fatalln("Failed to encode surge message:", err)
+		pushError("Error on transmit chunk", err.Error())
+		return
 	}
 
 	//Transmit the chunk
 	err = SessionWrite(Session, dateReplySerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), dateReplySerialized, nil)
 	if err != nil {
-		log.Fatal("If unexpected tell mutsi 0x0009", err)
+		pushError("Error on transmit chunk", err.Error())
 		return
 	}
 	log.Println("Chunk transmitted: ", bytesread, " bytes")
@@ -209,7 +215,8 @@ func listenForSession() {
 	for !client.IsClosed() {
 		listenSession, err := client.Accept()
 		if err != nil {
-			log.Panic(err)
+			pushError("Error on client accept", err.Error())
+			continue
 		}
 
 		var surgeSession *Session = nil
@@ -438,7 +445,7 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	//Open file
 	file, err := os.OpenFile(path, os.O_RDWR, 0644)
 	if err != nil {
-		log.Fatal("If unexpected tell mutsi 0x0003", err)
+		pushError("Error on write chunk", err.Error())
 		return
 	}
 	defer file.Close()
@@ -447,7 +454,7 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 
 	bytesWritten, err := file.WriteAt(Chunk, chunkOffset)
 	if err != nil {
-		log.Fatal("If unexpected tell mutsi 0x0004", err)
+		pushError("Error on write chunk", err.Error())
 		return
 	}
 	//Success
@@ -461,7 +468,8 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 		//Set chunk to available in the map
 		fileInfo, err = dbGetFile(FileID)
 		if err != nil {
-			log.Panicln(err)
+			pushError("Error on chunk write", err.Error())
+			return
 		}
 		bitmap.Set(fileInfo.ChunkMap, int(ChunkID), true)
 		dbInsertFile(*fileInfo)
@@ -522,38 +530,10 @@ func HashFile(filePath string) (string, error) {
 func surgeGetFileSize(path string) int64 {
 	fi, err := os.Stat(path)
 	if err != nil {
-		log.Fatal("If unexpected tell mutsi 0x0005", err)
+		log.Panicln("Error on get filesize", err)
 	}
 	// get the size
 	return fi.Size()
-}
-
-//ScanLocal scans local files
-func ScanLocal() {
-	var files []string
-
-	root := localFolder
-	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
-		if path != root {
-			name := filepath.Base(path)
-			if len(strings.Split(name, ".")[0]) > 0 {
-				files = append(files, path)
-			}
-		}
-		return nil
-	})
-	if err != nil {
-		panic(err)
-	}
-
-	var topic = TestTopic
-	queryPayload = ""
-	for _, file := range files {
-		SeedFile(file)
-	}
-	topicEncoded := TopicEncode(topic)
-	sendSeedSubscription(topicEncoded, queryPayload)
-	log.Println("Seeding to Topic: ", topicEncoded)
 }
 
 //BuildSeedString builds a string of seeded files to share with clients
@@ -628,7 +608,8 @@ func SeedFile(Path string) bool {
 func restartDownload(Hash string) {
 	file, err := dbGetFile(Hash)
 	if err != nil {
-		log.Panicln(err)
+		pushError("Error on restart download", err.Error())
+		return
 	}
 
 	//If its not downloading we do not have to do anything

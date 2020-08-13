@@ -3,10 +3,11 @@ package surge
 import (
 	"encoding/json"
 	"log"
-	"path/filepath"
 	"os"
-	"github.com/xujiajun/nutsdb"
+	"path/filepath"
 	"runtime"
+
+	"github.com/xujiajun/nutsdb"
 )
 
 const fileBucketName = "fileBucket"
@@ -18,12 +19,11 @@ func InitializeDb() {
 	var err error
 
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-    if err != nil {
-            log.Fatal(err)
+	if err != nil {
+		log.Fatal(err)
 	}
 
 	opt := nutsdb.DefaultOptions
-
 
 	if runtime.GOOS == "darwin" {
 		dir, _ = os.UserHomeDir()
@@ -32,7 +32,6 @@ func InitializeDb() {
 	} else {
 		opt.Dir = dir + string(os.PathSeparator) + "db"
 	}
-
 
 	db, err = nutsdb.Open(opt)
 	if err != nil {
