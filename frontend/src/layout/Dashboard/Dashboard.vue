@@ -18,6 +18,7 @@ export default {
     this.enableDownloadEvents();
     this.enableClientStatusUpdate();
     this.enableGlobalBandwidthEvents();
+    this.enableErrorEvents();
 
     this.fetchLocalFiles();
     this.fetchRemoteFiles();
@@ -33,6 +34,15 @@ export default {
       window.wails.Events.On("notificationEvent", (title, text) => {
         const notification = { title, text };
         this.$store.commit("notifications/addNotification", notification);
+      });
+    },
+    enableErrorEvents() {
+      window.wails.Events.On("errorEvent", (title, text) => {
+        this.$store.dispatch("snackbar/updateSnack", {
+          snack: `${title}: ${text}`,
+          color: "error",
+          timeout: false,
+        });
       });
     },
     enableDownloadEvents() {

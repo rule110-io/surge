@@ -90,9 +90,7 @@ export default {
       },
     };
   },
-  mounted() {
-    // this.interval = setInterval(this.updateData, 5000);
-  },
+  mounted() {},
   destroyed() {},
   methods: {},
 };

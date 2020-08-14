@@ -1,0 +1,58 @@
+.snackbar {
+  position: absolute;
+  bottom: 0;
+  box-shadow: $shadow-1;
+  width: calc(100% - 80px);
+  z-index: 10000;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: $padding-default;
+  box-sizing: border-box;
+  transition: $transition-1;
+  transform: translateY(200px);
+  box-shadow: $shadow-1;
+
+  &_color {
+    &_error {
+      background-color: $error;
+    }
+
+    &_success {
+      background-color: $primary;
+    }
+  }
+
+  &_visible {
+    transform: translateY(0px);
+  }
+
+  &__button {
+    appearance: none;
+    border: none;
+    background: transparent;
+    outline: none;
+  }
+
+  &__close {
+    color: white;
+    font-size: 16px;
+    cursor: pointer;
+    transition: $transition-1;
+
+    &:hover {
+      opacity: 0.8;
+    }
+
+    &:active {
+      opacity: 0.7;
+    }
+  }
+
+  &__text {
+    color: white;
+  }
+}

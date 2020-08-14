@@ -1,5 +1,6 @@
 <template>
   <div class="dashboard">
+    <Snackbar />
     <Header />
     <router-view
       v-if="remoteFiles !== false && localFiles !== false"
@@ -19,9 +20,10 @@ import { mapState } from "vuex";
 import Header from "@/components/Header/Header";
 import Preloader from "@/components/Preloader/Preloader";
 import NetworkStats from "@/components/NetworkStats/NetworkStats";
+import Snackbar from "@/components/Snackbar/Snackbar.vue";
 
 export default {
-  components: { Header, Preloader, NetworkStats },
+  components: { Header, Preloader, NetworkStats, Snackbar },
   data: () => {
     return {};
   },

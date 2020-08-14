@@ -1,9 +1,11 @@
 import Vue from "vue";
 import Vuex from "vuex";
+
 import Notifications from "./modules/notifications";
 import DownloadEvents from "./modules/downloadEvents";
 import ClientStatus from "./modules/clientStatus";
 import GlobalBandwidth from "./modules/globalBandwidth";
+import Snackbar from "./modules/snackbar";
 
 import Files from "./modules/files";
 
@@ -17,6 +19,7 @@ export const store = new Vuex.Store({
     clientStatus: ClientStatus,
     globalBandwidth: GlobalBandwidth,
     files: Files,
+    snackbar: Snackbar,
   },
 });
 
