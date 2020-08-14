@@ -293,6 +293,9 @@ func closeSession(Session *Session) {
 	Session.session.Close()
 	Session.session = nil
 	Session.reader = nil
+	if Session.file != nil {
+		Session.file.Close()
+	}
 
 	//Replace index of session to be removed with last element in slice
 	Sessions[index] = Sessions[len(Sessions)-1]
@@ -439,20 +442,20 @@ func ParsePayloadString(s string) {
 func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	workerCount--
 
-	fileInfo, err := dbGetFile(FileID)
-	var path = remoteFolder + string(os.PathSeparator) + fileInfo.FileName
+	if Session.file == nil {
+		fileInfo, err := dbGetFile(FileID)
+		var path = remoteFolder + string(os.PathSeparator) + fileInfo.FileName
 
-	//Open file
-	file, err := os.OpenFile(path, os.O_RDWR, 0644)
-	if err != nil {
-		pushError("Error on write chunk", err.Error())
-		return
+		//Open file
+		Session.file, err = os.OpenFile(path, os.O_RDWR, 0644)
+		if err != nil {
+			pushError("Error on write chunk", err.Error())
+			return
+		}
 	}
-	defer file.Close()
 
 	chunkOffset := int64(ChunkID) * ChunkSize
-
-	bytesWritten, err := file.WriteAt(Chunk, chunkOffset)
+	bytesWritten, err := Session.file.WriteAt(Chunk, chunkOffset)
 	if err != nil {
 		pushError("Error on write chunk", err.Error())
 		return
@@ -466,7 +469,7 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 		fileWriteLock.Lock()
 
 		//Set chunk to available in the map
-		fileInfo, err = dbGetFile(FileID)
+		fileInfo, err := dbGetFile(FileID)
 		if err != nil {
 			pushError("Error on chunk write", err.Error())
 			return

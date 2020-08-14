@@ -3,8 +3,8 @@ package surge
 import (
 	"io/ioutil"
 	"log"
-	"path/filepath"
 	"os"
+	"path/filepath"
 	"runtime"
 
 	nkn "github.com/nknorg/nkn-sdk-go"
@@ -25,14 +25,13 @@ func InitializeAccount() *nkn.Account {
 	} else {
 		dir, err = filepath.Abs(filepath.Dir(os.Args[0]))
 		if err != nil {
-				log.Fatal(err)
+			log.Fatal(err)
 		}
 	}
 
 	log.Println(runtime.GOOS)
 	log.Println(runtime.GOOS)
 	log.Println(runtime.GOOS)
-
 
 	var accountPathOS = dir + string(os.PathSeparator) + accountPath
 

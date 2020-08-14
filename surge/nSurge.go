@@ -131,6 +131,7 @@ type Session struct {
 	Uploaded   int64
 	session    net.Conn
 	reader     *bufio.Reader
+	file       *os.File
 }
 
 // FileStatusEvent holds update info on download progress
