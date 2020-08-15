@@ -22,6 +22,8 @@ export default {
 
     this.fetchLocalFiles();
     this.fetchRemoteFiles();
+
+    this.getNumberOfRemoteClient();
   },
   methods: {
     fetchLocalFiles() {
@@ -29,6 +31,16 @@ export default {
     },
     fetchRemoteFiles() {
       this.$store.dispatch("files/fetchRemoteFiles");
+    },
+    getNumberOfRemoteClient() {
+      window.backend
+        .getNumberOfRemoteClient()
+        .then(({ NumKnown, NumOnline }) => {
+          this.$store.commit("clientStatus/addClientStatus", {
+            total: NumKnown,
+            online: NumOnline,
+          });
+        });
     },
     enableNotifications() {
       window.wails.Events.On("notificationEvent", (title, text) => {
