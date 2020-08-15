@@ -482,7 +482,7 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	Session.Downloaded += int64(bytesWritten)
 
 	//Update bitmap async as this has a lock in it but does not have to be waited for
-	setBitMap := func() {
+	/*setBitMap := func() {
 		fileWriteLock.Lock()
 
 		//Set chunk to available in the map
@@ -496,7 +496,20 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 
 		fileWriteLock.Unlock()
 	}
-	go setBitMap()
+	go setBitMap()*/
+
+	fileWriteLock.Lock()
+
+	//Set chunk to available in the map
+	fileInfo, err := dbGetFile(FileID)
+	if err != nil {
+		pushError("Error on chunk write", err.Error())
+		return
+	}
+	bitmap.Set(fileInfo.ChunkMap, int(ChunkID), true)
+	dbInsertFile(*fileInfo)
+
+	fileWriteLock.Unlock()
 }
 
 //TopicEncode .
