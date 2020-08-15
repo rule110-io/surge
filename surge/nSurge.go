@@ -151,6 +151,9 @@ var ListedFiles []File
 var wailsRuntime *wails.Runtime
 var labelText chan string
 
+var numClientsSubscribed int
+var numClientsOnline int
+
 // Start initializes surge
 func Start(runtime *wails.Runtime, args []string) {
 
@@ -243,6 +246,10 @@ func rescanPeers() {
 				numOnline++
 			}
 		}
+
+		numClientsSubscribed = len(clientOnlineMap)
+		numClientsOnline = numOnline
+
 		wailsRuntime.Events.Emit("remoteClientsUpdate", len(clientOnlineMap), numOnline)
 		clientOnlineMapLock.Unlock()
 
@@ -250,6 +257,11 @@ func rescanPeers() {
 		topicEncoded := TopicEncode(TestTopic)
 		go GetSubscriptions(topicEncoded)
 	}
+}
+
+//GetNumberOfRemoteClient returns number of clients and online clients
+func GetNumberOfRemoteClient() (int, int) {
+	return numClientsSubscribed, numClientsOnline
 }
 
 func updateGUI() {
