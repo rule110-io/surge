@@ -45,7 +45,7 @@ func getFileChunkMap(Hash string, Size int) string {
 	if Size == 0 {
 		Size = 400
 	}
-	return surge.GetFileChunkMapString(Hash, Size)
+	return surge.GetFileChunkMapStringByHash(Hash, Size)
 }
 
 func downloadFile(Hash string) bool {

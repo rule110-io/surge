@@ -315,6 +315,23 @@ func processChunk(Session *Session, Data []byte) {
 		log.Fatalln("Failed to parse surge message:", err)
 	}
 
+	//If this is the first file data over this session we need to set the session
+	if Session.FileHash == "" {
+		dbFile, err := dbGetFile(surgeMessage.FileID)
+		if err != nil {
+			log.Println("Chunk requested by someone for a file which we do not have in our db")
+			return
+		}
+
+		if !dbFile.IsUploading {
+			log.Println("Chunk requested by someone for a file which we have not marked as uploading")
+			return
+		}
+
+		Session.FileHash = dbFile.FileHash
+		Session.FileSize = dbFile.FileSize
+	}
+
 	//Data nill means its a request for data
 	if surgeMessage.Data == nil {
 		go TransmitChunk(Session, surgeMessage.FileID, surgeMessage.ChunkID)

@@ -260,7 +260,7 @@ func updateGUI() {
 
 		sessionsWriteLock.Lock()
 		for _, session := range Sessions {
-			log.Println("Active session:", session.session.RemoteAddr().String())
+			//log.Println("Active session:", session.session.RemoteAddr().String())
 			if session.FileSize == 0 {
 				continue
 			}
@@ -286,15 +286,15 @@ func updateGUI() {
 		totalDown := 0
 		totalUp := 0
 
-		//for each file in aggregate maps send out a status event
-		for key := range fileProgressMap {
-			fileInfo, err := dbGetFile(key)
-			if err != nil {
-				log.Println(err)
-				continue
+		//Insert uploads
+		allFiles := dbGetAllFiles()
+		for _, file := range allFiles {
+			if file.IsUploading {
+				fileProgressMap[file.FileHash] = 1
 			}
+			key := file.FileHash
 
-			if fileInfo.IsPaused {
+			if file.IsPaused {
 				continue
 			}
 
@@ -307,13 +307,13 @@ func updateGUI() {
 				Progress:          fileProgressMap[key],
 				DownloadBandwidth: down,
 				UploadBandwidth:   up,
-				NumChunks:         fileInfo.NumChunks,
-				ChunkMap:          GetFileChunkMapString(key, 400),
+				NumChunks:         file.NumChunks,
+				ChunkMap:          GetFileChunkMapString(&file, 400),
 			}
-			log.Println("Emitting FileStatusEvent: ", statusEvent)
 			wailsRuntime.Events.Emit("fileStatusEvent", statusEvent)
 		}
 
+		//log.Println("Emitting globalBandwidthUpdate: ", totalDown, totalUp)
 		wailsRuntime.Events.Emit("globalBandwidthUpdate", totalDown, totalUp)
 	}
 }
@@ -582,12 +582,7 @@ func GetTrackedFiles() []File {
 }
 
 //GetFileChunkMapString returns the chunkmap in hex for a file given by hash
-func GetFileChunkMapString(Hash string, Size int) string {
-	file, err := dbGetFile(Hash)
-	if err != nil {
-		return ""
-	}
-
+func GetFileChunkMapString(file *File, Size int) string {
 	outputSize := Size
 	inputSize := file.NumChunks
 
@@ -625,7 +620,15 @@ func GetFileChunkMapString(Hash string, Size int) string {
 		}
 	}
 	return boolBuffer
-	//return hex.EncodeToString(file.ChunkMap)
+}
+
+//GetFileChunkMapStringByHash returns the chunkmap in hex for a file given by hash
+func GetFileChunkMapStringByHash(Hash string, Size int) string {
+	file, err := dbGetFile(Hash)
+	if err != nil {
+		return ""
+	}
+	return GetFileChunkMapString(file, 400)
 }
 
 //SetFilePause sets a file IsPaused state for by file hash
