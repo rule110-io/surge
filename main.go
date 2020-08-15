@@ -64,6 +64,10 @@ func openFolder(Hash string) {
 	surge.OpenFolderByHash(Hash)
 }
 
+func getNumberOfRemoteClient() (int, int) {
+	return surge.GetNumberOfRemoteClient()
+}
+
 func seedFile() bool {
 	path, err := surge.OpenFileDialog()
 	if err != nil {
@@ -128,6 +132,7 @@ func main() {
 	app.Bind(getFileChunkMap)
 	app.Bind(seedFile)
 	app.Bind(removeFile)
+	app.Bind(getNumberOfRemoteClient)
 
 	app.Run()
 
