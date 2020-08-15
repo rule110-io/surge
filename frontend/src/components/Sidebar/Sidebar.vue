@@ -1,6 +1,7 @@
 <template>
   <div class="sidebar">
-    <Logo class="sidebar__logo" />
+    <Logo v-if="!darkTheme" class="sidebar__logo" />
+    <LogoGradient v-else class="sidebar__logo" />
     <div class="sidebar__nav">
       <router-link to="/search" class="sidebar__item">
         <feather class="sidebar__item-icon" type="search"></feather
@@ -20,9 +21,15 @@
 </style>
 
 <script>
+import { mapState } from "vuex";
+
 import Logo from "@/assets/images/Logo.svg";
+import LogoGradient from "@/assets/images/LogoGradient.svg";
 
 export default {
-  components: { Logo },
+  components: { Logo, LogoGradient },
+  computed: {
+    ...mapState("darkTheme", ["darkTheme"]),
+  },
 };
 </script>

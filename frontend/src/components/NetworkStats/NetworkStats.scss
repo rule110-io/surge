@@ -77,6 +77,10 @@
       height: 18px;
       color: white;
       transition: $transition-1;
+
+      @include dark-theme {
+        color: color(dark, darkest);
+      }
     }
   }
 }
