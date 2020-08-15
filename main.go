@@ -64,8 +64,19 @@ func openFolder(Hash string) {
 	surge.OpenFolderByHash(Hash)
 }
 
-func getNumberOfRemoteClient() (int, int) {
-	return surge.GetNumberOfRemoteClient()
+//RemoteClientOnlineModel holds info of remote clients
+type RemoteClientOnlineModel struct {
+	NumKnown  int
+	NumOnline int
+}
+
+func getNumberOfRemoteClient() RemoteClientOnlineModel {
+	total, online := surge.GetNumberOfRemoteClient()
+
+	return RemoteClientOnlineModel{
+		NumKnown:  total,
+		NumOnline: online,
+	}
 }
 
 func seedFile() bool {
