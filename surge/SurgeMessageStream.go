@@ -28,9 +28,9 @@ func SessionWrite(Session *Session, Data []byte, ID byte) (err error) {
 	}
 
 	//Write add to upload
-	if Session.FileHash != "" {
-		uploadBandwidthAccumulator[Session.FileHash] += len(Data)
-	}
+	bandwidthAccumulatorMap.Lock()
+	uploadBandwidthAccumulator[Session.FileHash] += len(Data)
+	bandwidthAccumulatorMap.Unlock()
 
 	return err
 }
@@ -68,9 +68,9 @@ func SessionRead(Session *Session) (data []byte, ID byte, err error) {
 	}
 
 	//Write add to download
-	if Session.FileHash != "" {
-		downloadBandwidthAccumulator[Session.FileHash] += int(size)
-	}
+	bandwidthAccumulatorMap.Lock()
+	downloadBandwidthAccumulator[Session.FileHash] += int(size)
+	bandwidthAccumulatorMap.Unlock()
 
 	return data, packID, err
 }

@@ -82,11 +82,11 @@ var client *nkn.MultiClient
 
 var clientOnlineMap map[string]bool
 
-var downloadBandwidthMap map[string][]int
-var uploadBandwidthMap map[string][]int
-
 var downloadBandwidthAccumulator map[string]int
 var uploadBandwidthAccumulator map[string]int
+
+var clientOnlineMapLock = &sync.Mutex{}
+var bandwidthAccumulatorMap = &sync.Mutex{}
 
 //Sessions .
 var Sessions []*Session
@@ -205,8 +205,6 @@ func Start(runtime *wails.Runtime, args []string) {
 		topicEncoded := TopicEncode(TestTopic)
 
 		clientOnlineMap = make(map[string]bool)
-		downloadBandwidthMap = make(map[string][]int)
-		uploadBandwidthMap = make(map[string][]int)
 		downloadBandwidthAccumulator = make(map[string]int)
 		uploadBandwidthAccumulator = make(map[string]int)
 
@@ -239,12 +237,15 @@ func rescanPeers() {
 	for true {
 		var numOnline = 0
 		//Count num online clients
+		clientOnlineMapLock.Lock()
 		for _, value := range clientOnlineMap {
 			if value == true {
 				numOnline++
 			}
 		}
 		wailsRuntime.Events.Emit("remoteClientsUpdate", len(clientOnlineMap), numOnline)
+		clientOnlineMapLock.Unlock()
+
 		time.Sleep(time.Minute)
 		topicEncoded := TopicEncode(TestTopic)
 		go GetSubscriptions(topicEncoded)
@@ -320,11 +321,13 @@ func updateGUI() {
 
 func fileBandwidth(FileID string) (Download int, Upload int) {
 	//Get accumulator
+	bandwidthAccumulatorMap.Lock()
 	downAccu := downloadBandwidthAccumulator[FileID]
 	downloadBandwidthAccumulator[FileID] = 0
 
 	upAccu := uploadBandwidthAccumulator[FileID]
 	uploadBandwidthAccumulator[FileID] = 0
+	bandwidthAccumulatorMap.Unlock()
 
 	return downAccu, upAccu
 
@@ -399,7 +402,9 @@ func GetSubscriptions(Topic string) {
 	}
 
 	for k, v := range subscribers.SubscribersInTxPool.Map {
+		clientOnlineMapLock.Lock()
 		subscribers.Subscribers.Map[k] = v
+		clientOnlineMapLock.Unlock()
 	}
 
 	for k, v := range subscribers.Subscribers.Map {
