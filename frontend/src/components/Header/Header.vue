@@ -15,6 +15,14 @@
       </div>
     </div>
     <div class="header__right">
+      <div class="header__item" @click="toggleTheme">
+        <feather
+          class="header__item-icon"
+          v-if="!darkTheme"
+          type="moon"
+        ></feather>
+        <feather class="header__item-icon" v-else type="sun"></feather>
+      </div>
       <router-link to="/" class="header__item">
         <feather class="header__item-icon" type="settings"></feather
       ></router-link>
@@ -75,6 +83,7 @@ export default {
   computed: {
     ...mapState("notifications", ["counter", "open"]),
     ...mapState("files", ["remoteFilesConfig"]),
+    ...mapState("darkTheme", ["darkTheme"]),
   },
   created() {
     this.search = this._.debounce((search) => {
@@ -92,6 +101,9 @@ export default {
   },
   mounted() {},
   methods: {
+    toggleTheme() {
+      this.$store.commit("darkTheme/toggleDarkTheme");
+    },
     toggleNotifications() {
       this.$store.commit("notifications/toggleNotifications", !this.open);
     },

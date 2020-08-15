@@ -22,12 +22,20 @@
     margin-bottom: $padding-micro;
     font-weight: 600;
     font-size: $fz-md;
-    color: $dark;
+    color: $text-dark;
     max-width: 200px;
+
+    @include dark-theme {
+      color: white;
+    }
   }
 
   &__size {
     color: $grey;
     font-size: $fz-sm;
+
+    @include dark-theme {
+      color: color(dark, text-light);
+    }
   }
 }

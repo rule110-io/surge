@@ -38,8 +38,8 @@ export default {
           {
             label: "up",
             data: [0],
-            backgroundColor: "rgba(214, 54, 73, 0.2)",
-            borderColor: "rgba(214, 54, 73, 1)",
+            backgroundColor: "rgba(91, 152, 220, 0.2)",
+            borderColor: "rgba(91, 152, 220, 1)",
             borderWidth: 1,
           },
         ],

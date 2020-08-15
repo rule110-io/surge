@@ -2,7 +2,11 @@
   &__title {
     margin-bottom: $padding-small;
     font-size: $fz-md;
-    color: $dark;
+    color: $text-dark;
+
+    @include dark-theme {
+      color: color(dark, text-light);
+    }
   }
 
   &__percent {

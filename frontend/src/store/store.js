@@ -6,6 +6,7 @@ import DownloadEvents from "./modules/downloadEvents";
 import ClientStatus from "./modules/clientStatus";
 import GlobalBandwidth from "./modules/globalBandwidth";
 import Snackbar from "./modules/snackbar";
+import DarkTheme from "./modules/darkTheme";
 
 import Files from "./modules/files";
 
@@ -20,6 +21,7 @@ export const store = new Vuex.Store({
     globalBandwidth: GlobalBandwidth,
     files: Files,
     snackbar: Snackbar,
+    darkTheme: DarkTheme,
   },
 });
 

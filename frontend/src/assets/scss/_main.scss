@@ -54,6 +54,11 @@ b {
     background: $primary;
     height: 100%;
     position: relative;
+
+    @include dark-theme {
+      background: color(dark, darkest);
+      color: white;
+    }
   }
 }
 
@@ -105,6 +110,10 @@ b {
     font-size: $fz-md;
     font-family: "Roboto";
 
+    @include dark-theme {
+      color: color(dark, text-light);
+    }
+
     &:first-child {
       width: 280px;
     }
@@ -116,6 +125,11 @@ b {
     border-top: 1px solid $grey-light;
     vertical-align: middle;
     color: #4e5259;
+
+    @include dark-theme {
+      color: color(dark, text-light);
+      border-color: $divider-dark;
+    }
   }
 
   &__action {
@@ -124,6 +138,11 @@ b {
     color: $grey;
     transition: $transition-1;
     cursor: pointer;
+
+    @include dark-theme {
+      color: white;
+    }
+
     &:hover {
       color: $primary;
     }
@@ -145,7 +164,7 @@ b {
     }
 
     &_active {
-      color: $primary;
+      color: $primary !important;
       cursor: default;
     }
   }
@@ -181,6 +200,10 @@ b {
   position: relative;
   padding: $padding-big $padding-medium;
   box-shadow: $shadow-2;
+
+  @include dark-theme {
+    background: color(dark, darkest);
+  }
 
   &__checkbox {
     margin-top: $padding-normal;
@@ -224,7 +247,6 @@ b {
   }
 
   &__title {
-    color: $dark;
     text-align: center;
     margin-bottom: $padding-normal;
     line-height: 43px;

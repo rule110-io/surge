@@ -63,7 +63,7 @@
 
   &__title {
     font-family: "Roboto";
-    color: $dark;
+    color: $text-dark;
     font-weight: 500;
     margin-bottom: $padding-xs;
     font-size: $fz-md;
@@ -72,6 +72,7 @@
   &__text {
     font-size: $fz-xs;
     word-wrap: break-word;
+    color: $text-dark;
   }
 
   &__icon {

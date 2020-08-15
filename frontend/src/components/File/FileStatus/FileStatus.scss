@@ -6,6 +6,10 @@
     display: flex;
     align-items: center;
 
+    @include dark-theme {
+      color: color(dark, text-light);
+    }
+
     &-item {
       width: 200px;
       display: block;

@@ -13,6 +13,10 @@
     bottom: 0;
     left: -40px;
     background: $grey-light;
+
+    @include dark-theme {
+      background: $divider-dark;
+    }
   }
 
   &__file {
@@ -66,11 +70,21 @@
       position: absolute;
       left: 0;
       bottom: 0;
+
+      @include dark-theme {
+        background: white;
+      }
     }
 
     &_active {
       &:after {
         transform: scaleX(1);
+      }
+
+      @include dark-theme {
+        i {
+          color: white;
+        }
       }
     }
 
@@ -80,6 +94,10 @@
       color: $grey;
       transition: $transition-1;
       margin-right: $padding-default;
+
+      @include dark-theme {
+        color: color(dark, text-light);
+      }
     }
 
     &-input {
@@ -96,8 +114,16 @@
       outline: none;
       background: transparent;
 
+      @include dark-theme {
+        color: white;
+      }
+
       &::placeholder {
         opacity: 0.6;
+
+        @include dark-theme {
+          color: color(dark, text-light);
+        }
       }
 
       &:focus {
@@ -148,6 +174,10 @@
     color: $grey;
     cursor: pointer;
     position: relative;
+
+    @include dark-theme {
+      color: white;
+    }
 
     &:not(:last-child) {
       margin-right: $padding-default;

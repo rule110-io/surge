@@ -6,4 +6,8 @@
   padding: 0 0 $padding-big $padding-big;
   position: relative;
   overflow: hidden;
+
+  @include dark-theme {
+    background: color(dark, base);
+  }
 }

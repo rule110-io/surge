@@ -7,12 +7,25 @@ $base: #fcfcfc;
 $primary: #02d2b3;
 $primary-dark: #19bca4;
 $secondary: #fff505;
-$dark: #000;
+$dark: #2e3542;
+$darkest: #1b2029;
 $grey: #7d7d7d;
 $grey-light: #ebebeb;
 $grey-darkest: #646b83;
 $error: #d63649;
 $accent: #fe030a;
+$divider-dark: #5a626f;
+
+$text-dark: #000;
+$text-light: #93a4bc;
+
+$themes: (
+  dark: (
+    base: $dark,
+    darkest: $darkest,
+    text-light: $text-light,
+  ),
+);
 
 // Typography
 $fw-light: 300;

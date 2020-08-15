@@ -1,0 +1,30 @@
+@function color($theme, $colorq: primary) {
+  $color: map-get(map-get($themes, $theme), $colorq);
+  @return $color;
+}
+
+@mixin parent($parent-selector) {
+  $current-sequences: &;
+  $new-sequences: ();
+
+  @each $sequence in $current-sequences {
+    $current-selector: nth($sequence, -1);
+    $prepended-selector: join($parent-selector, $current-selector);
+    $new-sequence: set-nth($sequence, -1, $prepended-selector);
+    $new-sequences: append($new-sequences, $new-sequence, comma);
+  }
+
+  @at-root #{$new-sequences} {
+    @content;
+  }
+}
+
+@mixin dark-theme {
+  @include parent(".theme_dark") {
+    @content;
+  }
+}
+
+%dark-theme {
+  @include dark-theme;
+}

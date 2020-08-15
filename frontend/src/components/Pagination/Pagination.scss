@@ -15,6 +15,10 @@
       color: $grey;
       cursor: pointer;
 
+      @include dark-theme {
+        color: white;
+      }
+
       &:hover {
         color: $primary;
       }
@@ -27,6 +31,10 @@
     &_inactive {
       color: $grey-light;
       cursor: not-allowed;
+
+      @include dark-theme {
+        color: color(dark, text-light);
+      }
     }
 
     &:first-child {

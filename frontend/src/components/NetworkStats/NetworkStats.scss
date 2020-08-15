@@ -14,6 +14,11 @@
   border-top-left-radius: 18px;
   border-top-right-radius: 18px;
 
+  @include dark-theme {
+    background: color(dark, darkest);
+    color: white;
+  }
+
   &__item {
     margin: 0 $padding-normal;
     display: inline-flex;
@@ -35,6 +40,10 @@
     animation: spinner 2s linear infinite;
     height: 14px;
     width: 14px;
+
+    @include dark-theme {
+      color: white;
+    }
   }
 
   &__file {
@@ -55,6 +64,10 @@
     left: 44%;
     top: -24px;
     z-index: 1;
+
+    @include dark-theme {
+      border-color: color(dark, base);
+    }
 
     &:hover {
       transform: scale(1.1);
