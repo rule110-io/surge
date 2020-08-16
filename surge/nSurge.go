@@ -37,6 +37,7 @@ const remotePath = "remote"
 var localFolder = ""
 var remoteFolder = ""
 var magnetstring = ""
+var mode = ""
 
 //OS folder permission bitflags
 const (
@@ -84,6 +85,8 @@ var clientOnlineMap map[string]bool
 
 var downloadBandwidthAccumulator map[string]int
 var uploadBandwidthAccumulator map[string]int
+
+var zeroBandwidthMap map[string]bool
 
 var clientOnlineMapLock = &sync.Mutex{}
 var bandwidthAccumulatorMap = &sync.Mutex{}
@@ -150,6 +153,7 @@ var ListedFiles []File
 
 var wailsRuntime *wails.Runtime
 var labelText chan string
+var appearance chan string
 
 var numClientsSubscribed int
 var numClientsOnline int
@@ -159,7 +163,12 @@ func Start(runtime *wails.Runtime, args []string) {
 
 	var err error
 
+	//set default mode to light
+	DbWriteSetting("DarkMode", "false")
+
+	//Mac specific functions
 	go initOSXHandler()
+	go setVisualModeLikeOSX()
 
 	wailsRuntime = runtime
 	var dirFileMode os.FileMode
@@ -210,8 +219,7 @@ func Start(runtime *wails.Runtime, args []string) {
 		clientOnlineMap = make(map[string]bool)
 		downloadBandwidthAccumulator = make(map[string]int)
 		uploadBandwidthAccumulator = make(map[string]int)
-
-		//go ScanLocal()
+		zeroBandwidthMap = make(map[string]bool)
 
 		go BuildSeedString()
 
@@ -315,19 +323,27 @@ func updateGUI() {
 			totalDown += down
 			totalUp += up
 
-			statusEvent := FileStatusEvent{
-				FileHash:          key,
-				Progress:          fileProgressMap[key],
-				DownloadBandwidth: down,
-				UploadBandwidth:   up,
-				NumChunks:         file.NumChunks,
-				ChunkMap:          GetFileChunkMapString(&file, 400),
+			if zeroBandwidthMap[key] == false || down+up != 0 {
+				statusEvent := FileStatusEvent{
+					FileHash:          key,
+					Progress:          fileProgressMap[key],
+					DownloadBandwidth: down,
+					UploadBandwidth:   up,
+					NumChunks:         file.NumChunks,
+					ChunkMap:          GetFileChunkMapString(&file, 400),
+				}
+				wailsRuntime.Events.Emit("fileStatusEvent", statusEvent)
 			}
-			wailsRuntime.Events.Emit("fileStatusEvent", statusEvent)
+
+			zeroBandwidthMap[key] = down+up == 0
 		}
 
 		//log.Println("Emitting globalBandwidthUpdate: ", totalDown, totalUp)
-		wailsRuntime.Events.Emit("globalBandwidthUpdate", totalDown, totalUp)
+		if zeroBandwidthMap["total"] == false || totalDown+totalUp != 0 {
+			wailsRuntime.Events.Emit("globalBandwidthUpdate", totalDown, totalUp)
+		}
+
+		zeroBandwidthMap["total"] = totalDown+totalUp == 0
 	}
 }
 
@@ -414,15 +430,17 @@ func GetSubscriptions(Topic string) {
 	}
 
 	for k, v := range subscribers.SubscribersInTxPool.Map {
-		clientOnlineMapLock.Lock()
 		subscribers.Subscribers.Map[k] = v
-		clientOnlineMapLock.Unlock()
 	}
 
 	for k, v := range subscribers.Subscribers.Map {
 		if len(v) > 0 {
-			SendQueryRequest(k, "Testing query functionality.")
-			clientOnlineMap[k] = false
+			if k != client.Addr().String() {
+				SendQueryRequest(k, "Testing query functionality.")
+				clientOnlineMapLock.Lock()
+				clientOnlineMap[k] = false
+				clientOnlineMapLock.Unlock()
+			}
 		}
 	}
 }
@@ -436,7 +454,6 @@ type Stats struct {
 func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 	s.log = runtime.Log.New("Stats")
 	runtime.Events.Emit("notificationEvent", "Backend Init", "just a test")
-	log.Println("TESTING TESTING TESTING")
 	return nil
 }
 
@@ -522,12 +539,12 @@ func DownloadFile(Hash string) bool {
 }
 
 func pushNotification(title string, text string) {
-	log.Println("Emitting Event: ", "notificationEvent", title, text)
+	//log.Println("Emitting Event: ", "notificationEvent", title, text)
 	wailsRuntime.Events.Emit("notificationEvent", title, text)
 }
 
 func pushError(title string, text string) {
-	log.Println("Emitting Event: ", "errorEvent", title, text)
+	//log.Println("Emitting Event: ", "errorEvent", title, text)
 	wailsRuntime.Events.Emit("errorEvent", title, text)
 }
 
@@ -674,21 +691,33 @@ func OpenFileDialog() (string, error) {
 
 //RemoveFile removes file from surge db and optionally from disk
 func RemoveFile(Hash string, FromDisk bool) bool {
+	fileWriteLock.Lock()
+
 	if FromDisk {
 		file, err := dbGetFile(Hash)
 		if err != nil {
+			pushError("Error on remove file (read db)", err.Error())
 			return false
 		}
 		err = os.Remove(file.Path)
 		if err != nil {
+			pushError("Error on remove file (remove from disk)", err.Error())
 			return false
 		}
 	}
 
 	err := dbDeleteFile(Hash)
 	if err != nil {
+		pushError("Error on remove file (read db)", err.Error())
 		return false
 	}
+	fileWriteLock.Unlock()
+
+	/*for _, session := range Sessions {
+		if session.FileHash == Hash {
+			closeSession(session)
+		}
+	}*/
 
 	return true
 }

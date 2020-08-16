@@ -11,6 +11,7 @@ import (
 )
 
 const fileBucketName = "fileBucket"
+const settingBucketName = "settingsBucket"
 
 var db *nutsdb.DB
 
@@ -93,7 +94,6 @@ func dbGetAllFiles() []File {
 				newFile := &File{}
 				json.Unmarshal(entry.Value, newFile)
 				files = append(files, *newFile)
-				log.Println(string(entry.Key), newFile.FileName)
 			}
 
 			return nil
@@ -123,4 +123,42 @@ func dbDeleteFile(Hash string) error {
 //CloseDb .
 func CloseDb() {
 	db.Close()
+}
+
+//DbWriteSetting .
+func DbWriteSetting(Name string, value string) error {
+	err := db.Update(
+		func(tx *nutsdb.Tx) error {
+
+			keyBytes := []byte(Name)
+			valueBytes := []byte(value)
+
+			if err := tx.Put(settingBucketName, keyBytes, valueBytes, 0); err != nil {
+				return err
+			}
+			return nil
+		})
+	return err
+}
+
+//DbReadSetting .
+func DbReadSetting(Name string) (string, error) {
+	result := ""
+	key := []byte(Name)
+
+	if err := db.View(
+		func(tx *nutsdb.Tx) error {
+			bytes, err := tx.Get(settingBucketName, key)
+			if err != nil {
+				return err
+			}
+
+			result = string(bytes.Value)
+
+			return err
+		}); err != nil {
+		return "", err
+	}
+
+	return result, nil
 }

@@ -91,6 +91,16 @@ func removeFile(Hash string, FromDisk bool) bool {
 	return surge.RemoveFile(Hash, FromDisk)
 }
 
+func writeSetting(Key string, Value string) bool {
+	err := surge.DbWriteSetting(Key, Value)
+	return err != nil
+}
+
+func readSetting(Key string) string {
+	val, _ := surge.DbReadSetting(Key)
+	return val
+}
+
 // Stats .
 type Stats struct {
 	log *wails.CustomLogger
@@ -144,6 +154,8 @@ func main() {
 	app.Bind(seedFile)
 	app.Bind(removeFile)
 	app.Bind(getNumberOfRemoteClient)
+	app.Bind(writeSetting)
+	app.Bind(readSetting)
 
 	app.Run()
 

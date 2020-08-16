@@ -64,7 +64,8 @@ func SessionRead(Session *Session) (data []byte, ID byte, err error) {
 	// read the full message, or return an error
 	_, err = io.ReadFull(Session.reader, data[:int(size)])
 	if err != nil {
-		log.Panicln(err)
+		log.Println(err)
+		return nil, 0x0, err
 	}
 
 	//Write add to download
