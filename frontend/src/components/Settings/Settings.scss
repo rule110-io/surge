@@ -1,0 +1,93 @@
+.settings {
+  position: relative;
+
+  &__header {
+    padding: $padding-default;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: $grey-light;
+    border-top-right-radius: 18px;
+    border-top-left-radius: 18px;
+
+    @include dark-theme {
+      background: color(dark, darkest);
+    }
+
+    &-version {
+    }
+
+    &-support {
+      color: $grey;
+
+      @include dark-theme {
+        color: color(dark, text-light);
+      }
+    }
+
+    &-link {
+      color: $primary;
+      text-decoration: none;
+      transition: $transition-1;
+
+      &:hover {
+        color: $primary-dark;
+      }
+    }
+  }
+
+  &__item {
+    font-family: "Roboto";
+    padding: $padding-normal 0;
+    margin: 0 auto;
+    max-width: 40%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    &-link {
+      text-transform: uppercase;
+      font-weight: bold;
+      color: $primary;
+      text-decoration: none;
+      transition: $transition-1;
+
+      &:hover {
+        color: $primary-dark;
+      }
+    }
+
+    &:not(:last-child) {
+      border-bottom: 1px solid #dfdfdf;
+
+      @include dark-theme {
+        border-color: color(dark, text-light);
+      }
+    }
+
+    &-left {
+      display: flex;
+      align-items: center;
+    }
+
+    &-icon {
+      height: 20px;
+      width: 20px;
+      color: $grey;
+      margin-right: $padding-default;
+
+      @include dark-theme {
+        color: white;
+      }
+    }
+
+    &-title {
+      text-transform: uppercase;
+      font-weight: bold;
+
+      @include dark-theme {
+        color: color(dark, text-light);
+      }
+    }
+  }
+}

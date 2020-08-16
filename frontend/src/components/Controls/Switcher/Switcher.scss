@@ -1,0 +1,52 @@
+.switch {
+  position: relative;
+  height: 30px;
+  width: 56px;
+
+  &__control {
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    z-index: 3;
+    cursor: pointer;
+    box-sizing: border-box;
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    &:checked ~ .switch__container {
+      background: #2ecc71;
+      border: 1px solid #2ecc71;
+      transition: $transition-1;
+    }
+
+    &:checked ~ .switch__label {
+      transform: translate(24px);
+      transition: $transition-1;
+    }
+  }
+
+  &__label {
+    background: white;
+    border-radius: 40px;
+    display: block;
+    height: 26px;
+    margin-left: 4px;
+    margin-top: 3px;
+    position: relative;
+    transition: $transition-1;
+    width: 26px;
+    z-index: 2;
+  }
+
+  &__container {
+    background: #bdc3c7;
+    border-radius: 40px;
+    border: 1px solid #bdc3c7;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+  }
+}
