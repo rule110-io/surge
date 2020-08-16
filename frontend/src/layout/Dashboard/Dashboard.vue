@@ -23,6 +23,8 @@ export default {
     this.fetchLocalFiles();
     this.fetchRemoteFiles();
 
+    this.updateRemoteVersion();
+
     this.getNumberOfRemoteClient();
   },
   methods: {
@@ -31,6 +33,9 @@ export default {
     },
     fetchRemoteFiles() {
       this.$store.dispatch("files/fetchRemoteFiles");
+    },
+    updateRemoteVersion() {
+      this.$store.dispatch("version/updateRemoteVersion");
     },
     getNumberOfRemoteClient() {
       window.backend

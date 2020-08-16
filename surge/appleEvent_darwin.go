@@ -3,6 +3,7 @@ package surge
 //#cgo CFLAGS: -x objective-c
 //#cgo LDFLAGS: -framework Cocoa
 //#include "handler_darwin.h"
+//#include "appDelegate_darwin.h"
 import "C"
 import (
 	"log"
@@ -18,6 +19,11 @@ func HandleURL(u *C.char) {
 //export VisualModeSwitched
 func VisualModeSwitched() {
 	setVisualModeLikeOSX()
+}
+
+//export HandleFile
+func HandleFile(u *C.char) {
+	filestring = C.GoString(u)
 }
 
 func watchOSXHandler() {
@@ -36,17 +42,23 @@ func watchOSXHandler() {
 			//stream chan string into string
 			magnetstring = <-labelText
 		}
+		if len(filestring) > 0 {
+			//go ParsePayloadString(filestring)
+			pushNotification("File opened with content:", filestring)
+			//reregister URLHandler
+			filestring = ""
+		}
 		time.Sleep(time.Second)
 	}
 }
 
-func setVisualModeLikeOSX(){
+func setVisualModeLikeOSX() {
 	mode := C.GoString(C.GetOsxMode())
-	if(mode == ""){
+	if mode == "" {
 		//light mode
 		DbWriteSetting("DarkMode", "false")
 		wailsRuntime.Events.Emit("darkThemeEvent", "false")
-	} else{
+	} else {
 		//dark mode
 		DbWriteSetting("DarkMode", "true")
 		wailsRuntime.Events.Emit("darkThemeEvent", "true")

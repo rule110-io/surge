@@ -23,7 +23,7 @@
         ></feather>
         <feather class="header__item-icon" v-else type="sun"></feather>
       </div>
-      <router-link to="/" class="header__item">
+      <router-link to="/settings" class="header__item">
         <feather class="header__item-icon" type="settings"></feather
       ></router-link>
       <div
