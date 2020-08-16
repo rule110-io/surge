@@ -6,16 +6,31 @@ const getDefaultState = () => {
 
 const state = getDefaultState();
 
+const getters = {
+  getDarkTheme(state) {
+    return state.darkTheme;
+  },
+};
+
 const mutations = {
-  toggleDarkTheme(state) {
-    state.darkTheme = !state.darkTheme;
+  setDarkTheme(state, bool) {
+    state.darkTheme = bool == "true";
+  },
+};
+
+const actions = {
+  toggleDarkTheme({ commit, state }) {
+    const bool = (!state.darkTheme).toString();
+    window.backend.writeSetting("DarkMode", bool).then(() => {
+      commit("setDarkTheme", bool);
+    });
   },
 };
 
 export default {
   namespaced: true,
   state,
-  getters: {},
-  actions: {},
+  getters,
+  actions,
   mutations,
 };

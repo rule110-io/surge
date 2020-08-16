@@ -19,9 +19,8 @@
         <feather class="settings__item-icon" type="sliders"></feather>
         <span class="settings__item-title">Dark Theme</span>
       </div>
-      <Switcher name="theme" :value="darkTheme" @change="changeTheme">
-        Delete from disk
-      </Switcher>
+      <Switcher name="theme" :value="darkTheme" @change="changeTheme" />
+      {{ `state: ${darkTheme}` }}
     </div>
 
     <div class="settings__item">
@@ -54,7 +53,7 @@
 </style>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapGetters } from "vuex";
 
 import Switcher from "@/components/Controls/Switcher/Switcher.vue";
 
@@ -64,12 +63,12 @@ export default {
     return {};
   },
   computed: {
-    ...mapState("darkTheme", ["darkTheme"]),
+    ...mapGetters({ darkTheme: "darkTheme/getDarkTheme" }),
     ...mapState("version", ["currentVersion", "remoteVersion", "isNewVersion"]),
   },
   methods: {
     changeTheme() {
-      this.$store.commit("darkTheme/toggleDarkTheme");
+      this.$store.dispatch("darkTheme/toggleDarkTheme");
     },
   },
 };

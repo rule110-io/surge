@@ -49,7 +49,6 @@ export default {
   },
   watch: {
     downloadEvent(newEvent) {
-      console.log(newEvent);
       if (this.file.FileHash === newEvent.FileHash) {
         this.seconds =
           (this.file.FileSize - this.file.FileSize * newEvent.Progress) /

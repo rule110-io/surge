@@ -22,6 +22,7 @@ export default {
 
     this.fetchLocalFiles();
     this.fetchRemoteFiles();
+    this.fetchDarkTheme();
 
     this.updateRemoteVersion();
 
@@ -33,6 +34,11 @@ export default {
     },
     fetchRemoteFiles() {
       this.$store.dispatch("files/fetchRemoteFiles");
+    },
+    fetchDarkTheme() {
+      window.backend.readSetting("DarkMode").then((bool) => {
+        this.$store.commit("darkTheme/setDarkTheme", bool);
+      });
     },
     updateRemoteVersion() {
       this.$store.dispatch("version/updateRemoteVersion");
@@ -46,6 +52,11 @@ export default {
             online: NumOnline,
           });
         });
+    },
+    enableDarkThemeEvent() {
+      window.wails.Events.On("darkThemeEvent", (bool) => {
+        this.$store.commit("darkTheme/setDarkTheme", bool);
+      });
     },
     enableNotifications() {
       window.wails.Events.On("notificationEvent", (title, text) => {
@@ -64,7 +75,6 @@ export default {
     },
     enableDownloadEvents() {
       window.wails.Events.On("fileStatusEvent", (event) => {
-        console.log("fileEvent:", event);
         this.$store.commit("downloadEvents/addDownloadEvent", event);
       });
     },

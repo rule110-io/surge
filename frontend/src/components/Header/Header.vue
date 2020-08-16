@@ -102,7 +102,7 @@ export default {
   mounted() {},
   methods: {
     toggleTheme() {
-      this.$store.commit("darkTheme/toggleDarkTheme");
+      this.$store.dispatch("darkTheme/toggleDarkTheme");
     },
     toggleNotifications() {
       this.$store.commit("notifications/toggleNotifications", !this.open);
