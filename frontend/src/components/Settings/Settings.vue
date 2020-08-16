@@ -20,7 +20,6 @@
         <span class="settings__item-title">Dark Theme</span>
       </div>
       <Switcher name="theme" :value="darkTheme" @change="changeTheme" />
-      {{ `state: ${darkTheme}` }}
     </div>
 
     <div class="settings__item">
