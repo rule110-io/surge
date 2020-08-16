@@ -8,6 +8,7 @@ import VueMoment from "vue-moment";
 import vueFilterPrettyBytes from "vue-filter-pretty-bytes";
 import VueLodash from "vue-lodash";
 import lodash from "lodash";
+
 import { store } from "./store/store.js";
 
 import * as Wails from "@wailsapp/runtime";

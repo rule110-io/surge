@@ -10,7 +10,7 @@
         <feather class="sidebar__item-icon" type="play"></feather
       ></router-link>
     </div>
-    <router-link to="/" class="sidebar__item">
+    <router-link to="/settings" class="sidebar__item">
       <feather class="sidebar__item-icon" type="settings"></feather
     ></router-link>
   </div>
