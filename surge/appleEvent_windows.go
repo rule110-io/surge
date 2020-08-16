@@ -6,3 +6,7 @@ func watchOSXHandler() {
 func initOSXHandler() {
 
 }
+
+func setVisualModeLikeOSX(){
+	
+}

@@ -37,6 +37,7 @@ const remotePath = "remote"
 var localFolder = ""
 var remoteFolder = ""
 var magnetstring = ""
+var mode = ""
 
 //OS folder permission bitflags
 const (
@@ -150,6 +151,7 @@ var ListedFiles []File
 
 var wailsRuntime *wails.Runtime
 var labelText chan string
+var appearance chan string
 
 var numClientsSubscribed int
 var numClientsOnline int
@@ -159,7 +161,12 @@ func Start(runtime *wails.Runtime, args []string) {
 
 	var err error
 
+	//set default mode to light
+	DbWriteSetting("DarkMode", "false")
+
+	//Mac specific functions
 	go initOSXHandler()
+	go setVisualModeLikeOSX()
 
 	wailsRuntime = runtime
 	var dirFileMode os.FileMode
