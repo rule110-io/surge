@@ -94,7 +94,6 @@ func dbGetAllFiles() []File {
 				newFile := &File{}
 				json.Unmarshal(entry.Value, newFile)
 				files = append(files, *newFile)
-				log.Println(string(entry.Key), newFile.FileName)
 			}
 
 			return nil
