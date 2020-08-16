@@ -156,8 +156,8 @@ var wailsRuntime *wails.Runtime
 var labelText chan string
 var appearance chan string
 
-var numClientsSubscribed int
-var numClientsOnline int
+var numClientsSubscribed int = 0
+var numClientsOnline int = 0
 
 // Start initializes surge
 func Start(runtime *wails.Runtime, args []string) {
@@ -697,11 +697,13 @@ func RemoveFile(Hash string, FromDisk bool) bool {
 	if FromDisk {
 		file, err := dbGetFile(Hash)
 		if err != nil {
+			log.Println("Error on remove file (read db)", err.Error())
 			pushError("Error on remove file (read db)", err.Error())
 			return false
 		}
 		err = os.Remove(file.Path)
 		if err != nil {
+			log.Println("Error on remove file (remove from disk)", err.Error())
 			pushError("Error on remove file (remove from disk)", err.Error())
 			return false
 		}
@@ -709,6 +711,7 @@ func RemoveFile(Hash string, FromDisk bool) bool {
 
 	err := dbDeleteFile(Hash)
 	if err != nil {
+		log.Println("Error on remove file (read db)", err.Error())
 		pushError("Error on remove file (read db)", err.Error())
 		return false
 	}

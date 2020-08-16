@@ -464,12 +464,17 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 
 	if Session.file == nil {
 		fileInfo, err := dbGetFile(FileID)
+		if err != nil {
+			pushError("Error on write chunk (db get)", err.Error())
+			return
+		}
+
 		var path = remoteFolder + string(os.PathSeparator) + fileInfo.FileName
 
 		//Open file
 		Session.file, err = os.OpenFile(path, os.O_RDWR, 0644)
 		if err != nil {
-			pushError("Error on write chunk", err.Error())
+			pushError("Error on write chunk (os open)", err.Error())
 			return
 		}
 	}
@@ -477,7 +482,7 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	chunkOffset := int64(ChunkID) * ChunkSize
 	bytesWritten, err := Session.file.WriteAt(Chunk, chunkOffset)
 	if err != nil {
-		pushError("Error on write chunk", err.Error())
+		pushError("Error on write chunk (file write)", err.Error())
 		return
 	}
 	//Success
@@ -491,7 +496,7 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 		//Set chunk to available in the map
 		fileInfo, err := dbGetFile(FileID)
 		if err != nil {
-			pushError("Error on chunk write", err.Error())
+			pushError("Error on chunk write (db get)", err.Error())
 			return
 		}
 		bitmap.Set(fileInfo.ChunkMap, int(ChunkID), true)
