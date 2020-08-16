@@ -517,6 +517,9 @@ func surgeGenerateTopicPayload(fileName string, sizeInBytes int64, hash string) 
 func surgeGenerateMagnetLink(fileName string, sizeInBytes int64, hash string, seeder string) string {
 	//Example payload
 	//surge://|file|The_Two_Towers-The_Purist_Edit-Trailer.avi|14997504|965c013e991ee246d63d45ea71954c4d|/
+	if seeder == "" {
+		seeder = client.Addr().String()
+	}
 
 	return "surge://|file|" + fileName + "|" + strconv.FormatInt(sizeInBytes, 10) + "|" + hash + "|" + seeder + "|/"
 }
@@ -565,8 +568,8 @@ func BuildSeedString() {
 
 	newQueryPayload := ""
 	for _, dbFile := range dbFiles {
-		//magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Seeder)
-		//log.Println("Magnet:", magnet)
+		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Seeder)
+		log.Println("Magnet:", magnet)
 
 		if dbFile.IsUploading {
 			//Add to payload
