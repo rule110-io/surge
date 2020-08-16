@@ -294,7 +294,10 @@ func closeSession(Session *Session) {
 	Session.session = nil
 	Session.reader = nil
 	if Session.file != nil {
-		Session.file.Close()
+		err := Session.file.Close()
+		if err != nil {
+			log.Println("File no longer exists")
+		}
 	}
 
 	//Replace index of session to be removed with last element in slice
@@ -562,13 +565,13 @@ func BuildSeedString() {
 
 	newQueryPayload := ""
 	for _, dbFile := range dbFiles {
-		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Seeder)
-		log.Println("Magnet:", magnet)
+		//magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Seeder)
+		//log.Println("Magnet:", magnet)
 
 		if dbFile.IsUploading {
 			//Add to payload
 			payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)
-			log.Println(payload)
+			//log.Println(payload)
 			newQueryPayload += payload
 		}
 	}
