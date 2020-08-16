@@ -37,6 +37,7 @@ const remotePath = "remote"
 var localFolder = ""
 var remoteFolder = ""
 var magnetstring = ""
+var filestring = ""
 var mode = ""
 
 //OS folder permission bitflags
