@@ -124,7 +124,7 @@ func main() {
 	log.Println(argsWithProg)
 	log.Println(argsWithoutProg)
 	//test string
-	//arguments = []string{"surge://|file|Futurama.S07E01.BRRip.x264-ION10.mp4|219091405|cd0731496277102a869dacb0e99b7708c2b708824b647ffeb267de4743b7856e|e5579685272ad6d162d263a498da6eda0f35db97626dc2ecff788e9675298b67|/"}
+	//arguments = []string{"surge://|file|Big Buck Bunny (720p_24fps_H264-128kbit_AAC).mp4|69742504|81c91110a3ef40a26b3ea2830b115a455404d99fd7eefd1f622dfd65a47f9aa1|cbf7e5e0fe9c4d97ace680164fa31e399fac7df8921238dc390465e48ae21fe6|/"}
 
 	//invoked with a download
 	if len(argsWithoutProg) > 0 {

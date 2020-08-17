@@ -40,6 +40,8 @@ var magnetstring = ""
 var filestring = ""
 var mode = ""
 
+var subscribers []string
+
 //OS folder permission bitflags
 const (
 	osRead       = 04
@@ -235,6 +237,7 @@ func Start(runtime *wails.Runtime, args []string) {
 		go updateGUI()
 
 		go rescanPeers()
+		go queryRemoteForFiles()
 
 		go watchOSXHandler()
 
@@ -265,6 +268,18 @@ func rescanPeers() {
 		time.Sleep(time.Minute)
 		topicEncoded := TopicEncode(TestTopic)
 		go GetSubscriptions(topicEncoded)
+	}
+}
+
+func queryRemoteForFiles() {
+	for true {
+		for _, address := range subscribers {
+			clientOnlineMapLock.Lock()
+			clientOnlineMap[address] = false
+			clientOnlineMapLock.Unlock()
+			go SendQueryRequest(address, "Testing query functionality.")
+			time.Sleep(time.Second * 5)
+		}
 	}
 }
 
@@ -423,24 +438,21 @@ func sendSeedSubscription(Topic string, Payload string) {
 
 //GetSubscriptions .
 func GetSubscriptions(Topic string) {
-
-	subscribers, err := client.GetSubscribers(Topic, 0, 100, true, true)
+	subResponse, err := client.GetSubscribers(Topic, 0, 100, true, true)
 	if err != nil {
 		pushError("Error on get subscriptions", err.Error())
 		return
 	}
 
-	for k, v := range subscribers.SubscribersInTxPool.Map {
-		subscribers.Subscribers.Map[k] = v
+	for k, v := range subResponse.SubscribersInTxPool.Map {
+		subResponse.Subscribers.Map[k] = v
 	}
 
-	for k, v := range subscribers.Subscribers.Map {
+	subscribers = []string{}
+	for k, v := range subResponse.Subscribers.Map {
 		if len(v) > 0 {
 			if k != client.Addr().String() {
-				SendQueryRequest(k, "Testing query functionality.")
-				clientOnlineMapLock.Lock()
-				clientOnlineMap[k] = false
-				clientOnlineMapLock.Unlock()
+				subscribers = append(subscribers, k)
 			}
 		}
 	}
@@ -716,6 +728,8 @@ func RemoveFile(Hash string, FromDisk bool) bool {
 		return false
 	}
 	fileWriteLock.Unlock()
+
+	go BuildSeedString()
 
 	/*for _, session := range Sessions {
 		if session.FileHash == Hash {

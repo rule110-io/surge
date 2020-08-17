@@ -357,7 +357,21 @@ func processQueryRequest(Session *Session, Data []byte) {
 func processQueryResponse(Session *Session, Data []byte) {
 	//Try to parse SurgeMessage
 	s := string(Data)
-	clientOnlineMap[Session.session.RemoteAddr().String()] = true
+	seeder := Session.session.RemoteAddr().String()
+
+	clientOnlineMapLock.Lock()
+	clientOnlineMap[seeder] = true
+	clientOnlineMapLock.Unlock()
+
+	//Remove exisiting file listings for this user
+	n := 0
+	for _, x := range ListedFiles {
+		if x.Seeder != seeder {
+			ListedFiles[n] = x
+			n++
+		}
+	}
+	ListedFiles = ListedFiles[:n]
 
 	//Parse the response
 	payloadSplit := strings.Split(s, "surge://")
@@ -375,7 +389,7 @@ func processQueryResponse(Session *Session, Data []byte) {
 			FileName:  data[2],
 			FileSize:  fileSize,
 			FileHash:  data[4],
-			Seeder:    Session.session.RemoteAddr().String(),
+			Seeder:    seeder,
 			Path:      "",
 			NumChunks: numChunks,
 			ChunkMap:  nil,
