@@ -19,6 +19,7 @@ export default {
     this.enableClientStatusUpdate();
     this.enableGlobalBandwidthEvents();
     this.enableErrorEvents();
+    this.enableDarkThemeEvent();
 
     this.fetchLocalFiles();
     this.fetchRemoteFiles();
