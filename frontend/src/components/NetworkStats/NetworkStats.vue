@@ -9,7 +9,9 @@
       <template v-else>{{ online }} of {{ total }} connected </template>
     </div>
     <div class="network-stats__file" @click="seedFile">
-      <feather class="network-stats__file-icon" type="plus"></feather>
+      <div class="network-stats__file-wrapper">
+        <feather class="network-stats__file-icon" type="plus"></feather>
+      </div>
     </div>
     <BandwidthChart />
 

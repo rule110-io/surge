@@ -47,30 +47,38 @@
   }
 
   &__file {
-    box-sizing: border-box;
-    height: 50px;
-    width: 50px;
-    border-radius: 100%;
+    height: 52px;
+    width: 52px;
+    border-radius: 42px;
     position: absolute;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-left: $padding-big;
     margin-right: $padding-default;
-    border: 4px solid white;
+    background: white;
     transition: $transition-1;
     cursor: pointer;
-    background: $primary;
     left: 44%;
     top: -24px;
     z-index: 1;
 
     @include dark-theme {
-      border-color: color(dark, base);
+      background: color(dark, base);
     }
 
     &:hover {
       transform: scale(1.1);
+    }
+
+    &-wrapper {
+      background: $primary;
+      height: 42px;
+      width: 42px;
+      border-radius: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     &-icon {

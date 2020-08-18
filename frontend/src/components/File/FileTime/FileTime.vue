@@ -48,6 +48,11 @@ export default {
     ...mapState("downloadEvents", ["downloadEvent"]),
   },
   watch: {
+    progress(x) {
+      if (x === 100) {
+        this.$store.dispatch("files/fetchLocalFiles");
+      }
+    },
     downloadEvent(newEvent) {
       if (this.file.FileHash === newEvent.FileHash) {
         this.seconds =
