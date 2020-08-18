@@ -9,6 +9,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
   height: $app-height;
   width: $app-width;
+  -ms-overflow-style: none; /** IE11 */
 
   * {
     line-height: 1.2em;
