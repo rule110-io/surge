@@ -5,3 +5,4 @@ account.surge
 *.proto
 db
 .DS_Store
+frontend/package.json.md5
