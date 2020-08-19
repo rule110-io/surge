@@ -7,6 +7,10 @@ func initOSXHandler() {
 
 }
 
-func setVisualModeLikeOSX(){
-	
+func setVisualModeLikeOSX() {
+
+}
+
+func showNotification(title string, text string) {
+
 }

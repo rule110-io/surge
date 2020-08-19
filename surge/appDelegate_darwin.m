@@ -16,14 +16,21 @@
    NSLog(@"%@", filenames);
 }
 
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification {
-    // Insert code here to initialize your application
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification
+{
+    [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
 }
 
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification {
     // Insert code here to tear down your application
 }
+
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center shouldPresentNotification:(NSUserNotification *)notification{
+    return YES;
+}
+
+
 
 
 @end
@@ -80,3 +87,14 @@
 
 @end
 
+
+
+void ShowNotification(char* title, char* informativeText){
+    NSUserNotification *notification = [[NSUserNotification alloc] init];
+    notification.title = [NSString stringWithUTF8String:title];
+    notification.informativeText = [NSString stringWithUTF8String:informativeText];
+    notification.soundName = NSUserNotificationDefaultSoundName;
+
+    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
+    [notification release];
+}
