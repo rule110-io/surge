@@ -11,7 +11,7 @@ const mutations = {
   addClientStatus(state, event) {
     const { total, online } = event;
     state.total = total;
-    state.online = online;
+    state.online = online === 0 ? 1 : online;
   },
 };
 

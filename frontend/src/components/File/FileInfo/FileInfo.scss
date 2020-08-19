@@ -19,11 +19,11 @@
   }
 
   &__title {
-    margin-bottom: $padding-micro;
     font-weight: 600;
     font-size: $fz-md;
     color: $text-dark;
     max-width: 200px;
+    line-height: calc(1.2em + #{$padding-micro});
 
     @include dark-theme {
       color: white;

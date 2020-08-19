@@ -1,8 +1,8 @@
 .file-time {
   &__title {
-    margin-bottom: $padding-small;
     font-size: $fz-md;
     color: $text-dark;
+    line-height: calc(1.2em + #{$padding-small});
 
     @include dark-theme {
       color: color(dark, text-light);

@@ -2,7 +2,7 @@
   <div class="network-stats">
     <div class="network-stats__item">
       Clients:
-      <span class="network-stats__status" v-if="online === 0">
+      <span class="network-stats__status" v-if="total === 0">
         <feather class="network-stats__loader" type="loader"></feather>
         Loading...
       </span>
