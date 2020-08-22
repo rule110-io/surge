@@ -44,6 +44,14 @@
       </div>
       <a class="settings__item-link" href="#" target="_">surge.io</a>
     </div>
+
+    <div class="settings__item">
+      <div class="settings__item-left">
+        <feather class="settings__item-icon" type="book"></feather>
+        <span class="settings__item-title">Guide tour</span>
+      </div>
+      <div class="settings__item-link" @click="startTour">start</div>
+    </div>
   </div>
 </template>
 
@@ -68,6 +76,11 @@ export default {
   methods: {
     changeTheme() {
       this.$store.dispatch("darkTheme/toggleDarkTheme");
+    },
+    startTour() {
+      this.$router.push("search");
+      this.$store.commit("tour/setTour", "true");
+      this.$tours["myTour"].start();
     },
   },
 };

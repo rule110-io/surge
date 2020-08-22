@@ -27,7 +27,7 @@ export default {
     },
     steps: [
       {
-        target: ".table",
+        target: "#app",
         header: {
           title: "Hello there, welcome to surge!",
         },
@@ -91,6 +91,12 @@ export default {
       this.callbacks.onStop = () => {
         this.$store.dispatch("tour/offTour");
       };
+      this.callbacks.onNextStep = (currentStep) => {
+        if (currentStep === 2) {
+          this.$router.push("download");
+        }
+      };
+
       this.$tours["myTour"].start();
     },
   },

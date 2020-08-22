@@ -51,6 +51,7 @@
       color: $primary;
       text-decoration: none;
       transition: $transition-1;
+      cursor: pointer;
 
       &:hover {
         color: $primary-dark;
