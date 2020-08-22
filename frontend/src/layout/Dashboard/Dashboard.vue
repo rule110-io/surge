@@ -1,17 +1,29 @@
 <template>
   <div class="main__wrapper">
+    <div class="main__tour" v-if="tour"></div>
     <Sidebar />
     <Dashboard />
+    <Tour v-if="tour" />
   </div>
 </template>
 <script>
+import { mapState } from "vuex";
+
 import Dashboard from "@/components/Dashboard/Dashboard";
 import Sidebar from "@/components/Sidebar/Sidebar";
+import Tour from "@/components/Tour/Tour";
 
 export default {
   components: {
     Dashboard,
     Sidebar,
+    Tour,
+  },
+  computed: {
+    ...mapState("tour", ["tour"]),
+  },
+  data: () => {
+    return {};
   },
   mounted() {
     this.enableNotifications();
@@ -24,6 +36,7 @@ export default {
     this.fetchLocalFiles();
     this.fetchRemoteFiles();
     this.fetchDarkTheme();
+    this.fetchTour();
 
     this.updateRemoteVersion();
 
@@ -39,6 +52,11 @@ export default {
     fetchDarkTheme() {
       window.backend.readSetting("DarkMode").then((bool) => {
         this.$store.commit("darkTheme/setDarkTheme", bool);
+      });
+    },
+    fetchTour() {
+      window.backend.readSetting("Tour").then((bool) => {
+        this.$store.commit("tour/setTour", bool);
       });
     },
     updateRemoteVersion() {

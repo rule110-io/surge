@@ -169,6 +169,9 @@ func Start(runtime *wails.Runtime, args []string) {
 	//set default mode to light
 	DbWriteSetting("DarkMode", "false")
 
+	//set tour to active
+	DbWriteSetting("Tour", "true")
+
 	//Mac specific functions
 	go initOSXHandler()
 	go setVisualModeLikeOSX()

@@ -8,6 +8,7 @@ import VueMoment from "vue-moment";
 import vueFilterPrettyBytes from "vue-filter-pretty-bytes";
 import VueLodash from "vue-lodash";
 import lodash from "lodash";
+import VueTour from "vue-tour";
 
 import { store } from "./store/store.js";
 
@@ -20,6 +21,7 @@ Vue.use(VueFeather);
 Vue.use(vueFilterPrettyBytes);
 Vue.use(VueMoment);
 Vue.use(VueLodash, { lodash: lodash });
+Vue.use(VueTour);
 
 Wails.Init(() => {
   new Vue({

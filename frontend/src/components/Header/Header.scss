@@ -2,8 +2,14 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: $padding-default $padding-big $padding-default 0;
+  padding: $padding-default $padding-big $padding-default $padding-big;
   position: relative;
+  margin-left: -$padding-big;
+  background: white;
+
+  @include dark-theme {
+    background: color(dark, base);
+  }
 
   &:after {
     content: "";

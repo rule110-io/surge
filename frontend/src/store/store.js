@@ -8,6 +8,7 @@ import GlobalBandwidth from "./modules/globalBandwidth";
 import Snackbar from "./modules/snackbar";
 import DarkTheme from "./modules/darkTheme";
 import Version from "./modules/version";
+import Tour from "./modules/tour";
 
 import Files from "./modules/files";
 
@@ -24,6 +25,7 @@ export const store = new Vuex.Store({
     snackbar: Snackbar,
     darkTheme: DarkTheme,
     version: Version,
+    tour: Tour,
   },
 });
 

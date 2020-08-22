@@ -1,0 +1,36 @@
+.v-tour {
+  &__target {
+    &--highlighted {
+      box-shadow: none;
+    }
+  }
+
+  .v-step {
+    border-radius: 12px;
+    background: color(dark, base);
+
+    &__header {
+      border-top-right-radius: 12px;
+      border-top-left-radius: 12px;
+      background: color(dark, darkest);
+    }
+
+    &__button {
+      height: 38px;
+      border-radius: $card-br;
+      padding: 0 $padding-default;
+    }
+
+    &[x-placement="bottom"] {
+      .v-step__arrow {
+        border-bottom-color: color(dark, darkest) !important;
+      }
+    }
+
+    &[x-placement="top"] {
+      .v-step__arrow {
+        border-top-color: color(dark, base) !important;
+      }
+    }
+  }
+}

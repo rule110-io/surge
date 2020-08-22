@@ -1,5 +1,6 @@
 @import "../css/reset.css";
 @import "./fonts";
+@import "~vue-tour/dist/vue-tour.css";
 
 body {
   background: $background;
@@ -60,6 +61,16 @@ b {
       background: color(dark, darkest);
       color: white;
     }
+  }
+
+  &__tour {
+    position: absolute;
+    width: 100%;
+    left: 0px;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.4);
+    width: 1144px;
+    height: 100%;
   }
 }
 
