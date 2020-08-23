@@ -1,36 +1,47 @@
 .v-tour {
   &__target {
     &--highlighted {
-      box-shadow: none;
+      box-shadow: none !important;
+    }
+  }
+}
+
+.v-step {
+  border-radius: 12px !important;
+  background: color(dark, base) !important;
+
+  &__header {
+    border-top-right-radius: 12px !important;
+    border-top-left-radius: 12px !important;
+    background: color(dark, darkest) !important;
+
+    @include dark-theme {
+      background: $primary !important;
+      color: color(dark, darkest) !important;
     }
   }
 
-  .v-step {
-    border-radius: 12px;
-    background: color(dark, base);
+  &__button {
+    height: 38px !important;
+    border-radius: $card-br !important;
+    padding: 0 $padding-default !important;
+  }
 
-    &__header {
-      border-top-right-radius: 12px;
-      border-top-left-radius: 12px;
-      background: color(dark, darkest);
+  &[x-placement="bottom"] {
+    .v-step__arrow {
+      border-bottom-color: color(dark, darkest) !important;
     }
 
-    &__button {
-      height: 38px;
-      border-radius: $card-br;
-      padding: 0 $padding-default;
-    }
-
-    &[x-placement="bottom"] {
+    @include dark-theme {
       .v-step__arrow {
-        border-bottom-color: color(dark, darkest) !important;
+        border-bottom-color: $primary !important;
       }
     }
+  }
 
-    &[x-placement="top"] {
-      .v-step__arrow {
-        border-top-color: color(dark, base) !important;
-      }
+  &[x-placement="top"] {
+    .v-step__arrow {
+      border-top-color: color(dark, base) !important;
     }
   }
 }
