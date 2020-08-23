@@ -52,6 +52,14 @@
       </div>
       <div class="settings__item-link" @click="startTour">start</div>
     </div>
+
+    <div class="settings__item">
+      <div class="settings__item-left">
+        <feather class="settings__item-icon" type="file-text"></feather>
+        <span class="settings__item-title">Surge logs</span>
+      </div>
+      <div class="settings__item-link" @click="openLog">open</div>
+    </div>
   </div>
 </template>
 
@@ -81,6 +89,9 @@ export default {
       this.$router.push("search");
       this.$store.commit("tour/setTour", "true");
       this.$tours["myTour"].start();
+    },
+    openLog() {
+      window.backend.openLog().then(() => {});
     },
   },
 };

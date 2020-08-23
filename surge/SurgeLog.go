@@ -41,3 +41,29 @@ func InitializeLog() {
 	// Only log the warning severity or above.
 	log.SetLevel(log.WarnLevel)
 }
+
+//OpenLogFile opens a log file with OS default application for object type
+func OpenLogFile() {
+	var err error
+
+	var dir = ""
+
+	if runtime.GOOS == "darwin" {
+		dir, _ = os.UserHomeDir()
+		dir = dir + string(os.PathSeparator) + ".surge"
+	} else {
+		dir, err = filepath.Abs(filepath.Dir(os.Args[0]))
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	var logPathOS = dir + string(os.PathSeparator) + logPath
+
+	if err != nil {
+		pushError("Error on open log", err.Error())
+		return
+	}
+
+	OpenOSPath(logPathOS)
+}
