@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <div id="files_table">
+    <div class="page__results" id="files_table">
       <h1 class="page__title">Files</h1>
       <div class="table">
         <div class="table__row">
@@ -27,8 +27,9 @@
             ></feather>
             <feather
               v-if="!file.IsDownloading && !file.IsPaused"
-              class="table__action table__action_active"
-              type="check-circle"
+              class="table__action"
+              type="folder"
+              @click.native="openFolder(file.FileHash)"
             ></feather>
             <feather
               v-if="file.IsPaused"
@@ -105,6 +106,9 @@ export default {
       window.backend.setDownloadPause(hash, false).then(() => {
         this.$store.dispatch("files/fetchLocalFiles");
       });
+    },
+    openFolder(FileHash) {
+      window.backend.openFolder(FileHash).then(() => {});
     },
   },
 };

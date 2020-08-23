@@ -97,6 +97,14 @@ b {
     font-size: $fz-llg;
     margin-bottom: $padding-normal;
   }
+
+  &__results {
+    background: $base;
+
+    @include dark-theme {
+      background: color(dark, base);
+    }
+  }
 }
 
 /*========== table ==========*/

@@ -1,13 +1,17 @@
 <template>
   <div class="page">
-    <div id="search_results">
+    <div class="page__results" id="search_results">
       <h1 class="page__title">Explore</h1>
       <div class="table">
         <div class="table__row">
           <div class="table__head">Name & size</div>
           <div class="table__head">Seeder</div>
         </div>
-        <div class="table__row" v-for="file in remoteFiles" :key="file.FileName">
+        <div
+          class="table__row"
+          v-for="file in remoteFiles"
+          :key="file.FileName"
+        >
           <div class="table__cell">
             <FileInfo :file="file" />
           </div>
