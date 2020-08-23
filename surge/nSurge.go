@@ -3,7 +3,6 @@ package surge
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"math/rand"
 	"net"
 	"os"
@@ -12,6 +11,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
@@ -168,13 +169,11 @@ func Start(runtime *wails.Runtime, args []string) {
 
 	//set default mode to light
 	DbWriteSetting("DarkMode", "false")
-
-	//set tour to active
 	DbWriteSetting("Tour", "true")
 
 	//Mac specific functions
-	go initOSXHandler()
-	go setVisualModeLikeOSX()
+	go initOSHandler()
+	go setVisualModeLikeOS()
 
 	wailsRuntime = runtime
 	var dirFileMode os.FileMode
@@ -192,6 +191,9 @@ func Start(runtime *wails.Runtime, args []string) {
 		dir, _ := os.UserHomeDir()
 		dir = dir + string(os.PathSeparator) + ".surge"
 		if _, err := os.Stat(dir); os.IsNotExist(err) {
+			// seems like this is the first time starting the app
+			//set tour to active
+			DbWriteSetting("Tour", "true")
 			os.Mkdir(dir, dirFileMode)
 		}
 	}

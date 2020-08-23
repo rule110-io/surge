@@ -2,10 +2,11 @@ package surge
 
 import (
 	"encoding/json"
-	"log"
 	"os"
 	"path/filepath"
 	"runtime"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/xujiajun/nutsdb"
 )

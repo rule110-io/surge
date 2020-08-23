@@ -6,7 +6,6 @@ import (
 	b64 "encoding/base64"
 	"encoding/hex"
 	"io"
-	"log"
 	"math/rand"
 	"os"
 	"path/filepath"
@@ -14,6 +13,8 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"

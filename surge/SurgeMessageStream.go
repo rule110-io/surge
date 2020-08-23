@@ -3,7 +3,8 @@ package surge
 import (
 	"encoding/binary"
 	"io"
-	"log"
+
+	log "github.com/sirupsen/logrus"
 )
 
 // SessionWrite writes to session

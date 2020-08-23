@@ -1,10 +1,5 @@
 <template>
-  <v-tour
-    name="myTour"
-    :steps="steps"
-    :options="options"
-    :callbacks="callbacks"
-  ></v-tour>
+  <v-tour name="myTour" :steps="steps" :options="options" :callbacks="callbacks"></v-tour>
 </template>
 
 <style lang="scss">
@@ -71,7 +66,7 @@ export default {
         },
       },
       {
-        target: ".table",
+        target: "#app",
         header: {
           title: "That’s for the basics",
         },

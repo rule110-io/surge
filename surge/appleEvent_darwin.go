@@ -6,9 +6,10 @@ package surge
 //#include "appDelegate_darwin.h"
 import "C"
 import (
-	"log"
 	"net/url"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 )
 
 //export HandleURL
@@ -18,7 +19,7 @@ func HandleURL(u *C.char) {
 
 //export VisualModeSwitched
 func VisualModeSwitched() {
-	setVisualModeLikeOSX()
+	setVisualModeLikeOS()
 }
 
 //export HandleFile
@@ -52,7 +53,7 @@ func watchOSXHandler() {
 	}
 }
 
-func setVisualModeLikeOSX() {
+func setVisualModeLikeOS() {
 	mode := C.GoString(C.GetOsxMode())
 	if mode == "" {
 		//light mode
@@ -71,7 +72,7 @@ func showNotification(title string, text string) {
 	C.ShowNotification(cstr, cstr2)
 }
 
-func initOSXHandler() {
+func initOSHandler() {
 	// the event handler blocks!, so buffer the channel at least once to get the first message
 	labelText = make(chan string, 1)
 

@@ -3,11 +3,11 @@ package surge
 func watchOSXHandler() {
 }
 
-func initOSXHandler() {
+func initOSHandler() {
 
 }
 
-func setVisualModeLikeOSX() {
+func setVisualModeLikeOS() {
 
 }
 

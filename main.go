@@ -1,11 +1,11 @@
 package main
 
 import (
-	"log"
 	"os"
 
 	"github.com/leaanthony/mewn"
 	"github.com/rule110-io/surge-ui/surge"
+	log "github.com/sirupsen/logrus"
 	"github.com/wailsapp/wails"
 )
 
@@ -117,6 +117,7 @@ func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 func main() {
 	stats := &Stats{}
 	surge.InitializeDb()
+	surge.InitializeLog()
 	defer surge.CloseDb()
 
 	argsWithProg := os.Args

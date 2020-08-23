@@ -2,10 +2,11 @@ package surge
 
 import (
 	"io/ioutil"
-	"log"
 	"os"
 	"path/filepath"
 	"runtime"
+
+	log "github.com/sirupsen/logrus"
 
 	nkn "github.com/nknorg/nkn-sdk-go"
 )
@@ -28,10 +29,6 @@ func InitializeAccount() *nkn.Account {
 			log.Fatal(err)
 		}
 	}
-
-	log.Println(runtime.GOOS)
-	log.Println(runtime.GOOS)
-	log.Println(runtime.GOOS)
 
 	var accountPathOS = dir + string(os.PathSeparator) + accountPath
 
