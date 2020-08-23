@@ -76,6 +76,72 @@ export default {
           enableScrolling: false,
         },
       },
+      {
+        target: "#explore",
+        header: {
+          title: 'Let\'s check out the "Explore" view',
+        },
+        content: `It makes it easy for you to search the NKN network for files shared by others through surge.`,
+        params: {
+          highlight: true,
+          enableScrolling: false,
+        },
+      },
+      {
+        target: "#search_results",
+        header: {
+          title: "On top you see the search results",
+        },
+        content: `In this alpha version there is sadly no filter or search function, so you just see everything :)`,
+        params: {
+          highlight: true,
+          enableScrolling: false,
+        },
+      },
+      {
+        target: "#recent_files",
+        header: {
+          title: "These are your recent files",
+        },
+        content: `Whetever file you recently up- or downloaded with surge appears here. Click on it to directly open it in your file explorer.`,
+        params: {
+          highlight: true,
+          enableScrolling: false,
+        },
+      },
+      {
+        target: "#download",
+        header: {
+          title: 'Now lets have a look at the "Downloads" page',
+        },
+        content: `You can see the status of each file you interact with here.`,
+        params: {
+          highlight: true,
+          enableScrolling: false,
+        },
+      },
+      {
+        target: "#files_table",
+        header: {
+          title: "This is the files table",
+        },
+        content: `Here you could see the status of all files in surge. The status could vary by "Downloading", "Seeding" or "Finished"`,
+        params: {
+          highlight: true,
+          enableScrolling: false,
+        },
+      },
+      {
+        target: "#settings",
+        header: {
+          title: 'Last thing on the list is the "Settings" page',
+        },
+        content: `Since this page changes so often you're free to explore it by yourself.`,
+        params: {
+          highlight: true,
+          enableScrolling: false,
+        },
+      },
     ],
   }),
   mounted() {
@@ -87,7 +153,10 @@ export default {
         this.$store.dispatch("tour/offTour");
       };
       this.callbacks.onNextStep = (currentStep) => {
-        if (currentStep === 2) {
+        if (currentStep === 5) {
+          this.$router.push("search");
+        }
+        if (currentStep === 8) {
           this.$router.push("download");
         }
       };

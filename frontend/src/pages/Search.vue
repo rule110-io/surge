@@ -1,37 +1,43 @@
 <template>
   <div class="page">
-    <h1 class="page__title">Explore</h1>
-    <div class="table">
-      <div class="table__row">
-        <div class="table__head">Name & size</div>
-        <div class="table__head">Seeder</div>
-      </div>
-      <div class="table__row" v-for="file in remoteFiles" :key="file.FileName">
-        <div class="table__cell"><FileInfo :file="file" /></div>
-        <div class="table__cell">{{ file.Seeder }}</div>
-        <div class="table__cell">
-          <feather
-            v-if="!file.IsTracked"
-            class="table__action"
-            type="download"
-            @click.native="download(file.FileHash)"
-          ></feather>
-          <feather
-            v-if="file.IsTracked"
-            class="table__action table__action_active"
-            type="check-circle"
-          ></feather>
+    <div id="search_results">
+      <h1 class="page__title">Explore</h1>
+      <div class="table">
+        <div class="table__row">
+          <div class="table__head">Name & size</div>
+          <div class="table__head">Seeder</div>
         </div>
+        <div class="table__row" v-for="file in remoteFiles" :key="file.FileName">
+          <div class="table__cell">
+            <FileInfo :file="file" />
+          </div>
+          <div class="table__cell">{{ file.Seeder }}</div>
+          <div class="table__cell">
+            <feather
+              v-if="!file.IsTracked"
+              class="table__action"
+              type="download"
+              @click.native="download(file.FileHash)"
+            ></feather>
+            <feather
+              v-if="file.IsTracked"
+              class="table__action table__action_active"
+              type="check-circle"
+            ></feather>
+          </div>
+        </div>
+        <Pagination
+          dispatcher="files/fetchRemoteFiles"
+          filesConfig="remoteFilesConfig"
+          filePages="remotePages"
+          commit="files/setRemoteFilesConfig"
+        />
       </div>
-      <Pagination
-        dispatcher="files/fetchRemoteFiles"
-        filesConfig="remoteFilesConfig"
-        filePages="remotePages"
-        commit="files/setRemoteFilesConfig"
-      />
     </div>
-    <h2 class="page__subtitle">Recent Files</h2>
-    <RecentFiles :files="localFiles" />
+    <div id="recent_files">
+      <h2 class="page__subtitle">Recent Files</h2>
+      <RecentFiles :files="localFiles" />
+    </div>
   </div>
 </template>
 <script>
