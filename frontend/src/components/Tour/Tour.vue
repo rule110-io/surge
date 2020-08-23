@@ -92,7 +92,7 @@ export default {
         header: {
           title: "On top you see the search results",
         },
-        content: `In this alpha version there is sadly no filter or search function, so you just see everything :)`,
+        content: `You can always search in the top bar for files. This table will update accordingly.`,
         params: {
           highlight: true,
           enableScrolling: false,
