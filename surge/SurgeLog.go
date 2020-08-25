@@ -2,8 +2,6 @@ package surge
 
 import (
 	"os"
-	"path/filepath"
-	"runtime"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -14,17 +12,7 @@ func InitializeLog() {
 
 	var err error
 
-	var dir = ""
-
-	if runtime.GOOS == "darwin" {
-		dir, _ = os.UserHomeDir()
-		dir = dir + string(os.PathSeparator) + ".surge"
-	} else {
-		dir, err = filepath.Abs(filepath.Dir(os.Args[0]))
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+	var dir = GetSurgeDir()
 
 	var logPathOS = dir + string(os.PathSeparator) + logPath
 
@@ -46,17 +34,7 @@ func InitializeLog() {
 func OpenLogFile() {
 	var err error
 
-	var dir = ""
-
-	if runtime.GOOS == "darwin" {
-		dir, _ = os.UserHomeDir()
-		dir = dir + string(os.PathSeparator) + ".surge"
-	} else {
-		dir, err = filepath.Abs(filepath.Dir(os.Args[0]))
-		if err != nil {
-			log.Fatal(err)
-		}
-	}
+	var dir = GetSurgeDir()
 
 	var logPathOS = dir + string(os.PathSeparator) + logPath
 

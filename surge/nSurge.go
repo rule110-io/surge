@@ -7,7 +7,7 @@ import (
 	"net"
 	"os"
 	"os/user"
-	runtimelib "runtime"
+	"runtime"
 	"strings"
 	"sync"
 	"time"
@@ -177,6 +177,7 @@ func Start(runtime *wails.Runtime, args []string) {
 
 	wailsRuntime = runtime
 	var dirFileMode os.FileMode
+	var dir = GetSurgeDir()
 	dirFileMode = os.ModeDir | (osUserRwx | osAllR)
 
 	myself, err := user.Current()
@@ -187,15 +188,11 @@ func Start(runtime *wails.Runtime, args []string) {
 	localFolder = homedir + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "surge_" + localPath
 	remoteFolder = homedir + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "surge_" + remotePath
 
-	if runtimelib.GOOS == "darwin" {
-		dir, _ := os.UserHomeDir()
-		dir = dir + string(os.PathSeparator) + ".surge"
-		if _, err := os.Stat(dir); os.IsNotExist(err) {
-			// seems like this is the first time starting the app
-			//set tour to active
-			DbWriteSetting("Tour", "true")
-			os.Mkdir(dir, dirFileMode)
-		}
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		// seems like this is the first time starting the app
+		//set tour to active
+		DbWriteSetting("Tour", "true")
+		os.Mkdir(dir, dirFileMode)
 	}
 
 	//Ensure local and remote folders exist
@@ -748,4 +745,11 @@ func RemoveFile(Hash string, FromDisk bool) bool {
 	}*/
 
 	return true
+}
+
+func GetSurgeDir() string {
+	if runtime.GOOS == "windows" {
+		return os.Getenv("APPDATA") + string(os.PathSeparator) + "AppData" + string(os.PathSeparator) + "Roaming" + string(os.PathSeparator) + ".surge"
+	}
+	return os.Getenv("HOME") + string(os.PathSeparator) + ".surge"
 }

@@ -3,8 +3,6 @@ package surge
 import (
 	"encoding/json"
 	"os"
-	"path/filepath"
-	"runtime"
 
 	log "github.com/sirupsen/logrus"
 
@@ -19,22 +17,9 @@ var db *nutsdb.DB
 //InitializeDb initializes db
 func InitializeDb() {
 	var err error
-
-	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	opt := nutsdb.DefaultOptions
 
-	if runtime.GOOS == "darwin" {
-		dir, _ = os.UserHomeDir()
-		dir = dir + string(os.PathSeparator) + ".surge"
-		opt.Dir = dir + string(os.PathSeparator) + "db"
-	} else {
-		opt.Dir = dir + string(os.PathSeparator) + "db"
-	}
-
+	opt.Dir = GetSurgeDir() + string(os.PathSeparator) + "db"
 	db, err = nutsdb.Open(opt)
 	if err != nil {
 		log.Fatal(err)
