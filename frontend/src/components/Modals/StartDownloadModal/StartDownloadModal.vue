@@ -32,6 +32,9 @@ export default {
       open: false,
     };
   },
+  mounted() {
+    this.initDownloadEvent;
+  },
   methods: {
     closeModal() {
       this.open = false;
@@ -43,7 +46,6 @@ export default {
         this.closeModal();
       });
     },
-
     initDownloadEvent() {
       window.wails.Events.On("userEvent", (context, payload) => {
         this.open = true;
