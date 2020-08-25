@@ -1,4 +1,4 @@
-le i<template>
+<template>
   <div :class="['modal__wrapper', isOpen ? 'modal__wrapper_open' : null]">
     <div class="modal">
       <h2 class="modal__title">

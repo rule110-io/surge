@@ -7,6 +7,7 @@
     ></router-view>
     <Preloader v-else />
     <NetworkStats />
+    <StartDownloadModal />
   </div>
 </template>
 
@@ -21,9 +22,10 @@ import Header from "@/components/Header/Header";
 import Preloader from "@/components/Preloader/Preloader";
 import NetworkStats from "@/components/NetworkStats/NetworkStats";
 import Snackbar from "@/components/Snackbar/Snackbar.vue";
+import StartDownloadModal from "@/components/Modals/StartDownloadModal/StartDownloadModal";
 
 export default {
-  components: { Header, Preloader, NetworkStats, Snackbar },
+  components: { Header, Preloader, NetworkStats, Snackbar, StartDownloadModal },
   data: () => {
     return {};
   },

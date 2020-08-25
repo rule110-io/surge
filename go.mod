@@ -17,7 +17,7 @@ require (
 	github.com/sirupsen/logrus v1.4.1
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/sqweek/dialog v0.0.0-20200601143742-43ea34326190
-	github.com/wailsapp/wails v1.7.2-pre3
+	github.com/wailsapp/wails v1.7.1
 	github.com/xujiajun/nutsdb v0.5.0
 	golang.org/x/image v0.0.0-20200801110659-972c09e46d76 // indirect
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
