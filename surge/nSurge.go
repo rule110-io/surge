@@ -561,6 +561,11 @@ func pushNotification(title string, text string) {
 	wailsRuntime.Events.Emit("notificationEvent", title, text)
 }
 
+func askUser(context string, payload string) {
+	//log.Println("Emitting Event: ", "notificationEvent", title, text)
+	wailsRuntime.Events.Emit("userEvent", context, payload)
+}
+
 func pushError(title string, text string) {
 	//log.Println("Emitting Event: ", "errorEvent", title, text)
 	wailsRuntime.Events.Emit("errorEvent", title, text)

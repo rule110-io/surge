@@ -36,16 +36,18 @@ func watchOSXHandler() {
 				log.Fatal(err)
 				return
 			}
-			go ParsePayloadString(decodedMagetstring)
-			pushNotification("Received magnet link:", decodedMagetstring)
+			//go ParsePayloadString(decodedMagetstring)
+			askUser("startDownloadMagnetLinks", "{files : ["+decodedMagetstring+"]}")
+
 			//reregister URLHandler
 			C.StartURLHandler()
 			//stream chan string into string
 			magnetstring = <-labelText
 		}
 		if len(filestring) > 0 {
-			//go ParsePayloadString(filestring)
-			pushNotification("File opened with content:", filestring)
+			//decode file contents
+			//push in array
+			askUser("startDownloadMagnetLinks", "{files : ["+filestring+"]}")
 			//reregister URLHandler
 			filestring = ""
 		}

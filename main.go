@@ -105,6 +105,12 @@ func readSetting(Key string) string {
 	return val
 }
 
+func startDownloadMagnetLinks(Magnetlinks string) bool {
+	//need to parse Magnetlinks array and download all of them
+	go surge.ParsePayloadString(Magnetlinks)
+	return true
+}
+
 // Stats .
 type Stats struct {
 	log *wails.CustomLogger
@@ -162,6 +168,7 @@ func main() {
 	app.Bind(getNumberOfRemoteClient)
 	app.Bind(writeSetting)
 	app.Bind(readSetting)
+	app.Bind(startDownloadMagnetLinks)
 
 	app.Run()
 
