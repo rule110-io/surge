@@ -44,6 +44,8 @@ export default {
 
       window.backend.startDownloadMagnetLinks(links).then(() => {
         this.closeModal();
+        this.$store.dispatch("files/fetchLocalFiles");
+        this.$store.dispatch("files/fetchRemoteFiles");
       });
     },
     initDownloadEvent() {
