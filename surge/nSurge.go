@@ -245,7 +245,7 @@ func Start(runtime *wails.Runtime, args []string) {
 
 		//Insert new file from arguments and start download
 		if args != nil && len(args) > 0 && len(args[0]) > 0 {
-			go ParsePayloadString(args[0])
+			askUser("startDownloadMagnetLinks", "{files : ["+args[0]+"]}")
 		}
 	}
 }
