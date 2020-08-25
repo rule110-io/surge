@@ -749,7 +749,7 @@ func RemoveFile(Hash string, FromDisk bool) bool {
 
 func GetSurgeDir() string {
 	if runtime.GOOS == "windows" {
-		return os.Getenv("APPDATA") + string(os.PathSeparator) + "AppData" + string(os.PathSeparator) + "Roaming" + string(os.PathSeparator) + "Surge"
+		return os.Getenv("APPDATA") + string(os.PathSeparator) + "Roaming" + string(os.PathSeparator) + "Surge"
 	}
 	return os.Getenv("HOME") + string(os.PathSeparator) + ".surge"
 }
