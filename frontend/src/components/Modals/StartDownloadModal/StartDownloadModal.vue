@@ -33,7 +33,7 @@ export default {
     };
   },
   mounted() {
-    this.initDownloadEvent;
+    this.initDownloadEvent();
   },
   methods: {
     closeModal() {
