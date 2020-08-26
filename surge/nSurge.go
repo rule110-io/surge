@@ -307,6 +307,7 @@ func updateGUI() {
 			fileProgressMap[session.FileHash] = float32(float64(session.Downloaded) / float64(session.FileSize))
 
 			if session.Downloaded == session.FileSize {
+				showNotification("Download Finished", "Download for "+getListedFileByHash(session.FileHash).FileName+" finished!")
 				pushNotification("Download Finished", getListedFileByHash(session.FileHash).FileName)
 				session.session.Close()
 
