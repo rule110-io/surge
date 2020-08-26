@@ -27,7 +27,7 @@ func InitializeLog() {
 	log.SetOutput(file)
 
 	// Only log the warning severity or above.
-	log.SetLevel(log.WarnLevel)
+	//log.SetLevel(log.WarnLevel)
 }
 
 //OpenLogFile opens a log file with OS default application for object type

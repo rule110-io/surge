@@ -86,15 +86,3 @@
 
 
 @end
-
-
-
-void ShowNotification(char* title, char* informativeText){
-    NSUserNotification *notification = [[NSUserNotification alloc] init];
-    notification.title = [NSString stringWithUTF8String:title];
-    notification.informativeText = [NSString stringWithUTF8String:informativeText];
-    notification.soundName = NSUserNotificationDefaultSoundName;
-
-    [[NSUserNotificationCenter defaultUserNotificationCenter] deliverNotification:notification];
-    [notification release];
-}

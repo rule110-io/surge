@@ -68,12 +68,6 @@ func setVisualModeLikeOS() {
 	}
 }
 
-func showNotification(title string, text string) {
-	cstr := C.CString(title)
-	cstr2 := C.CString(text)
-	C.ShowNotification(cstr, cstr2)
-}
-
 func initOSHandler() {
 	// the event handler blocks!, so buffer the channel at least once to get the first message
 	labelText = make(chan string, 1)

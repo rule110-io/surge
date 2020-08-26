@@ -30,7 +30,7 @@
 	<key>CFBundleExecutable</key>
 	<string>surge-ui</string>
 	<key>CFBundleIdentifier</key>
-	<string>wails.surge-ui.0.1.0</string>
+	<string>rule110.surge</string>
 	<key>CFBundleVersion</key>
 	<string>0.1.0</string>
 	<key>CFBundleGetInfoString</key>

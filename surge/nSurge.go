@@ -293,6 +293,7 @@ func GetNumberOfRemoteClient() (int, int) {
 func updateGUI() {
 	for true {
 		time.Sleep(time.Second)
+		showNotification("Download Finished", "Download for XYZ.zip finished!")
 
 		//Create session aggregate maps for file
 		fileProgressMap := make(map[string]float32)

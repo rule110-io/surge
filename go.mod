@@ -5,6 +5,7 @@ go 1.14
 require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/boljen/go-bitmap v0.0.0-20151001105940-23cd2fb0ce7d
+	github.com/deckarep/gosx-notifier v0.0.0-20180201035817-e127226297fb
 	github.com/fatih/color v1.9.0 // indirect
 	github.com/golang/protobuf v1.4.2
 	github.com/gotk3/gotk3 v0.4.0 // indirect
