@@ -23,7 +23,7 @@ func showNotification(title string, text string) {
 		Message: text,
 		Icon:    Icon, // This file must exist (remove this line if it doesn't)
 	}
-	err := notification.Push()
+	err = notification.Push()
 	if err != nil {
 		log.Fatalln(err)
 	}

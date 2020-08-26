@@ -45,7 +45,8 @@ ChangesAssociations = yes
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\Christian Busch\Desktop\surge-ui.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\christian\go-projects\src\github.com\rule110-io\surge-ui\build\surge-ui.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\christian\go-projects\src\github.com\rule110-io\surge-ui\appicon.png"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
