@@ -1,17 +1,15 @@
 <template>
   <div class="settings">
     <div class="settings__header">
-      <div class="settings__header-version">
-        Manage your surge - v{{ currentVersion }}
-      </div>
+      <div class="settings__header-version">Manage your surge - v{{ currentVersion }}</div>
       <div class="settings__header-support">
         Community support:
         <a
+          @click="openLink('https://discord.gg/Zg3U5cb')"
           class="settings__header-link"
-          href="https://discord.gg/Zg3U5cb"
+          href="#"
           target="_blank"
-          >https://discord.gg/Zg3U5cb</a
-        >
+        >https://discord.gg/Zg3U5cb</a>
       </div>
     </div>
     <div class="settings__item">
@@ -30,11 +28,11 @@
       <div v-if="!isNewVersion">Latest version installed</div>
       <a
         v-else
+        @click="openLink('https://github.com/rule110-io/surge-ui/releases')"
         class="settings__item-link"
-        href="https://github.com/rule110-io/surge-ui/releases"
+        href="#"
         target="_"
-        >Get latest</a
-      >
+      >Get latest</a>
     </div>
 
     <div class="settings__item">
@@ -92,6 +90,9 @@ export default {
     },
     openLog() {
       window.backend.openLog().then(() => {});
+    },
+    openLink(Link) {
+      window.backend.openLink(Link).then(() => {});
     },
   },
 };

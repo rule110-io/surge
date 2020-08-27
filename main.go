@@ -60,6 +60,10 @@ func openFile(Hash string) {
 	surge.OpenFileByHash(Hash)
 }
 
+func openLink(Link string) {
+	surge.OpenOSPath(Link)
+}
+
 func openLog() {
 	surge.OpenLogFile()
 }
@@ -160,6 +164,7 @@ func main() {
 	app.Bind(downloadFile)
 	app.Bind(setDownloadPause)
 	app.Bind(openFile)
+	app.Bind(openLink)
 	app.Bind(openLog)
 	app.Bind(openFolder)
 	app.Bind(getFileChunkMap)
