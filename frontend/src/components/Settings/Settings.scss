@@ -26,11 +26,14 @@
     }
 
     &-link {
+      display: inline-block;
       color: $primary;
       text-decoration: none;
       transition: $transition-1;
+      cursor: pointer;
 
       &:hover {
+        text-decoration: underline;
         color: $primary-dark;
       }
     }
@@ -44,8 +47,16 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    position: relative;
+
+    &-switch {
+      position: absolute;
+      right: 0;
+      top: 18px;
+    }
 
     &-link {
+      display: inline-block;
       text-transform: uppercase;
       font-weight: bold;
       color: $primary;

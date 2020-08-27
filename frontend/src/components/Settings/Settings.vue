@@ -1,15 +1,17 @@
 <template>
   <div class="settings">
     <div class="settings__header">
-      <div class="settings__header-version">Manage your surge - v{{ currentVersion }}</div>
+      <div class="settings__header-version">
+        Manage your surge - v{{ currentVersion }}
+      </div>
       <div class="settings__header-support">
         Community support:
-        <a
+        <div
           @click="openLink('https://discord.gg/Zg3U5cb')"
           class="settings__header-link"
-          href="#"
-          target="_blank"
-        >https://discord.gg/Zg3U5cb</a>
+        >
+          https://discord.gg/Zg3U5cb
+        </div>
       </div>
     </div>
     <div class="settings__item">
@@ -17,7 +19,12 @@
         <feather class="settings__item-icon" type="sliders"></feather>
         <span class="settings__item-title">Dark Theme</span>
       </div>
-      <Switcher name="theme" :value="darkTheme" @change="changeTheme" />
+      <Switcher
+        class="settings__item-switch"
+        name="theme"
+        :value="darkTheme"
+        @change="changeTheme"
+      />
     </div>
 
     <div class="settings__item">
@@ -26,13 +33,13 @@
         <span class="settings__item-title">releases</span>
       </div>
       <div v-if="!isNewVersion">Latest version installed</div>
-      <a
+      <div
         v-else
         @click="openLink('https://github.com/rule110-io/surge-ui/releases')"
         class="settings__item-link"
-        href="#"
-        target="_"
-      >Get latest</a>
+      >
+        Get latest
+      </div>
     </div>
 
     <div class="settings__item">
@@ -40,7 +47,12 @@
         <feather class="settings__item-icon" type="link"></feather>
         <span class="settings__item-title">Official website</span>
       </div>
-      <a class="settings__item-link" href="#" target="_">surge.io</a>
+      <div
+        class="settings__item-link"
+        @click="openLink('https://surge.rule110.io')"
+      >
+        surge.io
+      </div>
     </div>
 
     <div class="settings__item">
