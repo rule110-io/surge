@@ -206,11 +206,10 @@ func Start(runtime *wails.Runtime, args []string) {
 	account := InitializeAccount()
 	client, err = nkn.NewMultiClient(account, "", NumClients, false, nil)
 
-	log.Println("MY ADDRESS:", client.Addr().String())
-
 	if err != nil {
 		pushError("Error on startup", err.Error())
 	} else {
+		log.Println("MY ADDRESS:", client.Addr().String())
 		<-client.OnConnect.C
 
 		pushNotification("Client Connected", "Successfully connected to the NKN network")
