@@ -188,6 +188,9 @@ func Start(runtime *wails.Runtime, args []string) {
 		// seems like this is the first time starting the app
 		//set tour to active
 		DbWriteSetting("Tour", "true")
+		//set default mode to light
+		DbWriteSetting("DarkMode", "false")
+
 		os.Mkdir(dir, dirFileMode)
 	}
 
