@@ -23,6 +23,19 @@
 			<string>Document</string>
 		</dict>
 	</array>
+	<key>CFBundleURLTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleURLName</key>
+			<string>Surge Link</string>
+			<key>CFBundleURLSchemes</key>
+			<array>
+				<string>surge</string>
+			</array>
+		</dict>
+	</array>
+	<key>NSUIElement</key>
+	<true/>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleName</key>
