@@ -25,6 +25,9 @@ export default {
   data: () => {
     return {};
   },
+  destroyed() {
+    clearInterval(this.remoteInterval);
+  },
   mounted() {
     this.enableNotifications();
     this.enableDownloadEvents();
@@ -41,6 +44,8 @@ export default {
     this.updateRemoteVersion();
 
     this.getNumberOfRemoteClient();
+
+    this.remoteInterval = setInterval(this.fetchRemoteFiles, 10000);
   },
   methods: {
     fetchLocalFiles() {
