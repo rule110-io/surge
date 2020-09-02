@@ -8,6 +8,7 @@ import (
 
 const logPath = "surge.log"
 
+//InitializeLog init for log file
 func InitializeLog() {
 
 	var err error

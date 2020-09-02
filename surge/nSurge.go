@@ -116,6 +116,7 @@ type File struct {
 	IsDownloading bool
 	IsUploading   bool
 	IsPaused      bool
+	IsMissing     bool
 	ChunkMap      []byte
 }
 
@@ -224,15 +225,27 @@ func Start(runtime *wails.Runtime, args []string) {
 		uploadBandwidthAccumulator = make(map[string]int)
 		zeroBandwidthMap = make(map[string]bool)
 
-		go BuildSeedString()
+		dbFiles := dbGetAllFiles()
+		var filesOnDisk []File
 
-		sendSeedSubscription(topicEncoded, "Surge File Seeder")
-		go GetSubscriptions(topicEncoded)
-
-		tracked := GetTrackedFiles()
-		for i := 0; i < len(tracked); i++ {
-			go restartDownload(tracked[i].FileHash)
+		for i := 0; i < len(dbFiles); i++ {
+			if FileExists(dbFiles[i].Path) {
+				filesOnDisk = append(filesOnDisk, dbFiles[i])
+			} else {
+				dbFiles[i].IsMissing = true
+				dbFiles[i].IsDownloading = false
+				dbFiles[i].IsUploading = false
+				dbInsertFile(dbFiles[i])
+			}
 		}
+
+		go BuildSeedString(filesOnDisk)
+		for i := 0; i < len(filesOnDisk); i++ {
+			go restartDownload(filesOnDisk[i].FileHash)
+		}
+
+		go sendSeedSubscription(topicEncoded, "Surge File Seeder")
+		go GetSubscriptions(topicEncoded)
 
 		go updateGUI()
 
@@ -319,7 +332,7 @@ func updateGUI() {
 				fileEntry.IsDownloading = false
 				fileEntry.IsUploading = true
 				dbInsertFile(*fileEntry)
-				go BuildSeedString()
+				go AddToSeedString(*fileEntry)
 			}
 		}
 		sessionsWriteLock.Unlock()
@@ -747,11 +760,14 @@ func RemoveFile(Hash string, FromDisk bool) bool {
 	}
 	fileWriteLock.Unlock()
 
-	go BuildSeedString()
+	//Rebuild entirely
+	dbFiles := dbGetAllFiles()
+	go BuildSeedString(dbFiles)
 
 	return true
 }
 
+//GetSurgeDir returns the surge dir
 func GetSurgeDir() string {
 	if runtime.GOOS == "windows" {
 		return os.Getenv("APPDATA") + string(os.PathSeparator) + "Surge"

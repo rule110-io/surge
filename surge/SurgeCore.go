@@ -583,9 +583,7 @@ func surgeGetFileSize(path string) int64 {
 }
 
 //BuildSeedString builds a string of seeded files to share with clients
-func BuildSeedString() {
-	dbFiles := dbGetAllFiles()
-
+func BuildSeedString(dbFiles []File) {
 	newQueryPayload := ""
 	for _, dbFile := range dbFiles {
 		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Seeder)
@@ -599,6 +597,14 @@ func BuildSeedString() {
 		}
 	}
 	queryPayload = newQueryPayload
+}
+
+//AddToSeedString adds to existing seed string
+func AddToSeedString(dbFile File) {
+	//Add to payload
+	payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)
+	//log.Println(payload)
+	queryPayload += payload
 }
 
 //SeedFile generates everything needed to seed a file
@@ -779,4 +785,14 @@ func createSession(File *File) (*Session, error) {
 		FileSize: File.FileSize,
 		FileHash: File.FileHash,
 	}, nil
+}
+
+// FileExists checks if a file exists and is not a directory before we
+// try using it to prevent further errors.
+func FileExists(filename string) bool {
+	info, err := os.Stat(filename)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
 }
