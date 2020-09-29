@@ -364,10 +364,20 @@ func processQueryResponse(Session *Session, Data []byte) {
 	clientOnlineMap[seeder] = true
 	clientOnlineMapLock.Unlock()
 
-	//Remove exisiting file listings for this user
+	//Remove exisiting file seed listings for this user
 	n := 0
 	for _, x := range ListedFiles {
-		if x.Seeder != seeder {
+		nn := 0
+		for _, y := range x.Seeders {
+			if y != seeder {
+				x.Seeders[nn] = y
+				nn++
+			}
+			x.Seeders = x.Seeders[:nn]
+		}
+
+		//If there are no remaining seeders, remove listing.
+		if len(ListedFiles[n].Seeders) == 0 {
 			ListedFiles[n] = x
 			n++
 		}
@@ -390,7 +400,7 @@ func processQueryResponse(Session *Session, Data []byte) {
 			FileName:  data[2],
 			FileSize:  fileSize,
 			FileHash:  data[4],
-			Seeder:    seeder,
+			Seeders:   []string{seeder},
 			Path:      "",
 			NumChunks: numChunks,
 			ChunkMap:  nil,
@@ -400,9 +410,8 @@ func processQueryResponse(Session *Session, Data []byte) {
 		var replace = false
 		for l := 0; l < len(ListedFiles); l++ {
 			if ListedFiles[l].FileHash == newListing.FileHash {
-				//TODO check seeder, if its unique add it as an additional seeder for the file
-				//For now we overwrite
-				ListedFiles[l] = newListing
+				//if the seeder is unique add it as an additional seeder for the file
+				ListedFiles[l].Seeders = append(ListedFiles[l].Seeders, seeder)
 				replace = true
 				break
 			}
@@ -412,7 +421,7 @@ func processQueryResponse(Session *Session, Data []byte) {
 			ListedFiles = append(ListedFiles, newListing)
 		}
 
-		log.Println("Query response new file: ", newListing.FileName, " seeder: ", newListing.Seeder)
+		log.Println("Query response new file: ", newListing.FileName, " seeder: ", seeder)
 
 		//Test gui
 		//newButton := widget.NewButton(newListing.Filename+" | "+ByteCountSI(newListing.FileSize), func() {
@@ -439,7 +448,7 @@ func ParsePayloadString(s string) {
 			FileName:  data[2],
 			FileSize:  fileSize,
 			FileHash:  data[4],
-			Seeder:    data[5],
+			Seeders:   strings.Split(data[5], ","),
 			Path:      "",
 			NumChunks: numChunks,
 			ChunkMap:  nil,
@@ -461,7 +470,7 @@ func ParsePayloadString(s string) {
 			ListedFiles = append(ListedFiles, newListing)
 		}
 
-		log.Println("Program paramater new file: ", newListing.FileName, " seeder: ", newListing.Seeder)
+		log.Println("Program paramater new file: ", newListing.FileName, " seeder: ", newListing.Seeders)
 
 		go DownloadFile(newListing.FileHash)
 
@@ -586,7 +595,7 @@ func surgeGetFileSize(path string) int64 {
 func BuildSeedString(dbFiles []File) {
 	newQueryPayload := ""
 	for _, dbFile := range dbFiles {
-		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Seeder)
+		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, strings.Join(dbFile.Seeders, ","))
 		log.Println("Magnet:", magnet)
 
 		if dbFile.IsUploading {
@@ -676,7 +685,7 @@ func restartDownload(Hash string) {
 	//TODO: Seed discovery?
 
 	//Early out if we have no seeder
-	if len(file.Seeder) == 0 {
+	if len(file.Seeders) == 0 {
 		return
 	}
 
@@ -762,7 +771,7 @@ func createSession(File *File) (*Session, error) {
 			DialTimeout:   60000,
 		}
 
-		downloadSession, err := client.DialWithConfig(File.Seeder, dialConfig)
+		downloadSession, err := client.DialWithConfig(File.Seeders[0], dialConfig)
 		if err != nil {
 			log.Println("Download Session timout for", File.FileName)
 			return nil, err

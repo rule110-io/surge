@@ -110,7 +110,7 @@ type File struct {
 	FileName      string
 	FileSize      int64
 	FileHash      string
-	Seeder        string
+	Seeders       []string
 	Path          string
 	NumChunks     int
 	IsDownloading bool
@@ -602,11 +602,13 @@ func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
 	for _, file := range ListedFiles {
 		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) {
 
+			seedString := strings.Join(file.Seeders[:], ",")
+
 			result := FileListing{
 				FileName:  file.FileName,
 				FileHash:  file.FileHash,
 				FileSize:  file.FileSize,
-				Seeder:    file.Seeder,
+				Seeder:    seedString,
 				NumChunks: file.NumChunks,
 			}
 
