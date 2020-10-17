@@ -157,11 +157,15 @@ type FileStatusEvent struct {
 var ListedFiles []File
 
 var wailsRuntime *wails.Runtime
+
 var labelText chan string
 var appearance chan string
 
 var numClientsSubscribed int = 0
 var numClientsOnline int = 0
+
+var numClientsSubscribedStore *wails.Store
+var numClientsOnlineStore *wails.Store
 
 // Start initializes surge
 func Start(runtime *wails.Runtime, args []string) {
@@ -173,6 +177,10 @@ func Start(runtime *wails.Runtime, args []string) {
 	go setVisualModeLikeOS()
 
 	wailsRuntime = runtime
+
+	numClientsSubscribedStore = wailsRuntime.Store.New("numClientsSubscribed", 0)
+	numClientsOnlineStore = wailsRuntime.Store.New("numClientsOnline", 0)
+
 	var dirFileMode os.FileMode
 	var dir = GetSurgeDir()
 	dirFileMode = os.ModeDir | (osUserRwx | osAllR)
@@ -277,6 +285,13 @@ func rescanPeers() {
 
 		numClientsSubscribed = len(clientOnlineMap)
 		numClientsOnline = numOnline
+
+		numClientsSubscribedStore.Update(func(data int) int {
+			return len(clientOnlineMap)
+		})
+		numClientsOnlineStore.Update(func(data int) int {
+			return numOnline
+		})
 
 		wailsRuntime.Events.Emit("remoteClientsUpdate", len(clientOnlineMap), numOnline)
 		clientOnlineMapLock.Unlock()
