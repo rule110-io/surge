@@ -7,6 +7,8 @@
   </div>
 </template>
 <script>
+const runtime = require("@wailsapp/runtime");
+
 import { mapState } from "vuex";
 
 import Dashboard from "@/components/Dashboard/Dashboard";
@@ -111,8 +113,12 @@ export default {
       });
     },
     enableClientStatusUpdate() {
-      window.wails.Events.On("remoteClientsUpdate", (total, online) => {
-        this.$store.commit("clientStatus/addClientStatus", { total, online });
+      const clientsStore = runtime.Store.New("numClients");
+      clientsStore.subscribe(({ Online, Subscribed }) => {
+        this.$store.commit("clientStatus/addClientStatus", {
+          total: Subscribed,
+          online: Online,
+        });
       });
     },
   },
