@@ -185,7 +185,12 @@ func Start(runtime *wails.Runtime, args []string) {
 
 	wailsRuntime = runtime
 
-	numClientsStore = wailsRuntime.Store.New("numClients", "numClients")
+	numClients := NumClientsStruct{
+		Subscribed: 0,
+		Online:     0,
+	}
+
+	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
 
 	numClientsSubscribedStore = wailsRuntime.Store.New("numClientsSubscribed", 0)
 	numClientsOnlineStore = wailsRuntime.Store.New("numClientsOnline", 0)
