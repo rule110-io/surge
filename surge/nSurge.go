@@ -169,9 +169,6 @@ var appearance chan string
 var numClientsSubscribed int = 0
 var numClientsOnline int = 0
 
-var numClientsSubscribedStore *wails.Store
-var numClientsOnlineStore *wails.Store
-
 var numClientsStore *wails.Store
 
 // Start initializes surge
@@ -191,9 +188,6 @@ func Start(runtime *wails.Runtime, args []string) {
 	}
 
 	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
-
-	numClientsSubscribedStore = wailsRuntime.Store.New("numClientsSubscribed", 0)
-	numClientsOnlineStore = wailsRuntime.Store.New("numClientsOnline", 0)
 
 	var dirFileMode os.FileMode
 	var dir = GetSurgeDir()
@@ -304,17 +298,6 @@ func rescanPeers() {
 				Subscribed: len(clientOnlineMap),
 				Online:     numOnline,
 			}
-		})
-
-		numClientsSubscribedStore.Update(func(data int) int {
-			return len(clientOnlineMap)
-		})
-
-		numClientsSubscribedStore.Update(func(data int) int {
-			return len(clientOnlineMap)
-		})
-		numClientsOnlineStore.Update(func(data int) int {
-			return numOnline
 		})
 
 		wailsRuntime.Events.Emit("remoteClientsUpdate", len(clientOnlineMap), numOnline)
