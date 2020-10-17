@@ -120,6 +120,11 @@ type File struct {
 	ChunkMap      []byte
 }
 
+type NumClientsStruct struct {
+	Subscribed int
+	Online     int
+}
+
 // FileListing struct for all frontend file listing props
 type FileListing struct {
 	FileName    string
@@ -167,6 +172,8 @@ var numClientsOnline int = 0
 var numClientsSubscribedStore *wails.Store
 var numClientsOnlineStore *wails.Store
 
+var numClientsStore *wails.Store
+
 // Start initializes surge
 func Start(runtime *wails.Runtime, args []string) {
 
@@ -177,6 +184,8 @@ func Start(runtime *wails.Runtime, args []string) {
 	go setVisualModeLikeOS()
 
 	wailsRuntime = runtime
+
+	numClientsStore = wailsRuntime.Store.New("numClients", "numClients")
 
 	numClientsSubscribedStore = wailsRuntime.Store.New("numClientsSubscribed", 0)
 	numClientsOnlineStore = wailsRuntime.Store.New("numClientsOnline", 0)
@@ -285,6 +294,16 @@ func rescanPeers() {
 
 		numClientsSubscribed = len(clientOnlineMap)
 		numClientsOnline = numOnline
+		numClientsStore.Update(func(data NumClientsStruct) NumClientsStruct {
+			return NumClientsStruct{
+				Subscribed: len(clientOnlineMap),
+				Online:     numOnline,
+			}
+		})
+
+		numClientsSubscribedStore.Update(func(data int) int {
+			return len(clientOnlineMap)
+		})
 
 		numClientsSubscribedStore.Update(func(data int) int {
 			return len(clientOnlineMap)
