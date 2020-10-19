@@ -114,6 +114,7 @@ b {
   width: 100%;
   margin-bottom: $padding-max;
   position: relative;
+  border-spacing: 0px 6px;
 
   &__row {
     display: table-row;
@@ -128,7 +129,7 @@ b {
     font-size: 15px;
     font-weight: normal;
     display: table-cell;
-    padding-bottom: $padding-default;
+    padding: 0 22px $padding-micro 22px;
     vertical-align: middle;
     font-weight: 500;
     font-size: $fz-md;
@@ -139,20 +140,33 @@ b {
     }
 
     &:first-child {
-      width: 280px;
+      width: 200px;
     }
   }
 
   &__cell {
     display: table-cell;
-    padding: $padding-default 0;
-    border-top: 1px solid $grey-light;
     vertical-align: middle;
     color: #4e5259;
+    padding: 20px 12px;
+
+    @include dark-theme {
+      background: $card-dark;
+    }
+
+    &:first-child {
+      border-top-left-radius: $card-br;
+      border-bottom-left-radius: $card-br;
+    }
+
+    &:last-child {
+      border-top-right-radius: $card-br;
+      border-bottom-right-radius: $card-br;
+      border: unset;
+    }
 
     @include dark-theme {
       color: color(dark, text-light);
-      border-color: $divider-dark;
     }
   }
 
@@ -208,6 +222,10 @@ b {
   &_align {
     &_right {
       text-align: right;
+    }
+
+    &_center {
+      text-align: center;
     }
   }
 }

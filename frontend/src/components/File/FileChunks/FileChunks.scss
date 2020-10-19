@@ -1,0 +1,20 @@
+.file-chunks {
+  height: 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &__percent {
+    color: white;
+    text-align: center;
+  }
+
+  &__progress {
+    width: 120px;
+    height: 20px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+  }
+}

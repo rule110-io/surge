@@ -7,7 +7,7 @@
         <feather class="sidebar__item-icon" type="search"></feather>
       </router-link>
       <router-link to="/download" id="download" class="sidebar__item">
-        <feather class="sidebar__item-icon" type="play"></feather>
+        <feather class="sidebar__item-icon" type="folder"></feather>
       </router-link>
     </div>
     <router-link to="/settings" id="settings" class="sidebar__item">

@@ -1,47 +1,30 @@
 <template>
   <div class="page">
     <div class="page__results" id="files_table">
-      <h1 class="page__title">Files</h1>
+      <h1 class="page__title">File Transfers</h1>
       <div class="table">
         <div class="table__row">
-          <div class="table__head">Name & size</div>
-          <div class="table__head">Speed & status</div>
-          <div class="table__head" style="width: 150px;">Time</div>
+          <div class="table__head">File</div>
+          <div class="table__head">Speed</div>
+          <div class="table__head text_align_center">Chunks</div>
+          <div class="table__head text_align_center">Remaining</div>
+          <div class="table__head text_align_center">Status</div>
         </div>
         <div class="table__row" v-for="file in localFiles" :key="file.FileName">
           <div class="table__cell">
             <FileInfo :file="file" />
           </div>
           <div class="table__cell">
-            <FileStatus :file="file" />
+            <FileSpeed :file="file" />
+          </div>
+          <div class="table__cell">
+            <FileChunks :file="file" />
           </div>
           <div class="table__cell">
             <FileTime :file="file" />
           </div>
-          <div class="table__cell text_align_right" style="width: 10%;">
-            <feather
-              v-if="!file.IsPaused && file.IsDownloading"
-              class="table__action"
-              type="pause-circle"
-              @click.native="pause(file.FileHash)"
-            ></feather>
-            <feather
-              v-if="!file.IsDownloading && !file.IsPaused"
-              class="table__action"
-              type="folder"
-              @click.native="openFolder(file.FileHash)"
-            ></feather>
-            <feather
-              v-if="file.IsPaused"
-              class="table__action"
-              type="play-circle"
-              @click.native="continueDownload(file.FileHash)"
-            ></feather>
-            <feather
-              class="table__action table__action_remove"
-              type="trash-2"
-              @click.native="removeFile(file)"
-            ></feather>
+          <div class="table__cell">
+            <FileStatus :file="file" />
           </div>
         </div>
         <Pagination
@@ -63,8 +46,10 @@
 import { mapState } from "vuex";
 
 import FileInfo from "@/components/File/FileInfo/FileInfo";
-import FileStatus from "@/components/File/FileStatus/FileStatus";
+import FileChunks from "@/components/File/FileChunks/FileChunks";
 import FileTime from "@/components/File/FileTime/FileTime";
+import FileSpeed from "@/components/File/FileSpeed/FileSpeed";
+import FileStatus from "@/components/File/FileStatus/FileStatus";
 import Pagination from "@/components/Pagination/Pagination";
 import RemoveFileModal from "@/components/Modals/RemoveFileModal/RemoveFileModal";
 
@@ -72,8 +57,10 @@ export default {
   name: "download",
   components: {
     FileInfo,
-    FileStatus,
+    FileChunks,
     FileTime,
+    FileSpeed,
+    FileStatus,
     Pagination,
     RemoveFileModal,
   },
@@ -90,25 +77,8 @@ export default {
     this.$store.dispatch("files/fetchLocalFiles");
   },
   methods: {
-    removeFile(file) {
-      this.activeFile = file;
-      this.toggleRemoveFileModal(true);
-    },
     toggleRemoveFileModal(bool) {
       this.isRemoveFileModal = bool;
-    },
-    pause(hash) {
-      window.backend.setDownloadPause(hash, true).then(() => {
-        this.$store.dispatch("files/fetchLocalFiles");
-      });
-    },
-    continueDownload(hash) {
-      window.backend.setDownloadPause(hash, false).then(() => {
-        this.$store.dispatch("files/fetchLocalFiles");
-      });
-    },
-    openFolder(FileHash) {
-      window.backend.openFolder(FileHash).then(() => {});
     },
   },
 };

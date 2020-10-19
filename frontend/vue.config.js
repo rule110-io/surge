@@ -62,6 +62,7 @@ module.exports = {
       .loader("vue-style-loader", "css-loader", "sass-loader");
   },
   css: cssConfig,
+  transpileDependencies: ["vue-clamp", "resize-detector"],
   configureWebpack: {
     output: {
       filename: "[name].js",

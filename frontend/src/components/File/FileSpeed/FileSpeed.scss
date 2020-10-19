@@ -1,0 +1,13 @@
+.file-speed {
+  font-size: $fz-sm;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 56px;
+
+  &__item {
+    @include dark-theme {
+      color: white;
+    }
+  }
+}

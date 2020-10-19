@@ -1,16 +1,22 @@
 .file-time {
+  height: 56px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+
   &__title {
-    font-size: $fz-md;
     color: $text-dark;
-    line-height: calc(1.2em + #{$padding-small});
+    font-size: $fz-md;
+    margin-bottom: $padding-micro;
 
     @include dark-theme {
       color: color(dark, text-light);
     }
   }
 
-  &__percent {
-    color: $primary;
-    font-size: $fz-sm;
+  &__status {
+    color: white;
+    min-width: 136px;
   }
 }

@@ -37,7 +37,7 @@
     justify-content: center;
 
     @include dark-theme {
-      background: color(dark, base);
+      background: $card-dark;
     }
 
     &:hover & {
@@ -47,7 +47,7 @@
     }
 
     &-icon {
-      height: 18px;
+      height: 24px;
       color: white;
       transition: $transition-1;
     }
@@ -69,7 +69,7 @@
     }
 
     &:not(:last-child) {
-      margin-bottom: $padding-medium;
+      margin-bottom: $padding-default;
     }
 
     &:hover {
