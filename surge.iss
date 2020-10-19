@@ -5,7 +5,7 @@
 #define MyAppVersion "0.1"
 #define MyAppPublisher "Rule110"
 #define MyAppURL "http://rule110.io/"
-#define MyAppExeName "surge-ui.exe"
+#define MyAppExeName "surge.exe"
 
 [Setup]
 ; NOTE: The value of AppId uniquely identifies this application. Do not use the same AppId value in installers for other applications.
@@ -45,7 +45,7 @@ ChangesAssociations = yes
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\christian\go-projects\src\github.com\rule110-io\surge-ui\build\surge-ui.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\christian\go-projects\src\github.com\rule110-io\surge-ui\build\surge.exe"; DestDir: "{app}"; Flags: ignoreversion
 Source: "C:\Users\christian\go-projects\src\github.com\rule110-io\surge-ui\appicon.png"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 

@@ -293,6 +293,7 @@ func rescanPeers() {
 
 		numClientsSubscribed = len(clientOnlineMap)
 		numClientsOnline = numOnline
+
 		numClientsStore.Update(func(data NumClientsStruct) NumClientsStruct {
 			return NumClientsStruct{
 				Subscribed: len(clientOnlineMap),
@@ -300,7 +301,6 @@ func rescanPeers() {
 			}
 		})
 
-		wailsRuntime.Events.Emit("remoteClientsUpdate", len(clientOnlineMap), numOnline)
 		clientOnlineMapLock.Unlock()
 
 		time.Sleep(time.Minute)
