@@ -120,6 +120,11 @@ type File struct {
 	ChunkMap      []byte
 }
 
+type NumClientsStruct struct {
+	Subscribed int
+	Online     int
+}
+
 // FileListing struct for all frontend file listing props
 type FileListing struct {
 	FileName    string
@@ -157,11 +162,14 @@ type FileStatusEvent struct {
 var ListedFiles []File
 
 var wailsRuntime *wails.Runtime
+
 var labelText chan string
 var appearance chan string
 
 var numClientsSubscribed int = 0
 var numClientsOnline int = 0
+
+var numClientsStore *wails.Store
 
 // Start initializes surge
 func Start(runtime *wails.Runtime, args []string) {
@@ -173,6 +181,14 @@ func Start(runtime *wails.Runtime, args []string) {
 	go setVisualModeLikeOS()
 
 	wailsRuntime = runtime
+
+	numClients := NumClientsStruct{
+		Subscribed: 0,
+		Online:     0,
+	}
+
+	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
+
 	var dirFileMode os.FileMode
 	var dir = GetSurgeDir()
 	dirFileMode = os.ModeDir | (osUserRwx | osAllR)
@@ -278,7 +294,13 @@ func rescanPeers() {
 		numClientsSubscribed = len(clientOnlineMap)
 		numClientsOnline = numOnline
 
-		wailsRuntime.Events.Emit("remoteClientsUpdate", len(clientOnlineMap), numOnline)
+		numClientsStore.Update(func(data NumClientsStruct) NumClientsStruct {
+			return NumClientsStruct{
+				Subscribed: len(clientOnlineMap),
+				Online:     numOnline,
+			}
+		})
+
 		clientOnlineMapLock.Unlock()
 
 		time.Sleep(time.Minute)

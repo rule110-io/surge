@@ -153,7 +153,7 @@ func main() {
 		Width:     1144,
 		Height:    768,
 		Resizable: false,
-		Title:     "surge-ui",
+		Title:     "Surge",
 		JS:        js,
 		CSS:       css,
 		Colour:    "#131313",
