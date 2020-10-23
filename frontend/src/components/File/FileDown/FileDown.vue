@@ -1,19 +1,11 @@
 <template>
-  <div class="file-speed">
-    <div class="file-speed__source">1 Source connected</div>
-    <div>
-      <div class="file-speed__item">
-        Down: {{ downloadBandwidth | prettyBytes(1) }}/s
-      </div>
-      <div class="file-speed__item">
-        Up: {{ uploadBandwidth | prettyBytes(1) }}/s
-      </div>
-    </div>
+  <div class="file-down text_wrap_none">
+    {{ downloadBandwidth | prettyBytes(0) }}/s
   </div>
 </template>
 
 <style lang="scss">
-@import "./FileSpeed.scss";
+@import "./FileDown.scss";
 </style>
 
 <script>
@@ -29,9 +21,9 @@ export default {
   data: () => {
     return {
       downloadBandwidth: 0,
-      uploadBandwidth: 0,
     };
   },
+  mounted() {},
   computed: {
     ...mapState("downloadEvents", ["downloadEvent"]),
   },
@@ -40,11 +32,10 @@ export default {
       const { FileHash } = this.file;
       if (FileHash === newEvent.FileHash) {
         this.downloadBandwidth = newEvent.DownloadBandwidth;
-        this.uploadBandwidth = newEvent.UploadBandwidth;
       }
     },
   },
-  mounted() {},
+
   methods: {},
 };
 </script>

@@ -1,22 +1,3 @@
 .file-time {
-  height: 56px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-
-  &__title {
-    color: $text-dark;
-    font-size: $fz-md;
-    margin-bottom: $padding-micro;
-
-    @include dark-theme {
-      color: color(dark, text-light);
-    }
-  }
-
-  &__status {
-    color: white;
-    min-width: 136px;
-  }
+  width: 102px;
 }

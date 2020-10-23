@@ -1,11 +1,24 @@
 <template>
   <div class="file-chunks">
-    <div class="file-chunks__percent">{{ progress.toFixed(2) }}%</div>
+    <div class="file-chunks__title text_wrap_none">
+      <template
+        v-if="!file.IsDownloading && !file.IsUploading && !file.IsPaused"
+      >
+        Finished
+      </template>
+      <template v-else-if="file.IsUploading">
+        Seeding
+      </template>
+      <template v-else-if="file.IsPaused">
+        Paused: {{ progress.toFixed(2) }}%
+      </template>
+      <template v-else> Downloading: {{ progress.toFixed(2) }}% </template>
+    </div>
     <canvas
       class="file-chunks__progress"
       ref="canvas"
-      width="120"
-      height="20"
+      width="156"
+      height="12"
     ></canvas>
   </div>
 </template>
@@ -26,8 +39,6 @@ export default {
   },
   data: () => {
     return {
-      downloadBandwidth: 0,
-      uploadBandwidth: 0,
       progress: 0,
     };
   },
@@ -38,8 +49,6 @@ export default {
     downloadEvent(newEvent) {
       const { FileHash } = this.file;
       if (FileHash === newEvent.FileHash) {
-        this.downloadBandwidth = newEvent.DownloadBandwidth;
-        this.uploadBandwidth = newEvent.UploadBandwidth;
         this.progress = newEvent.Progress * 100;
         this.drawProgress(newEvent.ChunkMap);
       }
@@ -56,7 +65,7 @@ export default {
   },
   methods: {
     getChunkMap() {
-      window.backend.getFileChunkMap(this.file.FileHash, 118).then((bits) => {
+      window.backend.getFileChunkMap(this.file.FileHash, 156).then((bits) => {
         this.drawProgress(bits);
       });
     },
@@ -72,7 +81,7 @@ export default {
         ctx.strokeStyle = colours[parseFloat(val)];
         ctx.lineWidth = 1;
         ctx.moveTo(i, 0);
-        ctx.lineTo(i, 20);
+        ctx.lineTo(i, 12);
         ctx.closePath();
         ctx.stroke();
       });

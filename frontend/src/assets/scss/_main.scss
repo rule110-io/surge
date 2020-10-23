@@ -118,10 +118,6 @@ b {
 
   &__row {
     display: table-row;
-
-    &:not(:first-child) {
-      height: 76px;
-    }
   }
 
   &__head {
@@ -129,7 +125,7 @@ b {
     font-size: 15px;
     font-weight: normal;
     display: table-cell;
-    padding: 0 22px $padding-micro 22px;
+    padding: 0 $padding-small $padding-micro $padding-small;
     vertical-align: middle;
     font-weight: 500;
     font-size: $fz-md;
@@ -148,10 +144,12 @@ b {
     display: table-cell;
     vertical-align: middle;
     color: #4e5259;
-    padding: 20px 12px;
+    padding: $padding-micro $padding-small;
+    font-size: $fz-sm;
 
     @include dark-theme {
       background: $card-dark;
+      color: white;
     }
 
     &:first-child {
@@ -164,15 +162,11 @@ b {
       border-bottom-right-radius: $card-br;
       border: unset;
     }
-
-    @include dark-theme {
-      color: color(dark, text-light);
-    }
   }
 
   &__action {
-    height: 24px;
-    width: 24px;
+    height: 20px;
+    width: 20px;
     color: $grey;
     transition: $transition-1;
     cursor: pointer;
@@ -190,7 +184,7 @@ b {
     }
 
     &_remove {
-      margin-left: $padding-small;
+      margin-right: $padding-small;
 
       &:hover {
         color: $error;

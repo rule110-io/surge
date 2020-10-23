@@ -1,17 +1,16 @@
 .file-chunks {
-  height: 56px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
 
-  &__percent {
-    color: white;
+  &__title {
     text-align: center;
+    margin-bottom: $padding-micro;
   }
 
   &__progress {
-    width: 120px;
-    height: 20px;
+    width: 156px;
+    height: 12px;
     position: relative;
     display: flex;
     align-items: center;

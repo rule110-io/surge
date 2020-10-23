@@ -2,27 +2,13 @@
   display: flex;
   align-items: center;
 
-  &__controls {
-    display: flex;
-    flex-direction: column;
-    margin-right: 20px;
-    justify-content: space-between;
-    height: 56px;
-  }
-
-  &__right {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    height: 56px;
-  }
-
   &__control {
     height: 20px;
     width: 20px;
     color: $grey;
     transition: $transition-1;
     cursor: pointer;
+    margin-right: $padding-default;
 
     @include dark-theme {
       color: white;
@@ -71,9 +57,8 @@
 
   &__title {
     font-weight: 600;
-    font-size: $fz-sm;
     color: $text-dark;
-    width: 200px;
+    width: 165px;
 
     @include dark-theme {
       color: white;
@@ -82,7 +67,8 @@
 
   &__size {
     color: $grey;
-    font-size: $fz-sm;
+    margin-right: $padding-micro;
+    min-width: 80px;
 
     @include dark-theme {
       color: color(dark, text-light);

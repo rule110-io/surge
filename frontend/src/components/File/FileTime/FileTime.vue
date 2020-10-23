@@ -1,17 +1,14 @@
 <template>
-  <div class="file-time">
-    <div class="file-time__title">ETA</div>
-    <div class="file-time__status">
-      <template v-if="file.IsPaused">
-        Paused
-      </template>
-      <template v-else-if="progress === 100">
-        Finished
-      </template>
-      <template v-else>
-        {{ [seconds, "seconds"] | duration("humanize") }}
-      </template>
-    </div>
+  <div class="file-time text_wrap_none">
+    <template v-if="file.IsPaused">
+      Paused
+    </template>
+    <template v-else-if="progress === 100">
+      Finished
+    </template>
+    <template v-else>
+      {{ [seconds, "seconds"] | duration("humanize") }}
+    </template>
   </div>
 </template>
 

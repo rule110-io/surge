@@ -5,26 +5,41 @@
       <div class="table">
         <div class="table__row">
           <div class="table__head">File</div>
-          <div class="table__head">Speed</div>
-          <div class="table__head text_align_center">Chunks</div>
-          <div class="table__head text_align_center">Remaining</div>
+          <div class="table__head text_align_center">Down</div>
+          <div class="table__head text_align_center">Up</div>
           <div class="table__head text_align_center">Status</div>
+          <div class="table__head">Remaining</div>
+          <div class="table__head">Peers</div>
+          <div class="table__head"></div>
         </div>
         <div class="table__row" v-for="file in localFiles" :key="file.FileName">
           <div class="table__cell">
             <FileInfo :file="file" />
           </div>
-          <div class="table__cell">
-            <FileSpeed :file="file" />
+          <div class="table__cell text_align_center">
+            <FileDown :file="file" />
           </div>
-          <div class="table__cell">
-            <FileChunks :file="file" />
+          <div class="table__cell text_align_center">
+            <FileUp :file="file" />
           </div>
+          <div class="table__cell"><FileChunks :file="file" /></div>
           <div class="table__cell">
             <FileTime :file="file" />
           </div>
           <div class="table__cell">
-            <FileStatus :file="file" />
+            1
+          </div>
+          <div class="table__cell">
+            <feather
+              class="table__action table__action_remove"
+              type="trash-2"
+              @click.native="removeFile(file)"
+            ></feather>
+            <feather
+              class="table__action"
+              type="folder"
+              @click.native="openFolder(file.FileHash)"
+            ></feather>
           </div>
         </div>
         <Pagination
@@ -48,8 +63,8 @@ import { mapState } from "vuex";
 import FileInfo from "@/components/File/FileInfo/FileInfo";
 import FileChunks from "@/components/File/FileChunks/FileChunks";
 import FileTime from "@/components/File/FileTime/FileTime";
-import FileSpeed from "@/components/File/FileSpeed/FileSpeed";
-import FileStatus from "@/components/File/FileStatus/FileStatus";
+import FileUp from "@/components/File/FileUp/FileUp";
+import FileDown from "@/components/File/FileDown/FileDown";
 import Pagination from "@/components/Pagination/Pagination";
 import RemoveFileModal from "@/components/Modals/RemoveFileModal/RemoveFileModal";
 
@@ -59,8 +74,8 @@ export default {
     FileInfo,
     FileChunks,
     FileTime,
-    FileSpeed,
-    FileStatus,
+    FileUp,
+    FileDown,
     Pagination,
     RemoveFileModal,
   },
@@ -79,6 +94,13 @@ export default {
   methods: {
     toggleRemoveFileModal(bool) {
       this.isRemoveFileModal = bool;
+    },
+    removeFile(file) {
+      this.activeFile = file;
+      this.toggleRemoveFileModal(true);
+    },
+    openFolder(FileHash) {
+      window.backend.openFolder(FileHash).then(() => {});
     },
   },
 };
