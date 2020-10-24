@@ -55,6 +55,7 @@ b {
   position: relative;
   overflow: hidden;
   margin-bottom: $padding-normal;
+  background: $grey-light;
 
   @include dark-theme {
     background: color(dark, darkest);
@@ -71,6 +72,11 @@ b {
     position: relative;
     z-index: 1;
     cursor: pointer;
+    transition: $transition-1;
+
+    &_active {
+      color: white;
+    }
   }
 
   &__marker {
@@ -78,7 +84,7 @@ b {
     position: absolute;
     left: 0;
     height: 100%;
-    background: $card-dark;
+    background: $primary;
     border-radius: $card-br;
     transition: $transition-1;
 
@@ -190,11 +196,11 @@ b {
   &__cell {
     display: table-cell;
     vertical-align: middle;
-    color: #4e5259;
     padding: $padding-micro $padding-small;
     font-size: $fz-sm;
     height: 51px;
     box-sizing: border-box;
+    background: $grey-light;
 
     @include dark-theme {
       background: $card-dark;
@@ -216,7 +222,7 @@ b {
   &__action {
     height: 20px;
     width: 20px;
-    color: $grey;
+    color: $text-dark;
     transition: $transition-1;
     cursor: pointer;
 

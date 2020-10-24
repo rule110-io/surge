@@ -3,8 +3,20 @@
     <div class="page__results" id="search_results">
       <h1 class="page__title page__title_explore">Explore</h1>
       <div class="tab">
-        <div class="tab__item" @click="isRemote = false">Local Files</div>
-        <div class="tab__item" @click="isRemote = true">Remote Files</div>
+        <div
+          class="tab__item"
+          :class="!isRemote ? 'tab__item_active' : ''"
+          @click="isRemote = false"
+        >
+          Local Files
+        </div>
+        <div
+          class="tab__item"
+          :class="isRemote ? 'tab__item_active' : ''"
+          @click="isRemote = true"
+        >
+          Remote Files
+        </div>
         <div
           class="tab__marker"
           :class="isRemote ? 'tab__marker_right' : ''"

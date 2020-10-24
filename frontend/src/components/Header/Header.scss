@@ -89,6 +89,7 @@
       align-items: center;
       justify-content: center;
       border-bottom-right-radius: $card-br;
+      background: $primary;
 
       @include dark-theme {
         background: color(dark, darkest);
@@ -120,9 +121,9 @@
       font-size: $fz-md;
       color: $grey;
       outline: none;
-      background: transparent;
       box-sizing: border-box;
       height: 40px;
+      background: $grey-light;
 
       @include dark-theme {
         color: white;
