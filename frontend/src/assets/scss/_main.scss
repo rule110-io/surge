@@ -45,6 +45,53 @@ b {
   transition: $transition-1;
 }
 
+/*========== tab ==========*/
+
+.tab {
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: $card-br;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: $padding-normal;
+
+  @include dark-theme {
+    background: color(dark, darkest);
+    color: white;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    width: 180px;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+  }
+
+  &__marker {
+    width: 180px;
+    position: absolute;
+    left: 0;
+    height: 100%;
+    background: $card-dark;
+    border-radius: $card-br;
+    transition: $transition-1;
+
+    @include dark-theme {
+      background: $card-dark;
+    }
+
+    &_right {
+      transform: translateX(180px);
+    }
+  }
+}
+
 /*========== main container ==========*/
 
 .main {
@@ -89,7 +136,7 @@ b {
   &__title {
     font-weight: 700;
     font-size: $fz-title;
-    margin-bottom: $padding-big;
+    margin-bottom: $padding-normal;
   }
 
   &__subtitle {
