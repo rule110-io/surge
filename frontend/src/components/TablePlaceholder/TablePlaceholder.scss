@@ -1,0 +1,13 @@
+.table-placeholder {
+  display: table-row;
+
+  &__title {
+    text-align: center;
+    border-radius: $card-br;
+    padding: $padding-default;
+
+    @include dark-theme {
+      background: $card-dark;
+    }
+  }
+}

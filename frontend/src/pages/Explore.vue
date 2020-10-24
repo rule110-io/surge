@@ -16,38 +16,41 @@
           <div class="table__head text_align_center">Seeds</div>
           <div class="table__head">Source</div>
         </div>
-        <div
-          class="table__row"
-          v-for="file in remoteFiles"
-          :key="file.FileName"
-        >
-          <div class="table__cell">
-            <FileInfo :file="file" :full="true" :icon="false" />
+        <TablePlaceholder v-if="!remoteFiles" type="remote" />
+        <template v-else>
+          <div
+            class="table__row"
+            v-for="file in remoteFiles"
+            :key="file.FileName"
+          >
+            <div class="table__cell">
+              <FileInfo :file="file" :full="true" :icon="false" />
+            </div>
+            <div class="table__cell text_align_center">
+              100
+            </div>
+            <div class="table__cell">{{ file.Seeder }}</div>
+            <div class="table__cell">
+              <feather
+                v-if="!file.IsTracked"
+                class="table__action"
+                type="download"
+                @click.native="download(file.FileHash)"
+              ></feather>
+              <feather
+                v-if="file.IsTracked"
+                class="table__action table__action_active"
+                type="check-circle"
+              ></feather>
+            </div>
           </div>
-          <div class="table__cell text_align_center">
-            100
-          </div>
-          <div class="table__cell">{{ file.Seeder }}</div>
-          <div class="table__cell">
-            <feather
-              v-if="!file.IsTracked"
-              class="table__action"
-              type="download"
-              @click.native="download(file.FileHash)"
-            ></feather>
-            <feather
-              v-if="file.IsTracked"
-              class="table__action table__action_active"
-              type="check-circle"
-            ></feather>
-          </div>
-        </div>
-        <Pagination
-          dispatcher="files/fetchRemoteFiles"
-          filesConfig="remoteFilesConfig"
-          filePages="remotePages"
-          commit="files/setRemoteFilesConfig"
-        />
+          <Pagination
+            dispatcher="files/fetchRemoteFiles"
+            filesConfig="remoteFilesConfig"
+            filePages="remotePages"
+            commit="files/setRemoteFilesConfig"
+          />
+        </template>
       </div>
 
       <div class="table" v-else>
@@ -56,34 +59,34 @@
           <div class="table__head text_align_center">Seeds</div>
           <div class="table__head">Source</div>
         </div>
-        <div class="table__row" v-for="file in localFiles" :key="file.FileName">
-          <div class="table__cell">
-            <FileInfo :file="file" :full="true" :icon="false" />
+        <TablePlaceholder v-if="!localFiles" type="local" />
+        <template v-else>
+          <div
+            class="table__row"
+            v-for="file in localFiles"
+            :key="file.FileName"
+          >
+            <div class="table__cell">
+              <FileInfo :file="file" :full="true" :icon="false" />
+            </div>
+            <div class="table__cell text_align_center">
+              100
+            </div>
+            <div class="table__cell">{{ file.Seeder }}</div>
+            <div class="table__cell">
+              <feather
+                class="table__action table__action_active"
+                type="check-circle"
+              ></feather>
+            </div>
           </div>
-          <div class="table__cell text_align_center">
-            100
-          </div>
-          <div class="table__cell">{{ file.Seeder }}</div>
-          <div class="table__cell">
-            <feather
-              v-if="!file.IsTracked"
-              class="table__action"
-              type="download"
-              @click.native="download(file.FileHash)"
-            ></feather>
-            <feather
-              v-if="file.IsTracked"
-              class="table__action table__action_active"
-              type="check-circle"
-            ></feather>
-          </div>
-        </div>
-        <Pagination
-          dispatcher="files/fetchLocalFiles"
-          filesConfig="localFilesConfig"
-          filePages="localPages"
-          commit="files/setLocalFilesConfig"
-        />
+          <Pagination
+            dispatcher="files/fetchLocalFiles"
+            filesConfig="localFilesConfig"
+            filePages="localPages"
+            commit="files/setLocalFilesConfig"
+          />
+        </template>
       </div>
     </div>
   </div>
@@ -93,12 +96,14 @@ import { mapState } from "vuex";
 
 import FileInfo from "@/components/File/FileInfo/FileInfo";
 import Pagination from "@/components/Pagination/Pagination";
+import TablePlaceholder from "@/components/TablePlaceholder/TablePlaceholder";
 
 export default {
   name: "explore",
   components: {
     FileInfo,
     Pagination,
+    TablePlaceholder,
   },
   data: () => {
     return {

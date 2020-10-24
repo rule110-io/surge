@@ -15,6 +15,7 @@ const mutations = {
   },
   toggleNotifications(state, bool) {
     state.open = bool;
+    state.counter = 0;
   },
   clearNotifications(state) {
     state.counter = 0;

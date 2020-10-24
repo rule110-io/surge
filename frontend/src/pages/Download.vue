@@ -12,42 +12,49 @@
           <div class="table__head">Peers</div>
           <div class="table__head"></div>
         </div>
-        <div class="table__row" v-for="file in localFiles" :key="file.FileName">
-          <div class="table__cell">
-            <FileInfo :file="file" />
+        <TablePlaceholder v-if="!localFiles" type="transfer" />
+        <template v-else>
+          <div
+            class="table__row"
+            v-for="file in localFiles"
+            :key="file.FileName"
+          >
+            <div class="table__cell">
+              <FileInfo :file="file" />
+            </div>
+            <div class="table__cell text_align_center">
+              <FileDown :file="file" />
+            </div>
+            <div class="table__cell text_align_center">
+              <FileUp :file="file" />
+            </div>
+            <div class="table__cell"><FileChunks :file="file" /></div>
+            <div class="table__cell">
+              <FileTime :file="file" />
+            </div>
+            <div class="table__cell">
+              1
+            </div>
+            <div class="table__cell">
+              <feather
+                class="table__action table__action_remove"
+                type="trash-2"
+                @click.native="removeFile(file)"
+              ></feather>
+              <feather
+                class="table__action"
+                type="folder"
+                @click.native="openFolder(file.FileHash)"
+              ></feather>
+            </div>
           </div>
-          <div class="table__cell text_align_center">
-            <FileDown :file="file" />
-          </div>
-          <div class="table__cell text_align_center">
-            <FileUp :file="file" />
-          </div>
-          <div class="table__cell"><FileChunks :file="file" /></div>
-          <div class="table__cell">
-            <FileTime :file="file" />
-          </div>
-          <div class="table__cell">
-            1
-          </div>
-          <div class="table__cell">
-            <feather
-              class="table__action table__action_remove"
-              type="trash-2"
-              @click.native="removeFile(file)"
-            ></feather>
-            <feather
-              class="table__action"
-              type="folder"
-              @click.native="openFolder(file.FileHash)"
-            ></feather>
-          </div>
-        </div>
-        <Pagination
-          dispatcher="files/fetchLocalFiles"
-          filesConfig="localFilesConfig"
-          filePages="localPages"
-          commit="files/setLocalFilesConfig"
-        />
+          <Pagination
+            dispatcher="files/fetchLocalFiles"
+            filesConfig="localFilesConfig"
+            filePages="localPages"
+            commit="files/setLocalFilesConfig"
+          />
+        </template>
       </div>
     </div>
     <RemoveFileModal
@@ -67,6 +74,7 @@ import FileUp from "@/components/File/FileUp/FileUp";
 import FileDown from "@/components/File/FileDown/FileDown";
 import Pagination from "@/components/Pagination/Pagination";
 import RemoveFileModal from "@/components/Modals/RemoveFileModal/RemoveFileModal";
+import TablePlaceholder from "@/components/TablePlaceholder/TablePlaceholder";
 
 export default {
   name: "download",
@@ -78,6 +86,7 @@ export default {
     FileDown,
     Pagination,
     RemoveFileModal,
+    TablePlaceholder,
   },
   data: () => {
     return {
