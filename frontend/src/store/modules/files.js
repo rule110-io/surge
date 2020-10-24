@@ -8,12 +8,12 @@ const getDefaultState = () => {
     remotePages: 0,
     localFilesConfig: {
       skip: 0,
-      get: 5,
+      get: 8,
     },
     remoteFilesConfig: {
       search: "",
       skip: 0,
-      get: 5,
+      get: 8,
     },
   };
 };

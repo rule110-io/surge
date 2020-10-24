@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page__results" id="search_results">
-      <h1 class="page__title">Explore</h1>
+      <h1 class="page__title">Search: {{ remoteFilesConfig.search }}</h1>
       <div class="table">
         <div class="table__row">
           <div class="table__head">Name & size</div>
@@ -13,7 +13,7 @@
           :key="file.FileName"
         >
           <div class="table__cell">
-            <FileInfo :file="file" />
+            <FileInfo :file="file" :full="true" :icon="false" />
           </div>
           <div class="table__cell">{{ file.Seeder }}</div>
           <div class="table__cell">
@@ -38,31 +38,25 @@
         />
       </div>
     </div>
-    <div id="recent_files">
-      <h2 class="page__subtitle">Recent Files</h2>
-      <RecentFiles :files="localFiles" />
-    </div>
   </div>
 </template>
 <script>
 import { mapState } from "vuex";
 
 import FileInfo from "@/components/File/FileInfo/FileInfo";
-import RecentFiles from "@/components/File/RecentFiles/RecentFiles";
 import Pagination from "@/components/Pagination/Pagination";
 
 export default {
   name: "search",
   components: {
     FileInfo,
-    RecentFiles,
     Pagination,
   },
   data: () => {
     return {};
   },
   computed: {
-    ...mapState("files", ["remoteFiles", "localFiles"]),
+    ...mapState("files", ["remoteFiles", "localFiles", "remoteFilesConfig"]),
   },
   mounted() {
     this.$store.dispatch("files/fetchRemoteFiles");

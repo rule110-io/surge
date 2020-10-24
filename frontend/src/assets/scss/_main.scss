@@ -146,6 +146,8 @@ b {
     color: #4e5259;
     padding: $padding-micro $padding-small;
     font-size: $fz-sm;
+    height: 51px;
+    box-sizing: border-box;
 
     @include dark-theme {
       background: $card-dark;

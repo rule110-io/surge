@@ -60,6 +60,10 @@
     color: $text-dark;
     width: 165px;
 
+    &_full {
+      width: 290px;
+    }
+
     @include dark-theme {
       color: white;
     }
