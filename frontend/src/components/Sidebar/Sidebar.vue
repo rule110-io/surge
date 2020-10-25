@@ -3,11 +3,14 @@
     <Logo v-if="!darkTheme" class="sidebar__logo" />
     <LogoGradient v-else class="sidebar__logo" />
     <div class="sidebar__nav">
-      <router-link to="/search" id="explore" class="sidebar__item">
+      <router-link to="/explore" id="explore" class="sidebar__item">
+        <feather class="sidebar__item-icon" type="globe"></feather>
+      </router-link>
+      <router-link to="/search" id="search" class="sidebar__item">
         <feather class="sidebar__item-icon" type="search"></feather>
       </router-link>
       <router-link to="/download" id="download" class="sidebar__item">
-        <feather class="sidebar__item-icon" type="play"></feather>
+        <feather class="sidebar__item-icon" type="folder"></feather>
       </router-link>
     </div>
     <router-link to="/settings" id="settings" class="sidebar__item">

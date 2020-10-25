@@ -45,6 +45,59 @@ b {
   transition: $transition-1;
 }
 
+/*========== tab ==========*/
+
+.tab {
+  display: inline-flex;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: $card-br;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: $padding-normal;
+  background: $grey-light;
+
+  @include dark-theme {
+    background: color(dark, darkest);
+    color: white;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 40px;
+    text-align: center;
+    width: 180px;
+    position: relative;
+    z-index: 1;
+    cursor: pointer;
+    transition: $transition-1;
+
+    &_active {
+      color: white;
+    }
+  }
+
+  &__marker {
+    width: 180px;
+    position: absolute;
+    left: 0;
+    height: 100%;
+    background: $primary;
+    border-radius: $card-br;
+    transition: $transition-1;
+
+    @include dark-theme {
+      background: $card-dark;
+    }
+
+    &_right {
+      transform: translateX(180px);
+    }
+  }
+}
+
 /*========== main container ==========*/
 
 .main {
@@ -89,7 +142,7 @@ b {
   &__title {
     font-weight: 700;
     font-size: $fz-title;
-    margin-bottom: $padding-big;
+    margin-bottom: $padding-normal;
   }
 
   &__subtitle {
@@ -114,13 +167,10 @@ b {
   width: 100%;
   margin-bottom: $padding-max;
   position: relative;
+  border-spacing: 0px 6px;
 
   &__row {
     display: table-row;
-
-    &:not(:first-child) {
-      height: 76px;
-    }
   }
 
   &__head {
@@ -128,7 +178,7 @@ b {
     font-size: 15px;
     font-weight: normal;
     display: table-cell;
-    padding-bottom: $padding-default;
+    padding: 0 $padding-small $padding-micro $padding-small;
     vertical-align: middle;
     font-weight: 500;
     font-size: $fz-md;
@@ -139,27 +189,40 @@ b {
     }
 
     &:first-child {
-      width: 280px;
+      width: 200px;
     }
   }
 
   &__cell {
     display: table-cell;
-    padding: $padding-default 0;
-    border-top: 1px solid $grey-light;
     vertical-align: middle;
-    color: #4e5259;
+    padding: $padding-micro $padding-small;
+    font-size: $fz-sm;
+    height: 51px;
+    box-sizing: border-box;
+    background: $grey-light;
 
     @include dark-theme {
-      color: color(dark, text-light);
-      border-color: $divider-dark;
+      background: $card-dark;
+      color: white;
+    }
+
+    &:first-child {
+      border-top-left-radius: $card-br;
+      border-bottom-left-radius: $card-br;
+    }
+
+    &:last-child {
+      border-top-right-radius: $card-br;
+      border-bottom-right-radius: $card-br;
+      border: unset;
     }
   }
 
   &__action {
-    height: 24px;
-    width: 24px;
-    color: $grey;
+    height: 20px;
+    width: 20px;
+    color: $text-dark;
     transition: $transition-1;
     cursor: pointer;
 
@@ -176,7 +239,7 @@ b {
     }
 
     &_remove {
-      margin-left: $padding-small;
+      margin-right: $padding-small;
 
       &:hover {
         color: $error;
@@ -208,6 +271,10 @@ b {
   &_align {
     &_right {
       text-align: right;
+    }
+
+    &_center {
+      text-align: center;
     }
   }
 }
