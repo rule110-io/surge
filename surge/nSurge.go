@@ -120,6 +120,7 @@ type File struct {
 	ChunkMap      []byte
 }
 
+//NumClientsStruct .
 type NumClientsStruct struct {
 	Subscribed int
 	Online     int
@@ -134,6 +135,7 @@ type FileListing struct {
 	NumChunks   int
 	IsTracked   bool
 	IsAvailable bool
+	SeederCount int
 }
 
 // Session is a wrapper for everything needed to maintain a surge session
@@ -627,11 +629,12 @@ func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
 			seedString := strings.Join(file.Seeders[:], ",")
 
 			result := FileListing{
-				FileName:  file.FileName,
-				FileHash:  file.FileHash,
-				FileSize:  file.FileSize,
-				Seeder:    seedString,
-				NumChunks: file.NumChunks,
+				FileName:    file.FileName,
+				FileHash:    file.FileHash,
+				FileSize:    file.FileSize,
+				Seeder:      seedString,
+				NumChunks:   file.NumChunks,
+				SeederCount: len(file.Seeders),
 			}
 
 			tracked, err := dbGetFile(result.FileHash)
