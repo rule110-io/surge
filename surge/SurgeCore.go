@@ -444,11 +444,13 @@ func ParsePayloadString(s string) {
 		fileSize, _ := strconv.ParseInt(data[3], 10, 64)
 		numChunks := int((fileSize-1)/int64(ChunkSize)) + 1
 
+		seeder := strings.Split(data[5], ",")
+
 		newListing := File{
 			FileName:  data[2],
 			FileSize:  fileSize,
 			FileHash:  data[4],
-			Seeders:   strings.Split(data[5], ","),
+			Seeders:   seeder,
 			Path:      "",
 			NumChunks: numChunks,
 			ChunkMap:  nil,
@@ -458,9 +460,8 @@ func ParsePayloadString(s string) {
 		var replace = false
 		for l := 0; l < len(ListedFiles); l++ {
 			if ListedFiles[l].FileHash == newListing.FileHash {
-				//TODO check seeder, if its unique add it as an additional seeder for the file
-				//For now we overwrite
-				ListedFiles[l] = newListing
+				//if the seeder is unique add it as an additional seeder for the file
+				ListedFiles[l].Seeders = append(ListedFiles[l].Seeders, seeder...)
 				replace = true
 				break
 			}
