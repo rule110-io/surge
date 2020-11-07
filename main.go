@@ -31,6 +31,9 @@ func getLocalFiles(Skip int, Take int) surge.LocalFilePageResult {
 		right = len(trackedFiles)
 	}
 
+	//Subset
+	trackedFiles = trackedFiles[left:right]
+
 	return surge.LocalFilePageResult{
 		Result: trackedFiles[left:right],
 		Count:  len(trackedFiles),

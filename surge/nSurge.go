@@ -118,6 +118,7 @@ type File struct {
 	IsPaused      bool
 	IsMissing     bool
 	ChunkMap      []byte
+	SeederCount   int
 }
 
 //NumClientsStruct .

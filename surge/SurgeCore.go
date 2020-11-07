@@ -397,13 +397,14 @@ func processQueryResponse(Session *Session, Data []byte) {
 		numChunks := int((fileSize-1)/int64(ChunkSize)) + 1
 
 		newListing := File{
-			FileName:  data[2],
-			FileSize:  fileSize,
-			FileHash:  data[4],
-			Seeders:   []string{seeder},
-			Path:      "",
-			NumChunks: numChunks,
-			ChunkMap:  nil,
+			FileName:    data[2],
+			FileSize:    fileSize,
+			FileHash:    data[4],
+			Seeders:     []string{seeder},
+			Path:        "",
+			NumChunks:   numChunks,
+			ChunkMap:    nil,
+			SeederCount: 1,
 		}
 
 		//Replace existing, or remove.
@@ -412,6 +413,7 @@ func processQueryResponse(Session *Session, Data []byte) {
 			if ListedFiles[l].FileHash == newListing.FileHash {
 				//if the seeder is unique add it as an additional seeder for the file
 				ListedFiles[l].Seeders = append(ListedFiles[l].Seeders, seeder)
+				ListedFiles[l].SeederCount = len(ListedFiles[l].Seeders)
 				replace = true
 				break
 			}
@@ -647,6 +649,7 @@ func SeedFile(Path string) bool {
 		NumChunks:   numChunks,
 		ChunkMap:    chunkMap,
 		IsUploading: true,
+		SeederCount: 1,
 	}
 
 	//Check if file is already seeded
