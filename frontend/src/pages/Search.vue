@@ -19,9 +19,9 @@
               <FileInfo :file="file" :full="true" :icon="false" />
             </div>
             <div class="table__cell text_align_center">
-              100
+              {{ file.SeederCount }}
             </div>
-            <div class="table__cell">{{ file.Seeder }}</div>
+            <div class="table__cell">{{ file.FileHash }}</div>
             <div class="table__cell">
               <feather
                 v-if="!file.IsTracked"

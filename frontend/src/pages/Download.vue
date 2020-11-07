@@ -9,7 +9,7 @@
           <div class="table__head text_align_center">Up</div>
           <div class="table__head text_align_center">Status</div>
           <div class="table__head">Remaining</div>
-          <div class="table__head">Peers</div>
+          <div class="table__head">Seeds</div>
           <div class="table__head"></div>
         </div>
         <TablePlaceholder v-if="!localFiles" type="transfer" />
@@ -33,7 +33,7 @@
               <FileTime :file="file" />
             </div>
             <div class="table__cell">
-              1
+              {{ file.SeederCount }}
             </div>
             <div class="table__cell">
               <feather
