@@ -1,16 +1,3 @@
 .file-time {
-  &__title {
-    font-size: $fz-md;
-    color: $text-dark;
-    line-height: calc(1.2em + #{$padding-small});
-
-    @include dark-theme {
-      color: color(dark, text-light);
-    }
-  }
-
-  &__percent {
-    color: $primary;
-    font-size: $fz-sm;
-  }
+  width: 102px;
 }

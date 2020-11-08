@@ -110,7 +110,7 @@ type File struct {
 	FileName      string
 	FileSize      int64
 	FileHash      string
-	Seeder        string
+	Seeders       []string
 	Path          string
 	NumChunks     int
 	IsDownloading bool
@@ -118,8 +118,10 @@ type File struct {
 	IsPaused      bool
 	IsMissing     bool
 	ChunkMap      []byte
+	SeederCount   int
 }
 
+//NumClientsStruct .
 type NumClientsStruct struct {
 	Subscribed int
 	Online     int
@@ -130,10 +132,11 @@ type FileListing struct {
 	FileName    string
 	FileSize    int64
 	FileHash    string
-	Seeder      string
+	Seeders     []string
 	NumChunks   int
 	IsTracked   bool
 	IsAvailable bool
+	SeederCount int
 }
 
 // Session is a wrapper for everything needed to maintain a surge session
@@ -625,11 +628,12 @@ func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
 		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) {
 
 			result := FileListing{
-				FileName:  file.FileName,
-				FileHash:  file.FileHash,
-				FileSize:  file.FileSize,
-				Seeder:    file.Seeder,
-				NumChunks: file.NumChunks,
+				FileName:    file.FileName,
+				FileHash:    file.FileHash,
+				FileSize:    file.FileSize,
+				Seeders:     file.Seeders,
+				NumChunks:   file.NumChunks,
+				SeederCount: len(file.Seeders),
 			}
 
 			tracked, err := dbGetFile(result.FileHash)

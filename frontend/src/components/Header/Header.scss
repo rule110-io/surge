@@ -59,75 +59,82 @@
   }
 
   &__search {
-    flex: 0 0 284px;
-    display: flex;
     align-items: center;
     position: relative;
-    padding: $padding-micro 0;
+    border-top-left-radius: $card-br;
+    border-top-right-radius: $card-br;
+    padding-right: 48px;
+    height: 40px;
 
-    &:after {
-      display: block;
-      content: "";
-      height: 1px;
-      width: 100%;
-      background: $grey;
-      transform: scaleX(0);
-      transition: $transition-1;
-      position: absolute;
-      left: 0;
-      bottom: 0;
-
-      @include dark-theme {
-        background: white;
-      }
+    @include dark-theme {
     }
 
     &_active {
-      &:after {
-        transform: scaleX(1);
-      }
-
       @include dark-theme {
         i {
-          color: white;
+          color: $primary;
         }
       }
     }
 
-    &-icon {
-      flex: 0 0 18px;
-      height: 18px;
-      color: $grey;
-      transition: $transition-1;
-      margin-right: $padding-default;
+    &-right {
+      box-sizing: border-box;
+      position: absolute;
+      top: 0;
+      right: 0px;
+      width: 56px;
+      border-top-right-radius: $card-br;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-bottom-right-radius: $card-br;
+      background: $primary;
 
       @include dark-theme {
-        color: color(dark, text-light);
+        background: color(dark, darkest);
+      }
+    }
+
+    &-icon {
+      height: 22px;
+      width: 22px;
+      color: white;
+      padding-left: 6px;
+      transition: $transition-1;
+
+      @include dark-theme {
       }
     }
 
     &-input {
-      flex: 0 0 250px;
+      position: relative;
+      z-index: 1;
+      border-radius: $card-br;
+      padding: $padding-small $padding-default;
       transition: $transition-1;
       appearance: none;
       border: unset;
       border: 0;
       font-family: "Source Code Pro";
-      width: 250px;
+      width: 440px;
       font-size: $fz-md;
-      padding: 0;
       color: $grey;
       outline: none;
-      background: transparent;
+      box-sizing: border-box;
+      height: 40px;
+      background: $grey-light;
 
       @include dark-theme {
         color: white;
+        background: $card-dark;
       }
 
       &::placeholder {
-        opacity: 0.6;
+        opacity: 1;
 
         @include dark-theme {
+          color: white;
           color: color(dark, text-light);
         }
       }
@@ -176,7 +183,7 @@
   }
 
   &__item {
-    flex: 1 1 18px;
+    flex: 1 1 22px;
     color: $grey;
     cursor: pointer;
     position: relative;
@@ -186,12 +193,12 @@
     }
 
     &:not(:last-child) {
-      margin-right: $padding-default;
+      margin-right: $padding-normal;
     }
 
     &-icon {
-      height: 18px;
-      width: 18px;
+      height: 22px;
+      width: 22px;
       transition: $transition-1;
 
       &_active {

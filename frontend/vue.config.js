@@ -22,7 +22,7 @@ module.exports = {
       // Required - The path to the webpack-outputted app to prerender.
       staticDir: path.join(__dirname, "dist"),
       // Required - Routes to render.
-      routes: ["/", "/search", "/download", "/settings"],
+      routes: ["/", "/explore", "/search", "/download", "/settings"],
     }),
   ],
 };
@@ -62,6 +62,7 @@ module.exports = {
       .loader("vue-style-loader", "css-loader", "sass-loader");
   },
   css: cssConfig,
+  transpileDependencies: ["vue-clamp", "resize-detector"],
   configureWebpack: {
     output: {
       filename: "[name].js",
