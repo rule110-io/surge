@@ -1,0 +1,19 @@
+.file-chunks {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  &__title {
+    text-align: center;
+    margin-bottom: $padding-micro;
+  }
+
+  &__progress {
+    width: 156px;
+    height: 12px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    margin: 0 auto;
+  }
+}

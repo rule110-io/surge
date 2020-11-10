@@ -31,8 +31,20 @@ func getLocalFiles(Skip int, Take int) surge.LocalFilePageResult {
 		right = len(trackedFiles)
 	}
 
+	//Subset
+	trackedFiles = trackedFiles[left:right]
+
+	for i := 0; i < len(trackedFiles); i++ {
+		for _, file := range surge.ListedFiles {
+			if file.FileHash == trackedFiles[i].FileHash {
+				trackedFiles[i].Seeders = file.Seeders
+				trackedFiles[i].SeederCount = len(file.Seeders) + 1
+			}
+		}
+	}
+
 	return surge.LocalFilePageResult{
-		Result: trackedFiles[left:right],
+		Result: trackedFiles,
 		Count:  len(trackedFiles),
 	}
 }
