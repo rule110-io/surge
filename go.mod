@@ -13,6 +13,7 @@ require (
 	github.com/leaanthony/slicer v1.4.1 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mgutz/ansi v0.0.0-20200706080929-d51e80ef957d // indirect
+	github.com/mxmCherry/movavg v1.1.0
 	github.com/nknorg/nkn-sdk-go v1.3.0
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/pkg/errors v0.9.1 // indirect
