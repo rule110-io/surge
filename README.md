@@ -1,4 +1,4 @@
-![](https://github.com/rule110-io/surge/blob/development/documentation/surge_color.png?raw=true | width=100) 
+![](https://github.com/rule110-io/surge/blob/development/documentation/img/surge_color.png?raw=true | width=100) 
 # Surge - P2P on steroids (...and NKN)
 
 
@@ -9,9 +9,9 @@ This is the code of [Surge](https://surge.rule110.io). Surge is a 100% decentral
 No, we are not :) 
 By completely bypassing current internet technologies and using the NKN network each client is identified by an ID and nothing more. Here are some skribbles to show you how it all works: 
 
-![When sending a file through the NKN network the sender just needs to contact one NKN node and tell him to what client the file should be delivered to. To communicate the IP is still needed but instantly dropped by the entry node.](https://github.com/rule110-io/surge/blob/development/documentation/surge1.png?raw=true | width=600)
+![When sending a file through the NKN network the sender just needs to contact one NKN node and tell him to what client the file should be delivered to. To communicate the IP is still needed but instantly dropped by the entry node.](https://github.com/rule110-io/surge/blob/development/documentation/img/surge1.png?raw=true | width=600)
 
-![NKN now routes the file through its network using the optimal an fastest route to the client. If there is a client who is connected to the recipient it delivers the file to it.](https://github.com/rule110-io/surge/blob/development/documentation/surge2.png?raw=true | width=600)
+![NKN now routes the file through its network using the optimal an fastest route to the client. If there is a client who is connected to the recipient it delivers the file to it.](https://github.com/rule110-io/surge/blob/development/documentation/img/surge2.png?raw=true | width=600)
 
 ## Where to download?
 Find the current version for your operation system [here](https://github.com/rule110-io/surge/releases)
