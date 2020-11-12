@@ -536,12 +536,13 @@ func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 
 func getListedFileByHash(Hash string) *File {
 
-	var selectedFile *File
+	var selectedFile *File = nil
 
 	ListedFilesLock.Lock()
 	for _, file := range ListedFiles {
 		if file.FileHash == Hash {
 			selectedFile = &file
+			break
 		}
 	}
 	ListedFilesLock.Unlock()
