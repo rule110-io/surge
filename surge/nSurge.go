@@ -15,6 +15,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	bitmap "github.com/boljen/go-bitmap"
+	movavg "github.com/mxmCherry/movavg"
 	nkn "github.com/nknorg/nkn-sdk-go"
 	dialog "github.com/sqweek/dialog"
 	"github.com/wailsapp/wails"
@@ -90,6 +91,8 @@ var clientOnlineMap map[string]bool
 var downloadBandwidthAccumulator map[string]int
 var uploadBandwidthAccumulator map[string]int
 
+var fileBandwidthMap map[string]BandwidthMA
+
 var zeroBandwidthMap map[string]bool
 
 var clientOnlineMapLock = &sync.Mutex{}
@@ -161,6 +164,12 @@ type FileStatusEvent struct {
 	ChunkMap          string
 }
 
+//BandwidthMA tracks moving average for download and upload bandwidth
+type BandwidthMA struct {
+	Download movavg.MA
+	Upload   movavg.MA
+}
+
 //ListedFiles are remote files that can be downloaded
 var ListedFiles []File
 
@@ -176,7 +185,6 @@ var numClientsStore *wails.Store
 
 // Start initializes surge
 func Start(runtime *wails.Runtime, args []string) {
-
 	var err error
 
 	//Mac specific functions
@@ -243,6 +251,7 @@ func Start(runtime *wails.Runtime, args []string) {
 		downloadBandwidthAccumulator = make(map[string]int)
 		uploadBandwidthAccumulator = make(map[string]int)
 		zeroBandwidthMap = make(map[string]bool)
+		fileBandwidthMap = make(map[string]BandwidthMA)
 
 		dbFiles := dbGetAllFiles()
 		var filesOnDisk []File
@@ -415,7 +424,17 @@ func fileBandwidth(FileID string) (Download int, Upload int) {
 	uploadBandwidthAccumulator[FileID] = 0
 	bandwidthAccumulatorMap.Unlock()
 
-	return downAccu, upAccu
+	if fileBandwidthMap[FileID].Download == nil {
+		fileBandwidthMap[FileID] = BandwidthMA{
+			Download: movavg.ThreadSafe(movavg.NewSMA(10)),
+			Upload:   movavg.ThreadSafe(movavg.NewSMA(10)),
+		}
+	}
+
+	fileBandwidthMap[FileID].Download.Add(float64(downAccu))
+	fileBandwidthMap[FileID].Upload.Add(float64(upAccu))
+
+	return int(fileBandwidthMap[FileID].Download.Avg()), int(fileBandwidthMap[FileID].Upload.Avg())
 
 	//Take bandwith delta
 	/*deltaDownload := int(Session.Downloaded - Session.deltaDownloaded)
