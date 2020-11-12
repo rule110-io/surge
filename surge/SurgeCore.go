@@ -431,8 +431,8 @@ func processQueryResponse(Session *Session, Data []byte) {
 		//	downloadFile(newListing.Seeder, newListing.FileSize, newListing.Filename)
 		//})
 		//fileBox.Append(newButton)
-		ListedFilesLock.Unlock()
 	}
+	ListedFilesLock.Unlock()
 }
 
 //ParsePayloadString parses payload of files
