@@ -96,7 +96,7 @@ var fileBandwidthMap map[string]BandwidthMA
 var zeroBandwidthMap map[string]bool
 
 var clientOnlineMapLock = &sync.Mutex{}
-var bandwidthAccumulatorMap = &sync.Mutex{}
+var bandwidthAccumulatorMapLock = &sync.Mutex{}
 
 //Sessions .
 var Sessions []*Session
@@ -107,6 +107,9 @@ var workerCount = 0
 
 //Sessions collection lock
 var sessionsWriteLock = &sync.Mutex{}
+
+//ListedFilesLock lock this whenever you're reading or mutating the ListedFiles collection
+var ListedFilesLock = &sync.Mutex{}
 
 // File holds all info of a tracked file in surge
 type File struct {
@@ -416,13 +419,13 @@ func updateGUI() {
 
 func fileBandwidth(FileID string) (Download int, Upload int) {
 	//Get accumulator
-	bandwidthAccumulatorMap.Lock()
+	bandwidthAccumulatorMapLock.Lock()
 	downAccu := downloadBandwidthAccumulator[FileID]
 	downloadBandwidthAccumulator[FileID] = 0
 
 	upAccu := uploadBandwidthAccumulator[FileID]
 	uploadBandwidthAccumulator[FileID] = 0
-	bandwidthAccumulatorMap.Unlock()
+	bandwidthAccumulatorMapLock.Unlock()
 
 	if fileBandwidthMap[FileID].Download == nil {
 		fileBandwidthMap[FileID] = BandwidthMA{
@@ -532,12 +535,18 @@ func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 }
 
 func getListedFileByHash(Hash string) *File {
+
+	var selectedFile *File
+
+	ListedFilesLock.Lock()
 	for _, file := range ListedFiles {
 		if file.FileHash == Hash {
-			return &file
+			selectedFile = &file
 		}
 	}
-	return nil
+	ListedFilesLock.Unlock()
+
+	return selectedFile
 }
 
 //DownloadFile downloads the file
@@ -562,9 +571,6 @@ func DownloadFile(Hash string) bool {
 
 	// If the file doesn't exist allocate it
 	var path = remoteFolder + string(os.PathSeparator) + file.FileName
-	fmt.Println(path)
-	fmt.Println(path)
-	fmt.Println(path)
 	AllocateFile(path, file.FileSize)
 	numChunks := int((file.FileSize-1)/int64(ChunkSize)) + 1
 
@@ -643,6 +649,7 @@ type LocalFilePageResult struct {
 func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
 	var results []FileListing
 
+	ListedFilesLock.Lock()
 	for _, file := range ListedFiles {
 		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) {
 
@@ -672,6 +679,7 @@ func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
 			results = append(results, result)
 		}
 	}
+	ListedFilesLock.Unlock()
 
 	left := Skip
 	right := Skip + Take

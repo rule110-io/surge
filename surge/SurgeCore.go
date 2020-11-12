@@ -364,6 +364,7 @@ func processQueryResponse(Session *Session, Data []byte) {
 	clientOnlineMap[seeder] = true
 	clientOnlineMapLock.Unlock()
 
+	ListedFilesLock.Lock()
 	//Remove exisiting file seed listings for this user
 	n := 0
 	for _, x := range ListedFiles {
@@ -430,6 +431,7 @@ func processQueryResponse(Session *Session, Data []byte) {
 		//	downloadFile(newListing.Seeder, newListing.FileSize, newListing.Filename)
 		//})
 		//fileBox.Append(newButton)
+		ListedFilesLock.Unlock()
 	}
 }
 
@@ -458,6 +460,7 @@ func ParsePayloadString(s string) {
 			ChunkMap:  nil,
 		}
 
+		ListedFilesLock.Lock()
 		//Replace existing, or remove.
 		var replace = false
 		for l := 0; l < len(ListedFiles); l++ {
@@ -472,6 +475,7 @@ func ParsePayloadString(s string) {
 		if replace == false {
 			ListedFiles = append(ListedFiles, newListing)
 		}
+		ListedFilesLock.Unlock()
 
 		log.Println("Program paramater new file: ", newListing.FileName, " seeder: ", newListing.Seeders)
 

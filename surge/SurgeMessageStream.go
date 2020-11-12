@@ -29,9 +29,9 @@ func SessionWrite(Session *Session, Data []byte, ID byte) (err error) {
 	}
 
 	//Write add to upload
-	bandwidthAccumulatorMap.Lock()
+	bandwidthAccumulatorMapLock.Lock()
 	uploadBandwidthAccumulator[Session.FileHash] += len(Data)
-	bandwidthAccumulatorMap.Unlock()
+	bandwidthAccumulatorMapLock.Unlock()
 
 	return err
 }
@@ -70,9 +70,9 @@ func SessionRead(Session *Session) (data []byte, ID byte, err error) {
 	}
 
 	//Write add to download
-	bandwidthAccumulatorMap.Lock()
+	bandwidthAccumulatorMapLock.Lock()
 	downloadBandwidthAccumulator[Session.FileHash] += int(size)
-	bandwidthAccumulatorMap.Unlock()
+	bandwidthAccumulatorMapLock.Unlock()
 
 	return data, packID, err
 }
