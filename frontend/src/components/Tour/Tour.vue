@@ -1,5 +1,10 @@
 <template>
-  <v-tour name="myTour" :steps="steps" :options="options" :callbacks="callbacks"></v-tour>
+  <v-tour
+    name="myTour"
+    :steps="steps"
+    :options="options"
+    :callbacks="callbacks"
+  ></v-tour>
 </template>
 
 <style lang="scss">
@@ -99,17 +104,6 @@ export default {
         },
       },
       {
-        target: "#recent_files",
-        header: {
-          title: "These are your recent files",
-        },
-        content: `Whetever file you recently up- or downloaded with surge appears here. Click on it to directly open it in your file explorer.`,
-        params: {
-          highlight: true,
-          enableScrolling: false,
-        },
-      },
-      {
         target: "#download",
         header: {
           title: 'Now lets have a look at the "Downloads" page',
@@ -153,11 +147,14 @@ export default {
         this.$store.dispatch("tour/offTour");
       };
       this.callbacks.onNextStep = (currentStep) => {
-        if (currentStep === 5) {
-          this.$router.push("search");
+        if (currentStep === 4) {
+          this.$router.push("explore");
+        }
+        if (currentStep === 6) {
+          this.$router.push("download");
         }
         if (currentStep === 8) {
-          this.$router.push("download");
+          this.$router.push("settings");
         }
       };
 
