@@ -232,6 +232,8 @@ github.com/wailsapp/wails v1.7.2-pre3 h1:/8KQovCez6P5cRZz0xfYjyagiPJANxfzz3n42u5
 github.com/wailsapp/wails v1.7.2-pre3/go.mod h1:XFZunea+USOCMMgBlz0A0JHLL3oWrRhnOl4baZlRpxo=
 github.com/wailsapp/wails v1.8.0 h1:gnQhpwoGM8s2GD5PZrgMKU1PO3pQ9cdKKJgwtkNz2f4=
 github.com/wailsapp/wails v1.8.0/go.mod h1:XFZunea+USOCMMgBlz0A0JHLL3oWrRhnOl4baZlRpxo=
+github.com/wailsapp/wails v1.9.1 h1:ez/TK8YpU9lvOZ9nkgzUXsWu+xOPFVO57zTy0n5w3hc=
+github.com/wailsapp/wails v1.9.1/go.mod h1:XFZunea+USOCMMgBlz0A0JHLL3oWrRhnOl4baZlRpxo=
 github.com/xtaci/kcp-go v4.3.1+incompatible h1:JU7DMiCsyj6S+LkR6/+tPQEgdwnihOgYtbUkdtvyUDc=
 github.com/xtaci/kcp-go v4.3.1+incompatible/go.mod h1:bN6vIwHQbfHaHtFpEssmWsN45a+AZwO7eyRCmEIbtvE=
 github.com/xtaci/smux v1.2.11 h1:QI4M2HgkkpsVU3Bfcmyx10qURBEeHfKi7xDhGEORfu0=

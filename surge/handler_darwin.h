@@ -1,7 +1,8 @@
 #import <Cocoa/Cocoa.h>
 
-extern void HandleURL(char*);
-extern char* GetOsxMode();
+extern void HandleURL(char *);
+extern void VisualModeSwitched();
+extern char *GetOsxMode();
 
 @interface GoPasser : NSObject
 + (void)handleGetURLEvent:(NSAppleEventDescriptor *)event;
