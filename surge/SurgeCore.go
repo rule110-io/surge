@@ -365,25 +365,29 @@ func processQueryResponse(Session *Session, Data []byte) {
 	clientOnlineMapLock.Unlock()
 
 	ListedFilesLock.Lock()
-	//Remove exisiting file seed listings for this user
-	n := 0
-	for _, x := range ListedFiles {
-		nn := 0
-		for _, y := range x.Seeders {
-			if y != seeder {
-				x.Seeders[nn] = y
-				nn++
-			}
-			x.Seeders = x.Seeders[:nn]
-		}
 
-		//If there are no remaining seeders, remove listing.
-		if len(ListedFiles[n].Seeders) == 0 {
-			ListedFiles[n] = x
-			n++
+	//Remove seeders that match current seeder from file listings
+	for i := 0; i < len(ListedFiles); i++ {
+		for j := 0; j < len(ListedFiles[i].Seeders); j++ {
+			if ListedFiles[i].Seeders[j] == seeder {
+				// Remove the element at index i from a.
+				ListedFiles[i].Seeders[j] = ListedFiles[i].Seeders[len(ListedFiles[i].Seeders)-1] // Copy last element to index i.
+				ListedFiles[i].Seeders[len(ListedFiles[i].Seeders)-1] = ""                        // Erase last element (write zero value).
+				ListedFiles[i].Seeders = ListedFiles[i].Seeders[:len(ListedFiles[i].Seeders)-1]   // Truncate slice.
+			}
 		}
 	}
-	ListedFiles = ListedFiles[:n]
+
+	//Remove empty seeders listings
+	/*
+		for i := 0; i < len(ListedFiles); i++ {
+			if len(ListedFiles[i].Seeders) == 0 {
+				// Remove the element at index i from a.
+				ListedFiles[i] = ListedFiles[len(ListedFiles)-1] // Copy last element to index i.
+				ListedFiles[len(ListedFiles)-1] = File{}         // Erase last element (write zero value).
+				ListedFiles = ListedFiles[:len(ListedFiles)-1]   // Truncate slice.
+			}
+		}*/
 
 	//Parse the response
 	payloadSplit := strings.Split(s, "surge://")
@@ -412,6 +416,7 @@ func processQueryResponse(Session *Session, Data []byte) {
 		var replace = false
 		for l := 0; l < len(ListedFiles); l++ {
 			if ListedFiles[l].FileHash == newListing.FileHash {
+
 				//if the seeder is unique add it as an additional seeder for the file
 				ListedFiles[l].Seeders = append(ListedFiles[l].Seeders, seeder)
 				ListedFiles[l].SeederCount = len(ListedFiles[l].Seeders)
@@ -518,7 +523,13 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 	}
 	//Success
 	log.Println("Chunk written to disk: ", bytesWritten, " bytes")
-	Session.Downloaded += int64(bytesWritten)
+
+	//Multiple sessions can be downloading this file so we add to all
+	for i := 0; i < len(Sessions); i++ {
+		if Sessions[i].FileHash == FileID {
+			Sessions[i].Downloaded += int64(bytesWritten)
+		}
+	}
 
 	//Update bitmap async as this has a lock in it but does not have to be waited for
 	setBitMap := func() {
@@ -716,28 +727,39 @@ func restartDownload(Hash string) {
 
 	log.Println("Restarting Download Creation Session for", file.FileName)
 
-	//Create a session
-	surgeSession, err := createSession(file)
-	if err != nil {
-		log.Println("Restarting Download Failed for", file.FileName)
+	downloadSessions := []*Session{}
+	// Create  sessions
+	for i := 0; i < len(file.Seeders); i++ {
+		surgeSession, err := createSession(file, file.Seeders[i])
+		if err != nil {
+			log.Println("Restarting Download Failed for", file.FileName, file.Seeders[i])
+			continue
+		}
+
+		//Prime the session with known bytes downloaded
+		surgeSession.Downloaded = int64(file.NumChunks-len(missingChunks)) * ChunkSize
+		//If the last chunk is set, we want to deduct the missing bytes because its not a complete chunk
+		lastChunkSet := bitmap.Get(file.ChunkMap, file.NumChunks-1)
+		if lastChunkSet {
+			overshotBytes := int64(file.NumChunks)*int64(ChunkSize) - file.FileSize
+			surgeSession.Downloaded -= overshotBytes
+		}
+
+		go initiateSession(surgeSession)
+
+		downloadSessions = append(downloadSessions, surgeSession)
+	}
+
+	if len(downloadSessions) == 0 {
+		pushNotification("Restart download Session Failed, failed to connect to all seeders.", file.FileName)
 		return
 	}
-
-	//Prime the session with known bytes downloaded
-	surgeSession.Downloaded = int64(file.NumChunks-len(missingChunks)) * ChunkSize
-
-	//If the last chunk is set, we want to deduct the missing bytes because its not a complete chunk
-	lastChunkSet := bitmap.Get(file.ChunkMap, file.NumChunks-1)
-	if lastChunkSet {
-		overshotBytes := int64(file.NumChunks)*int64(ChunkSize) - file.FileSize
-		surgeSession.Downloaded -= overshotBytes
-	}
-
-	go initiateSession(surgeSession)
 
 	log.Println("Restarting Download for", file.FileName)
 	log.Println("Total Chunks", file.NumChunks)
 	log.Println("Remaining Chunks", len(missingChunks))
+
+	seederAlternator := 0
 
 	//Download missing chunks
 	for i := 0; i < len(missingChunks); i++ {
@@ -752,7 +774,12 @@ func restartDownload(Hash string) {
 		}
 
 		workerCount++
-		go RequestChunk(surgeSession, file.FileHash, missingChunks[i])
+		go RequestChunk(downloadSessions[seederAlternator], file.FileHash, missingChunks[i])
+
+		seederAlternator++
+		if seederAlternator > len(downloadSessions)-1 {
+			seederAlternator = 0
+		}
 
 		for workerCount >= NumWorkers {
 			time.Sleep(time.Millisecond)
@@ -760,7 +787,7 @@ func restartDownload(Hash string) {
 	}
 }
 
-func createSession(File *File) (*Session, error) {
+func createSession(File *File, Seeder string) (*Session, error) {
 	//Check if nkn session exists with address
 	var downloadSession *Session
 	/*for i := 0; i < len(Sessions); i++ {
@@ -779,7 +806,7 @@ func createSession(File *File) (*Session, error) {
 			DialTimeout:   60000,
 		}
 
-		downloadSession, err := client.DialWithConfig(File.Seeders[0], dialConfig)
+		downloadSession, err := client.DialWithConfig(Seeder, dialConfig)
 		if err != nil {
 			log.Println("Download Session timout for", File.FileName)
 			return nil, err
