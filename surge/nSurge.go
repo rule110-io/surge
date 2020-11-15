@@ -559,14 +559,24 @@ func DownloadFile(Hash string) bool {
 		pushError("Error on download file", "No listed file with hash: "+Hash)
 	}
 
-	// Create a sessions
-	surgeSession, err := createSession(file)
-	if err != nil {
-		log.Println("Could not create session for download", Hash)
-		pushNotification("Download Session Failed", file.FileName)
+	downloadSessions := []*Session{}
+
+	// Create  sessions
+	for i := 0; i < len(file.Seeders); i++ {
+		surgeSession, err := createSession(file, file.Seeders[i])
+		if err != nil {
+			log.Println("Could not create session for download", Hash, file.Seeders[i])
+			continue
+		}
+		go initiateSession(surgeSession)
+
+		downloadSessions = append(downloadSessions, surgeSession)
+	}
+
+	if len(downloadSessions) == 0 {
+		pushNotification("Download Session Failed, failed to connect to all seeders.", file.FileName)
 		return false
 	}
-	go initiateSession(surgeSession)
 
 	pushNotification("Download Started", file.FileName)
 
@@ -594,6 +604,8 @@ func DownloadFile(Hash string) bool {
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(len(randomChunks), func(i, j int) { randomChunks[i], randomChunks[j] = randomChunks[j], randomChunks[i] })
 
+	seederAlternator := 0
+
 	downloadJob := func() {
 		for i := 0; i < numChunks; i++ {
 			//Pause if file is paused
@@ -607,7 +619,13 @@ func DownloadFile(Hash string) bool {
 			}
 
 			workerCount++
-			go RequestChunk(surgeSession, file.FileHash, int32(randomChunks[i]))
+
+			go RequestChunk(downloadSessions[seederAlternator], file.FileHash, int32(randomChunks[i]))
+
+			seederAlternator++
+			if seederAlternator > len(downloadSessions)-1 {
+				seederAlternator = 0
+			}
 
 			for workerCount >= NumWorkers {
 				time.Sleep(time.Millisecond)
@@ -722,12 +740,16 @@ func GetFileChunkMapString(file *File, Size int) string {
 				if local {
 					localCount++
 				} else {
-					boolBuffer += "0"
+					if localCount == 0 {
+						boolBuffer += "0"
+					} else {
+						boolBuffer += "1"
+					}
 					break
 				}
 			}
 			if localCount == stepSizeInt {
-				boolBuffer += "1"
+				boolBuffer += "2"
 			}
 		}
 	} else {
@@ -735,7 +757,7 @@ func GetFileChunkMapString(file *File, Size int) string {
 		for i := 0; i < outputSize; i++ {
 			local := bitmap.Get(file.ChunkMap, int(iter))
 			if local {
-				boolBuffer += "1"
+				boolBuffer += "2"
 			} else {
 				boolBuffer += "0"
 			}
