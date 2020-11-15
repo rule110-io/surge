@@ -44,6 +44,11 @@ export default {
   },
   computed: {
     ...mapState("downloadEvents", ["downloadEvent"]),
+    baseColor() {
+      return document.getElementById("app").classList.contains("dark-theme")
+        ? "#ebebeb"
+        : "#fcfcfc";
+    },
   },
   watch: {
     downloadEvent(newEvent) {
@@ -72,7 +77,7 @@ export default {
     drawProgress(bits) {
       const canvas = this.$refs.canvas;
       const ctx = canvas.getContext("2d");
-      const colours = ["#ebebeb", "#02d2b3"];
+      const colours = [this.baseColor, "#5EC1FF", "#02d2b3"];
 
       const bitmap = `${bits}`.split("");
 
