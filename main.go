@@ -16,6 +16,8 @@ func getLocalFiles(Skip int, Take int) surge.LocalFilePageResult {
 
 	trackedFiles := surge.GetTrackedFiles()
 
+	totalNum := len(trackedFiles)
+
 	for i := 0; i < len(trackedFiles); i++ {
 		trackedFiles[i].ChunkMap = nil
 	}
@@ -47,7 +49,7 @@ func getLocalFiles(Skip int, Take int) surge.LocalFilePageResult {
 
 	return surge.LocalFilePageResult{
 		Result: trackedFiles,
-		Count:  len(trackedFiles),
+		Count:  totalNum,
 	}
 }
 
