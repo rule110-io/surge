@@ -400,7 +400,7 @@ func updateGUI() {
 					DownloadBandwidth: down,
 					UploadBandwidth:   up,
 					NumChunks:         file.NumChunks,
-					ChunkMap:          GetFileChunkMapString(&file, 400),
+					ChunkMap:          GetFileChunkMapString(&file, 156),
 				}
 				wailsRuntime.Events.Emit("fileStatusEvent", statusEvent)
 			}
@@ -773,7 +773,7 @@ func GetFileChunkMapStringByHash(Hash string, Size int) string {
 	if err != nil {
 		return ""
 	}
-	return GetFileChunkMapString(file, 400)
+	return GetFileChunkMapString(file, Size)
 }
 
 //SetFilePause sets a file IsPaused state for by file hash
