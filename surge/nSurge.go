@@ -740,12 +740,16 @@ func GetFileChunkMapString(file *File, Size int) string {
 				if local {
 					localCount++
 				} else {
-					boolBuffer += "0"
+					if localCount == 0 {
+						boolBuffer += "0"
+					} else {
+						boolBuffer += "1"
+					}
 					break
 				}
 			}
 			if localCount == stepSizeInt {
-				boolBuffer += "1"
+				boolBuffer += "2"
 			}
 		}
 	} else {
@@ -753,7 +757,7 @@ func GetFileChunkMapString(file *File, Size int) string {
 		for i := 0; i < outputSize; i++ {
 			local := bitmap.Get(file.ChunkMap, int(iter))
 			if local {
-				boolBuffer += "1"
+				boolBuffer += "2"
 			} else {
 				boolBuffer += "0"
 			}
