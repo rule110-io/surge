@@ -133,12 +133,14 @@ func SendQueryRequest(Addr string, Query string) {
 	var surgeSession *Session = nil
 
 	//Check for sessions
+	sessionsWriteLock.Lock()
 	for i := 0; i < len(Sessions); i++ {
 		if Sessions[i].session.RemoteAddr().String() == Addr {
 			surgeSession = Sessions[i]
 			break
 		}
 	}
+	sessionsWriteLock.Unlock()
 
 	if surgeSession == nil {
 		//Create session
