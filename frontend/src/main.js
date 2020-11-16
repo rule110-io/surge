@@ -9,6 +9,7 @@ import vueFilterPrettyBytes from "vue-filter-pretty-bytes";
 import VueLodash from "vue-lodash";
 import lodash from "lodash";
 import VueTour from "vue-tour";
+import VTooltip from "v-tooltip";
 
 import { store } from "./store/store.js";
 
@@ -22,6 +23,7 @@ Vue.use(vueFilterPrettyBytes);
 Vue.use(VueMoment);
 Vue.use(VueLodash, { lodash: lodash });
 Vue.use(VueTour);
+Vue.use(VTooltip);
 
 Wails.Init(() => {
   new Vue({

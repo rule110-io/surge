@@ -25,6 +25,11 @@
     <div
       class="file-info__title text_wrap_none"
       :class="full ? 'file-info__title_full' : ''"
+      v-tooltip="{
+        content: file.FileName,
+        placement: 'bottom-start',
+        offset: 5,
+      }"
     >
       {{ file.FileName }}
     </div>

@@ -19,6 +19,7 @@
     "feather-icons": "^4.28.0",
     "lodash": "^4.17.19",
     "regenerator-runtime": "^0.13.3",
+    "v-tooltip": "^2.0.3",
     "vue": "^2.6.11",
     "vue-chartjs": "^3.5.0",
     "vue-clamp": "^0.3.1",
