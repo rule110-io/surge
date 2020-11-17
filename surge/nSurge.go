@@ -296,6 +296,7 @@ func Start(runtime *wails.Runtime, args []string) {
 }
 
 func rescanPeers() {
+	defer RecoverAndLog()
 	for true {
 		var numOnline = 0
 		//Count num online clients
@@ -325,6 +326,7 @@ func rescanPeers() {
 }
 
 func queryRemoteForFiles() {
+	defer RecoverAndLog()
 	for true {
 		for _, address := range subscribers {
 			clientOnlineMapLock.Lock()
@@ -342,6 +344,7 @@ func GetNumberOfRemoteClient() (int, int) {
 }
 
 func updateGUI() {
+	defer RecoverAndLog()
 	for true {
 		time.Sleep(time.Second)
 
@@ -418,6 +421,7 @@ func updateGUI() {
 }
 
 func fileBandwidth(FileID string) (Download int, Upload int) {
+	defer RecoverAndLog()
 	//Get accumulator
 	bandwidthAccumulatorMapLock.Lock()
 	downAccu := downloadBandwidthAccumulator[FileID]
@@ -492,6 +496,7 @@ func getFileSize(path string) (size int64) {
 }
 
 func sendSeedSubscription(Topic string, Payload string) {
+	defer RecoverAndLog()
 	txnHash, err := client.Subscribe("", Topic, 4320, Payload, nil)
 	if err != nil {
 		log.Println("Probably already subscribed", err)
@@ -502,6 +507,7 @@ func sendSeedSubscription(Topic string, Payload string) {
 
 //GetSubscriptions .
 func GetSubscriptions(Topic string) {
+	defer RecoverAndLog()
 	subResponse, err := client.GetSubscribers(Topic, 0, 100, true, true)
 	if err != nil {
 		pushError("Error on get subscriptions", err.Error())
@@ -536,6 +542,7 @@ func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 
 func getListedFileByHash(Hash string) *File {
 
+	defer RecoverAndLog()
 	var selectedFile *File = nil
 
 	ListedFilesLock.Lock()
@@ -553,6 +560,7 @@ func getListedFileByHash(Hash string) *File {
 //DownloadFile downloads the file
 func DownloadFile(Hash string) bool {
 	//Addr string, Size int64, FileID string
+	defer RecoverAndLog()
 
 	file := getListedFileByHash(Hash)
 	if file == nil {
@@ -666,6 +674,7 @@ type LocalFilePageResult struct {
 
 //SearchFile runs a paged query
 func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
+	defer RecoverAndLog()
 	var results []FileListing
 
 	ListedFilesLock.Lock()
@@ -719,11 +728,13 @@ func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
 
 //GetTrackedFiles returns all files tracked in surge client
 func GetTrackedFiles() []File {
+	defer RecoverAndLog()
 	return dbGetAllFiles()
 }
 
 //GetFileChunkMapString returns the chunkmap in hex for a file given by hash
 func GetFileChunkMapString(file *File, Size int) string {
+	defer RecoverAndLog()
 	outputSize := Size
 	inputSize := file.NumChunks
 
@@ -769,6 +780,7 @@ func GetFileChunkMapString(file *File, Size int) string {
 
 //GetFileChunkMapStringByHash returns the chunkmap in hex for a file given by hash
 func GetFileChunkMapStringByHash(Hash string, Size int) string {
+	defer RecoverAndLog()
 	file, err := dbGetFile(Hash)
 	if err != nil {
 		return ""
@@ -778,6 +790,7 @@ func GetFileChunkMapStringByHash(Hash string, Size int) string {
 
 //SetFilePause sets a file IsPaused state for by file hash
 func SetFilePause(Hash string, State bool) {
+	defer RecoverAndLog()
 	fileWriteLock.Lock()
 	file, err := dbGetFile(Hash)
 	if err != nil {
@@ -797,11 +810,13 @@ func SetFilePause(Hash string, State bool) {
 
 //OpenFileDialog uses platform agnostic package for a file dialog
 func OpenFileDialog() (string, error) {
+	defer RecoverAndLog()
 	return dialog.File().Load()
 }
 
 //RemoveFile removes file from surge db and optionally from disk
 func RemoveFile(Hash string, FromDisk bool) bool {
+	defer RecoverAndLog()
 
 	//Close sessions for this file
 	for _, session := range Sessions {
@@ -845,6 +860,7 @@ func RemoveFile(Hash string, FromDisk bool) bool {
 
 //GetSurgeDir returns the surge dir
 func GetSurgeDir() string {
+	defer RecoverAndLog()
 	if runtime.GOOS == "windows" {
 		return os.Getenv("APPDATA") + string(os.PathSeparator) + "Surge"
 	}
