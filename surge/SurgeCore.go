@@ -10,7 +10,7 @@ import (
 	"math/rand"
 	"os"
 	"path/filepath"
-	"runtime/debug"
+	"runtime"
 	"strconv"
 	"strings"
 	"sync"
@@ -259,6 +259,7 @@ func Listen() {
 
 func initiateSession(Session *Session) {
 	defer RecoverAndLog()
+
 	sessionsWriteLock.Lock()
 	Sessions = append(Sessions, Session)
 	sessionsWriteLock.Unlock()
@@ -872,10 +873,22 @@ func FileExists(filename string) bool {
 //RecoverAndLog Recovers and then logs the stack
 func RecoverAndLog() {
 	if r := recover(); r != nil {
-		log.Println("!!! PANIC !!!")
-		fmt.Println("recovered from ", r)
-		debug.PrintStack()
-		log.Println("!!! END OF PANIC !!!")
+		fmt.Println("Panic digested from ", r)
+
+		log.Printf("Internal error: %v", r)
+		buf := make([]byte, 1<<16)
+		stackSize := runtime.Stack(buf, true)
+		log.Printf("%s\n", string(buf[0:stackSize]))
+
+		var dir = GetSurgeDir()
+		var logPathOS = dir + string(os.PathSeparator) + "paniclog.txt"
+		f, _ := os.OpenFile(logPathOS, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+		w := bufio.NewWriter(f)
+		w.WriteString(string(buf[0:stackSize]))
+		w.Flush()
+
+		pushError("Panic", "Please check your log file and paniclog for more info")
+
 		panic("Panic dumped but not digested, please check your log")
 	}
 }
