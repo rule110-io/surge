@@ -5,10 +5,12 @@ import (
 	"crypto/sha256"
 	b64 "encoding/base64"
 	"encoding/hex"
+	"fmt"
 	"io"
 	"math/rand"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"strconv"
 	"strings"
 	"sync"
@@ -41,6 +43,7 @@ func OpenOSPath(Path string) {
 
 //OpenFileByHash opens a file with OS default application for object type
 func OpenFileByHash(Hash string) {
+	defer RecoverAndLog()
 	fileInfo, err := dbGetFile(Hash)
 	if err != nil {
 		pushError("Error on open file", err.Error())
@@ -51,6 +54,7 @@ func OpenFileByHash(Hash string) {
 
 //OpenFolderByHash opens the folder containing the file by hash in os
 func OpenFolderByHash(Hash string) {
+	defer RecoverAndLog()
 	fileInfo, err := dbGetFile(Hash)
 	if err != nil {
 		pushError("Error on open folder", err.Error())
@@ -61,6 +65,7 @@ func OpenFolderByHash(Hash string) {
 
 // RequestChunk sends a request to an address for a specific chunk of a specific file
 func RequestChunk(Session *Session, FileID string, ChunkID int32) {
+	defer RecoverAndLog()
 	msg := &pb.SurgeMessage{
 		FileID:  FileID,
 		ChunkID: ChunkID,
@@ -78,6 +83,7 @@ func RequestChunk(Session *Session, FileID string, ChunkID int32) {
 
 // TransmitChunk tranmits target file chunk to address
 func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
+	defer RecoverAndLog()
 	//Open file
 	fileInfo, err := dbGetFile(FileID)
 	if err != nil {
@@ -129,6 +135,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 
 // SendQueryRequest sends a query to a client on session
 func SendQueryRequest(Addr string, Query string) {
+	defer RecoverAndLog()
 
 	var surgeSession *Session = nil
 
@@ -187,6 +194,7 @@ func SendQueryRequest(Addr string, Query string) {
 
 // SendQueryResponse sends a query to a client on session
 func SendQueryResponse(Session *Session, Query string) {
+	defer RecoverAndLog()
 	b := []byte(queryPayload)
 	err := SessionWrite(Session, b, surgeQueryResponseID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 	if err != nil {
@@ -196,6 +204,7 @@ func SendQueryResponse(Session *Session, Query string) {
 
 // AllocateFile Allocates a file on disk at path with size in bytes
 func AllocateFile(path string, size int64) {
+	defer RecoverAndLog()
 	fd, err := os.Create(path)
 	if err != nil {
 		log.Fatal("Failed to create output")
@@ -215,6 +224,7 @@ func AllocateFile(path string, size int64) {
 }
 
 func listenForSession() {
+	defer RecoverAndLog()
 	for !client.IsClosed() {
 		listenSession, err := client.Accept()
 		if err != nil {
@@ -248,6 +258,7 @@ func Listen() {
 }
 
 func initiateSession(Session *Session) {
+	defer RecoverAndLog()
 	sessionsWriteLock.Lock()
 	Sessions = append(Sessions, Session)
 	sessionsWriteLock.Unlock()
@@ -276,6 +287,7 @@ func initiateSession(Session *Session) {
 }
 
 func closeSession(Session *Session) {
+	defer RecoverAndLog()
 	//find index in Sessions
 	sessionsWriteLock.Lock()
 	var index = -1
@@ -315,6 +327,7 @@ func closeSession(Session *Session) {
 }
 
 func processChunk(Session *Session, Data []byte) {
+	defer RecoverAndLog()
 	//Try to parse SurgeMessage
 	surgeMessage := &pb.SurgeMessage{}
 	if err := proto.Unmarshal(Data, surgeMessage); err != nil {
@@ -347,6 +360,7 @@ func processChunk(Session *Session, Data []byte) {
 }
 
 func processQueryRequest(Session *Session, Data []byte) {
+	defer RecoverAndLog()
 	//Try to parse SurgeMessage
 	surgeQuery := &pb.SurgeQuery{}
 	if err := proto.Unmarshal(Data, surgeQuery); err != nil {
@@ -358,6 +372,7 @@ func processQueryRequest(Session *Session, Data []byte) {
 }
 
 func processQueryResponse(Session *Session, Data []byte) {
+	defer RecoverAndLog()
 	//Try to parse SurgeMessage
 	s := string(Data)
 	seeder := Session.session.RemoteAddr().String()
@@ -444,6 +459,7 @@ func processQueryResponse(Session *Session, Data []byte) {
 
 //ParsePayloadString parses payload of files
 func ParsePayloadString(s string) {
+	defer RecoverAndLog()
 	payloadSplit := strings.Split(s, "surge://")
 	for j := 0; j < len(payloadSplit); j++ {
 		data := strings.Split(payloadSplit[j], "|")
@@ -498,6 +514,7 @@ func ParsePayloadString(s string) {
 
 //WriteChunk writes a chunk to disk
 func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
+	defer RecoverAndLog()
 	workerCount--
 
 	if Session.file == nil {
@@ -575,6 +592,7 @@ func surgeGenerateMagnetLink(fileName string, sizeInBytes int64, hash string, se
 
 // HashFile generates hash for file given filepath
 func HashFile(filePath string) (string, error) {
+	defer RecoverAndLog()
 	//Open the passed argument and check for any error
 	file, err := os.Open(filePath)
 	if err != nil {
@@ -603,6 +621,7 @@ func HashFile(filePath string) (string, error) {
 }
 
 func surgeGetFileSize(path string) int64 {
+	defer RecoverAndLog()
 	fi, err := os.Stat(path)
 	if err != nil {
 		log.Panicln("Error on get filesize", err)
@@ -613,6 +632,7 @@ func surgeGetFileSize(path string) int64 {
 
 //BuildSeedString builds a string of seeded files to share with clients
 func BuildSeedString(dbFiles []File) {
+	defer RecoverAndLog()
 	newQueryPayload := ""
 	for _, dbFile := range dbFiles {
 		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, strings.Join(dbFile.Seeders, ","))
@@ -630,6 +650,7 @@ func BuildSeedString(dbFiles []File) {
 
 //AddToSeedString adds to existing seed string
 func AddToSeedString(dbFile File) {
+	defer RecoverAndLog()
 	//Add to payload
 	payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)
 	//log.Println(payload)
@@ -638,6 +659,7 @@ func AddToSeedString(dbFile File) {
 
 //SeedFile generates everything needed to seed a file
 func SeedFile(Path string) bool {
+	defer RecoverAndLog()
 	log.Println("Seeding file", Path)
 
 	hashString, err := HashFile(Path)
@@ -688,6 +710,8 @@ func SeedFile(Path string) bool {
 }
 
 func restartDownload(Hash string) {
+	defer RecoverAndLog()
+
 	file, err := dbGetFile(Hash)
 	if err != nil {
 		pushError("Error on restart download", err.Error())
@@ -790,6 +814,8 @@ func restartDownload(Hash string) {
 }
 
 func createSession(File *File, Seeder string) (*Session, error) {
+	defer RecoverAndLog()
+
 	//Check if nkn session exists with address
 	var downloadSession *Session
 	/*for i := 0; i < len(Sessions); i++ {
@@ -841,4 +867,14 @@ func FileExists(filename string) bool {
 		return false
 	}
 	return !info.IsDir()
+}
+
+//RecoverAndLog Recovers and then logs the stack
+func RecoverAndLog() {
+	if r := recover(); r != nil {
+		log.Println("!!! PANIC !!!")
+		fmt.Println("recovered from ", r)
+		debug.PrintStack()
+		log.Println("!!! END OF PANIC !!!")
+	}
 }
