@@ -876,5 +876,6 @@ func RecoverAndLog() {
 		fmt.Println("recovered from ", r)
 		debug.PrintStack()
 		log.Println("!!! END OF PANIC !!!")
+		panic("Panic dumped but not digested, please check your log")
 	}
 }
