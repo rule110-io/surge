@@ -44,6 +44,8 @@ var mode = ""
 
 var subscribers []string
 
+var clientInitialized = false
+
 //OS folder permission bitflags
 const (
 	osRead       = 04
@@ -235,6 +237,8 @@ func Start(runtime *wails.Runtime, args []string) {
 
 	account := InitializeAccount()
 	client, err = nkn.NewMultiClient(account, "", NumClients, false, nil)
+
+	clientInitialized = true
 
 	if err != nil {
 		pushError("Error on startup", err.Error())
@@ -872,6 +876,8 @@ func GetSurgeDir() string {
 
 //GetMyAddress returns current client address
 func GetMyAddress() string {
-	return "test"
-	//return client.Addr().String()
+	for !clientInitialized {
+		time.Sleep(time.Millisecond * 50)
+	}
+	return client.Addr().String()
 }
