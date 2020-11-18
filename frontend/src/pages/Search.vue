@@ -60,6 +60,7 @@
 <script>
 import { mapState } from "vuex";
 
+import FileSeeders from "@/components/File/FileSeeders/FileSeeders";
 import FileInfo from "@/components/File/FileInfo/FileInfo";
 import FileHash from "@/components/File/FileHash/FileHash";
 import Pagination from "@/components/Pagination/Pagination";
@@ -72,6 +73,7 @@ export default {
     FileHash,
     Pagination,
     TablePlaceholder,
+    FileSeeders,
   },
   data: () => {
     return {};
