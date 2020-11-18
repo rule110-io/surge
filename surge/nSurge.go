@@ -869,3 +869,9 @@ func GetSurgeDir() string {
 	}
 	return os.Getenv("HOME") + string(os.PathSeparator) + ".surge"
 }
+
+//GetMyAddress returns current client address
+func GetMyAddress() string {
+	return "test"
+	//return client.Addr().String()
+}

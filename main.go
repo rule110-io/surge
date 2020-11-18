@@ -38,6 +38,27 @@ func getLocalFiles(Skip int, Take int) surge.LocalFilePageResult {
 
 	for i := 0; i < len(trackedFiles); i++ {
 		surge.ListedFilesLock.Lock()
+
+		for _, file := range surge.ListedFiles {
+			trackedFiles[i].Seeders = []string{surge.GetMyAddress()}
+			if file.FileHash == trackedFiles[i].FileHash {
+				trackedFiles[i].Seeders = file.Seeders
+				trackedFiles[i].Seeders = append(trackedFiles[i].Seeders, surge.GetMyAddress())
+				trackedFiles[i].SeederCount = len(trackedFiles[i].Seeders)
+				break
+			}
+		}
+
+		if len(trackedFiles[i].Seeders) == 0 && trackedFiles[i].IsUploading {
+			trackedFiles[i].Seeders = []string{surge.GetMyAddress()}
+			trackedFiles[i].SeederCount = len(trackedFiles[i].Seeders)
+		}
+
+		surge.ListedFilesLock.Unlock()
+	}
+
+	/*for i := 0; i < len(trackedFiles); i++ {
+		surge.ListedFilesLock.Lock()
 		for _, file := range surge.ListedFiles {
 			if file.FileHash == trackedFiles[i].FileHash {
 				trackedFiles[i].Seeders = file.Seeders
@@ -45,7 +66,7 @@ func getLocalFiles(Skip int, Take int) surge.LocalFilePageResult {
 			}
 		}
 		surge.ListedFilesLock.Unlock()
-	}
+	}*/
 
 	return surge.LocalFilePageResult{
 		Result: trackedFiles,
