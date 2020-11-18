@@ -691,20 +691,23 @@ func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
 			}
 
 			tracked, err := dbGetFile(result.FileHash)
-			if err == nil && tracked != nil {
-				result.IsTracked = true
-				result.IsAvailable = true
+			//if err == nil && tracked != nil {
+			//	result.IsTracked = true
+			//	result.IsAvailable = true
 
-				//If any chunk is missing set available to false
-				for i := 0; i < result.NumChunks; i++ {
-					if bitmap.Get(tracked.ChunkMap, i) == false {
-						result.IsAvailable = false
-						break
-					}
-				}
+			//If any chunk is missing set available to false
+			//	for i := 0; i < result.NumChunks; i++ {
+			//		if bitmap.Get(tracked.ChunkMap, i) == false {
+			//			result.IsAvailable = false
+			//			break
+			//		}
+			//}
+
+			//only add non-local files to the result
+			if err != nil && tracked == nil {
+				results = append(results, result)
 			}
 
-			results = append(results, result)
 		}
 	}
 	ListedFilesLock.Unlock()
