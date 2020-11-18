@@ -78,6 +78,10 @@ func getRemoteFiles(Query string, Skip int, Take int) surge.SearchQueryResult {
 	return surge.SearchFile(Query, Skip, Take)
 }
 
+func getPublicKey() string {
+	return surge.GetMyAddress()
+}
+
 func getFileChunkMap(Hash string, Size int) string {
 	if Size == 0 {
 		Size = 400
@@ -211,6 +215,7 @@ func main() {
 	app.Bind(writeSetting)
 	app.Bind(readSetting)
 	app.Bind(startDownloadMagnetLinks)
+	app.Bind(getPublicKey)
 
 	app.Run()
 

@@ -1,12 +1,11 @@
 <template>
   <div class="network-stats">
     <div class="network-stats__item">
-      Clients:
       <span class="network-stats__status" v-if="total === 0">
         <feather class="network-stats__loader" type="loader"></feather>
-        Loading...
+        Discovering network...
       </span>
-      <template v-else>{{ online }} of {{ total }} connected </template>
+      <template v-else>Total clients connected: {{ online + 1 }} </template>
     </div>
     <div class="network-stats__file" @click="seedFile">
       <div class="network-stats__file-wrapper">
