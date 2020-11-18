@@ -1,0 +1,45 @@
+.file-seeders {
+  display: flex;
+  align-items: center;
+  width: 136px;
+
+  &__icon {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+
+  &__item {
+    height: 35px;
+    width: 35px;
+    border-radius: 100%;
+    border: 4px solid;
+    border-color: $grey-light;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+
+    @include dark-theme {
+      border-color: $card-dark;
+    }
+
+    &:not(:first-child) {
+      margin-left: -10px;
+    }
+
+    &_more {
+      font-weight: 900;
+      font-family: "Roboto";
+      font-size: $fz-xs;
+      background: white;
+
+      @include dark-theme {
+        color: $card-dark;
+      }
+    }
+  }
+}

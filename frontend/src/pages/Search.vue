@@ -5,7 +5,9 @@
       <div class="table">
         <div class="table__row">
           <div class="table__head">Name & size</div>
-          <div class="table__head text_align_center">Seeds</div>
+          <div class="table__head">Chunks</div>
+          <div class="table__head">File Hash</div>
+          <div class="table__head">Seeds</div>
           <div class="table__head">Source</div>
         </div>
         <TablePlaceholder v-if="!remoteFiles" type="search" />
@@ -16,13 +18,21 @@
             :key="file.FileName"
           >
             <div class="table__cell">
-              <FileInfo :file="file" :full="true" :icon="false" />
+              <FileInfo :file="file" :max="true" :icon="false" />
+            </div>
+            <div class="table__cell text_align_center">
+              {{ file.NumChunks }}
+            </div>
+            <div class="table__cell">
+              <FileHash :hash="file.FileHash" />
             </div>
             <div class="table__cell text_align_center">
               {{ file.SeederCount }}
             </div>
-            <div class="table__cell">{{ file.FileHash }}</div>
             <div class="table__cell">
+              <FileSeeders :seeders="file.Seeders" />
+            </div>
+            <div class="table__cell text_align_right">
               <feather
                 v-if="!file.IsTracked"
                 class="table__action"
@@ -51,6 +61,7 @@
 import { mapState } from "vuex";
 
 import FileInfo from "@/components/File/FileInfo/FileInfo";
+import FileHash from "@/components/File/FileHash/FileHash";
 import Pagination from "@/components/Pagination/Pagination";
 import TablePlaceholder from "@/components/TablePlaceholder/TablePlaceholder";
 
@@ -58,6 +69,7 @@ export default {
   name: "search",
   components: {
     FileInfo,
+    FileHash,
     Pagination,
     TablePlaceholder,
   },

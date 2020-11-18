@@ -64,6 +64,10 @@
       width: 234px;
     }
 
+    &_max {
+      width: 300px;
+    }
+
     @include dark-theme {
       color: white;
     }

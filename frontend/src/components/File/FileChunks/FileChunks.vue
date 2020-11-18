@@ -45,7 +45,7 @@ export default {
   computed: {
     ...mapState("downloadEvents", ["downloadEvent"]),
     baseColor() {
-      return document.getElementById("app").classList.contains("dark-theme")
+      return document.getElementById("app").classList.contains("theme_dark")
         ? "#ebebeb"
         : "#fcfcfc";
     },

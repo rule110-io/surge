@@ -9,6 +9,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@download/blockies": "^1.0.3",
     "@wailsapp/runtime": "^1.1.1",
     "axios": "^0.19.2",
     "babel-plugin-transform-remove-strict-mode": "0.0.2",

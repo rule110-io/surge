@@ -24,8 +24,12 @@
     </div>
     <div
       class="file-info__title text_wrap_none"
-      :class="full ? 'file-info__title_full' : ''"
+      :class="[
+        full ? 'file-info__title_full' : '',
+        max ? 'file-info__title_max' : '',
+      ]"
       v-tooltip="{
+        classes: 'tooltip_left',
         content: file.FileName,
         placement: 'bottom-start',
         offset: 5,
@@ -53,6 +57,10 @@ export default {
       default: true,
     },
     full: {
+      type: Boolean,
+      default: false,
+    },
+    max: {
       type: Boolean,
       default: false,
     },

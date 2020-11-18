@@ -392,6 +392,12 @@ b {
   display: block !important;
   z-index: 10000;
 
+  &_left {
+    .tooltip-arrow {
+      left: 15px !important;
+    }
+  }
+
   .tooltip-inner {
     background: color(dark, darkest);
     color: white;
@@ -408,7 +414,6 @@ b {
     margin: 5px;
     border-color: color(dark, darkest);
     z-index: 1;
-    left: 15px !important;
   }
 
   &[x-placement^="top"] {

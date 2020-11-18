@@ -25,7 +25,9 @@
       <div class="table" v-if="isRemote">
         <div class="table__row">
           <div class="table__head">Name & size</div>
-          <div class="table__head text_align_center">Seeds</div>
+          <div class="table__head">Chunks</div>
+          <div class="table__head">File Hash</div>
+          <div class="table__head">Seeds</div>
           <div class="table__head">Source</div>
         </div>
         <TablePlaceholder v-if="!remoteFiles" type="remote" />
@@ -36,13 +38,21 @@
             :key="file.FileName"
           >
             <div class="table__cell">
-              <FileInfo :file="file" :full="true" :icon="false" />
+              <FileInfo :file="file" :max="true" :icon="false" />
+            </div>
+            <div class="table__cell text_align_center">
+              {{ file.NumChunks }}
+            </div>
+            <div class="table__cell">
+              <FileHash :hash="file.FileHash" />
             </div>
             <div class="table__cell text_align_center">
               {{ file.SeederCount }}
             </div>
-            <div class="table__cell">{{ file.FileHash }}</div>
             <div class="table__cell">
+              <FileSeeders :seeders="file.Seeders" />
+            </div>
+            <div class="table__cell text_align_right">
               <feather
                 v-if="!file.IsTracked"
                 class="table__action"
@@ -68,7 +78,9 @@
       <div class="table" v-else>
         <div class="table__row">
           <div class="table__head">Name & size</div>
-          <div class="table__head text_align_center">Seeds</div>
+          <div class="table__head">Chunks</div>
+          <div class="table__head">File Hash</div>
+          <div class="table__head">Seeds</div>
           <div class="table__head">Source</div>
         </div>
         <TablePlaceholder v-if="!localFiles" type="local" />
@@ -79,13 +91,21 @@
             :key="file.FileName"
           >
             <div class="table__cell">
-              <FileInfo :file="file" :full="true" :icon="false" />
+              <FileInfo :file="file" :max="true" :icon="false" />
+            </div>
+            <div class="table__cell text_align_center">
+              {{ file.NumChunks }}
+            </div>
+            <div class="table__cell">
+              <FileHash :hash="file.FileHash" />
             </div>
             <div class="table__cell text_align_center">
               {{ file.SeederCount }}
             </div>
-            <div class="table__cell">{{ file.FileHash }}</div>
             <div class="table__cell">
+              <FileSeeders :seeders="file.Seeders" />
+            </div>
+            <div class="table__cell text_align_right">
               <feather
                 class="table__action table__action_active"
                 type="check-circle"
@@ -107,6 +127,8 @@
 import { mapState } from "vuex";
 
 import FileInfo from "@/components/File/FileInfo/FileInfo";
+import FileSeeders from "@/components/File/FileSeeders/FileSeeders";
+import FileHash from "@/components/File/FileHash/FileHash";
 import Pagination from "@/components/Pagination/Pagination";
 import TablePlaceholder from "@/components/TablePlaceholder/TablePlaceholder";
 
@@ -116,6 +138,8 @@ export default {
     FileInfo,
     Pagination,
     TablePlaceholder,
+    FileSeeders,
+    FileHash,
   },
   data: () => {
     return {
