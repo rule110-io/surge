@@ -5,7 +5,7 @@
       v-for="seeder in seedersSlice"
       :key="seeder"
       v-tooltip="{
-        content: seeder,
+        content: seeder === pubKey ? 'It`s me' : seeder,
         placement: 'bottom-center',
         offset: 0,
       }"
@@ -26,6 +26,8 @@
 </style>
 
 <script>
+import { mapState } from "vuex";
+
 import FileAvatar from "@/components/File/FileAvatar/FileAvatar";
 
 export default {
@@ -42,6 +44,7 @@ export default {
     };
   },
   computed: {
+    ...mapState("pubKey", ["pubKey"]),
     seedersSlice() {
       return this.seeders ? this.seeders.slice(0, this.count) : [];
     },
