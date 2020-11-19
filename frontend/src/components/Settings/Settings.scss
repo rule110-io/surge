@@ -1,6 +1,12 @@
 .settings {
   position: relative;
 
+  &__avatar {
+    display: flex;
+    justify-content: center;
+    margin-top: $padding-default;
+  }
+
   &__header {
     padding: $padding-default;
     display: flex;

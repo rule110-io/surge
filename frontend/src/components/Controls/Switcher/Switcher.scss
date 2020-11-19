@@ -15,8 +15,8 @@
     left: 0;
 
     &:checked ~ .switch__container {
-      background: #2ecc71;
-      border: 1px solid #2ecc71;
+      background: $primary;
+      border: 1px solid $primary;
       transition: $transition-1;
     }
 

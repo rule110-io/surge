@@ -47,9 +47,16 @@ export default {
 
     this.getNumberOfRemoteClient();
 
+    this.getPublicKey();
+
     this.remoteInterval = setInterval(this.fetchRemoteFiles, 10000);
   },
   methods: {
+    getPublicKey() {
+      window.backend.getPublicKey().then((address) => {
+        this.$store.commit("pubKey/setPubKey", address);
+      });
+    },
     fetchLocalFiles() {
       this.$store.dispatch("files/fetchLocalFiles");
     },

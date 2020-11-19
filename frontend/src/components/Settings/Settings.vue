@@ -14,6 +14,16 @@
         </div>
       </div>
     </div>
+    <div
+      class="settings__avatar"
+      v-tooltip="{
+        content: pubKey,
+        placement: 'bottom-center',
+        offset: 5,
+      }"
+    >
+      <FileAvatar class="settings__avatar-img" :seed="pubKey" type="big" />
+    </div>
     <div class="settings__item">
       <div class="settings__item-left">
         <feather class="settings__item-icon" type="sliders"></feather>
@@ -81,15 +91,17 @@
 import { mapState, mapGetters } from "vuex";
 
 import Switcher from "@/components/Controls/Switcher/Switcher.vue";
+import FileAvatar from "@/components/File/FileAvatar/FileAvatar.vue";
 
 export default {
-  components: { Switcher },
+  components: { Switcher, FileAvatar },
   data: () => {
     return {};
   },
   computed: {
     ...mapGetters({ darkTheme: "darkTheme/getDarkTheme" }),
     ...mapState("version", ["currentVersion", "remoteVersion", "isNewVersion"]),
+    ...mapState("pubKey", ["pubKey"]),
   },
   methods: {
     changeTheme() {

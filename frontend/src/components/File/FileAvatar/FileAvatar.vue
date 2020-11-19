@@ -1,5 +1,8 @@
 <template>
-  <div :class="`file-avatar file-avatar_type_${seeder}`" ref="avatar"></div>
+  <div
+    :class="`file-avatar file-avatar_${seeder} file-avatar_type_${type}`"
+    ref="avatar"
+  ></div>
 </template>
 
 <style lang="scss">
@@ -16,6 +19,18 @@ export default {
       type: String,
       default: "",
     },
+    size: {
+      type: Number,
+      default: 15,
+    },
+    scale: {
+      type: Number,
+      default: 5,
+    },
+    type: {
+      type: String,
+      default: "small",
+    },
   },
   data: () => {
     return {};
@@ -31,8 +46,8 @@ export default {
         seed: this.seeder, // seed used to generate icon data, default: random
         bgcolor: "#fff", // choose a different background color, default: white
         color: "#02d2b3",
-        size: 32, // width/height of the icon in blocks, default: 10
-        scale: 2, // width/height of each block in pixels, default: 5
+        size: this.size, // width/height of the icon in blocks, default: 10
+        scale: this.scale, // width/height of each block in pixels, default: 5
       });
 
       this.$refs.avatar.appendChild(avatar);
