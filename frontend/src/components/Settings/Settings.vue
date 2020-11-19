@@ -22,7 +22,7 @@
         offset: 5,
       }"
     >
-      <FileAvatar class="settings__avatar-img" :seed="pubKey" type="big" />
+      <FileAvatar class="settings__avatar-img" :seeder="pubKey" type="big" />
     </div>
     <div class="settings__item">
       <div class="settings__item-left">
