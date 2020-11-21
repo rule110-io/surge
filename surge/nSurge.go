@@ -31,7 +31,7 @@ const ChunkSize = 1024 * 256
 const NumClients = 8
 
 //NumWorkers is the total number of concurrent chunk fetches allowed
-const NumWorkers = 16
+const NumWorkers = 32
 
 const localPath = "local"
 const remotePath = "remote"
@@ -297,6 +297,12 @@ func Start(runtime *wails.Runtime, args []string) {
 		//Just paste one of your own magnets (from the startup logs) here to download something over nkn from yourself to test if no-one is online
 		//go ParsePayloadString("surge://|file|justatvshow.mp4|219091405|cd0731496277102a869dacb0e99b7708c2b708824b647ffeb267de4743b7856e|a536528d2e321623375535af88974d7a7899836f9b84644320023bc3af3b9cf1|/")
 	}
+}
+
+//Stop cleanup for surge
+func Stop() {
+	client.Close()
+	client = nil
 }
 
 func rescanPeers() {

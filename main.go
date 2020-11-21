@@ -169,10 +169,20 @@ func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 	return nil
 }
 
+//WailsRuntime .
+type WailsRuntime struct {
+	runtime *wails.Runtime
+}
+
+//WailsShutdown .
+func (s *WailsRuntime) WailsShutdown() {
+	surge.Stop()
+}
+
 func main() {
 	stats := &Stats{}
 	surge.InitializeDb()
-	surge.InitializeLog()
+	//surge.InitializeLog()
 	defer surge.CloseDb()
 
 	argsWithProg := os.Args
