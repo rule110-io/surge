@@ -190,7 +190,7 @@ func SendQueryRequest(Addr string, Query string) {
 	} else {
 		err := SessionWrite(surgeSession, msgSerialized, surgeQueryRequestID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 		if err != nil {
-			log.Fatalln("Failed to send Surge Ruquest:", err)
+			log.Println("Failed to send Surge Request:", err)
 		}
 	}
 }
@@ -201,7 +201,7 @@ func SendQueryResponse(Session *Session, Query string) {
 	b := []byte(queryPayload)
 	err := SessionWrite(Session, b, surgeQueryResponseID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 	if err != nil {
-		log.Fatalln("Failed to send Surge Ruquest:", err)
+		log.Println("Failed to send Surge Ruquest:", err)
 	}
 }
 
