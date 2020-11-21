@@ -9,8 +9,6 @@ import (
 
 // SessionWrite writes to session
 func SessionWrite(Session *Session, Data []byte, ID byte) (err error) {
-	defer RecoverAndLog()
-
 	//Package identifier to know what we are sending
 	packID := make([]byte, 1)
 	packID[0] = ID
@@ -26,7 +24,7 @@ func SessionWrite(Session *Session, Data []byte, ID byte) (err error) {
 	buff = append(buff, Data...)
 	_, err = Session.session.Write(buff)
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	//Write add to upload
@@ -39,7 +37,6 @@ func SessionWrite(Session *Session, Data []byte, ID byte) (err error) {
 
 //SessionRead reads from session
 func SessionRead(Session *Session) (data []byte, ID byte, err error) {
-	defer RecoverAndLog()
 	headerBuffer := make([]byte, 5) //int32 size of header + 1 for packid
 
 	// the header of 4 bytes + 1 for packid

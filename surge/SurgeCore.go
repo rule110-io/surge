@@ -64,7 +64,7 @@ func OpenFolderByHash(Hash string) {
 }
 
 // RequestChunk sends a request to an address for a specific chunk of a specific file
-func RequestChunk(Session *Session, FileID string, ChunkID int32) {
+func RequestChunk(Session *Session, FileID string, ChunkID int32) bool {
 	defer RecoverAndLog()
 	msg := &pb.SurgeMessage{
 		FileID:  FileID,
@@ -76,9 +76,12 @@ func RequestChunk(Session *Session, FileID string, ChunkID int32) {
 	} else {
 		err := SessionWrite(Session, msgSerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 		if err != nil {
-			log.Fatalln("Failed to send Surge Ruquest:", err)
+			log.Error("Failed to request chunk from:", Session.session.RemoteAddr().String(), err)
+			return false
 		}
 	}
+
+	return true
 }
 
 // TransmitChunk tranmits target file chunk to address
@@ -787,9 +790,13 @@ func restartDownload(Hash string) {
 	log.Println("Remaining Chunks", len(missingChunks))
 
 	seederAlternator := 0
+	mutateSeederLock := sync.Mutex{}
+
+	appendChunkLock := sync.Mutex{}
+	chunksRemaining := len(missingChunks)
 
 	//Download missing chunks
-	for i := 0; i < len(missingChunks); i++ {
+	for i := 0; i < chunksRemaining; i++ {
 		//Pause if file is paused
 		dbFile, err := dbGetFile(file.FileHash)
 		for err == nil && dbFile.IsPaused {
@@ -801,17 +808,69 @@ func restartDownload(Hash string) {
 		}
 
 		workerCount++
-		go RequestChunk(downloadSessions[seederAlternator], file.FileHash, missingChunks[i])
 
+		//Create a async job to download a chunk
+		requestChunkJob := func() {
+			requestChunk := missingChunks[i]
+
+			//Get seeder
+			mutateSeederLock.Lock()
+			downloadSeeder := downloadSessions[seederAlternator]
+			mutateSeederLock.Unlock()
+
+			success := RequestChunk(downloadSeeder, file.FileHash, requestChunk)
+
+			//if download fails append the chunk to remaining to retry later
+			if !success {
+				appendChunkLock.Lock()
+				missingChunks = append(missingChunks, requestChunk)
+				chunksRemaining++
+				appendChunkLock.Unlock()
+
+				//Drop the seeder
+				mutateSeederLock.Lock()
+				downloadSessions = removeAndCloseSessionOrdered(downloadSessions, downloadSeeder)
+				pushError("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+				log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+				log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+				log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+				log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+				log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+				log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+				mutateSeederLock.Unlock()
+			}
+		}
+		go requestChunkJob()
+
+		mutateSeederLock.Lock()
 		seederAlternator++
 		if seederAlternator > len(downloadSessions)-1 {
 			seederAlternator = 0
 		}
+		mutateSeederLock.Unlock()
+
+		log.Println("Active Workers:", workerCount)
+		fmt.Println("Active Workers:", workerCount)
 
 		for workerCount >= NumWorkers {
 			time.Sleep(time.Millisecond)
 		}
 	}
+}
+
+func removeAndCloseSessionOrdered(slice []*Session, s *Session) []*Session {
+	index := -1
+	for i := 0; i < len(slice); i++ {
+		if slice[i].session.RemoteAddr().String() == s.session.RemoteAddr().String() {
+			index = i
+			break
+		}
+	}
+	if index != -1 {
+		closeSession(slice[index])
+		return append(slice[:index], slice[index+1:]...)
+	}
+	return slice
 }
 
 func createSession(File *File, Seeder string) (*Session, error) {
