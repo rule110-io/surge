@@ -849,9 +849,6 @@ func restartDownload(Hash string) {
 		}
 		mutateSeederLock.Unlock()
 
-		log.Println("Active Workers:", workerCount)
-		fmt.Println("Active Workers:", workerCount)
-
 		for workerCount >= NumWorkers {
 			time.Sleep(time.Millisecond)
 			//log.Println("Active Workers:", workerCount)

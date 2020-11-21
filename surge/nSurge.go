@@ -427,6 +427,9 @@ func updateGUI() {
 		}
 
 		zeroBandwidthMap["total"] = totalDown+totalUp == 0
+
+		log.Println("Active Workers:", workerCount)
+		fmt.Println("Active Workers:", workerCount)
 	}
 }
 
@@ -623,6 +626,8 @@ func DownloadFile(Hash string) bool {
 	rand.Shuffle(len(randomChunks), func(i, j int) { randomChunks[i], randomChunks[j] = randomChunks[j], randomChunks[i] })
 
 	seederAlternator := 0
+	mutateSeederLock := sync.Mutex{}
+	appendChunkLock := sync.Mutex{}
 
 	downloadJob := func() {
 		for i := 0; i < numChunks; i++ {
@@ -638,15 +643,50 @@ func DownloadFile(Hash string) bool {
 
 			workerCount++
 
-			go RequestChunk(downloadSessions[seederAlternator], file.FileHash, int32(randomChunks[i]))
+			//Create a async job to download a chunk
+			requestChunkJob := func() {
+				requestChunk := randomChunks[i]
 
+				//Get seeder
+				mutateSeederLock.Lock()
+				downloadSeeder := downloadSessions[seederAlternator]
+				mutateSeederLock.Unlock()
+
+				success := RequestChunk(downloadSeeder, file.FileHash, int32(requestChunk))
+
+				//if download fails append the chunk to remaining to retry later
+				if !success {
+					appendChunkLock.Lock()
+					randomChunks = append(randomChunks, requestChunk)
+					numChunks++
+					appendChunkLock.Unlock()
+
+					//Drop the seeder
+					mutateSeederLock.Lock()
+					downloadSessions = removeAndCloseSessionOrdered(downloadSessions, downloadSeeder)
+					pushError("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+					log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+					log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+					log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+					log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+					log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+					log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+					mutateSeederLock.Unlock()
+				}
+			}
+			go requestChunkJob()
+
+			mutateSeederLock.Lock()
 			seederAlternator++
 			if seederAlternator > len(downloadSessions)-1 {
 				seederAlternator = 0
 			}
+			mutateSeederLock.Unlock()
 
 			for workerCount >= NumWorkers {
 				time.Sleep(time.Millisecond)
+				//log.Println("Active Workers:", workerCount)
+				//fmt.Println("Active Workers:", workerCount)
 			}
 		}
 	}
