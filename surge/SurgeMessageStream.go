@@ -3,6 +3,7 @@ package surge
 import (
 	"encoding/binary"
 	"io"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -22,6 +23,7 @@ func SessionWrite(Session *Session, Data []byte, ID byte) (err error) {
 
 	//Write data
 	buff = append(buff, Data...)
+	Session.session.SetWriteDeadline(time.Now().Add(10 * time.Second))
 	_, err = Session.session.Write(buff)
 	if err != nil {
 		return err

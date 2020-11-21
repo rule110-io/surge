@@ -854,6 +854,8 @@ func restartDownload(Hash string) {
 
 		for workerCount >= NumWorkers {
 			time.Sleep(time.Millisecond)
+			//log.Println("Active Workers:", workerCount)
+			//fmt.Println("Active Workers:", workerCount)
 		}
 	}
 }
