@@ -1,7 +1,7 @@
 <template>
   <div class="page">
     <div class="page__results" id="search_results">
-      <h1 class="page__title">Search: {{ remoteFilesConfig.search }}</h1>
+      <h1 class="page__title">Remote Files</h1>
       <div class="table">
         <div class="table__row">
           <div class="table__head">Name & size</div>
@@ -10,7 +10,15 @@
           <div class="table__head">Seeds</div>
           <div class="table__head">Source</div>
         </div>
-        <TablePlaceholder v-if="!remoteFiles" type="search" />
+        <TablePlaceholder
+          v-if="!remoteFiles && remoteFilesConfig.search.length > 0"
+          type="search"
+        />
+        <TablePlaceholder
+          v-if="!remoteFiles && remoteFilesConfig.search.length === 0"
+          type="remote"
+        />
+
         <template v-else>
           <div
             class="table__row"
@@ -89,6 +97,7 @@ export default {
       window.backend.downloadFile(hash).then(() => {
         this.$store.dispatch("files/fetchLocalFiles");
         this.$store.dispatch("files/fetchRemoteFiles");
+        this.$router.replace("/download");
       });
     },
   },

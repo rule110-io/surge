@@ -3,9 +3,6 @@
     <Logo v-if="!darkTheme" class="sidebar__logo" />
     <LogoGradient v-else class="sidebar__logo" />
     <div class="sidebar__nav">
-      <router-link to="/explore" id="explore" class="sidebar__item">
-        <feather class="sidebar__item-icon" type="globe"></feather>
-      </router-link>
       <router-link to="/search" id="search" class="sidebar__item">
         <feather class="sidebar__item-icon" type="search"></feather>
       </router-link>
