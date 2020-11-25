@@ -811,6 +811,7 @@ func restartDownload(Hash string) {
 
 		//Create a async job to download a chunk
 		requestChunkJob := func() {
+			defer RecoverAndLog()
 			requestChunk := missingChunks[i]
 
 			//Get seeder
@@ -832,12 +833,12 @@ func restartDownload(Hash string) {
 				downloadSessions = removeAndCloseSessionOrdered(downloadSessions, downloadSeeder)
 				pushError("Lost connection", "Dropping 1 Session for Download "+file.FileName)
 				log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
-				log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
-				log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
-				log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
-				log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
-				log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
 				mutateSeederLock.Unlock()
+
+				if len(downloadSessions) == 0 {
+					pushNotification("Download stopped, no more remote connections.", file.FileName)
+					return
+				}
 			}
 		}
 		go requestChunkJob()
