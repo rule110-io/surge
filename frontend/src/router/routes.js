@@ -1,5 +1,4 @@
 import Dashboard from "@/layout/Dashboard/Dashboard.vue";
-import Explore from "@/pages/Explore.vue";
 import Search from "@/pages/Search.vue";
 import Download from "@/pages/Download.vue";
 import Settings from "@/pages/Settings.vue";
@@ -8,13 +7,8 @@ const routes = [
   {
     path: "/",
     component: Dashboard,
-    redirect: "/explore",
+    redirect: "/search",
     children: [
-      {
-        path: "explore",
-        name: "explore",
-        component: Explore,
-      },
       {
         path: "search",
         name: "search",
