@@ -810,7 +810,7 @@ func restartDownload(Hash string) {
 		workerCount++
 
 		//Create a async job to download a chunk
-		requestChunkJob := func() {
+		requestChunkJob := func(chunkID int32) {
 			defer RecoverAndLog()
 
 			//Get seeder
@@ -818,17 +818,12 @@ func restartDownload(Hash string) {
 			downloadSeeder := downloadSessions[seederAlternator]
 			mutateSeederLock.Unlock()
 
-			//get chunk id
-			appendChunkLock.Lock()
-			requestChunk := missingChunks[i]
-			appendChunkLock.Unlock()
-
-			success := RequestChunk(downloadSeeder, file.FileHash, requestChunk)
+			success := RequestChunk(downloadSeeder, file.FileHash, chunkID)
 
 			//if download fails append the chunk to remaining to retry later
 			if !success {
 				appendChunkLock.Lock()
-				missingChunks = append(missingChunks, requestChunk)
+				missingChunks = append(missingChunks, chunkID)
 				chunksRemaining++
 				appendChunkLock.Unlock()
 
@@ -845,7 +840,13 @@ func restartDownload(Hash string) {
 				}
 			}
 		}
-		go requestChunkJob()
+
+		//get chunk id
+		appendChunkLock.Lock()
+		chunkid := missingChunks[i]
+		appendChunkLock.Unlock()
+
+		go requestChunkJob(chunkid)
 
 		mutateSeederLock.Lock()
 		seederAlternator++

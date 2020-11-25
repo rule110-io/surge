@@ -371,8 +371,14 @@ func updateGUI() {
 			fileProgressMap[session.FileHash] = float32(float64(session.Downloaded) / float64(session.FileSize))
 
 			if session.Downloaded == session.FileSize {
-				showNotification("Download Finished", "Download for "+getListedFileByHash(session.FileHash).FileName+" finished!")
-				pushNotification("Download Finished", getListedFileByHash(session.FileHash).FileName)
+
+				filename := "unknown"
+				listedFileByHash := getListedFileByHash(session.FileHash)
+				if listedFileByHash != nil {
+					filename = listedFileByHash.FileName
+				}
+				showNotification("Download Finished", "Download for "+filename+" finished!")
+				pushNotification("Download Finished", filename)
 				session.session.Close()
 
 				fileEntry, err := dbGetFile(session.FileHash)
@@ -644,7 +650,7 @@ func DownloadFile(Hash string) bool {
 			workerCount++
 
 			//Create a async job to download a chunk
-			requestChunkJob := func() {
+			requestChunkJob := func(chunkID int) {
 				defer RecoverAndLog()
 
 				//Get seeder
@@ -652,17 +658,12 @@ func DownloadFile(Hash string) bool {
 				downloadSeeder := downloadSessions[seederAlternator]
 				mutateSeederLock.Unlock()
 
-				//get chunk id
-				appendChunkLock.Lock()
-				requestChunk := randomChunks[i]
-				appendChunkLock.Unlock()
-
-				success := RequestChunk(downloadSeeder, file.FileHash, int32(requestChunk))
+				success := RequestChunk(downloadSeeder, file.FileHash, int32(chunkID))
 
 				//if download fails append the chunk to remaining to retry later
 				if !success {
 					appendChunkLock.Lock()
-					randomChunks = append(randomChunks, requestChunk)
+					randomChunks = append(randomChunks, chunkID)
 					numChunks++
 					appendChunkLock.Unlock()
 
@@ -679,7 +680,13 @@ func DownloadFile(Hash string) bool {
 					}
 				}
 			}
-			go requestChunkJob()
+
+			//get chunk id
+			appendChunkLock.Lock()
+			chunkid := randomChunks[i]
+			appendChunkLock.Unlock()
+
+			go requestChunkJob(chunkid)
 
 			mutateSeederLock.Lock()
 			seederAlternator++
