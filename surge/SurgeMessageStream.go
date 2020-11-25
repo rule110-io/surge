@@ -39,6 +39,19 @@ func SessionWrite(Session *Session, Data []byte, ID byte) (err error) {
 
 //SessionRead reads from session
 func SessionRead(Session *Session) (data []byte, ID byte, err error) {
+
+	/*one := make([]byte, 1)
+	Session.session.SetReadDeadline(time.Now())
+	if _, err := Session.session.Read(one); err == io.EOF {
+		log.Printf("%s detected closed LAN connection", Session.session.RemoteAddr().String())
+		Session.session.Close()
+		Session.session = nil
+	} else {
+		Session.session.SetReadDeadline(time.Now().Add(10 * time.Second))
+	}*/
+
+	Session.session.SetReadDeadline(time.Now().Add(10 * time.Second))
+
 	headerBuffer := make([]byte, 5) //int32 size of header + 1 for packid
 
 	// the header of 4 bytes + 1 for packid
