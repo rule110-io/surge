@@ -663,14 +663,17 @@ func DownloadFile(Hash string) bool {
 			requestChunkJob := func(chunkID int) {
 				defer RecoverAndLog()
 
-				//Get seeder
-				downloadSeeder := downloadSessions[seederAlternator]
-
 				success := false
+				downloadSeeder := &Session{}
 				downloadSeederAddr := ""
-				if downloadSeeder != nil && downloadSeeder.session != nil {
-					downloadSeederAddr = downloadSeeder.session.RemoteAddr().String()
-					success = RequestChunk(downloadSeeder, file.FileHash, int32(chunkID))
+
+				if len(downloadSessions) > seederAlternator {
+					//Get seeder
+					downloadSeeder = downloadSessions[seederAlternator]
+					if downloadSeeder != nil && downloadSeeder.session != nil {
+						downloadSeederAddr = downloadSeeder.session.RemoteAddr().String()
+						success = RequestChunk(downloadSeeder, file.FileHash, int32(chunkID))
+					}
 				}
 
 				//if download fails append the chunk to remaining to retry later
