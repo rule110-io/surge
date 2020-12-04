@@ -2,6 +2,7 @@ package surge
 
 import (
 	"encoding/binary"
+	"errors"
 	"io"
 	"time"
 
@@ -10,6 +11,9 @@ import (
 
 // SessionWrite writes to session
 func SessionWrite(Session *Session, Data []byte, ID byte) (err error) {
+	if Session == nil || Session.session == nil {
+		return errors.New("write to session error, session nil")
+	}
 	//Package identifier to know what we are sending
 	packID := make([]byte, 1)
 	packID[0] = ID
@@ -23,6 +27,7 @@ func SessionWrite(Session *Session, Data []byte, ID byte) (err error) {
 
 	//Write data
 	buff = append(buff, Data...)
+
 	Session.session.SetWriteDeadline(time.Now().Add(10 * time.Second))
 	_, err = Session.session.Write(buff)
 	if err != nil {

@@ -65,6 +65,10 @@ func OpenFolderByHash(Hash string) {
 
 // RequestChunk sends a request to an address for a specific chunk of a specific file
 func RequestChunk(Session *Session, FileID string, ChunkID int32) bool {
+	if Session == nil || Session.session == nil {
+		return false
+	}
+
 	defer RecoverAndLog()
 	msg := &pb.SurgeMessage{
 		FileID:  FileID,
@@ -76,7 +80,7 @@ func RequestChunk(Session *Session, FileID string, ChunkID int32) bool {
 	} else {
 		err := SessionWrite(Session, msgSerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 		if err != nil {
-			log.Error("Failed to request chunk from:", Session.session.RemoteAddr().String(), err)
+			log.Error("Failed to request chunk", err)
 			return false
 		}
 	}
@@ -359,6 +363,14 @@ func processChunk(Session *Session, Data []byte) {
 	if surgeMessage.Data == nil {
 		go TransmitChunk(Session, surgeMessage.FileID, surgeMessage.ChunkID)
 	} else { //If data is not nill we are receiving data
+
+		//When we receive a chunk mark it as no longer in transit
+		chunkKey := surgeMessage.FileID + "_" + strconv.Itoa(int(surgeMessage.ChunkID))
+
+		chunkInTransitLock.Lock()
+		chunksInTransit[chunkKey] = false
+		chunkInTransitLock.Unlock()
+
 		go WriteChunk(Session, surgeMessage.FileID, surgeMessage.ChunkID, surgeMessage.Data)
 	}
 }
@@ -797,6 +809,11 @@ func restartDownload(Hash string) {
 
 	//Download missing chunks
 	for i := 0; i < chunksRemaining; i++ {
+
+		if len(downloadSessions) == 0 {
+			break
+		}
+
 		//Pause if file is paused
 		dbFile, err := dbGetFile(file.FileHash)
 		for err == nil && dbFile.IsPaused {
@@ -814,11 +831,14 @@ func restartDownload(Hash string) {
 			defer RecoverAndLog()
 
 			//Get seeder
-			mutateSeederLock.Lock()
 			downloadSeeder := downloadSessions[seederAlternator]
-			mutateSeederLock.Unlock()
 
-			success := RequestChunk(downloadSeeder, file.FileHash, chunkID)
+			success := false
+			downloadSeederAddr := ""
+			if downloadSeeder != nil && downloadSeeder.session != nil {
+				downloadSeederAddr = downloadSeeder.session.RemoteAddr().String()
+				success = RequestChunk(downloadSeeder, file.FileHash, int32(chunkID))
+			}
 
 			//if download fails append the chunk to remaining to retry later
 			if !success {
@@ -827,9 +847,43 @@ func restartDownload(Hash string) {
 				chunksRemaining++
 				appendChunkLock.Unlock()
 
+				workerCount--
+
 				//Drop the seeder
 				mutateSeederLock.Lock()
-				downloadSessions = removeAndCloseSessionOrdered(downloadSessions, downloadSeeder)
+				downloadSessions = removeAndCloseSessionOrdered(downloadSessions, downloadSeederAddr)
+				pushError("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+				log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+				mutateSeederLock.Unlock()
+
+				if len(downloadSessions) == 0 {
+					pushNotification("Download stopped, no more remote connections.", file.FileName)
+					return
+				}
+			}
+
+			//If chunk is requested add to transit map
+			chunkKey := file.FileHash + "_" + strconv.Itoa(int(chunkID))
+			chunkInTransitLock.Lock()
+			chunksInTransit[chunkKey] = true
+			chunkInTransitLock.Unlock()
+
+			//Sleep for 30 seconds, check if entry still exists in transit map.
+			time.Sleep(time.Second * 30)
+			inTransit := chunksInTransit[chunkKey]
+
+			//If its still in transit abort
+			if inTransit {
+				appendChunkLock.Lock()
+				missingChunks = append(missingChunks, chunkID)
+				chunksRemaining++
+				appendChunkLock.Unlock()
+
+				workerCount--
+
+				//Drop the seeder
+				mutateSeederLock.Lock()
+				downloadSessions = removeAndCloseSessionOrdered(downloadSessions, downloadSeederAddr)
 				pushError("Lost connection", "Dropping 1 Session for Download "+file.FileName)
 				log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
 				mutateSeederLock.Unlock()
@@ -863,12 +917,29 @@ func restartDownload(Hash string) {
 	}
 }
 
-func removeAndCloseSessionOrdered(slice []*Session, s *Session) []*Session {
+func removeAndCloseSessionOrdered(slice []*Session, s string) []*Session {
+
+	//Find empty session
+	emptyIndex := -1
+	for i := 0; i < len(slice); i++ {
+		if slice[i] == nil || slice[i].session == nil {
+			emptyIndex = i
+			break
+		}
+	}
+	if emptyIndex != -1 {
+		slice = append(slice[:emptyIndex], slice[emptyIndex+1:]...)
+	}
+
+	//Find target session
 	index := -1
 	for i := 0; i < len(slice); i++ {
-		if slice[i].session.RemoteAddr().String() == s.session.RemoteAddr().String() {
-			index = i
-			break
+		//Find the target s
+		if slice[i] != nil && slice[i].session != nil {
+			if slice[i].session.RemoteAddr().String() == s {
+				index = i
+				break
+			}
 		}
 	}
 	if index != -1 {

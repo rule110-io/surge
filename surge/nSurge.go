@@ -8,6 +8,7 @@ import (
 	"os"
 	"os/user"
 	"runtime"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -97,8 +98,11 @@ var fileBandwidthMap map[string]BandwidthMA
 
 var zeroBandwidthMap map[string]bool
 
+var chunksInTransit map[string]bool
+
 var clientOnlineMapLock = &sync.Mutex{}
 var bandwidthAccumulatorMapLock = &sync.Mutex{}
+var chunkInTransitLock = &sync.Mutex{}
 
 //Sessions .
 var Sessions []*Session
@@ -259,6 +263,7 @@ func Start(runtime *wails.Runtime, args []string) {
 		uploadBandwidthAccumulator = make(map[string]int)
 		zeroBandwidthMap = make(map[string]bool)
 		fileBandwidthMap = make(map[string]BandwidthMA)
+		chunksInTransit = make(map[string]bool)
 
 		dbFiles := dbGetAllFiles()
 		var filesOnDisk []File
@@ -637,6 +642,11 @@ func DownloadFile(Hash string) bool {
 
 	downloadJob := func() {
 		for i := 0; i < numChunks; i++ {
+
+			if len(downloadSessions) == 0 {
+				break
+			}
+
 			//Pause if file is paused
 			dbFile, err := dbGetFile(file.FileHash)
 			for err == nil && dbFile.IsPaused {
@@ -654,11 +664,14 @@ func DownloadFile(Hash string) bool {
 				defer RecoverAndLog()
 
 				//Get seeder
-				mutateSeederLock.Lock()
 				downloadSeeder := downloadSessions[seederAlternator]
-				mutateSeederLock.Unlock()
 
-				success := RequestChunk(downloadSeeder, file.FileHash, int32(chunkID))
+				success := false
+				downloadSeederAddr := ""
+				if downloadSeeder != nil && downloadSeeder.session != nil {
+					downloadSeederAddr = downloadSeeder.session.RemoteAddr().String()
+					success = RequestChunk(downloadSeeder, file.FileHash, int32(chunkID))
+				}
 
 				//if download fails append the chunk to remaining to retry later
 				if !success {
@@ -667,9 +680,44 @@ func DownloadFile(Hash string) bool {
 					numChunks++
 					appendChunkLock.Unlock()
 
+					workerCount--
+
 					//Drop the seeder
 					mutateSeederLock.Lock()
-					downloadSessions = removeAndCloseSessionOrdered(downloadSessions, downloadSeeder)
+					downloadSessions = removeAndCloseSessionOrdered(downloadSessions, downloadSeederAddr)
+					pushError("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+					log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
+					mutateSeederLock.Unlock()
+
+					if len(downloadSessions) == 0 {
+						pushNotification("Download stopped, no more remote connections.", file.FileName)
+						return
+					}
+				}
+
+				//If chunk is requested add to transit map
+				chunkKey := file.FileHash + "_" + strconv.Itoa(chunkID)
+
+				chunkInTransitLock.Lock()
+				chunksInTransit[chunkKey] = true
+				chunkInTransitLock.Unlock()
+
+				//Sleep for 30 seconds, check if entry still exists in transit map.
+				time.Sleep(time.Second * 30)
+				inTransit := chunksInTransit[chunkKey]
+
+				//If its still in transit abort
+				if inTransit {
+					appendChunkLock.Lock()
+					randomChunks = append(randomChunks, chunkID)
+					numChunks++
+					appendChunkLock.Unlock()
+
+					workerCount--
+
+					//Drop the seeder
+					mutateSeederLock.Lock()
+					downloadSessions = removeAndCloseSessionOrdered(downloadSessions, downloadSeederAddr)
 					pushError("Lost connection", "Dropping 1 Session for Download "+file.FileName)
 					log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
 					mutateSeederLock.Unlock()
