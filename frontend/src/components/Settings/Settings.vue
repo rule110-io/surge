@@ -48,7 +48,7 @@
         @click="openLink('https://github.com/rule110-io/surge-ui/releases')"
         class="settings__item-link"
       >
-        Get latest
+        Get latest {{ remoteVersion }}
       </div>
     </div>
 
