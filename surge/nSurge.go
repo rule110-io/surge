@@ -643,8 +643,23 @@ func DownloadFile(Hash string) bool {
 	downloadJob := func() {
 		for i := 0; i < numChunks; i++ {
 
-			if len(downloadSessions) == 0 {
-				break
+			for len(downloadSessions) == 0 {
+				time.Sleep(time.Second * 5)
+				file = getListedFileByHash(Hash)
+				//Check for new sessions
+				// Create  sessions
+				for i := 0; i < len(file.Seeders); i++ {
+					surgeSession, err := createSession(file, file.Seeders[i])
+					if err != nil {
+						log.Println("Could not create session for download", Hash, file.Seeders[i])
+						continue
+					}
+					go initiateSession(surgeSession)
+
+					mutateSeederLock.Lock()
+					downloadSessions = append(downloadSessions, surgeSession)
+					mutateSeederLock.Unlock()
+				}
 			}
 
 			//Pause if file is paused
