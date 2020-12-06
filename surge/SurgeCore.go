@@ -882,7 +882,7 @@ func restartDownload(Hash string) {
 				chunkInTransitLock.Unlock()
 
 				//Sleep for 30 seconds, check if entry still exists in transit map.
-				time.Sleep(time.Second * 180)
+				time.Sleep(time.Second * 60)
 				inTransit := chunksInTransit[chunkKey]
 
 				//If its still in transit abort
