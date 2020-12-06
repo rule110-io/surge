@@ -182,7 +182,7 @@ func (s *WailsRuntime) WailsShutdown() {
 func main() {
 	stats := &Stats{}
 	surge.InitializeDb()
-	//surge.InitializeLog()
+	surge.InitializeLog()
 	defer surge.CloseDb()
 
 	argsWithProg := os.Args
