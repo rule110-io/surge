@@ -32,7 +32,7 @@ const getters = {
 const actions = {
   async updateRemoteVersion({ commit }) {
     const data = await axios(
-      "https://api.github.com/repos/nknx-org/nknx-vault/releases"
+      "https://api.github.com/repos/rule110-io/surge/releases"
     );
 
     const currentVersion = this.state.version.currentVersion;
