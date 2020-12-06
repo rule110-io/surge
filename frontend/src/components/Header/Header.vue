@@ -1,7 +1,10 @@
 <template>
   <div class="header">
     <div class="header__left">
-      <div :class="['header__search', focus ? 'header__search_active' : '']">
+      <div
+        :class="['header__search', focus ? 'header__search_active' : '']"
+        id="search_input"
+      >
         <input
           type="text"
           class="header__search-input"

@@ -882,7 +882,7 @@ func restartDownload(Hash string) {
 				chunkInTransitLock.Unlock()
 
 				//Sleep for 30 seconds, check if entry still exists in transit map.
-				time.Sleep(time.Second * 30)
+				time.Sleep(time.Second * 60)
 				inTransit := chunksInTransit[chunkKey]
 
 				//If its still in transit abort
@@ -962,7 +962,7 @@ func restartDownload(Hash string) {
 					}
 
 					dbFile, err := dbGetFile(Hash)
-					if err != nil {
+					if err != nil && dbFile != nil {
 						//Prime the session with known bytes downloaded
 						surgeSession.Downloaded = int64(dbFile.NumChunks-len(missingChunks)) * ChunkSize
 						//If the last chunk is set, we want to deduct the missing bytes because its not a complete chunk

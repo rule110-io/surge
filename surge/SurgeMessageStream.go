@@ -28,7 +28,7 @@ func SessionWrite(Session *Session, Data []byte, ID byte) (err error) {
 	//Write data
 	buff = append(buff, Data...)
 
-	Session.session.SetWriteDeadline(time.Now().Add(10 * time.Second))
+	Session.session.SetWriteDeadline(time.Now().Add(60 * time.Second))
 	_, err = Session.session.Write(buff)
 	if err != nil {
 		return err
@@ -55,7 +55,7 @@ func SessionRead(Session *Session) (data []byte, ID byte, err error) {
 		Session.session.SetReadDeadline(time.Now().Add(10 * time.Second))
 	}*/
 
-	Session.session.SetReadDeadline(time.Now().Add(10 * time.Second))
+	Session.session.SetReadDeadline(time.Now().Add(60 * time.Second))
 
 	headerBuffer := make([]byte, 5) //int32 size of header + 1 for packid
 

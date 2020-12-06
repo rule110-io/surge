@@ -82,9 +82,9 @@ export default {
         },
       },
       {
-        target: "#explore",
+        target: "#search",
         header: {
-          title: 'Let\'s check out the "Explore" view',
+          title: 'Let\'s check out the "Search" view',
         },
         content: `It makes it easy for you to search the NKN network for files shared by others through surge.`,
         params: {
@@ -97,7 +97,18 @@ export default {
         header: {
           title: "On top you see the search results",
         },
-        content: `You can always search in the top bar for files. This table will update accordingly.`,
+        content: `Here you can see all the files that are currently shared by any user in the NKN network. This table will auto update when new files are found.`,
+        params: {
+          highlight: true,
+          enableScrolling: false,
+        },
+      },
+      {
+        target: "#search_input",
+        header: {
+          title: "Dont forget!",
+        },
+        content: `You can always use the search bar to filter the results if you're searching for something specific.`,
         params: {
           highlight: true,
           enableScrolling: false,
@@ -119,7 +130,7 @@ export default {
         header: {
           title: "This is the files table",
         },
-        content: `Here you could see the status of all files in surge. The status could vary by "Downloading", "Seeding" or "Finished"`,
+        content: `Here you can see the status of all your local files. The status could vary by "Downloading", "Seeding" or "Finished".`,
         params: {
           highlight: true,
           enableScrolling: false,
@@ -136,6 +147,17 @@ export default {
           enableScrolling: false,
         },
       },
+      {
+        target: "#app",
+        header: {
+          title: "That's all for now!",
+        },
+        content: `We hope you now have a better understanding on how things work. Feek free to join our discord when you got problems or want to participate in the project!`,
+        params: {
+          highlight: false,
+          enableScrolling: false,
+        },
+      },
     ],
   }),
   mounted() {
@@ -148,12 +170,12 @@ export default {
       };
       this.callbacks.onNextStep = (currentStep) => {
         if (currentStep === 4) {
-          this.$router.push("explore");
-        }
-        if (currentStep === 6) {
-          this.$router.push("download");
+          this.$router.push("search");
         }
         if (currentStep === 8) {
+          this.$router.push("download");
+        }
+        if (currentStep === 10) {
           this.$router.push("settings");
         }
       };
