@@ -1,7 +1,7 @@
 const getDefaultState = () => {
   return {
-    localFiles: false,
-    remoteFiles: false,
+    localFiles: [],
+    remoteFiles: [],
     localCount: 0,
     remoteCount: 0,
     localPages: 0,
