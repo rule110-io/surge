@@ -12,7 +12,7 @@
           <div class="table__head">Seeds</div>
           <div class="table__head"></div>
         </div>
-        <TablePlaceholder v-if="!localFiles" type="transfer" />
+        <TablePlaceholder v-if="!localFiles.length" type="transfer" />
         <template v-else>
           <div
             class="table__row"
