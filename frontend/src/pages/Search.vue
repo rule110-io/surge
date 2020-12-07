@@ -11,14 +11,10 @@
           <div class="table__head">Source</div>
         </div>
         <TablePlaceholder
-          v-if="!remoteFiles.length && remoteFilesConfig.search.length > 0"
+          v-if="remoteFilesConfig.search.length > 0"
           type="search"
         />
-        <TablePlaceholder
-          v-if="!remoteFiles.length && remoteFilesConfig.search.length === 0"
-          type="remote"
-        />
-
+        <TablePlaceholder v-else-if="!remoteFiles" type="remote" />
         <template v-else>
           <div
             class="table__row"
