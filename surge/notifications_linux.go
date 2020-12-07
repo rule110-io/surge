@@ -18,5 +18,4 @@ func showNotification(title string, text string) {
 	Icon := filepath.Join(dir, "appicon.png")
 
 	exec.Command("notify-send", "-i", Icon, title, text).Run()
-	return nil
 }

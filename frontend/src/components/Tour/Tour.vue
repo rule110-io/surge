@@ -31,7 +31,7 @@ export default {
         header: {
           title: "Hello there, welcome to surge!",
         },
-        content: `It seems like you have opened the app for the first time – Would you like to show you around a little?`,
+        content: `Would you like to show you around a little?`,
         params: {
           highlight: false,
           enableScrolling: false,

@@ -34,10 +34,8 @@ const NumClients = 8
 //NumWorkers is the total number of concurrent chunk fetches allowed
 const NumWorkers = 32
 
-const localPath = "local"
-const remotePath = "remote"
+const remotePath = "downloads"
 
-var localFolder = ""
 var remoteFolder = ""
 var magnetstring = ""
 var filestring = ""
@@ -218,7 +216,7 @@ func Start(runtime *wails.Runtime, args []string) {
 		pushError("Error on startup", err.Error())
 	}
 	homedir := myself.HomeDir
-	localFolder = homedir + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "surge_" + localPath
+
 	remoteFolder = homedir + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "surge_" + remotePath
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
@@ -231,10 +229,7 @@ func Start(runtime *wails.Runtime, args []string) {
 		os.Mkdir(dir, dirFileMode)
 	}
 
-	//Ensure local and remote folders exist
-	if _, err := os.Stat(localFolder); os.IsNotExist(err) {
-		os.Mkdir(localFolder, dirFileMode)
-	}
+	//Ensure remote folders exist
 	if _, err := os.Stat(remoteFolder); os.IsNotExist(err) {
 		os.Mkdir(remoteFolder, dirFileMode)
 	}
