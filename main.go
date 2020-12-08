@@ -164,7 +164,7 @@ type Stats struct {
 // WailsInit .
 func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 	s.log = runtime.Log.New("Stats")
-	go surge.Start(runtime, arguments)
+	go surge.WailsBind(runtime)
 
 	return nil
 }
@@ -196,6 +196,8 @@ func main() {
 	if len(argsWithoutProg) > 0 {
 		arguments = os.Args[1:]
 	}
+
+	surge.Start(arguments)
 
 	js := mewn.String("./frontend/dist/app.js")
 	css := mewn.String("./frontend/dist/app.css")

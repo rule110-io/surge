@@ -99,6 +99,7 @@ var zeroBandwidthMap map[string]bool
 var chunksInTransit map[string]bool
 
 var clientOnlineMapLock = &sync.Mutex{}
+var clientOnlineRefreshingLock = &sync.Mutex{}
 var bandwidthAccumulatorMapLock = &sync.Mutex{}
 var chunkInTransitLock = &sync.Mutex{}
 
@@ -190,14 +191,8 @@ var numClientsOnline int = 0
 
 var numClientsStore *wails.Store
 
-// Start initializes surge
-func Start(runtime *wails.Runtime, args []string) {
-	var err error
-
-	//Mac specific functions
-	go initOSHandler()
-	go setVisualModeLikeOS()
-
+// WailsBind is a binding function at startup
+func WailsBind(runtime *wails.Runtime) {
 	wailsRuntime = runtime
 
 	numClients := NumClientsStruct{
@@ -206,6 +201,18 @@ func Start(runtime *wails.Runtime, args []string) {
 	}
 
 	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
+
+	//Update scan results starts after binding numClientStore is shared storage
+	go updateClientOnlineMap()
+}
+
+// Start initializes surge
+func Start(args []string) {
+	var err error
+
+	//Mac specific functions
+	go initOSHandler()
+	go setVisualModeLikeOS()
 
 	var dirFileMode os.FileMode
 	var dir = GetSurgeDir()
@@ -284,10 +291,11 @@ func Start(runtime *wails.Runtime, args []string) {
 
 		go updateGUI()
 
-		go rescanPeers()
 		go queryRemoteForFiles()
 
 		go watchOSXHandler()
+
+		go rescanPeers()
 
 		//Insert new file from arguments and start download
 		if args != nil && len(args) > 0 && len(args[0]) > 0 {
@@ -308,9 +316,18 @@ func Stop() {
 func rescanPeers() {
 	defer RecoverAndLog()
 	for true {
+		time.Sleep(time.Minute)
+		topicEncoded := TopicEncode(TestTopic)
+		go GetSubscriptions(topicEncoded)
+	}
+}
+
+func updateClientOnlineMap() {
+	defer RecoverAndLog()
+	for true {
 		var numOnline = 0
 		//Count num online clients
-		clientOnlineMapLock.Lock()
+		clientOnlineRefreshingLock.Lock()
 		for _, value := range clientOnlineMap {
 			if value == true {
 				numOnline++
@@ -318,33 +335,49 @@ func rescanPeers() {
 		}
 
 		numClientsSubscribed = len(clientOnlineMap)
-		numClientsOnline = numOnline
 
 		numClientsStore.Update(func(data NumClientsStruct) NumClientsStruct {
 			return NumClientsStruct{
-				Subscribed: len(clientOnlineMap),
+				Subscribed: numClientsSubscribed,
 				Online:     numOnline,
 			}
 		})
-
-		clientOnlineMapLock.Unlock()
-
-		time.Sleep(time.Minute)
-		topicEncoded := TopicEncode(TestTopic)
-		go GetSubscriptions(topicEncoded)
+		clientOnlineRefreshingLock.Unlock()
+		time.Sleep(time.Second)
 	}
 }
 
 func queryRemoteForFiles() {
 	defer RecoverAndLog()
 	for true {
+
+		var wg sync.WaitGroup
+
+		//lock for write to map
+		clientOnlineRefreshingLock.Lock()
 		for _, address := range subscribers {
-			clientOnlineMapLock.Lock()
-			clientOnlineMap[address] = false
-			clientOnlineMapLock.Unlock()
-			go SendQueryRequest(address, "Testing query functionality.")
-			time.Sleep(time.Second * 5)
+
+			wg.Add(1)
+
+			queryWorker := func(workerWaitGroup *sync.WaitGroup) {
+				defer workerWaitGroup.Done()
+
+				//Request
+				clientOnline := SendQueryRequest(address, "Testing query functionality.")
+
+				clientOnlineMapLock.Lock()
+				clientOnlineMap[address] = clientOnline
+				clientOnlineMapLock.Unlock()
+			}
+
+			go queryWorker(&wg)
 		}
+
+		//Wait till all requests resolve then sleep for a bit before rescanning
+		wg.Wait()
+		clientOnlineRefreshingLock.Unlock()
+
+		time.Sleep(time.Second * 5)
 	}
 }
 
@@ -819,8 +852,19 @@ func DownloadFile(Hash string) bool {
 }
 
 func pushNotification(title string, text string) {
-	//log.Println("Emitting Event: ", "notificationEvent", title, text)
-	wailsRuntime.Events.Emit("notificationEvent", title, text)
+	//If wails frontend is not yet binded, we wait in a task to not block main thread
+	if wailsRuntime == nil {
+
+		waitAndPush := func() {
+			for wailsRuntime == nil {
+				time.Sleep(50)
+			}
+			wailsRuntime.Events.Emit("notificationEvent", title, text)
+		}
+		go waitAndPush()
+	} else {
+		wailsRuntime.Events.Emit("notificationEvent", title, text)
+	}
 }
 
 func askUser(context string, payload string) {
