@@ -10,12 +10,7 @@
           <div class="table__head">Seeds</div>
           <div class="table__head">Source</div>
         </div>
-        <TablePlaceholder
-          v-if="remoteFilesConfig.search.length > 0"
-          type="search"
-        />
-        <TablePlaceholder v-else-if="!remoteFiles" type="remote" />
-        <template v-else>
+        <template v-if="remoteFiles">
           <div
             class="table__row"
             v-for="file in remoteFiles"
@@ -57,6 +52,11 @@
             commit="files/setRemoteFilesConfig"
           />
         </template>
+        <TablePlaceholder
+          v-else-if="remoteFilesConfig.search.length > 0"
+          type="search"
+        />
+        <TablePlaceholder v-else type="remote" />
       </div>
     </div>
   </div>
