@@ -141,7 +141,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 }
 
 // SendQueryRequest sends a query to a client on session
-func SendQueryRequest(Addr string, Query string) {
+func SendQueryRequest(Addr string, Query string) bool {
 	defer RecoverAndLog()
 
 	var surgeSession *Session = nil
@@ -172,7 +172,7 @@ func SendQueryRequest(Addr string, Query string) {
 		downloadSession, err := client.DialWithConfig(Addr, dialConfig)
 		if err != nil {
 			log.Printf("Peer with address %s is not online, stopped trying after 5000ms\n", Addr)
-			return
+			return false
 		}
 		log.Printf("Connected to peer %s requesting file listings\n", Addr)
 
@@ -191,12 +191,16 @@ func SendQueryRequest(Addr string, Query string) {
 	msgSerialized, err := proto.Marshal(msg)
 	if err != nil {
 		log.Fatalln("Failed to encode surge message:", err)
-	} else {
-		err := SessionWrite(surgeSession, msgSerialized, surgeQueryRequestID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
-		if err != nil {
-			log.Println("Failed to send Surge Request:", err)
-		}
+		return false
 	}
+
+	err = SessionWrite(surgeSession, msgSerialized, surgeQueryRequestID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
+	if err != nil {
+		log.Println("Failed to send Surge Request:", err)
+		return false
+	}
+
+	return true
 }
 
 // SendQueryResponse sends a query to a client on session

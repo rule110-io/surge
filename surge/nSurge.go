@@ -350,13 +350,32 @@ func updateClientOnlineMap() {
 func queryRemoteForFiles() {
 	defer RecoverAndLog()
 	for true {
+
+		var wg sync.WaitGroup
+
+		//lock for write to map
+		clientOnlineMapLock.Lock()
 		for _, address := range subscribers {
-			clientOnlineMapLock.Lock()
-			clientOnlineMap[address] = false
-			clientOnlineMapLock.Unlock()
-			go SendQueryRequest(address, "Testing query functionality.")
-			time.Sleep(time.Second * 5)
+
+			wg.Add(1)
+
+			queryWorker := func(workerWaitGroup *sync.WaitGroup) {
+				defer workerWaitGroup.Done()
+
+				//Request
+				clientOnline := SendQueryRequest(address, "Testing query functionality.")
+
+				clientOnlineMap[address] = clientOnline
+			}
+
+			go queryWorker(&wg)
 		}
+
+		//Wait till all requests resolve then sleep for a bit before rescanning
+		wg.Wait()
+		clientOnlineMapLock.Unlock()
+
+		time.Sleep(time.Second * 5)
 	}
 }
 
