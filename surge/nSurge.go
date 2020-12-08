@@ -99,6 +99,7 @@ var zeroBandwidthMap map[string]bool
 var chunksInTransit map[string]bool
 
 var clientOnlineMapLock = &sync.Mutex{}
+var clientOnlineRefreshingLock = &sync.Mutex{}
 var bandwidthAccumulatorMapLock = &sync.Mutex{}
 var chunkInTransitLock = &sync.Mutex{}
 
@@ -326,7 +327,7 @@ func updateClientOnlineMap() {
 	for true {
 		var numOnline = 0
 		//Count num online clients
-		clientOnlineMapLock.Lock()
+		clientOnlineRefreshingLock.Lock()
 		for _, value := range clientOnlineMap {
 			if value == true {
 				numOnline++
@@ -334,15 +335,14 @@ func updateClientOnlineMap() {
 		}
 
 		numClientsSubscribed = len(clientOnlineMap)
-		numClientsOnline = numOnline
 
 		numClientsStore.Update(func(data NumClientsStruct) NumClientsStruct {
 			return NumClientsStruct{
-				Subscribed: len(clientOnlineMap),
+				Subscribed: numClientsSubscribed,
 				Online:     numOnline,
 			}
 		})
-		clientOnlineMapLock.Unlock()
+		clientOnlineRefreshingLock.Unlock()
 		time.Sleep(time.Second)
 	}
 }
@@ -354,7 +354,7 @@ func queryRemoteForFiles() {
 		var wg sync.WaitGroup
 
 		//lock for write to map
-		clientOnlineMapLock.Lock()
+		clientOnlineRefreshingLock.Lock()
 		for _, address := range subscribers {
 
 			wg.Add(1)
@@ -365,7 +365,9 @@ func queryRemoteForFiles() {
 				//Request
 				clientOnline := SendQueryRequest(address, "Testing query functionality.")
 
+				clientOnlineMapLock.Lock()
 				clientOnlineMap[address] = clientOnline
+				clientOnlineMapLock.Unlock()
 			}
 
 			go queryWorker(&wg)
@@ -373,7 +375,7 @@ func queryRemoteForFiles() {
 
 		//Wait till all requests resolve then sleep for a bit before rescanning
 		wg.Wait()
-		clientOnlineMapLock.Unlock()
+		clientOnlineRefreshingLock.Unlock()
 
 		time.Sleep(time.Second * 5)
 	}
