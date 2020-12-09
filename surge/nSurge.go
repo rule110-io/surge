@@ -195,6 +195,10 @@ var numClientsStore *wails.Store
 func WailsBind(runtime *wails.Runtime) {
 	wailsRuntime = runtime
 
+	//Mac specific functions
+	go initOSHandler()
+	go setVisualModeLikeOS()
+
 	numClients := NumClientsStruct{
 		Subscribed: 0,
 		Online:     0,
@@ -209,10 +213,6 @@ func WailsBind(runtime *wails.Runtime) {
 // Start initializes surge
 func Start(args []string) {
 	var err error
-
-	//Mac specific functions
-	go initOSHandler()
-	go setVisualModeLikeOS()
 
 	var dirFileMode os.FileMode
 	var dir = GetSurgeDir()
