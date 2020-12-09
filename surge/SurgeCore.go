@@ -398,7 +398,7 @@ func processQueryResponse(Session *Session, Data []byte) {
 	seeder := Session.session.RemoteAddr().String()
 
 	clientOnlineMapLock.Lock()
-	clientOnlineMap[seeder] = true
+	clientOnlineMap[seeder] = time.Now().Unix()
 	clientOnlineMapLock.Unlock()
 
 	ListedFilesLock.Lock()

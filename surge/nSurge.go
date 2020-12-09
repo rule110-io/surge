@@ -87,7 +87,7 @@ var startTime = time.Now()
 
 var client *nkn.MultiClient
 
-var clientOnlineMap map[string]bool
+var clientOnlineMap map[string]int64
 
 var downloadBandwidthAccumulator map[string]int
 var uploadBandwidthAccumulator map[string]int
@@ -260,7 +260,7 @@ func Start(args []string) {
 
 		topicEncoded := TopicEncode(TestTopic)
 
-		clientOnlineMap = make(map[string]bool)
+		clientOnlineMap = make(map[string]int64)
 		downloadBandwidthAccumulator = make(map[string]int)
 		uploadBandwidthAccumulator = make(map[string]int)
 		zeroBandwidthMap = make(map[string]bool)
@@ -327,9 +327,10 @@ func updateClientOnlineMap() {
 	for true {
 		var numOnline = 0
 		//Count num online clients
-		clientOnlineRefreshingLock.Lock()
+		unix := time.Now().Unix()
 		for _, value := range clientOnlineMap {
-			if value == true {
+			//Needs to be here at least in the last 60
+			if value > unix-60 {
 				numOnline++
 			}
 		}
@@ -342,7 +343,6 @@ func updateClientOnlineMap() {
 				Online:     numOnline,
 			}
 		})
-		clientOnlineRefreshingLock.Unlock()
 		time.Sleep(time.Second)
 	}
 }
@@ -353,8 +353,6 @@ func queryRemoteForFiles() {
 
 		var wg sync.WaitGroup
 
-		//lock for write to map
-		clientOnlineRefreshingLock.Lock()
 		for _, address := range subscribers {
 
 			wg.Add(1)
@@ -363,11 +361,7 @@ func queryRemoteForFiles() {
 				defer workerWaitGroup.Done()
 
 				//Request
-				clientOnline := SendQueryRequest(address, "Testing query functionality.")
-
-				clientOnlineMapLock.Lock()
-				clientOnlineMap[address] = clientOnline
-				clientOnlineMapLock.Unlock()
+				SendQueryRequest(address, "Testing query functionality.")
 			}
 
 			go queryWorker(&wg)
@@ -375,7 +369,6 @@ func queryRemoteForFiles() {
 
 		//Wait till all requests resolve then sleep for a bit before rescanning
 		wg.Wait()
-		clientOnlineRefreshingLock.Unlock()
 
 		time.Sleep(time.Second * 5)
 	}
