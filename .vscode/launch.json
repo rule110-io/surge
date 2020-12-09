@@ -1,0 +1,15 @@
+{
+    "version": "0.2.1-beta",
+    "configurations": [
+        {
+            "name": "Wails: build debug",
+            "type": "go",
+            "request": "launch",
+            "mode": "exec",
+            "program": "${workspaceFolder}/build/surge",
+            "preLaunchTask": "wails_debug_build",
+            "env": {},
+            "args": []
+        }
+    ]
+}
