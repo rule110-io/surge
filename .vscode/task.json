@@ -1,0 +1,10 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "wails_debug_build",
+            "type": "shell",
+            "command": "wails build -d"
+        }
+    ]
+}
