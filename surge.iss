@@ -20,7 +20,6 @@ AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
 DefaultDirName={autopf}\{#MyAppName}
 DisableProgramGroupPage=yes
-PrivilegesRequiredOverridesAllowed=dialog
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
