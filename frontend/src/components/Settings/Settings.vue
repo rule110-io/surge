@@ -14,15 +14,17 @@
         </div>
       </div>
     </div>
-    <div
-      class="settings__avatar"
-      v-tooltip="{
-        content: pubKey,
-        placement: 'bottom-center',
-        offset: 5,
-      }"
-    >
-      <FileAvatar class="settings__avatar-img" :seeder="pubKey" type="big" />
+    <div class="settings__avatar">
+      <FileAvatar
+        class="settings__avatar-img"
+        :seeder="pubKey"
+        type="big"
+        v-tooltip="{
+          content: pubKey,
+          placement: 'bottom-center',
+          offset: 5,
+        }"
+      />
     </div>
     <div class="settings__item">
       <div class="settings__item-left">
