@@ -13,6 +13,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/rule110-io/surge-ui/surge/platform"
 	log "github.com/sirupsen/logrus"
 
 	bitmap "github.com/boljen/go-bitmap"
@@ -195,8 +196,8 @@ func WailsBind(runtime *wails.Runtime) {
 	wailsRuntime = runtime
 
 	//Mac specific functions
-	go initOSHandler()
-	go setVisualModeLikeOS()
+	go platform.InitOSHandler()
+	go platform.SetVisualModeLikeOS()
 
 	numClients := NumClientsStruct{
 		Subscribed: 0,
@@ -292,7 +293,7 @@ func Start(args []string) {
 
 		go queryRemoteForFiles()
 
-		go watchOSXHandler()
+		go platform.WatchOSXHandler()
 
 		go rescanPeers()
 
@@ -402,7 +403,7 @@ func updateGUI() {
 				if listedFileByHash != nil {
 					filename = listedFileByHash.FileName
 				}
-				showNotification("Download Finished", "Download for "+filename+" finished!")
+				platform.ShowNotification("Download Finished", "Download for "+filename+" finished!")
 				pushNotification("Download Finished", filename)
 				session.session.Close()
 

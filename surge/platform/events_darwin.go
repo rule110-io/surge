@@ -1,4 +1,4 @@
-package surge
+package platform
 
 //#cgo CFLAGS: -x objective-c
 //#cgo LDFLAGS: -framework Cocoa
@@ -19,7 +19,7 @@ func HandleURL(u *C.char) {
 
 //export VisualModeSwitched
 func VisualModeSwitched() {
-	setVisualModeLikeOS()
+	SetVisualModeLikeOS()
 }
 
 //export HandleFile
@@ -27,7 +27,8 @@ func HandleFile(u *C.char) {
 	filestring = C.GoString(u)
 }
 
-func watchOSXHandler() {
+//WatchOSXHandler .
+func WatchOSXHandler() {
 	for true {
 		if len(magnetstring) > 0 {
 			//do act
@@ -55,7 +56,8 @@ func watchOSXHandler() {
 	}
 }
 
-func setVisualModeLikeOS() {
+//SetVisualModeLikeOS .
+func SetVisualModeLikeOS() {
 	mode := C.GoString(C.GetOsxMode())
 	if mode == "" {
 		//light mode
@@ -68,7 +70,8 @@ func setVisualModeLikeOS() {
 	}
 }
 
-func initOSHandler() {
+// InitOSHandler .
+func InitOSHandler() {
 	// the event handler blocks!, so buffer the channel at least once to get the first message
 	labelText = make(chan string, 1)
 
