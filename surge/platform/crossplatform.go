@@ -10,9 +10,14 @@ var mode = ""
 
 var wailsRuntime *wails.Runtime
 
+type setVisualMode func(int)
+
+var setVisualModeRef setVisualMode
+
 // SetWailsRuntime binds the runtime
-func SetWailsRuntime(runtime *wails.Runtime) {
+func SetWailsRuntime(runtime *wails.Runtime, setVisualModeFunc setVisualMode) {
 	wailsRuntime = runtime
+	setVisualModeRef = setVisualModeFunc
 }
 
 //AskUser emit ask user event

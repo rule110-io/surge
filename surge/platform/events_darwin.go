@@ -57,14 +57,14 @@ func WatchOSXHandler() {
 }
 
 //SetVisualModeLikeOS .
-func SetVisualModeLikeOS() int {
+func SetVisualModeLikeOS() {
 	mode := C.GoString(C.GetOsxMode())
 	if mode == "" {
 		//light mode
-		return 0
+		setVisualModeRef(0)
 	} else {
 		//dark mode
-		return 1
+		setVisualModeRef(1)
 	}
 }
 

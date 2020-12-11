@@ -188,21 +188,11 @@ var numClientsStore *wails.Store
 // WailsBind is a binding function at startup
 func WailsBind(runtime *wails.Runtime) {
 	wailsRuntime = runtime
-	platform.SetWailsRuntime(wailsRuntime)
+	platform.SetWailsRuntime(wailsRuntime, SetVisualMode)
 
 	//Mac specific functions
 	go platform.InitOSHandler()
-	visualMode := platform.SetVisualModeLikeOS()
-
-	if visualMode == 0 {
-		//light mode
-		DbWriteSetting("DarkMode", "false")
-		wailsRuntime.Events.Emit("darkThemeEvent", "false")
-	} else if visualMode == 1 {
-		//dark mode
-		DbWriteSetting("DarkMode", "true")
-		wailsRuntime.Events.Emit("darkThemeEvent", "true")
-	}
+	platform.SetVisualModeLikeOS()
 
 	numClients := NumClientsStruct{
 		Subscribed: 0,
@@ -213,6 +203,19 @@ func WailsBind(runtime *wails.Runtime) {
 
 	//Update scan results starts after binding numClientStore is shared storage
 	go updateClientOnlineMap()
+}
+
+//SetVisualMode Sets the visualmode
+func SetVisualMode(visualMode int) {
+	if visualMode == 0 {
+		//light mode
+		DbWriteSetting("DarkMode", "false")
+		wailsRuntime.Events.Emit("darkThemeEvent", "false")
+	} else if visualMode == 1 {
+		//dark mode
+		DbWriteSetting("DarkMode", "true")
+		wailsRuntime.Events.Emit("darkThemeEvent", "true")
+	}
 }
 
 // Start initializes surge
