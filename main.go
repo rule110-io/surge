@@ -129,8 +129,8 @@ func getNumberOfRemoteClient() RemoteClientOnlineModel {
 }
 
 func seedFile() bool {
-	path, err := surge.OpenFileDialog()
-	if err != nil {
+	path := surge.OpenFileDialog()
+	if path == "" {
 		return false
 	}
 	return surge.SeedFile(path)

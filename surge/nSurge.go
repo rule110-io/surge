@@ -18,7 +18,6 @@ import (
 	bitmap "github.com/boljen/go-bitmap"
 	movavg "github.com/mxmCherry/movavg"
 	nkn "github.com/nknorg/nkn-sdk-go"
-	dialog "github.com/sqweek/dialog"
 	"github.com/wailsapp/wails"
 )
 
@@ -1022,9 +1021,10 @@ func SetFilePause(Hash string, State bool) {
 }
 
 //OpenFileDialog uses platform agnostic package for a file dialog
-func OpenFileDialog() (string, error) {
+func OpenFileDialog() string {
 	defer RecoverAndLog()
-	return dialog.File().Load()
+	selectedFile := wailsRuntime.Dialog.SelectFile()
+	return selectedFile
 }
 
 //RemoveFile removes file from surge db and optionally from disk
