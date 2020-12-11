@@ -38,7 +38,7 @@ func WatchOSXHandler() {
 				return
 			}
 			//go ParsePayloadString(decodedMagetstring)
-			askUser("startDownloadMagnetLinks", "{files : ["+decodedMagetstring+"]}")
+			AskUser("startDownloadMagnetLinks", "{files : ["+decodedMagetstring+"]}")
 
 			//reregister URLHandler
 			C.StartURLHandler()
@@ -48,7 +48,7 @@ func WatchOSXHandler() {
 		if len(filestring) > 0 {
 			//decode file contents
 			//push in array
-			askUser("startDownloadMagnetLinks", "{files : ["+filestring+"]}")
+			AskUser("startDownloadMagnetLinks", "{files : ["+filestring+"]}")
 			//reregister URLHandler
 			filestring = ""
 		}
@@ -61,13 +61,9 @@ func SetVisualModeLikeOS() int {
 	mode := C.GoString(C.GetOsxMode())
 	if mode == "" {
 		//light mode
-		DbWriteSetting("DarkMode", "false")
-		wailsRuntime.Events.Emit("darkThemeEvent", "false")
 		return 0
 	} else {
 		//dark mode
-		DbWriteSetting("DarkMode", "true")
-		wailsRuntime.Events.Emit("darkThemeEvent", "true")
 		return 1
 	}
 }
