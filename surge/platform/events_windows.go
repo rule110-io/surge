@@ -10,6 +10,6 @@ func InitOSHandler() {
 }
 
 //SetVisualModeLikeOS .
-func SetVisualModeLikeOS() {
-
+func SetVisualModeLikeOS() int {
+	return -1
 }

@@ -37,7 +37,6 @@ const NumWorkers = 32
 const remotePath = "downloads"
 
 var remoteFolder = ""
-var mode = ""
 
 var subscribers []string
 
@@ -189,10 +188,21 @@ var numClientsStore *wails.Store
 // WailsBind is a binding function at startup
 func WailsBind(runtime *wails.Runtime) {
 	wailsRuntime = runtime
+	platform.SetWailsRuntime(wailsRuntime)
 
 	//Mac specific functions
 	go platform.InitOSHandler()
-	go platform.SetVisualModeLikeOS()
+	visualMode := platform.SetVisualModeLikeOS()
+
+	if visualMode == 0 {
+		//light mode
+		DbWriteSetting("DarkMode", "false")
+		wailsRuntime.Events.Emit("darkThemeEvent", "false")
+	} else if visualMode == 1 {
+		//dark mode
+		DbWriteSetting("DarkMode", "true")
+		wailsRuntime.Events.Emit("darkThemeEvent", "true")
+	}
 
 	numClients := NumClientsStruct{
 		Subscribed: 0,
@@ -294,7 +304,7 @@ func Start(args []string) {
 
 		//Insert new file from arguments and start download
 		if args != nil && len(args) > 0 && len(args[0]) > 0 {
-			platform.AskUser(wailsRuntime, "startDownloadMagnetLinks", "{files : ["+args[0]+"]}")
+			platform.AskUser("startDownloadMagnetLinks", "{files : ["+args[0]+"]}")
 		}
 
 		//Just paste one of your own magnets (from the startup logs) here to download something over nkn from yourself to test if no-one is online

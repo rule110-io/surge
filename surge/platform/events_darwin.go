@@ -57,16 +57,18 @@ func WatchOSXHandler() {
 }
 
 //SetVisualModeLikeOS .
-func SetVisualModeLikeOS() {
+func SetVisualModeLikeOS() int {
 	mode := C.GoString(C.GetOsxMode())
 	if mode == "" {
 		//light mode
 		DbWriteSetting("DarkMode", "false")
 		wailsRuntime.Events.Emit("darkThemeEvent", "false")
+		return 0
 	} else {
 		//dark mode
 		DbWriteSetting("DarkMode", "true")
 		wailsRuntime.Events.Emit("darkThemeEvent", "true")
+		return 1
 	}
 }
 
