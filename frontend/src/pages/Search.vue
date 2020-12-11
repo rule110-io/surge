@@ -50,6 +50,7 @@
             filesConfig="remoteFilesConfig"
             filePages="remotePages"
             commit="files/setRemoteFilesConfig"
+            :count="remoteCount"
           />
         </template>
         <TablePlaceholder
@@ -83,7 +84,12 @@ export default {
     return {};
   },
   computed: {
-    ...mapState("files", ["remoteFiles", "localFiles", "remoteFilesConfig"]),
+    ...mapState("files", [
+      "remoteFiles",
+      "localFiles",
+      "remoteFilesConfig",
+      "remoteCount",
+    ]),
   },
   mounted() {
     this.$store.dispatch("files/fetchRemoteFiles");
