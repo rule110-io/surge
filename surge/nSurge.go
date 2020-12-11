@@ -37,8 +37,6 @@ const NumWorkers = 32
 const remotePath = "downloads"
 
 var remoteFolder = ""
-var magnetstring = ""
-var filestring = ""
 var mode = ""
 
 var subscribers []string
@@ -183,9 +181,6 @@ var ListedFiles []File
 
 var wailsRuntime *wails.Runtime
 
-var labelText chan string
-var appearance chan string
-
 var numClientsSubscribed int = 0
 var numClientsOnline int = 0
 
@@ -299,7 +294,7 @@ func Start(args []string) {
 
 		//Insert new file from arguments and start download
 		if args != nil && len(args) > 0 && len(args[0]) > 0 {
-			askUser("startDownloadMagnetLinks", "{files : ["+args[0]+"]}")
+			platform.AskUser(wailsRuntime, "startDownloadMagnetLinks", "{files : ["+args[0]+"]}")
 		}
 
 		//Just paste one of your own magnets (from the startup logs) here to download something over nkn from yourself to test if no-one is online
@@ -858,11 +853,6 @@ func pushNotification(title string, text string) {
 	} else {
 		wailsRuntime.Events.Emit("notificationEvent", title, text)
 	}
-}
-
-func askUser(context string, payload string) {
-	//log.Println("Emitting Event: ", "notificationEvent", title, text)
-	wailsRuntime.Events.Emit("userEvent", context, payload)
 }
 
 func pushError(title string, text string) {
