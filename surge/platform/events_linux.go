@@ -1,5 +1,7 @@
 package platform
 
+import "github.com/wailsapp/wails"
+
 //WatchOSXHandler .
 func WatchOSXHandler() {
 }
@@ -10,6 +12,6 @@ func InitOSHandler() {
 }
 
 //SetVisualModeLikeOS .
-func SetVisualModeLikeOS() {
-
+func SetVisualModeLikeOS(wailsRuntime *wails.Runtime) int {
+	return -1
 }
