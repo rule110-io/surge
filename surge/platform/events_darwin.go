@@ -10,7 +10,6 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/wailsapp/wails"
 )
 
 //export HandleURL
@@ -39,7 +38,7 @@ func WatchOSXHandler() {
 				return
 			}
 			//go ParsePayloadString(decodedMagetstring)
-			AskUser("startDownloadMagnetLinks", "{files : ["+decodedMagetstring+"]}")
+			askUser("startDownloadMagnetLinks", "{files : ["+decodedMagetstring+"]}")
 
 			//reregister URLHandler
 			C.StartURLHandler()
@@ -49,7 +48,7 @@ func WatchOSXHandler() {
 		if len(filestring) > 0 {
 			//decode file contents
 			//push in array
-			AskUser("startDownloadMagnetLinks", "{files : ["+filestring+"]}")
+			askUser("startDownloadMagnetLinks", "{files : ["+filestring+"]}")
 			//reregister URLHandler
 			filestring = ""
 		}
@@ -58,14 +57,16 @@ func WatchOSXHandler() {
 }
 
 //SetVisualModeLikeOS .
-func SetVisualModeLikeOS(wailsRuntime *wails.Runtime) int {
+func SetVisualModeLikeOS() {
 	mode := C.GoString(C.GetOsxMode())
 	if mode == "" {
 		//light mode
-		return 0
+		DbWriteSetting("DarkMode", "false")
+		wailsRuntime.Events.Emit("darkThemeEvent", "false")
 	} else {
 		//dark mode
-		return 1
+		DbWriteSetting("DarkMode", "true")
+		wailsRuntime.Events.Emit("darkThemeEvent", "true")
 	}
 }
 

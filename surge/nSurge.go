@@ -37,6 +37,7 @@ const NumWorkers = 32
 const remotePath = "downloads"
 
 var remoteFolder = ""
+var mode = ""
 
 var subscribers []string
 
@@ -191,17 +192,7 @@ func WailsBind(runtime *wails.Runtime) {
 
 	//Mac specific functions
 	go platform.InitOSHandler()
-	visualMode := platform.SetVisualModeLikeOS(wailsRuntime)
-
-	if visualMode == 0 {
-		//light mode
-		DbWriteSetting("DarkMode", "false")
-		wailsRuntime.Events.Emit("darkThemeEvent", "false")
-	} else if visualMode == 1 {
-		//dark mode
-		DbWriteSetting("DarkMode", "true")
-		wailsRuntime.Events.Emit("darkThemeEvent", "true")
-	}
+	go platform.SetVisualModeLikeOS()
 
 	numClients := NumClientsStruct{
 		Subscribed: 0,
