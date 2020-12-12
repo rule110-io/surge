@@ -28,52 +28,64 @@ var client *nkn.MultiClient
 const subscriptionDuration = 180 // 180 is approximately one hour
 
 //InitializeClient initializes connection with nkn
-func InitializeClient() {
+func InitializeClient(args []string) {
 	var err error
 
 	account := InitializeAccount()
 	client, err = nkn.NewMultiClient(account, "", NumClients, false, nil)
+	if err != nil {
+		pushError(err.Error(), "do you have an active internet connection?")
+	}
+
+	for client == nil {
+		time.Sleep(5000)
+		client, _ = nkn.NewMultiClient(account, "", NumClients, false, nil)
+	}
+
+	<-client.OnConnect.C
 	clientInitialized = true
 
-	if err != nil {
-		pushError("Error on startup", err.Error())
-	} else {
-		<-client.OnConnect.C
+	pushNotification("Client Connected", "Successfully connected to the NKN network")
 
-		pushNotification("Client Connected", "Successfully connected to the NKN network")
+	client.Listen(nil)
+	SurgeActive = true
+	go Listen()
 
-		client.Listen(nil)
-		SurgeActive = true
-		go Listen()
+	dbFiles := dbGetAllFiles()
+	var filesOnDisk []File
 
-		dbFiles := dbGetAllFiles()
-		var filesOnDisk []File
-
-		for i := 0; i < len(dbFiles); i++ {
-			if FileExists(dbFiles[i].Path) {
-				filesOnDisk = append(filesOnDisk, dbFiles[i])
-			} else {
-				dbFiles[i].IsMissing = true
-				dbFiles[i].IsDownloading = false
-				dbFiles[i].IsUploading = false
-				dbInsertFile(dbFiles[i])
-			}
+	for i := 0; i < len(dbFiles); i++ {
+		if FileExists(dbFiles[i].Path) {
+			filesOnDisk = append(filesOnDisk, dbFiles[i])
+		} else {
+			dbFiles[i].IsMissing = true
+			dbFiles[i].IsDownloading = false
+			dbFiles[i].IsUploading = false
+			dbInsertFile(dbFiles[i])
 		}
-
-		go BuildSeedString(filesOnDisk)
-		for i := 0; i < len(filesOnDisk); i++ {
-			go restartDownload(filesOnDisk[i].FileHash)
-		}
-
-		go autoSubscribeWorker()
-
-		GetSubscriptions()
-		go queryRemoteForFiles()
-
-		go platform.WatchOSXHandler()
-
-		go rescanPeers()
 	}
+
+	go BuildSeedString(filesOnDisk)
+	for i := 0; i < len(filesOnDisk); i++ {
+		go restartDownload(filesOnDisk[i].FileHash)
+	}
+
+	go autoSubscribeWorker()
+
+	GetSubscriptions()
+	go queryRemoteForFiles()
+
+	go platform.WatchOSXHandler()
+
+	go rescanPeers()
+
+	//Insert new file from arguments and start download
+	if args != nil && len(args) > 0 && len(args[0]) > 0 {
+		platform.AskUser("startDownloadMagnetLinks", "{files : ["+args[0]+"]}")
+	}
+
+	//Run gui update worker for frontend
+	go updateGUI()
 }
 
 //Stop cleanup for surge

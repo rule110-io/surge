@@ -220,15 +220,7 @@ func Start(args []string) {
 	}
 
 	//Initialize our surge nkn client
-	InitializeClient()
-
-	//Insert new file from arguments and start download
-	if args != nil && len(args) > 0 && len(args[0]) > 0 {
-		platform.AskUser("startDownloadMagnetLinks", "{files : ["+args[0]+"]}")
-	}
-
-	//Run gui update worker for frontend
-	go updateGUI()
+	go InitializeClient(args)
 }
 
 func updateClientOnlineMap() {

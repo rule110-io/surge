@@ -19,6 +19,16 @@ func pushNotification(title string, text string) {
 }
 
 func pushError(title string, text string) {
-	//log.Println("Emitting Event: ", "errorEvent", title, text)
-	wailsRuntime.Events.Emit("errorEvent", title, text)
+	//If wails frontend is not yet binded, we wait in a task to not block main thread
+	if wailsRuntime == nil {
+		waitAndPush := func() {
+			for wailsRuntime == nil {
+				time.Sleep(50)
+			}
+			wailsRuntime.Events.Emit("errorEvent", title, text)
+		}
+		go waitAndPush()
+	} else {
+		wailsRuntime.Events.Emit("errorEvent", title, text)
+	}
 }

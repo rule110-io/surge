@@ -189,8 +189,6 @@ func main() {
 	argsWithoutProg := os.Args[1:]
 	log.Println(argsWithProg)
 	log.Println(argsWithoutProg)
-	//test string
-	//arguments = []string{"surge://|file|Big Buck Bunny (720p_24fps_H264-128kbit_AAC).mp4|69742504|81c91110a3ef40a26b3ea2830b115a455404d99fd7eefd1f622dfd65a47f9aa1|cbf7e5e0fe9c4d97ace680164fa31e399fac7df8921238dc390465e48ae21fe6|/"}
 
 	//invoked with a download
 	if len(argsWithoutProg) > 0 {
