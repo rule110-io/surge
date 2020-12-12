@@ -675,6 +675,9 @@ func AddToSeedString(dbFile File) {
 	payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)
 	//log.Println(payload)
 	queryPayload += payload
+
+	//Make sure you're subscribed when seeding a file
+	go subscribeToSurgeTopic()
 }
 
 //SeedFile generates everything needed to seed a file
@@ -723,8 +726,7 @@ func SeedFile(Path string) bool {
 	dbInsertFile(localFile)
 
 	//Add to payload
-	payload := surgeGenerateTopicPayload(fileName, fileSize, hashString)
-	queryPayload += payload
+	AddToSeedString(localFile)
 	pushNotification("Now seeding", fileName)
 	return true
 }
