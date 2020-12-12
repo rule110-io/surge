@@ -28,12 +28,15 @@ var client *nkn.MultiClient
 const subscriptionDuration = 180 // 180 is approximately one hour
 
 //InitializeClient initializes connection with nkn
-func InitializeClient(args []string) {
+func InitializeClient(args []string, waitForReconnect bool) bool {
 	var err error
 
 	account := InitializeAccount()
 	client, err = nkn.NewMultiClient(account, "", NumClients, false, nil)
 	if err != nil {
+		if waitForReconnect {
+			return false
+		}
 		pushError(err.Error(), "do you have an active internet connection?")
 	}
 
@@ -84,8 +87,7 @@ func InitializeClient(args []string) {
 		platform.AskUser("startDownloadMagnetLinks", "{files : ["+args[0]+"]}")
 	}
 
-	//Run gui update worker for frontend
-	go updateGUI()
+	return true
 }
 
 //Stop cleanup for surge

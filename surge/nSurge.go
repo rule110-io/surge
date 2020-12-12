@@ -183,6 +183,9 @@ func WailsBind(runtime *wails.Runtime) {
 
 	//Update scan results starts after binding numClientStore is shared storage
 	go updateClientOnlineMap()
+
+	//Run gui update worker for frontend
+	go updateGUI()
 }
 
 //SetVisualMode Sets the visualmode
@@ -220,7 +223,10 @@ func Start(args []string) {
 	}
 
 	//Initialize our surge nkn client
-	go InitializeClient(args)
+	initialSuccess := InitializeClient(args, false)
+	if !initialSuccess {
+		go InitializeClient(args, true)
+	}
 }
 
 func updateClientOnlineMap() {
