@@ -1,6 +1,7 @@
 package surge
 
 import (
+	"fmt"
 	"time"
 
 	nkn "github.com/nknorg/nkn-sdk-go"
@@ -65,8 +66,8 @@ func InitializeClient() {
 		}
 
 		go autoSubscribeWorker()
-		go GetSubscriptions()
 
+		GetSubscriptions()
 		go queryRemoteForFiles()
 
 		go platform.WatchOSXHandler()
@@ -86,7 +87,8 @@ func rescanPeers() {
 	defer RecoverAndLog()
 	for true {
 		time.Sleep(time.Minute)
-		go GetSubscriptions()
+		GetSubscriptions()
+		go queryRemoteForFiles()
 	}
 }
 
@@ -153,4 +155,21 @@ func GetSubscriptions() {
 			}
 		}
 	}
+
+	fmt.Println(string("\033[36m"), "Get Subscriptions", len(subscribers), string("\033[0m"))
+}
+
+func queryRemoteForFiles() {
+	defer RecoverAndLog()
+
+	fmt.Println(string("\033[36m"), "Start sending file queries to remotes", len(subscribers), string("\033[0m"))
+	for _, address := range subscribers {
+		//Request
+		go SendQueryRequest(address, "Testing query functionality.")
+	}
+
+	//Wait till all requests resolve then sleep for a bit before rescanning
+	fmt.Println(string("\033[36m"), "Finished sending file queries to remotes", len(subscribers), string("\033[0m"))
+
+	time.Sleep(time.Second * 60)
 }

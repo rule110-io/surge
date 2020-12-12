@@ -256,33 +256,6 @@ func updateClientOnlineMap() {
 	}
 }
 
-func queryRemoteForFiles() {
-	defer RecoverAndLog()
-	for true {
-
-		var wg sync.WaitGroup
-
-		for _, address := range subscribers {
-
-			wg.Add(1)
-
-			queryWorker := func(workerWaitGroup *sync.WaitGroup) {
-				defer workerWaitGroup.Done()
-
-				//Request
-				SendQueryRequest(address, "Testing query functionality.")
-			}
-
-			go queryWorker(&wg)
-		}
-
-		//Wait till all requests resolve then sleep for a bit before rescanning
-		wg.Wait()
-
-		time.Sleep(time.Second * 5)
-	}
-}
-
 func chunkMapFull(s []byte, num int) bool {
 	//No chunkmap means no download was initiated, all chunks are local
 	if s == nil {
@@ -320,12 +293,6 @@ func updateGUI() {
 					pushError("Error on download complete", err.Error())
 					continue
 				}
-
-				fmt.Println(fileEntry.ChunkMap)
-				fmt.Println(fileEntry.ChunkMap)
-				fmt.Println(fileEntry.ChunkMap)
-				fmt.Println(fileEntry.ChunkMap)
-				fmt.Println(fileEntry.ChunkMap)
 
 				if chunkMapFull(fileEntry.ChunkMap, fileEntry.NumChunks) {
 					platform.ShowNotification("Download Finished", "Download for "+fileEntry.FileName+" finished!")

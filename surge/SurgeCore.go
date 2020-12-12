@@ -166,12 +166,12 @@ func SendQueryRequest(Addr string, Query string) bool {
 
 		dialConfig := &nkn.DialConfig{
 			SessionConfig: sessionConfig,
-			DialTimeout:   5000,
+			DialTimeout:   60000,
 		}
 
 		downloadSession, err := client.DialWithConfig(Addr, dialConfig)
 		if err != nil {
-			log.Printf("Peer with address %s is not online, stopped trying after 5000ms\n", Addr)
+			log.Printf("Peer with address %s is not online, stopped trying after 60000ms\n", Addr)
 			return false
 		}
 		log.Printf("Connected to peer %s requesting file listings\n", Addr)
@@ -393,6 +393,9 @@ func processQueryRequest(Session *Session, Data []byte) {
 
 func processQueryResponse(Session *Session, Data []byte) {
 	defer RecoverAndLog()
+
+	fmt.Println(string("\033[36m"), "file query response received", string("\033[0m"))
+
 	//Try to parse SurgeMessage
 	s := string(Data)
 	seeder := Session.session.RemoteAddr().String()
