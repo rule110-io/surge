@@ -183,8 +183,13 @@ func WailsBind(runtime *wails.Runtime) {
 
 	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
 
-	//Run gui update worker for frontend
+	//Get subs first synced then grab file queries for those subs
+	GetSubscriptions()
+	go queryRemoteForFiles()
+
+	//Startup async processes to continue processing subs/files and updating gui
 	go updateGUI()
+	go rescanPeers()
 }
 
 //SetVisualMode Sets the visualmode
