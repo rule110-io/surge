@@ -177,9 +177,12 @@ func SendQueryRequest(Addr string, Query string) bool {
 		downloadSession, err := client.DialWithConfig(Addr, dialConfig)
 		if err != nil {
 			fmt.Println(string("\033[35m"), "Peer with address is not online, stopped trying after 60000ms", Addr, string("\033[0m"))
+			go setClientOnlineMap(Addr, false)
 			return false
 		}
 		fmt.Println(string("\033[36m"), "Connected to peer %s requesting file listings", Addr, string("\033[0m"))
+
+		go setClientOnlineMap(Addr, true)
 
 		downloadReader := bufio.NewReader(downloadSession)
 
@@ -405,9 +408,7 @@ func processQueryResponse(Session *Session, Data []byte) {
 
 	fmt.Println(string("\033[36m"), "file query response received", seeder, string("\033[0m"))
 
-	clientOnlineMapLock.Lock()
-	clientOnlineMap[seeder] = time.Now().Unix()
-	clientOnlineMapLock.Unlock()
+	go setClientOnlineMap(seeder, true)
 
 	ListedFilesLock.Lock()
 

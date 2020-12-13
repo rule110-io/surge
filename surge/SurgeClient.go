@@ -187,3 +187,26 @@ func queryRemoteForFiles() {
 
 	time.Sleep(time.Second * 60)
 }
+
+func setClientOnlineMap(addr string, value bool) {
+	clientOnlineMapLock.Lock()
+	clientOnlineMap[addr] = value
+	clientOnlineMapLock.Unlock()
+
+	var numOnline = 0
+	//Count num online clients
+	//unix := time.Now().Unix()
+	for _, value := range clientOnlineMap {
+		//Needs to be here at least in the last 60
+		if value == true {
+			numOnline++
+		}
+	}
+
+	numClientsStore.Update(func(data NumClientsStruct) NumClientsStruct {
+		return NumClientsStruct{
+			Subscribed: len(subscribers),
+			Online:     numOnline,
+		}
+	})
+}

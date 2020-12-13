@@ -64,7 +64,7 @@ var receivedSize int64
 
 var startTime = time.Now()
 
-var clientOnlineMap map[string]int64
+var clientOnlineMap map[string]bool
 
 var downloadBandwidthAccumulator map[string]int
 var uploadBandwidthAccumulator map[string]int
@@ -183,9 +183,6 @@ func WailsBind(runtime *wails.Runtime) {
 
 	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
 
-	//Update scan results starts after binding numClientStore is shared storage
-	go updateClientOnlineMap()
-
 	//Run gui update worker for frontend
 	go updateGUI()
 }
@@ -207,7 +204,7 @@ func SetVisualMode(visualMode int) {
 func Start(args []string) {
 
 	//Initialize all our global data maps
-	clientOnlineMap = make(map[string]int64)
+	clientOnlineMap = make(map[string]bool)
 	downloadBandwidthAccumulator = make(map[string]int)
 	uploadBandwidthAccumulator = make(map[string]int)
 	zeroBandwidthMap = make(map[string]bool)
@@ -228,31 +225,6 @@ func Start(args []string) {
 	initialSuccess := InitializeClient(args, false)
 	if !initialSuccess {
 		go InitializeClient(args, true)
-	}
-}
-
-func updateClientOnlineMap() {
-	defer RecoverAndLog()
-	for true {
-		var numOnline = 0
-		//Count num online clients
-		unix := time.Now().Unix()
-		for _, value := range clientOnlineMap {
-			//Needs to be here at least in the last 60
-			if value > unix-60 {
-				numOnline++
-			}
-		}
-
-		numClientsSubscribed = len(clientOnlineMap)
-
-		numClientsStore.Update(func(data NumClientsStruct) NumClientsStruct {
-			return NumClientsStruct{
-				Subscribed: numClientsSubscribed,
-				Online:     numOnline,
-			}
-		})
-		time.Sleep(time.Second)
 	}
 }
 

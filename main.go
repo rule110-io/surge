@@ -57,17 +57,6 @@ func getLocalFiles(Skip int, Take int) surge.LocalFilePageResult {
 		surge.ListedFilesLock.Unlock()
 	}
 
-	/*for i := 0; i < len(trackedFiles); i++ {
-		surge.ListedFilesLock.Lock()
-		for _, file := range surge.ListedFiles {
-			if file.FileHash == trackedFiles[i].FileHash {
-				trackedFiles[i].Seeders = file.Seeders
-				trackedFiles[i].SeederCount = len(file.Seeders) + 1
-			}
-		}
-		surge.ListedFilesLock.Unlock()
-	}*/
-
 	return surge.LocalFilePageResult{
 		Result: trackedFiles,
 		Count:  totalNum,
