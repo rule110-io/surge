@@ -190,8 +190,9 @@ func queryRemoteForFiles() {
 
 func setClientOnlineMap(addr string, value bool) {
 	clientOnlineMapLock.Lock()
+	defer clientOnlineMapLock.Unlock()
+
 	clientOnlineMap[addr] = value
-	clientOnlineMapLock.Unlock()
 
 	var numOnline = 0
 	//Count num online clients
