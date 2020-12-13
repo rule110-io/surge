@@ -8,8 +8,6 @@ body {
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: $app-height;
-  width: $app-width;
   -ms-overflow-style: none; /** IE11 */
 
   * {
@@ -19,6 +17,10 @@ body {
 
 b {
   font-weight: $fw-bold;
+}
+
+#app {
+  height: 100vh;
 }
 
 /*========== scroll ==========*/
@@ -102,8 +104,6 @@ b {
 /*========== main container ==========*/
 
 .main {
-  height: $app-height;
-  width: $app-width;
   margin: 0 auto;
 
   &__wrapper {
