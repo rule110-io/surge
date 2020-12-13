@@ -484,6 +484,8 @@ func processQueryResponse(Session *Session, Data []byte) {
 			ListedFiles = append(ListedFiles, newListing)
 		}
 
+		fmt.Println(string("\033[33m"), "Filename", newListing.FileName, "FileHash", newListing.FileHash, string("\033[0m"))
+
 		log.Println("Query response new file: ", newListing.FileName, " seeder: ", seeder)
 
 		//Test gui
@@ -703,12 +705,13 @@ func SeedFile(Path string) bool {
 	defer RecoverAndLog()
 	log.Println("Seeding file", Path)
 
-	hashString, err := HashFile(Path)
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
 	if err != nil {
-		log.Println(err)
-		pushNotification("Seed failed", "Could not hash file at "+Path)
-		return false
+		log.Fatal(err)
 	}
+	randomHash := fmt.Sprintf("%x-%x-%x-%x-%x",
+		b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 
 	fileName := filepath.Base(Path)
 	fileSize := surgeGetFileSize(Path)
@@ -722,31 +725,58 @@ func SeedFile(Path string) bool {
 
 	//Append to local files
 	localFile := File{
-		FileName:    fileName,
-		FileSize:    fileSize,
-		FileHash:    hashString,
-		Path:        Path,
-		NumChunks:   numChunks,
-		ChunkMap:    chunkMap,
-		IsUploading: true,
-		SeederCount: 1,
+		FileName:      fileName,
+		FileSize:      fileSize,
+		FileHash:      randomHash,
+		Path:          Path,
+		NumChunks:     numChunks,
+		ChunkMap:      chunkMap,
+		IsUploading:   false,
+		IsDownloading: false,
+		IsHashing:     true,
+		SeederCount:   0,
 	}
 
 	//Check if file is already seeded
 	_, err = dbGetFile(localFile.FileHash)
 	if err == nil {
 		//File already seeding
-		pushNotification("Seed failed", fileName+" already seeding.")
+		pushError("Seed failed", fileName+" already seeding.")
 		return false
 	}
 
 	//When seeding a new file enter file into db
 	dbInsertFile(localFile)
 
-	//Add to payload
-	AddToSeedString(localFile)
-	pushNotification("Now seeding", fileName)
+	go hashFileJob(randomHash)
+
 	return true
+}
+
+func hashFileJob(randomHash string) {
+	//Clean up after were done here, even when we fail we dont want these randomhash files in db
+	defer dbDeleteFile(randomHash)
+
+	dbFile, err := dbGetFile(randomHash)
+	if err != nil {
+		pushError("File Hash Failed", "Could find dbEntry for hash "+randomHash)
+	}
+
+	hashString, err := HashFile(dbFile.Path)
+	if err != nil {
+		log.Println(err)
+		pushError("File Hash Failed", "Could not hash file at "+dbFile.Path)
+	}
+
+	dbFile.IsUploading = true
+	dbFile.IsHashing = false
+	dbFile.FileHash = hashString
+	dbFile.SeederCount = 1
+	dbInsertFile(*dbFile)
+
+	//Add to payload
+	AddToSeedString(*dbFile)
+	pushNotification("Now seeding", dbFile.FileName)
 }
 
 func restartDownload(Hash string) {

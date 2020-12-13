@@ -106,6 +106,7 @@ type File struct {
 	IsUploading   bool
 	IsPaused      bool
 	IsMissing     bool
+	IsHashing     bool
 	ChunkMap      []byte
 	SeederCount   int
 	ChunksShared  int

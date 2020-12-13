@@ -49,7 +49,7 @@ func getLocalFiles(Skip int, Take int) surge.LocalFilePageResult {
 			}
 		}
 
-		if len(trackedFiles[i].Seeders) == 0 && trackedFiles[i].IsUploading {
+		if len(trackedFiles[i].Seeders) == 0 && (trackedFiles[i].IsUploading || trackedFiles[i].IsHashing) {
 			trackedFiles[i].Seeders = []string{surge.GetMyAddress()}
 			trackedFiles[i].SeederCount = len(trackedFiles[i].Seeders)
 		}
@@ -169,6 +169,9 @@ func (s *WailsRuntime) WailsShutdown() {
 }
 
 func main() {
+
+	//surge.HashFile("C:\\Users\\mitch\\Downloads\\surge_remote\\surge-0.2.0-beta.windows.zip")
+
 	stats := &Stats{}
 	surge.InitializeDb()
 	surge.InitializeLog()
