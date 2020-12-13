@@ -812,12 +812,11 @@ func RemoveFile(Hash string, FromDisk bool) bool {
 			log.Println("Error on remove file (read db)", err.Error())
 			pushError("Error on remove file (read db)", err.Error())
 			return false
-		} else {
-			err = os.Remove(file.Path)
-			if err != nil {
-				log.Println("Error on remove file from disk - removing from surge", err.Error())
-				pushError("Error on remove file from disk - removing from surge", err.Error())
-			}
+		}
+		err = os.Remove(file.Path)
+		if err != nil {
+			log.Println("Error on remove file from disk - removing from surge", err.Error())
+			pushError("Error on remove file from disk - removing from surge", err.Error())
 		}
 	}
 
