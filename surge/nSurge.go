@@ -7,6 +7,7 @@ import (
 	"net"
 	"os"
 	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -663,7 +664,7 @@ type LocalFilePageResult struct {
 }
 
 //SearchFile runs a paged query
-func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
+func SearchFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) SearchQueryResult {
 	defer RecoverAndLog()
 	var results []FileListing
 
@@ -690,6 +691,27 @@ func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
 		}
 	}
 	ListedFilesLock.Unlock()
+
+	switch OrderBy {
+	case "FileName":
+		if !IsDesc {
+			sort.Sort(sortByFileNameAsc(results))
+		} else {
+			sort.Sort(sortByFileNameDesc(results))
+		}
+	case "FileSize":
+		if !IsDesc {
+			sort.Sort(sortByFileSizeAsc(results))
+		} else {
+			sort.Sort(sortByFileSizeDesc(results))
+		}
+	default:
+		if !IsDesc {
+			sort.Sort(sortBySeederCountAsc(results))
+		} else {
+			sort.Sort(sortBySeederCountDesc(results))
+		}
+	}
 
 	left := Skip
 	right := Skip + Take

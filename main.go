@@ -63,8 +63,8 @@ func getLocalFiles(Skip int, Take int) surge.LocalFilePageResult {
 	}
 }
 
-func getRemoteFiles(Query string, Skip int, Take int) surge.SearchQueryResult {
-	return surge.SearchFile(Query, Skip, Take)
+func getRemoteFiles(Query string, OrderBy string, IsDesc bool, Skip int, Take int) surge.SearchQueryResult {
+	return surge.SearchFile(Query, OrderBy, IsDesc, Skip, Take)
 }
 
 func getPublicKey() string {
