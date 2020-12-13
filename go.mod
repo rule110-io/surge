@@ -24,7 +24,7 @@ require (
 	github.com/xujiajun/nutsdb v0.5.0
 	golang.org/x/image v0.0.0-20200801110659-972c09e46d76 // indirect
 	golang.org/x/net v0.0.0-20200707034311-ab3426394381 // indirect
-	golang.org/x/sys v0.0.0-20200802091954-4b90ce9b60b3 // indirect
+	golang.org/x/sys v0.0.0-20200802091954-4b90ce9b60b3
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/AlecAivazis/survey.v1 v1.8.8 // indirect
 	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2
