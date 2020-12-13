@@ -12,6 +12,8 @@ const getDefaultState = () => {
     },
     remoteFilesConfig: {
       search: "",
+      orderBy: "SeederCount",
+      isDesc: true,
       skip: 0,
       get: 6,
     },
@@ -50,10 +52,10 @@ const actions = {
     });
   },
   fetchRemoteFiles({ commit, state }) {
-    const { search, skip, get } = state.remoteFilesConfig;
+    const { search, skip, get, orderBy, isDesc } = state.remoteFilesConfig;
 
     window.backend
-      .getRemoteFiles(search, skip, get)
+      .getRemoteFiles(search, orderBy, isDesc, skip, get)
       .then(({ Result, Count }) => {
         commit("setRemoteFiles", { Result, Count });
       });

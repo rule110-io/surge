@@ -10,7 +10,7 @@
         offset: 0,
       }"
     >
-      <FileAvatar :seeder="seeder" />
+      <FileAvatar :seeder="seeder" type="small" />
     </div>
     <div
       v-if="seedsLeft > 0"
