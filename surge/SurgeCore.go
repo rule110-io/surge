@@ -434,15 +434,14 @@ func processQueryResponse(Session *Session, Data []byte) {
 	}
 
 	//Remove empty seeders listings
-	/*
-		for i := 0; i < len(ListedFiles); i++ {
-			if len(ListedFiles[i].Seeders) == 0 {
-				// Remove the element at index i from a.
-				ListedFiles[i] = ListedFiles[len(ListedFiles)-1] // Copy last element to index i.
-				ListedFiles[len(ListedFiles)-1] = File{}         // Erase last element (write zero value).
-				ListedFiles = ListedFiles[:len(ListedFiles)-1]   // Truncate slice.
-			}
-		}*/
+	for i := 0; i < len(ListedFiles); i++ {
+		if len(ListedFiles[i].Seeders) == 0 {
+			// Remove the element at index i from a.
+			ListedFiles[i] = ListedFiles[len(ListedFiles)-1] // Copy last element to index i.
+			ListedFiles[len(ListedFiles)-1] = File{}         // Erase last element (write zero value).
+			ListedFiles = ListedFiles[:len(ListedFiles)-1]   // Truncate slice.
+		}
+	}
 
 	//Parse the response
 	payloadSplit := strings.Split(s, "surge://")
@@ -474,7 +473,9 @@ func processQueryResponse(Session *Session, Data []byte) {
 
 				//if the seeder is unique add it as an additional seeder for the file
 				ListedFiles[l].Seeders = append(ListedFiles[l].Seeders, seeder)
+				ListedFiles[l].Seeders = distinctStringSlice(ListedFiles[l].Seeders)
 				ListedFiles[l].SeederCount = len(ListedFiles[l].Seeders)
+
 				replace = true
 				break
 			}
@@ -495,6 +496,18 @@ func processQueryResponse(Session *Session, Data []byte) {
 		//fileBox.Append(newButton)
 	}
 	ListedFilesLock.Unlock()
+}
+
+func distinctStringSlice(stringSlice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range stringSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
 }
 
 //ParsePayloadString parses payload of files
