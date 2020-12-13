@@ -671,7 +671,7 @@ func SearchFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) S
 
 	ListedFilesLock.Lock()
 	for _, file := range ListedFiles {
-		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) {
+		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) {
 
 			result := FileListing{
 				FileName:    file.FileName,
