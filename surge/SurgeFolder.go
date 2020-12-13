@@ -3,6 +3,9 @@ package surge
 import (
 	"os"
 	"os/user"
+	"runtime"
+
+	"golang.org/x/sys/windows"
 )
 
 const remotePath = "downloads"
@@ -21,8 +24,14 @@ func InitializeFolders() bool {
 	if err != nil {
 		pushError("Error on startup", err.Error())
 	}
-	homedir := myself.HomeDir
-	remoteFolder = homedir + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "surge_" + remotePath
+
+	if runtime.GOOS == "windows" {
+		homedir, _ := windows.KnownFolderPath(windows.FOLDERID_Downloads, 0)
+		remoteFolder = homedir + string(os.PathSeparator) + "surge_" + remotePath
+	} else {
+		homedir := myself.HomeDir
+		remoteFolder = homedir + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "surge_" + remotePath
+	}
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		os.Mkdir(dir, dirFileMode)
