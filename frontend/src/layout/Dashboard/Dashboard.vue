@@ -29,6 +29,7 @@ export default {
   },
   destroyed() {
     clearInterval(this.remoteInterval);
+    clearInterval(this.localInterval);
   },
   mounted() {
     this.enableNotifications();
@@ -50,6 +51,7 @@ export default {
     this.getPublicKey();
 
     this.remoteInterval = setInterval(this.fetchRemoteFiles, 10000);
+    this.localInterval = setInterval(this.fetchLocalFiles, 10000);
   },
   methods: {
     getPublicKey() {

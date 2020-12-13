@@ -186,8 +186,8 @@ b {
     transition: $transition-1;
 
     &-action {
-      position: relative;
-      top: 3px;
+      position: absolute;
+      top: 6px;
       height: 15px;
       width: 15px;
       transition: $transition-1;

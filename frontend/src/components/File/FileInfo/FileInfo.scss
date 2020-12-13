@@ -38,6 +38,26 @@
       color: $primary !important;
       cursor: default;
     }
+
+    &_error {
+      color: $error !important;
+      cursor: default;
+    }
+
+    &_alert {
+      color: white !important;
+      cursor: default;
+      animation: spinner 2.5s linear infinite;
+
+      @keyframes spinner {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    }
   }
 
   &__icon {

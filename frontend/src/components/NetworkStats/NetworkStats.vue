@@ -48,6 +48,7 @@ export default {
       window.backend.seedFile().then(() => {
         this.$store.dispatch("files/fetchLocalFiles");
         this.$store.dispatch("files/fetchRemoteFiles");
+        this.$router.replace("/download");
       });
     },
   },

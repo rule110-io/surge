@@ -5,7 +5,6 @@
 
   &__title {
     text-align: center;
-    margin-bottom: $padding-micro;
   }
 
   &__progress {
@@ -15,5 +14,6 @@
     display: flex;
     align-items: center;
     margin: 0 auto;
+    margin-top: $padding-micro;
   }
 }
