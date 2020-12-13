@@ -35,7 +35,7 @@
             <div class="table__cell">
               {{ file.SeederCount }}
             </div>
-            <div class="table__cell text_align_right">
+            <div class="table__cell text_align_right" style="min-width: 78px;">
               <feather
                 class="table__action table__action_remove"
                 type="trash-2"
