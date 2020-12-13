@@ -92,11 +92,16 @@ func RequestChunk(Session *Session, FileID string, ChunkID int32) bool {
 func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	defer RecoverAndLog()
 	//Open file
+
+	fileWriteLock.Lock()
 	fileInfo, err := dbGetFile(FileID)
 	if err != nil {
 		log.Error("Error on transmit chunk", err.Error())
 		return
 	}
+	fileInfo.ChunksShared++
+	dbInsertFile(*fileInfo)
+	fileWriteLock.Unlock()
 
 	file, err := os.Open(fileInfo.Path)
 

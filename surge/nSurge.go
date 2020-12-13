@@ -107,6 +107,7 @@ type File struct {
 	IsMissing     bool
 	ChunkMap      []byte
 	SeederCount   int
+	ChunksShared  int
 }
 
 //NumClientsStruct .
@@ -117,14 +118,15 @@ type NumClientsStruct struct {
 
 // FileListing struct for all frontend file listing props
 type FileListing struct {
-	FileName    string
-	FileSize    int64
-	FileHash    string
-	Seeders     []string
-	NumChunks   int
-	IsTracked   bool
-	IsAvailable bool
-	SeederCount int
+	FileName     string
+	FileSize     int64
+	FileHash     string
+	Seeders      []string
+	NumChunks    int
+	IsTracked    bool
+	IsAvailable  bool
+	SeederCount  int
+	ChunksShared int
 }
 
 // Session is a wrapper for everything needed to maintain a surge session
