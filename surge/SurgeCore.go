@@ -96,7 +96,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	fileWriteLock.Lock()
 	fileInfo, err := dbGetFile(FileID)
 	if err != nil {
-		log.Error("Error on transmit chunk", err.Error())
+		log.Error("Error on transmit chunk - file not in db", err.Error())
 		return
 	}
 	fileInfo.ChunksShared++
@@ -105,8 +105,17 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 
 	file, err := os.Open(fileInfo.Path)
 
+	//When we have an OS read error on the file mark the file as missing, stop down and uploads on it
 	if err != nil {
-		log.Error("Error on transmit chunk", err.Error())
+		log.Error("Error on transmit chunk - file read failure", err.Error())
+
+		fileWriteLock.Lock()
+		fileInfo.IsMissing = true
+		fileInfo.IsDownloading = false
+		fileInfo.IsUploading = false
+		dbInsertFile(*fileInfo)
+		fileWriteLock.Unlock()
+
 		return
 	}
 	defer file.Close()
@@ -118,7 +127,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 
 	if err != nil {
 		if err != io.EOF {
-			log.Error("Error on transmit chunk", err.Error())
+			log.Error("Error on transmit chunk - read chunk failed: ", ChunkID, err.Error())
 			return
 		}
 	}
@@ -131,14 +140,14 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	}
 	dateReplySerialized, err := proto.Marshal(dataReply)
 	if err != nil {
-		log.Error("Error on transmit chunk", err.Error())
+		log.Error("Error on transmit chunk - chunk serialization error", err.Error())
 		return
 	}
 
 	//Transmit the chunk
 	err = SessionWrite(Session, dateReplySerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), dateReplySerialized, nil)
 	if err != nil {
-		log.Error("Error on transmit chunk", err.Error())
+		log.Error("Error on transmit chunk - failed to write to session", err.Error())
 		return
 	}
 	log.Println("Chunk transmitted: ", bytesread, " bytes")
