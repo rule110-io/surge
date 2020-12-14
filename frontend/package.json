@@ -25,6 +25,7 @@
     "vue-chartjs": "^3.5.0",
     "vue-clamp": "^0.3.1",
     "vue-clickaway": "^2.2.2",
+    "vue-clipboard2": "^0.3.1",
     "vue-feather": "^1.0.1",
     "vue-filter-pretty-bytes": "^0.1.5",
     "vue-lodash": "^2.1.2",
