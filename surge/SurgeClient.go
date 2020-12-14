@@ -70,7 +70,9 @@ func InitializeClient(args []string, waitForReconnect bool) bool {
 
 	go BuildSeedString(filesOnDisk)
 	for i := 0; i < len(filesOnDisk); i++ {
-		go restartDownload(filesOnDisk[i].FileHash)
+		if filesOnDisk[i].IsDownloading {
+			go restartDownload(filesOnDisk[i].FileHash)
+		}
 	}
 
 	go autoSubscribeWorker()
