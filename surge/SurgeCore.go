@@ -835,7 +835,13 @@ func restartDownload(Hash string) {
 
 	//Nothing more to download
 	if len(missingChunks) == 0 {
-		//TODO: set flag so we dont keep doing this?
+		platform.ShowNotification("Download Finished", "Download for "+file.FileName+" finished!")
+		pushNotification("Download Finished", file.FileName)
+
+		file.IsDownloading = false
+		file.IsUploading = true
+		dbInsertFile(*file)
+		go AddToSeedString(*file)
 		return
 	}
 
