@@ -6,7 +6,6 @@ import (
 	"math/rand"
 	"net"
 	"os"
-	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -24,40 +23,6 @@ import (
 // SurgeActive is true when client is operational
 var SurgeActive bool = false
 var subscribers []string
-
-//OS folder permission bitflags
-const (
-	osRead       = 04
-	osWrite      = 02
-	osEx         = 01
-	osUserShift  = 6
-	osGroupShift = 3
-	osOthShift   = 0
-
-	osUserR   = osRead << osUserShift
-	osUserW   = osWrite << osUserShift
-	osUserX   = osEx << osUserShift
-	osUserRw  = osUserR | osUserW
-	osUserRwx = osUserRw | osUserX
-
-	osGroupR   = osRead << osGroupShift
-	osGroupW   = osWrite << osGroupShift
-	osGroupX   = osEx << osGroupShift
-	osGroupRw  = osGroupR | osGroupW
-	osGroupRwx = osGroupRw | osGroupX
-
-	osOthR   = osRead << osOthShift
-	osOthW   = osWrite << osOthShift
-	osOthX   = osEx << osOthShift
-	osOthRw  = osOthR | osOthW
-	osOthRwx = osOthRw | osOthX
-
-	osAllR   = osUserR | osGroupR | osOthR
-	osAllW   = osUserW | osGroupW | osOthW
-	osAllX   = osUserX | osGroupX | osOthX
-	osAllRw  = osAllR | osAllW
-	osAllRwx = osAllRw | osGroupX
-)
 
 var localFileName string
 var sendSize int64
@@ -219,7 +184,10 @@ func Start(args []string) {
 	chunksInTransit = make(map[string]bool)
 
 	//Initialize folder structures on os filesystem
-	newlyCreated := InitializeFolders()
+	newlyCreated, err := platform.InitializeFolders()
+	if err != nil {
+		pushError("Error on startup", err.Error())
+	}
 	if newlyCreated {
 		// seems like this is the first time starting the app
 		//set tour to active
@@ -440,6 +408,11 @@ func DownloadFile(Hash string) bool {
 	}
 
 	pushNotification("Download Started", file.FileName)
+
+	remoteFolder, err := platform.GetRemoteFolder()
+	if err != nil {
+		log.Println("Remote folder does not exist")
+	}
 
 	// If the file doesn't exist allocate it
 	var path = remoteFolder + string(os.PathSeparator) + file.FileName
@@ -861,15 +834,6 @@ func RemoveFile(Hash string, FromDisk bool) bool {
 	go BuildSeedString(dbFiles)
 
 	return true
-}
-
-//GetSurgeDir returns the surge dir
-func GetSurgeDir() string {
-	defer RecoverAndLog()
-	if runtime.GOOS == "windows" {
-		return os.Getenv("APPDATA") + string(os.PathSeparator) + "Surge"
-	}
-	return os.Getenv("HOME") + string(os.PathSeparator) + ".surge"
 }
 
 //GetMyAddress returns current client address

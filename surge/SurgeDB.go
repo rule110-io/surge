@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"os"
 
+	"github.com/rule110-io/surge-ui/surge/platform"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/xujiajun/nutsdb"
@@ -19,7 +20,7 @@ func InitializeDb() {
 	var err error
 	opt := nutsdb.DefaultOptions
 
-	opt.Dir = GetSurgeDir() + string(os.PathSeparator) + "db"
+	opt.Dir = platform.GetSurgeDir() + string(os.PathSeparator) + "db"
 	db, err = nutsdb.Open(opt)
 	if err != nil {
 		log.Fatal(err)

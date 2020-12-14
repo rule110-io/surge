@@ -21,6 +21,7 @@ import (
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
 	pb "github.com/rule110-io/surge-ui/payloads"
+	"github.com/rule110-io/surge-ui/surge/platform"
 	"google.golang.org/protobuf/proto"
 
 	open "github.com/skratchdot/open-golang/open"
@@ -574,6 +575,13 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 		fileInfo, err := dbGetFile(FileID)
 		if err != nil {
 			pushError("Error on write chunk (db get)", err.Error())
+			return
+		}
+
+		remoteFolder, err := platform.GetRemoteFolder()
+
+		if err != nil {
+			pushError("Remote folder does not exist", err.Error())
 			return
 		}
 
@@ -1153,7 +1161,7 @@ func RecoverAndLog() {
 		stackSize := runtime.Stack(buf, true)
 		log.Printf("%s\n", string(buf[0:stackSize]))
 
-		var dir = GetSurgeDir()
+		var dir = platform.GetSurgeDir()
 		var logPathOS = dir + string(os.PathSeparator) + "paniclog.txt"
 		f, _ := os.OpenFile(logPathOS, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 		w := bufio.NewWriter(f)
