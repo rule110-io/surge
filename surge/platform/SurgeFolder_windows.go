@@ -44,13 +44,9 @@ const (
 func InitializeFolders() (bool, error) {
 	newCreated := false
 
-	var dirFileMode os.FileMode
 	var dir = GetSurgeDir()
+	var dirFileMode os.FileMode
 	dirFileMode = os.ModeDir | (osUserRwx | osAllR)
-
-	if err != nil {
-		return false, err
-	}
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		os.Mkdir(dir, dirFileMode)
@@ -78,5 +74,5 @@ func GetSurgeDir() string {
 //GetRemoteFolder returns the download dir
 func GetRemoteFolder() (string, error) {
 	homedir, _ := windows.KnownFolderPath(windows.FOLDERID_Downloads, 0)
-	return homedir + string(os.PathSeparator) + "surge_downloads"
+	return homedir + string(os.PathSeparator) + "surge_downloads", nil
 }
