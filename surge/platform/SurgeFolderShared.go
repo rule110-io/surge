@@ -1,5 +1,7 @@
 package platform
 
+import "os"
+
 //OS folder permission bitflags
 const (
 	osRead       = 04
@@ -33,3 +35,29 @@ const (
 	osAllRw  = osAllR | osAllW
 	osAllRwx = osAllRw | osGroupX
 )
+
+//InitializeFolders initializes folder structures needed, returns if folders are created (not yet existing)
+func InitializeFolders() (bool, error) {
+	newCreated := false
+
+	var dir = GetSurgeDir()
+	var dirFileMode os.FileMode
+	dirFileMode = os.ModeDir | (osUserRwx | osAllR)
+
+	if _, err := os.Stat(dir); os.IsNotExist(err) {
+		os.Mkdir(dir, dirFileMode)
+		newCreated = true
+	}
+
+	remoteFolder, err := GetRemoteFolder()
+	if err != nil {
+		return false, err
+	}
+
+	//Ensure remote folders exist
+	if _, err := os.Stat(remoteFolder); os.IsNotExist(err) {
+		os.Mkdir(remoteFolder, dirFileMode)
+	}
+
+	return newCreated, nil
+}
