@@ -2,13 +2,14 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
+  width: 156px;
 
   &__title {
     text-align: center;
   }
 
   &__progress {
-    width: 156px;
+    width: 100%;
     height: 12px;
     position: relative;
     display: flex;
