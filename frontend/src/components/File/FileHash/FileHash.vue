@@ -1,14 +1,18 @@
 <template>
   <div
-    class="file-hash text_wrap_none"
+    class="file-hash"
+    :class="copied ? 'file-hash_active' : null"
+    data-label="Copied"
     v-tooltip="{
-      content: tooltipLabel,
+      content: 'Click to copy to clipboard',
       placement: 'bottom-start',
       offset: 5,
     }"
-    v-on:click="copyHash(hash)"
+    v-clipboard:copy="hash"
+    v-clipboard:success="onCopy"
   >
-    {{ hash }}
+    <feather class="file-hash__icon" type="copy"></feather>
+    <div class="file-hash__text text_wrap_none">{{ hash }}</div>
   </div>
 </template>
 
@@ -27,17 +31,12 @@ export default {
   },
   data: () => {
     return {
-      tooltipLabel: "click to copy to clipboard",
+      copied: false,
     };
   },
   methods: {
-    copyHash(hash) {
-      const el = document.createElement('textarea');
-      el.value = hash;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
+    onCopy() {
+      this.copied = !this.copied;
     },
   },
 };
