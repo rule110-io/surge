@@ -953,7 +953,6 @@ func restartDownload(Hash string) {
 					mutateSeederLock.Unlock()
 
 					if len(downloadSessions) == 0 {
-						pushNotification("Download stopped, no more remote connections.", file.FileName)
 						return
 					}
 				}
@@ -985,7 +984,6 @@ func restartDownload(Hash string) {
 					mutateSeederLock.Unlock()
 
 					if len(downloadSessions) == 0 {
-						pushNotification("Download stopped, no more remote connections.", file.FileName)
 						return
 					}
 				}

@@ -508,7 +508,6 @@ func DownloadFile(Hash string) bool {
 					mutateSeederLock.Unlock()
 
 					if len(downloadSessions) == 0 {
-						pushNotification("Download stopped, no more remote connections.", file.FileName)
 						return
 					}
 				}
@@ -540,7 +539,6 @@ func DownloadFile(Hash string) bool {
 					mutateSeederLock.Unlock()
 
 					if len(downloadSessions) == 0 {
-						pushNotification("Download stopped, no more remote connections.", file.FileName)
 						return
 					}
 				}
