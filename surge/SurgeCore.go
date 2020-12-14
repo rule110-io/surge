@@ -909,6 +909,9 @@ func restartDownload(Hash string) {
 				}
 			}
 
+			for workerCount >= NumWorkers {
+				time.Sleep(time.Millisecond)
+			}
 			workerCount++
 
 			//Create a async job to download a chunk
@@ -995,12 +998,6 @@ func restartDownload(Hash string) {
 				seederAlternator = 0
 			}
 			mutateSeederLock.Unlock()
-
-			for workerCount >= NumWorkers {
-				time.Sleep(time.Millisecond)
-				//log.Println("Active Workers:", workerCount)
-				//fmt.Println("Active Workers:", workerCount)
-			}
 		}
 	}
 
@@ -1037,7 +1034,7 @@ func restartDownload(Hash string) {
 					}
 
 					dbFile, err := dbGetFile(Hash)
-					if err != nil && dbFile != nil {
+					if err == nil && dbFile != nil {
 						//Prime the session with known bytes downloaded
 						surgeSession.Downloaded = int64(dbFile.NumChunks-len(missingChunks)) * ChunkSize
 						//If the last chunk is set, we want to deduct the missing bytes because its not a complete chunk
