@@ -873,11 +873,6 @@ func restartDownload(Hash string) {
 		downloadSessions = append(downloadSessions, surgeSession)
 	}
 
-	if len(downloadSessions) == 0 {
-		pushNotification("Restart download Session Failed, failed to connect to all seeders.", file.FileName)
-		return
-	}
-
 	log.Println("Restarting Download for", file.FileName)
 	log.Println("Total Chunks", file.NumChunks)
 	log.Println("Remaining Chunks", len(missingChunks))
