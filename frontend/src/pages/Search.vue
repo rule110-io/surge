@@ -35,7 +35,7 @@
             <div class="table__cell">
               <FileInfo :file="file" :max="true" :icon="false" />
             </div>
-            <div class="table__cell text_align_center">
+            <div class="table__cell text_align_center" style="min-width: 81px;">
               {{ file.NumChunks }}
             </div>
             <div class="table__cell">
@@ -101,13 +101,13 @@ export default {
       headers: [
         {
           title: "Name & size",
-          orderName: "FileSize",
+          orderName: "FileName",
           sortable: true,
         },
         {
           title: "Chunks",
-          orderName: "",
-          sortable: false,
+          orderName: "FileSize",
+          sortable: true,
         },
         {
           title: "File Hash",
