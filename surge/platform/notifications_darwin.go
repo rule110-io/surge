@@ -9,7 +9,7 @@ import (
 )
 
 // ShowNotification .
-func ShowNotification(title string, text string) error {
+func ShowNotification(title string, text string) {
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
 		log.Fatal(err)
@@ -25,5 +25,5 @@ func ShowNotification(title string, text string) error {
 		AppIcon: Icon,
 	}
 
-	return notification.Push()
+	notification.Push()
 }
