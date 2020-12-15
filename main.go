@@ -49,7 +49,7 @@ func getLocalFiles(Skip int, Take int) surge.LocalFilePageResult {
 			}
 		}
 
-		if len(trackedFiles[i].Seeders) == 0 && trackedFiles[i].IsUploading {
+		if len(trackedFiles[i].Seeders) == 0 && (trackedFiles[i].IsUploading || trackedFiles[i].IsHashing) {
 			trackedFiles[i].Seeders = []string{surge.GetMyAddress()}
 			trackedFiles[i].SeederCount = len(trackedFiles[i].Seeders)
 		}
@@ -57,25 +57,14 @@ func getLocalFiles(Skip int, Take int) surge.LocalFilePageResult {
 		surge.ListedFilesLock.Unlock()
 	}
 
-	/*for i := 0; i < len(trackedFiles); i++ {
-		surge.ListedFilesLock.Lock()
-		for _, file := range surge.ListedFiles {
-			if file.FileHash == trackedFiles[i].FileHash {
-				trackedFiles[i].Seeders = file.Seeders
-				trackedFiles[i].SeederCount = len(file.Seeders) + 1
-			}
-		}
-		surge.ListedFilesLock.Unlock()
-	}*/
-
 	return surge.LocalFilePageResult{
 		Result: trackedFiles,
 		Count:  totalNum,
 	}
 }
 
-func getRemoteFiles(Query string, Skip int, Take int) surge.SearchQueryResult {
-	return surge.SearchFile(Query, Skip, Take)
+func getRemoteFiles(Query string, OrderBy string, IsDesc bool, Skip int, Take int) surge.SearchQueryResult {
+	return surge.SearchFile(Query, OrderBy, IsDesc, Skip, Take)
 }
 
 func getPublicKey() string {
@@ -129,8 +118,8 @@ func getNumberOfRemoteClient() RemoteClientOnlineModel {
 }
 
 func seedFile() bool {
-	path, err := surge.OpenFileDialog()
-	if err != nil {
+	path := surge.OpenFileDialog()
+	if path == "" {
 		return false
 	}
 	return surge.SeedFile(path)
@@ -180,6 +169,9 @@ func (s *WailsRuntime) WailsShutdown() {
 }
 
 func main() {
+
+	//surge.HashFile("C:\\Users\\mitch\\Downloads\\surge_remote\\surge-0.2.0-beta.windows.zip")
+
 	stats := &Stats{}
 	surge.InitializeDb()
 	surge.InitializeLog()
@@ -189,8 +181,6 @@ func main() {
 	argsWithoutProg := os.Args[1:]
 	log.Println(argsWithProg)
 	log.Println(argsWithoutProg)
-	//test string
-	//arguments = []string{"surge://|file|Big Buck Bunny (720p_24fps_H264-128kbit_AAC).mp4|69742504|81c91110a3ef40a26b3ea2830b115a455404d99fd7eefd1f622dfd65a47f9aa1|cbf7e5e0fe9c4d97ace680164fa31e399fac7df8921238dc390465e48ae21fe6|/"}
 
 	//invoked with a download
 	if len(argsWithoutProg) > 0 {

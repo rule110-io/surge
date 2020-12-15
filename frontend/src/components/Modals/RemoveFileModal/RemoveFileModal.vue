@@ -32,6 +32,8 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
+
 import Button from "@/components/Button/Button";
 import Checkbox from "@/components/Controls/Checkbox/Checkbox.vue";
 
@@ -53,6 +55,7 @@ export default {
     };
   },
   computed: {
+    ...mapState("files", ["localFilesConfig"]),
     isOpen() {
       return this.open;
     },
@@ -66,6 +69,10 @@ export default {
     },
     removeFile() {
       window.backend.removeFile(this.file.FileHash, this.fromDisk).then(() => {
+        let newConfig = Object.assign({}, this.localFilesConfig);
+        newConfig.skip = 0;
+        this.$store.commit("files/setLocalFilesConfig", newConfig);
+
         this.$store.dispatch("files/fetchLocalFiles");
         this.closeModal();
       });

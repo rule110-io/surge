@@ -13,6 +13,9 @@
 
     &_small {
       canvas {
+        position: absolute;
+        left: -4px;
+        top: -4px;
         height: 35px;
         width: 35px;
       }

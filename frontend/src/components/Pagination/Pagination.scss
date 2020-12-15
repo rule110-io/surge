@@ -1,10 +1,20 @@
 .pagination {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
   position: absolute;
-  bottom: -32px;
+  width: 100%;
+  bottom: -60px;
+
+  &__descr {
+    text-align: center;
+    margin-bottom: $padding-micro;
+    font-size: $fz-md;
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+  }
 
   &__button {
     cursor: pointer;

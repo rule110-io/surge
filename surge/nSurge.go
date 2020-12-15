@@ -6,86 +6,29 @@ import (
 	"math/rand"
 	"net"
 	"os"
-	"os/user"
-	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 
+	"github.com/rule110-io/surge-ui/surge/platform"
 	log "github.com/sirupsen/logrus"
 
 	bitmap "github.com/boljen/go-bitmap"
 	movavg "github.com/mxmCherry/movavg"
-	nkn "github.com/nknorg/nkn-sdk-go"
-	dialog "github.com/sqweek/dialog"
 	"github.com/wailsapp/wails"
 )
 
 // SurgeActive is true when client is operational
 var SurgeActive bool = false
-
-//ChunkSize is size of chunk in bytes (256 kB)
-const ChunkSize = 1024 * 256
-
-//NumClients is the number of NKN clients
-const NumClients = 8
-
-//NumWorkers is the total number of concurrent chunk fetches allowed
-const NumWorkers = 32
-
-const remotePath = "downloads"
-
-var remoteFolder = ""
-var magnetstring = ""
-var filestring = ""
-var mode = ""
-
 var subscribers []string
-
-var clientInitialized = false
-
-//OS folder permission bitflags
-const (
-	osRead       = 04
-	osWrite      = 02
-	osEx         = 01
-	osUserShift  = 6
-	osGroupShift = 3
-	osOthShift   = 0
-
-	osUserR   = osRead << osUserShift
-	osUserW   = osWrite << osUserShift
-	osUserX   = osEx << osUserShift
-	osUserRw  = osUserR | osUserW
-	osUserRwx = osUserRw | osUserX
-
-	osGroupR   = osRead << osGroupShift
-	osGroupW   = osWrite << osGroupShift
-	osGroupX   = osEx << osGroupShift
-	osGroupRw  = osGroupR | osGroupW
-	osGroupRwx = osGroupRw | osGroupX
-
-	osOthR   = osRead << osOthShift
-	osOthW   = osWrite << osOthShift
-	osOthX   = osEx << osOthShift
-	osOthRw  = osOthR | osOthW
-	osOthRwx = osOthRw | osOthX
-
-	osAllR   = osUserR | osGroupR | osOthR
-	osAllW   = osUserW | osGroupW | osOthW
-	osAllX   = osUserX | osGroupX | osOthX
-	osAllRw  = osAllR | osAllW
-	osAllRwx = osAllRw | osGroupX
-)
 
 var localFileName string
 var sendSize int64
 var receivedSize int64
 
 var startTime = time.Now()
-
-var client *nkn.MultiClient
 
 var clientOnlineMap map[string]bool
 
@@ -128,8 +71,10 @@ type File struct {
 	IsUploading   bool
 	IsPaused      bool
 	IsMissing     bool
+	IsHashing     bool
 	ChunkMap      []byte
 	SeederCount   int
+	ChunksShared  int
 }
 
 //NumClientsStruct .
@@ -140,14 +85,15 @@ type NumClientsStruct struct {
 
 // FileListing struct for all frontend file listing props
 type FileListing struct {
-	FileName    string
-	FileSize    int64
-	FileHash    string
-	Seeders     []string
-	NumChunks   int
-	IsTracked   bool
-	IsAvailable bool
-	SeederCount int
+	FileName     string
+	FileSize     int64
+	FileHash     string
+	Seeders      []string
+	NumChunks    int
+	IsTracked    bool
+	IsAvailable  bool
+	SeederCount  int
+	ChunksShared int
 }
 
 // Session is a wrapper for everything needed to maintain a surge session
@@ -183,9 +129,6 @@ var ListedFiles []File
 
 var wailsRuntime *wails.Runtime
 
-var labelText chan string
-var appearance chan string
-
 var numClientsSubscribed int = 0
 var numClientsOnline int = 0
 
@@ -194,6 +137,11 @@ var numClientsStore *wails.Store
 // WailsBind is a binding function at startup
 func WailsBind(runtime *wails.Runtime) {
 	wailsRuntime = runtime
+	platform.SetWailsRuntime(wailsRuntime, SetVisualMode)
+
+	//Mac specific functions
+	go platform.InitOSHandler()
+	platform.SetVisualModeLikeOS()
 
 	numClients := NumClientsStruct{
 		Subscribed: 0,
@@ -202,188 +150,71 @@ func WailsBind(runtime *wails.Runtime) {
 
 	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
 
-	//Update scan results starts after binding numClientStore is shared storage
-	go updateClientOnlineMap()
+	//Get subs first synced then grab file queries for those subs
+	GetSubscriptions()
+	go queryRemoteForFiles()
+
+	//Startup async processes to continue processing subs/files and updating gui
+	go updateGUI()
+	go rescanPeers()
+}
+
+//SetVisualMode Sets the visualmode
+func SetVisualMode(visualMode int) {
+	if visualMode == 0 {
+		//light mode
+		DbWriteSetting("DarkMode", "false")
+		wailsRuntime.Events.Emit("darkThemeEvent", "false")
+	} else if visualMode == 1 {
+		//dark mode
+		DbWriteSetting("DarkMode", "true")
+		wailsRuntime.Events.Emit("darkThemeEvent", "true")
+	}
 }
 
 // Start initializes surge
 func Start(args []string) {
-	var err error
 
-	//Mac specific functions
-	go initOSHandler()
-	go setVisualModeLikeOS()
+	//Initialize all our global data maps
+	clientOnlineMap = make(map[string]bool)
+	downloadBandwidthAccumulator = make(map[string]int)
+	uploadBandwidthAccumulator = make(map[string]int)
+	zeroBandwidthMap = make(map[string]bool)
+	fileBandwidthMap = make(map[string]BandwidthMA)
+	chunksInTransit = make(map[string]bool)
 
-	var dirFileMode os.FileMode
-	var dir = GetSurgeDir()
-	dirFileMode = os.ModeDir | (osUserRwx | osAllR)
-
-	myself, err := user.Current()
+	//Initialize folder structures on os filesystem
+	newlyCreated, err := platform.InitializeFolders()
 	if err != nil {
 		pushError("Error on startup", err.Error())
 	}
-	homedir := myself.HomeDir
-
-	remoteFolder = homedir + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "surge_" + remotePath
-
-	if _, err := os.Stat(dir); os.IsNotExist(err) {
+	if newlyCreated {
 		// seems like this is the first time starting the app
 		//set tour to active
 		DbWriteSetting("Tour", "true")
 		//set default mode to light
 		DbWriteSetting("DarkMode", "false")
-
-		os.Mkdir(dir, dirFileMode)
 	}
 
-	//Ensure remote folders exist
-	if _, err := os.Stat(remoteFolder); os.IsNotExist(err) {
-		os.Mkdir(remoteFolder, dirFileMode)
-	}
-
-	account := InitializeAccount()
-	client, err = nkn.NewMultiClient(account, "", NumClients, false, nil)
-
-	clientInitialized = true
-
-	if err != nil {
-		pushError("Error on startup", err.Error())
-	} else {
-		log.Println("MY ADDRESS:", client.Addr().String())
-		<-client.OnConnect.C
-
-		pushNotification("Client Connected", "Successfully connected to the NKN network")
-
-		client.Listen(nil)
-		SurgeActive = true
-		go Listen()
-
-		topicEncoded := TopicEncode(TestTopic)
-
-		clientOnlineMap = make(map[string]bool)
-		downloadBandwidthAccumulator = make(map[string]int)
-		uploadBandwidthAccumulator = make(map[string]int)
-		zeroBandwidthMap = make(map[string]bool)
-		fileBandwidthMap = make(map[string]BandwidthMA)
-		chunksInTransit = make(map[string]bool)
-
-		dbFiles := dbGetAllFiles()
-		var filesOnDisk []File
-
-		for i := 0; i < len(dbFiles); i++ {
-			if FileExists(dbFiles[i].Path) {
-				filesOnDisk = append(filesOnDisk, dbFiles[i])
-			} else {
-				dbFiles[i].IsMissing = true
-				dbFiles[i].IsDownloading = false
-				dbFiles[i].IsUploading = false
-				dbInsertFile(dbFiles[i])
-			}
-		}
-
-		go BuildSeedString(filesOnDisk)
-		for i := 0; i < len(filesOnDisk); i++ {
-			go restartDownload(filesOnDisk[i].FileHash)
-		}
-
-		go sendSeedSubscription(topicEncoded, "Surge File Seeder")
-		go GetSubscriptions(topicEncoded)
-
-		go updateGUI()
-
-		go queryRemoteForFiles()
-
-		go watchOSXHandler()
-
-		go rescanPeers()
-
-		//Insert new file from arguments and start download
-		if args != nil && len(args) > 0 && len(args[0]) > 0 {
-			askUser("startDownloadMagnetLinks", "{files : ["+args[0]+"]}")
-		}
-
-		//Just paste one of your own magnets (from the startup logs) here to download something over nkn from yourself to test if no-one is online
-		//go ParsePayloadString("surge://|file|justatvshow.mp4|219091405|cd0731496277102a869dacb0e99b7708c2b708824b647ffeb267de4743b7856e|a536528d2e321623375535af88974d7a7899836f9b84644320023bc3af3b9cf1|/")
+	//Initialize our surge nkn client
+	initialSuccess := InitializeClient(args, false)
+	if !initialSuccess {
+		go InitializeClient(args, true)
 	}
 }
 
-//Stop cleanup for surge
-func Stop() {
-	client.Close()
-	client = nil
-}
-
-func rescanPeers() {
-	defer RecoverAndLog()
-	for true {
-		time.Sleep(time.Minute)
-		topicEncoded := TopicEncode(TestTopic)
-		go GetSubscriptions(topicEncoded)
+func chunkMapFull(s []byte, num int) bool {
+	//No chunkmap means no download was initiated, all chunks are local
+	if s == nil {
+		return true
 	}
-}
 
-func updateClientOnlineMap() {
-	defer RecoverAndLog()
-	for true {
-		var numOnline = 0
-		//Count num online clients
-		clientOnlineRefreshingLock.Lock()
-		for _, value := range clientOnlineMap {
-			if value == true {
-				numOnline++
-			}
+	for i := 0; i < num; i++ {
+		if bitmap.Get(s, i) == false {
+			return false
 		}
-
-		numClientsSubscribed = len(clientOnlineMap)
-
-		numClientsStore.Update(func(data NumClientsStruct) NumClientsStruct {
-			return NumClientsStruct{
-				Subscribed: numClientsSubscribed,
-				Online:     numOnline,
-			}
-		})
-		clientOnlineRefreshingLock.Unlock()
-		time.Sleep(time.Second)
 	}
-}
-
-func queryRemoteForFiles() {
-	defer RecoverAndLog()
-	for true {
-
-		var wg sync.WaitGroup
-
-		//lock for write to map
-		clientOnlineRefreshingLock.Lock()
-		for _, address := range subscribers {
-
-			wg.Add(1)
-
-			queryWorker := func(workerWaitGroup *sync.WaitGroup) {
-				defer workerWaitGroup.Done()
-
-				//Request
-				clientOnline := SendQueryRequest(address, "Testing query functionality.")
-
-				clientOnlineMapLock.Lock()
-				clientOnlineMap[address] = clientOnline
-				clientOnlineMapLock.Unlock()
-			}
-
-			go queryWorker(&wg)
-		}
-
-		//Wait till all requests resolve then sleep for a bit before rescanning
-		wg.Wait()
-		clientOnlineRefreshingLock.Unlock()
-
-		time.Sleep(time.Second * 5)
-	}
-}
-
-//GetNumberOfRemoteClient returns number of clients and online clients
-func GetNumberOfRemoteClient() (int, int) {
-	return numClientsSubscribed, numClientsOnline
+	return true
 }
 
 func updateGUI() {
@@ -403,25 +234,23 @@ func updateGUI() {
 
 			fileProgressMap[session.FileHash] = float32(float64(session.Downloaded) / float64(session.FileSize))
 
-			if session.Downloaded == session.FileSize {
-
-				filename := "unknown"
-				listedFileByHash := getListedFileByHash(session.FileHash)
-				if listedFileByHash != nil {
-					filename = listedFileByHash.FileName
-				}
-				showNotification("Download Finished", "Download for "+filename+" finished!")
-				pushNotification("Download Finished", filename)
-				session.session.Close()
-
+			if session.Downloaded >= session.FileSize {
 				fileEntry, err := dbGetFile(session.FileHash)
 				if err != nil {
 					pushError("Error on download complete", err.Error())
+					continue
 				}
-				fileEntry.IsDownloading = false
-				fileEntry.IsUploading = true
-				dbInsertFile(*fileEntry)
-				go AddToSeedString(*fileEntry)
+
+				if chunkMapFull(fileEntry.ChunkMap, fileEntry.NumChunks) {
+					platform.ShowNotification("Download Finished", "Download for "+fileEntry.FileName+" finished!")
+					pushNotification("Download Finished", fileEntry.FileName)
+					session.session.Close()
+
+					fileEntry.IsDownloading = false
+					fileEntry.IsUploading = true
+					dbInsertFile(*fileEntry)
+					go AddToSeedString(*fileEntry)
+				}
 			}
 		}
 		sessionsWriteLock.Unlock()
@@ -494,33 +323,6 @@ func fileBandwidth(FileID string) (Download int, Upload int) {
 	fileBandwidthMap[FileID].Upload.Add(float64(upAccu))
 
 	return int(fileBandwidthMap[FileID].Download.Avg()), int(fileBandwidthMap[FileID].Upload.Avg())
-
-	//Take bandwith delta
-	/*deltaDownload := int(Session.Downloaded - Session.deltaDownloaded)
-	Session.deltaDownloaded = Session.Downloaded
-	deltaUpload := int(Session.Uploaded - Session.deltaUploaded)
-	Session.deltaUploaded = Session.Uploaded
-
-	//Append to queue
-	Session.bandwidthDownloadQueue = append(Session.bandwidthDownloadQueue, deltaDownload)
-	Session.bandwidthUploadQueue = append(Session.bandwidthUploadQueue, deltaUpload)
-
-	//Dequeue if queue > 10
-	if len(Session.bandwidthDownloadQueue) > 10 {
-		Session.bandwidthDownloadQueue = Session.bandwidthDownloadQueue[1:]
-		Session.bandwidthUploadQueue = Session.bandwidthUploadQueue[1:]
-	}
-
-	var downloadMA10 = 0
-	var uploadMA10 = 0
-	for i := 0; i < len(Session.bandwidthDownloadQueue); i++ {
-		downloadMA10 += Session.bandwidthDownloadQueue[i]
-		uploadMA10 += Session.bandwidthUploadQueue[i]
-	}
-	downloadMA10 /= len(Session.bandwidthDownloadQueue)
-	uploadMA10 /= len(Session.bandwidthUploadQueue)
-
-	return downloadMA10, uploadMA10*/
 }
 
 //ByteCountSI converts filesize in bytes to human readable text
@@ -545,39 +347,6 @@ func getFileSize(path string) (size int64) {
 	}
 	// get the size
 	return fi.Size()
-}
-
-func sendSeedSubscription(Topic string, Payload string) {
-	defer RecoverAndLog()
-	txnHash, err := client.Subscribe("", Topic, 4320, Payload, nil)
-	if err != nil {
-		log.Println("Probably already subscribed", err)
-	} else {
-		log.Println("Subscribed: ", txnHash)
-	}
-}
-
-//GetSubscriptions .
-func GetSubscriptions(Topic string) {
-	defer RecoverAndLog()
-	subResponse, err := client.GetSubscribers(Topic, 0, 100, true, true)
-	if err != nil {
-		pushError("Error on get subscriptions", err.Error())
-		return
-	}
-
-	for k, v := range subResponse.SubscribersInTxPool.Map {
-		subResponse.Subscribers.Map[k] = v
-	}
-
-	subscribers = []string{}
-	for k, v := range subResponse.Subscribers.Map {
-		if len(v) > 0 {
-			if k != client.Addr().String() {
-				subscribers = append(subscribers, k)
-			}
-		}
-	}
 }
 
 // Stats .
@@ -640,6 +409,11 @@ func DownloadFile(Hash string) bool {
 
 	pushNotification("Download Started", file.FileName)
 
+	remoteFolder, err := platform.GetRemoteFolder()
+	if err != nil {
+		log.Println("Remote folder does not exist")
+	}
+
 	// If the file doesn't exist allocate it
 	var path = remoteFolder + string(os.PathSeparator) + file.FileName
 	AllocateFile(path, file.FileSize)
@@ -676,6 +450,7 @@ func DownloadFile(Hash string) bool {
 		defer terminate(terminateFlag)
 
 		for i := 0; i < numChunks; i++ {
+
 			newFileData := getListedFileByHash(Hash)
 			if newFileData != nil {
 				file = newFileData
@@ -695,6 +470,9 @@ func DownloadFile(Hash string) bool {
 				}
 			}
 
+			for workerCount >= NumWorkers {
+				time.Sleep(time.Millisecond)
+			}
 			workerCount++
 
 			//Create a async job to download a chunk
@@ -730,7 +508,6 @@ func DownloadFile(Hash string) bool {
 					mutateSeederLock.Unlock()
 
 					if len(downloadSessions) == 0 {
-						pushNotification("Download stopped, no more remote connections.", file.FileName)
 						return
 					}
 				}
@@ -762,7 +539,6 @@ func DownloadFile(Hash string) bool {
 					mutateSeederLock.Unlock()
 
 					if len(downloadSessions) == 0 {
-						pushNotification("Download stopped, no more remote connections.", file.FileName)
 						return
 					}
 				}
@@ -781,12 +557,6 @@ func DownloadFile(Hash string) bool {
 				seederAlternator = 0
 			}
 			mutateSeederLock.Unlock()
-
-			for workerCount >= NumWorkers {
-				time.Sleep(time.Millisecond)
-				//log.Println("Active Workers:", workerCount)
-				//fmt.Println("Active Workers:", workerCount)
-			}
 		}
 	}
 
@@ -823,7 +593,7 @@ func DownloadFile(Hash string) bool {
 					}
 
 					dbFile, err := dbGetFile(Hash)
-					if err != nil && dbFile != nil {
+					if err == nil && dbFile != nil {
 						//Prime the session with known bytes downloaded
 						surgeSession.Downloaded = int64(dbFile.NumChunks-len(randomChunks)) * ChunkSize
 						//If the last chunk is set, we want to deduct the missing bytes because its not a complete chunk
@@ -851,32 +621,6 @@ func DownloadFile(Hash string) bool {
 	return true
 }
 
-func pushNotification(title string, text string) {
-	//If wails frontend is not yet binded, we wait in a task to not block main thread
-	if wailsRuntime == nil {
-
-		waitAndPush := func() {
-			for wailsRuntime == nil {
-				time.Sleep(50)
-			}
-			wailsRuntime.Events.Emit("notificationEvent", title, text)
-		}
-		go waitAndPush()
-	} else {
-		wailsRuntime.Events.Emit("notificationEvent", title, text)
-	}
-}
-
-func askUser(context string, payload string) {
-	//log.Println("Emitting Event: ", "notificationEvent", title, text)
-	wailsRuntime.Events.Emit("userEvent", context, payload)
-}
-
-func pushError(title string, text string) {
-	//log.Println("Emitting Event: ", "errorEvent", title, text)
-	wailsRuntime.Events.Emit("errorEvent", title, text)
-}
-
 //SearchQueryResult is a paging query result for file searches
 type SearchQueryResult struct {
 	Result []FileListing
@@ -890,13 +634,13 @@ type LocalFilePageResult struct {
 }
 
 //SearchFile runs a paged query
-func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
+func SearchFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) SearchQueryResult {
 	defer RecoverAndLog()
 	var results []FileListing
 
 	ListedFilesLock.Lock()
 	for _, file := range ListedFiles {
-		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) {
+		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) {
 
 			result := FileListing{
 				FileName:    file.FileName,
@@ -908,17 +652,6 @@ func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
 			}
 
 			tracked, err := dbGetFile(result.FileHash)
-			//if err == nil && tracked != nil {
-			//	result.IsTracked = true
-			//	result.IsAvailable = true
-
-			//If any chunk is missing set available to false
-			//	for i := 0; i < result.NumChunks; i++ {
-			//		if bitmap.Get(tracked.ChunkMap, i) == false {
-			//			result.IsAvailable = false
-			//			break
-			//		}
-			//}
 
 			//only add non-local files to the result
 			if err != nil && tracked == nil {
@@ -928,6 +661,27 @@ func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
 		}
 	}
 	ListedFilesLock.Unlock()
+
+	switch OrderBy {
+	case "FileName":
+		if !IsDesc {
+			sort.Sort(sortByFileNameAsc(results))
+		} else {
+			sort.Sort(sortByFileNameDesc(results))
+		}
+	case "FileSize":
+		if !IsDesc {
+			sort.Sort(sortByFileSizeAsc(results))
+		} else {
+			sort.Sort(sortByFileSizeDesc(results))
+		}
+	default:
+		if !IsDesc {
+			sort.Sort(sortBySeederCountAsc(results))
+		} else {
+			sort.Sort(sortBySeederCountDesc(results))
+		}
+	}
 
 	left := Skip
 	right := Skip + Take
@@ -1029,9 +783,10 @@ func SetFilePause(Hash string, State bool) {
 }
 
 //OpenFileDialog uses platform agnostic package for a file dialog
-func OpenFileDialog() (string, error) {
+func OpenFileDialog() string {
 	defer RecoverAndLog()
-	return dialog.File().Load()
+	selectedFile := wailsRuntime.Dialog.SelectFile()
+	return selectedFile
 }
 
 //RemoveFile removes file from surge db and optionally from disk
@@ -1057,9 +812,8 @@ func RemoveFile(Hash string, FromDisk bool) bool {
 		}
 		err = os.Remove(file.Path)
 		if err != nil {
-			log.Println("Error on remove file (remove from disk)", err.Error())
-			pushError("Error on remove file (remove from disk)", err.Error())
-			return false
+			log.Println("Error on remove file from disk - removing from surge", err.Error())
+			pushError("Error on remove file from disk - removing from surge", err.Error())
 		}
 	}
 
@@ -1076,15 +830,6 @@ func RemoveFile(Hash string, FromDisk bool) bool {
 	go BuildSeedString(dbFiles)
 
 	return true
-}
-
-//GetSurgeDir returns the surge dir
-func GetSurgeDir() string {
-	defer RecoverAndLog()
-	if runtime.GOOS == "windows" {
-		return os.Getenv("APPDATA") + string(os.PathSeparator) + "Surge"
-	}
-	return os.Getenv("HOME") + string(os.PathSeparator) + ".surge"
 }
 
 //GetMyAddress returns current client address

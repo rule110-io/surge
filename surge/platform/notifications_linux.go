@@ -1,4 +1,4 @@
-package surge
+package platform
 
 import (
 	"os"
@@ -8,7 +8,8 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func showNotification(title string, text string) {
+// ShowNotification .
+func ShowNotification(title string, text string) error {
 
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {

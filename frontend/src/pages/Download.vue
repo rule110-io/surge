@@ -53,6 +53,7 @@
             filesConfig="localFilesConfig"
             filePages="localPages"
             commit="files/setLocalFilesConfig"
+            :count="localCount"
           />
         </template>
       </div>
@@ -95,7 +96,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("files", ["localFiles"]),
+    ...mapState("files", ["localFiles", "localCount"]),
   },
   mounted() {
     this.$store.dispatch("files/fetchLocalFiles");

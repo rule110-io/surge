@@ -4,11 +4,27 @@
       <h1 class="page__title">Remote Files</h1>
       <div class="table">
         <div class="table__row">
-          <div class="table__head">Name & size</div>
-          <div class="table__head">Chunks</div>
-          <div class="table__head">File Hash</div>
-          <div class="table__head">Seeds</div>
-          <div class="table__head">Source</div>
+          <div
+            v-for="header in headers"
+            :key="header.title"
+            class="table__head"
+            :class="[
+              header.sortable ? 'table__head_sortable' : '',
+              header.orderName === remoteFilesConfig.orderBy
+                ? 'table__head_active'
+                : '',
+            ]"
+            @click="header.sortable ? setSorting(header.orderName) : false"
+          >
+            {{ header.title }}
+
+            <feather
+              v-if="header.orderName === remoteFilesConfig.orderBy"
+              class="table__head-action"
+              :class="!remoteFilesConfig.isDesc ? 'table__head-action_asc' : ''"
+              type="chevron-down"
+            ></feather>
+          </div>
         </div>
         <template v-if="remoteFiles">
           <div
@@ -19,13 +35,13 @@
             <div class="table__cell">
               <FileInfo :file="file" :max="true" :icon="false" />
             </div>
-            <div class="table__cell text_align_center">
+            <div class="table__cell text_align_center" style="min-width: 81px;">
               {{ file.NumChunks }}
             </div>
             <div class="table__cell">
               <FileHash :hash="file.FileHash" />
             </div>
-            <div class="table__cell text_align_center">
+            <div class="table__cell text_align_center" style="min-width: 85px;">
               {{ file.SeederCount }}
             </div>
             <div class="table__cell">
@@ -50,6 +66,7 @@
             filesConfig="remoteFilesConfig"
             filePages="remotePages"
             commit="files/setRemoteFilesConfig"
+            :count="remoteCount"
           />
         </template>
         <TablePlaceholder
@@ -80,15 +97,60 @@ export default {
     FileSeeders,
   },
   data: () => {
-    return {};
+    return {
+      headers: [
+        {
+          title: "Name & size",
+          orderName: "FileName",
+          sortable: true,
+        },
+        {
+          title: "Chunks",
+          orderName: "FileSize",
+          sortable: true,
+        },
+        {
+          title: "File Hash",
+          orderName: "",
+          sortable: false,
+        },
+        {
+          title: "Seeds",
+          orderName: "SeederCount",
+          sortable: true,
+        },
+        {
+          title: "Source",
+          orderName: "",
+          sortable: false,
+        },
+      ],
+    };
   },
   computed: {
-    ...mapState("files", ["remoteFiles", "localFiles", "remoteFilesConfig"]),
+    ...mapState("files", [
+      "remoteFiles",
+      "localFiles",
+      "remoteFilesConfig",
+      "remoteCount",
+    ]),
   },
   mounted() {
     this.$store.dispatch("files/fetchRemoteFiles");
   },
   methods: {
+    setSorting(orderBy) {
+      console.log(orderBy);
+      let newConfig = Object.assign({}, this.remoteFilesConfig);
+      const currentOrder = newConfig.orderBy;
+      const currentIsDesc = newConfig.isDesc;
+
+      newConfig.isDesc = currentOrder === orderBy ? !currentIsDesc : true;
+      newConfig.orderBy = orderBy;
+
+      this.$store.commit("files/setRemoteFilesConfig", newConfig);
+      this.$store.dispatch("files/fetchRemoteFiles");
+    },
     download(hash) {
       window.backend.downloadFile(hash).then(() => {
         this.$store.dispatch("files/fetchLocalFiles");

@@ -1,4 +1,4 @@
-package surge
+package platform
 
 //#cgo CFLAGS: -x objective-c
 //#cgo LDFLAGS: -framework Cocoa
@@ -19,7 +19,7 @@ func HandleURL(u *C.char) {
 
 //export VisualModeSwitched
 func VisualModeSwitched() {
-	setVisualModeLikeOS()
+	SetVisualModeLikeOS()
 }
 
 //export HandleFile
@@ -27,7 +27,8 @@ func HandleFile(u *C.char) {
 	filestring = C.GoString(u)
 }
 
-func watchOSXHandler() {
+//WatchOSXHandler .
+func WatchOSXHandler() {
 	for true {
 		if len(magnetstring) > 0 {
 			//do act
@@ -37,7 +38,7 @@ func watchOSXHandler() {
 				return
 			}
 			//go ParsePayloadString(decodedMagetstring)
-			askUser("startDownloadMagnetLinks", "{files : ["+decodedMagetstring+"]}")
+			AskUser("startDownloadMagnetLinks", "{files : ["+decodedMagetstring+"]}")
 
 			//reregister URLHandler
 			C.StartURLHandler()
@@ -47,7 +48,7 @@ func watchOSXHandler() {
 		if len(filestring) > 0 {
 			//decode file contents
 			//push in array
-			askUser("startDownloadMagnetLinks", "{files : ["+filestring+"]}")
+			AskUser("startDownloadMagnetLinks", "{files : ["+filestring+"]}")
 			//reregister URLHandler
 			filestring = ""
 		}
@@ -55,20 +56,20 @@ func watchOSXHandler() {
 	}
 }
 
-func setVisualModeLikeOS() {
+//SetVisualModeLikeOS .
+func SetVisualModeLikeOS() {
 	mode := C.GoString(C.GetOsxMode())
 	if mode == "" {
 		//light mode
-		DbWriteSetting("DarkMode", "false")
-		wailsRuntime.Events.Emit("darkThemeEvent", "false")
+		setVisualModeRef(0)
 	} else {
 		//dark mode
-		DbWriteSetting("DarkMode", "true")
-		wailsRuntime.Events.Emit("darkThemeEvent", "true")
+		setVisualModeRef(1)
 	}
 }
 
-func initOSHandler() {
+// InitOSHandler .
+func InitOSHandler() {
 	// the event handler blocks!, so buffer the channel at least once to get the first message
 	labelText = make(chan string, 1)
 

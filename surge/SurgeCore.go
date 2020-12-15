@@ -21,6 +21,7 @@ import (
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
 	pb "github.com/rule110-io/surge-ui/payloads"
+	"github.com/rule110-io/surge-ui/surge/platform"
 	"google.golang.org/protobuf/proto"
 
 	open "github.com/skratchdot/open-golang/open"
@@ -92,16 +93,30 @@ func RequestChunk(Session *Session, FileID string, ChunkID int32) bool {
 func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	defer RecoverAndLog()
 	//Open file
+
+	fileWriteLock.Lock()
 	fileInfo, err := dbGetFile(FileID)
 	if err != nil {
-		log.Error("Error on transmit chunk", err.Error())
+		log.Error("Error on transmit chunk - file not in db", err.Error())
 		return
 	}
+	fileInfo.ChunksShared++
+	dbInsertFile(*fileInfo)
+	fileWriteLock.Unlock()
 
 	file, err := os.Open(fileInfo.Path)
 
+	//When we have an OS read error on the file mark the file as missing, stop down and uploads on it
 	if err != nil {
-		log.Error("Error on transmit chunk", err.Error())
+		log.Error("Error on transmit chunk - file read failure", err.Error())
+
+		fileWriteLock.Lock()
+		fileInfo.IsMissing = true
+		fileInfo.IsDownloading = false
+		fileInfo.IsUploading = false
+		dbInsertFile(*fileInfo)
+		fileWriteLock.Unlock()
+
 		return
 	}
 	defer file.Close()
@@ -113,7 +128,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 
 	if err != nil {
 		if err != io.EOF {
-			log.Error("Error on transmit chunk", err.Error())
+			log.Error("Error on transmit chunk - read chunk failed: ", ChunkID, err.Error())
 			return
 		}
 	}
@@ -126,14 +141,14 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	}
 	dateReplySerialized, err := proto.Marshal(dataReply)
 	if err != nil {
-		log.Error("Error on transmit chunk", err.Error())
+		log.Error("Error on transmit chunk - chunk serialization error", err.Error())
 		return
 	}
 
 	//Transmit the chunk
 	err = SessionWrite(Session, dateReplySerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), dateReplySerialized, nil)
 	if err != nil {
-		log.Error("Error on transmit chunk", err.Error())
+		log.Error("Error on transmit chunk - failed to write to session", err.Error())
 		return
 	}
 	log.Println("Chunk transmitted: ", bytesread, " bytes")
@@ -166,15 +181,18 @@ func SendQueryRequest(Addr string, Query string) bool {
 
 		dialConfig := &nkn.DialConfig{
 			SessionConfig: sessionConfig,
-			DialTimeout:   5000,
+			DialTimeout:   60000,
 		}
 
 		downloadSession, err := client.DialWithConfig(Addr, dialConfig)
 		if err != nil {
-			log.Printf("Peer with address %s is not online, stopped trying after 5000ms\n", Addr)
+			fmt.Println(string("\033[35m"), "Peer with address is not online, stopped trying after 60000ms", Addr, string("\033[0m"))
+			go setClientOnlineMap(Addr, false)
 			return false
 		}
-		log.Printf("Connected to peer %s requesting file listings\n", Addr)
+		fmt.Println(string("\033[36m"), "Connected to peer %s requesting file listings", Addr, string("\033[0m"))
+
+		go setClientOnlineMap(Addr, true)
 
 		downloadReader := bufio.NewReader(downloadSession)
 
@@ -393,13 +411,14 @@ func processQueryRequest(Session *Session, Data []byte) {
 
 func processQueryResponse(Session *Session, Data []byte) {
 	defer RecoverAndLog()
+
 	//Try to parse SurgeMessage
 	s := string(Data)
 	seeder := Session.session.RemoteAddr().String()
 
-	clientOnlineMapLock.Lock()
-	clientOnlineMap[seeder] = true
-	clientOnlineMapLock.Unlock()
+	fmt.Println(string("\033[36m"), "file query response received", seeder, string("\033[0m"))
+
+	go setClientOnlineMap(seeder, true)
 
 	ListedFilesLock.Lock()
 
@@ -416,15 +435,14 @@ func processQueryResponse(Session *Session, Data []byte) {
 	}
 
 	//Remove empty seeders listings
-	/*
-		for i := 0; i < len(ListedFiles); i++ {
-			if len(ListedFiles[i].Seeders) == 0 {
-				// Remove the element at index i from a.
-				ListedFiles[i] = ListedFiles[len(ListedFiles)-1] // Copy last element to index i.
-				ListedFiles[len(ListedFiles)-1] = File{}         // Erase last element (write zero value).
-				ListedFiles = ListedFiles[:len(ListedFiles)-1]   // Truncate slice.
-			}
-		}*/
+	for i := 0; i < len(ListedFiles); i++ {
+		if len(ListedFiles[i].Seeders) == 0 {
+			// Remove the element at index i from a.
+			ListedFiles[i] = ListedFiles[len(ListedFiles)-1] // Copy last element to index i.
+			ListedFiles[len(ListedFiles)-1] = File{}         // Erase last element (write zero value).
+			ListedFiles = ListedFiles[:len(ListedFiles)-1]   // Truncate slice.
+		}
+	}
 
 	//Parse the response
 	payloadSplit := strings.Split(s, "surge://")
@@ -456,7 +474,9 @@ func processQueryResponse(Session *Session, Data []byte) {
 
 				//if the seeder is unique add it as an additional seeder for the file
 				ListedFiles[l].Seeders = append(ListedFiles[l].Seeders, seeder)
+				ListedFiles[l].Seeders = distinctStringSlice(ListedFiles[l].Seeders)
 				ListedFiles[l].SeederCount = len(ListedFiles[l].Seeders)
+
 				replace = true
 				break
 			}
@@ -465,6 +485,8 @@ func processQueryResponse(Session *Session, Data []byte) {
 		if replace == false {
 			ListedFiles = append(ListedFiles, newListing)
 		}
+
+		fmt.Println(string("\033[33m"), "Filename", newListing.FileName, "FileHash", newListing.FileHash, string("\033[0m"))
 
 		log.Println("Query response new file: ", newListing.FileName, " seeder: ", seeder)
 
@@ -475,6 +497,18 @@ func processQueryResponse(Session *Session, Data []byte) {
 		//fileBox.Append(newButton)
 	}
 	ListedFilesLock.Unlock()
+}
+
+func distinctStringSlice(stringSlice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range stringSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
 }
 
 //ParsePayloadString parses payload of files
@@ -541,6 +575,13 @@ func WriteChunk(Session *Session, FileID string, ChunkID int32, Chunk []byte) {
 		fileInfo, err := dbGetFile(FileID)
 		if err != nil {
 			pushError("Error on write chunk (db get)", err.Error())
+			return
+		}
+
+		remoteFolder, err := platform.GetRemoteFolder()
+
+		if err != nil {
+			pushError("Remote folder does not exist", err.Error())
 			return
 		}
 
@@ -675,6 +716,9 @@ func AddToSeedString(dbFile File) {
 	payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)
 	//log.Println(payload)
 	queryPayload += payload
+
+	//Make sure you're subscribed when seeding a file
+	go subscribeToSurgeTopic()
 }
 
 //SeedFile generates everything needed to seed a file
@@ -682,12 +726,13 @@ func SeedFile(Path string) bool {
 	defer RecoverAndLog()
 	log.Println("Seeding file", Path)
 
-	hashString, err := HashFile(Path)
+	b := make([]byte, 16)
+	_, err := rand.Read(b)
 	if err != nil {
-		log.Println(err)
-		pushNotification("Seed failed", "Could not hash file at "+Path)
-		return false
+		log.Fatal(err)
 	}
+	randomHash := fmt.Sprintf("%x-%x-%x-%x-%x",
+		b[0:4], b[4:6], b[6:8], b[8:10], b[10:])
 
 	fileName := filepath.Base(Path)
 	fileSize := surgeGetFileSize(Path)
@@ -701,32 +746,58 @@ func SeedFile(Path string) bool {
 
 	//Append to local files
 	localFile := File{
-		FileName:    fileName,
-		FileSize:    fileSize,
-		FileHash:    hashString,
-		Path:        Path,
-		NumChunks:   numChunks,
-		ChunkMap:    chunkMap,
-		IsUploading: true,
-		SeederCount: 1,
+		FileName:      fileName,
+		FileSize:      fileSize,
+		FileHash:      randomHash,
+		Path:          Path,
+		NumChunks:     numChunks,
+		ChunkMap:      chunkMap,
+		IsUploading:   false,
+		IsDownloading: false,
+		IsHashing:     true,
+		SeederCount:   0,
 	}
 
 	//Check if file is already seeded
 	_, err = dbGetFile(localFile.FileHash)
 	if err == nil {
 		//File already seeding
-		pushNotification("Seed failed", fileName+" already seeding.")
+		pushError("Seed failed", fileName+" already seeding.")
 		return false
 	}
 
 	//When seeding a new file enter file into db
 	dbInsertFile(localFile)
 
-	//Add to payload
-	payload := surgeGenerateTopicPayload(fileName, fileSize, hashString)
-	queryPayload += payload
-	pushNotification("Now seeding", fileName)
+	go hashFileJob(randomHash)
+
 	return true
+}
+
+func hashFileJob(randomHash string) {
+	//Clean up after were done here, even when we fail we dont want these randomhash files in db
+	defer dbDeleteFile(randomHash)
+
+	dbFile, err := dbGetFile(randomHash)
+	if err != nil {
+		pushError("File Hash Failed", "Could find dbEntry for hash "+randomHash)
+	}
+
+	hashString, err := HashFile(dbFile.Path)
+	if err != nil {
+		log.Println(err)
+		pushError("File Hash Failed", "Could not hash file at "+dbFile.Path)
+	}
+
+	dbFile.IsUploading = true
+	dbFile.IsHashing = false
+	dbFile.FileHash = hashString
+	dbFile.SeederCount = 1
+	dbInsertFile(*dbFile)
+
+	//Add to payload
+	AddToSeedString(*dbFile)
+	pushNotification("Now seeding", dbFile.FileName)
 }
 
 func restartDownload(Hash string) {
@@ -764,7 +835,13 @@ func restartDownload(Hash string) {
 
 	//Nothing more to download
 	if len(missingChunks) == 0 {
-		//TODO: set flag so we dont keep doing this?
+		platform.ShowNotification("Download Finished", "Download for "+file.FileName+" finished!")
+		pushNotification("Download Finished", file.FileName)
+
+		file.IsDownloading = false
+		file.IsUploading = true
+		dbInsertFile(*file)
+		go AddToSeedString(*file)
 		return
 	}
 
@@ -794,11 +871,6 @@ func restartDownload(Hash string) {
 		go initiateSession(surgeSession)
 
 		downloadSessions = append(downloadSessions, surgeSession)
-	}
-
-	if len(downloadSessions) == 0 {
-		pushNotification("Restart download Session Failed, failed to connect to all seeders.", file.FileName)
-		return
 	}
 
 	log.Println("Restarting Download for", file.FileName)
@@ -838,6 +910,9 @@ func restartDownload(Hash string) {
 				}
 			}
 
+			for workerCount >= NumWorkers {
+				time.Sleep(time.Millisecond)
+			}
 			workerCount++
 
 			//Create a async job to download a chunk
@@ -873,7 +948,6 @@ func restartDownload(Hash string) {
 					mutateSeederLock.Unlock()
 
 					if len(downloadSessions) == 0 {
-						pushNotification("Download stopped, no more remote connections.", file.FileName)
 						return
 					}
 				}
@@ -905,7 +979,6 @@ func restartDownload(Hash string) {
 					mutateSeederLock.Unlock()
 
 					if len(downloadSessions) == 0 {
-						pushNotification("Download stopped, no more remote connections.", file.FileName)
 						return
 					}
 				}
@@ -924,12 +997,6 @@ func restartDownload(Hash string) {
 				seederAlternator = 0
 			}
 			mutateSeederLock.Unlock()
-
-			for workerCount >= NumWorkers {
-				time.Sleep(time.Millisecond)
-				//log.Println("Active Workers:", workerCount)
-				//fmt.Println("Active Workers:", workerCount)
-			}
 		}
 	}
 
@@ -966,7 +1033,7 @@ func restartDownload(Hash string) {
 					}
 
 					dbFile, err := dbGetFile(Hash)
-					if err != nil && dbFile != nil {
+					if err == nil && dbFile != nil {
 						//Prime the session with known bytes downloaded
 						surgeSession.Downloaded = int64(dbFile.NumChunks-len(missingChunks)) * ChunkSize
 						//If the last chunk is set, we want to deduct the missing bytes because its not a complete chunk
@@ -1090,7 +1157,7 @@ func RecoverAndLog() {
 		stackSize := runtime.Stack(buf, true)
 		log.Printf("%s\n", string(buf[0:stackSize]))
 
-		var dir = GetSurgeDir()
+		var dir = platform.GetSurgeDir()
 		var logPathOS = dir + string(os.PathSeparator) + "paniclog.txt"
 		f, _ := os.OpenFile(logPathOS, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 		w := bufio.NewWriter(f)

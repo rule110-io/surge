@@ -1,21 +1,26 @@
 <template>
   <div class="pagination">
-    <feather
-      :class="[
-        'pagination__button',
-        isPrev ? 'pagination__button_active' : 'pagination__button_inactive',
-      ]"
-      type="arrow-left-circle"
-      @click.native="decreasePage"
-    />
-    <feather
-      :class="[
-        'pagination__button',
-        isNext ? 'pagination__button_active' : 'pagination__button_inactive',
-      ]"
-      type="arrow-right-circle"
-      @click.native="increasePage"
-    />
+    <div class="pagination__descr">
+      Showing {{ showFrom }} to {{ showTo }} of {{ count }}
+    </div>
+    <div class="pagination__controls">
+      <feather
+        :class="[
+          'pagination__button',
+          isPrev ? 'pagination__button_active' : 'pagination__button_inactive',
+        ]"
+        type="arrow-left-circle"
+        @click.native="decreasePage"
+      />
+      <feather
+        :class="[
+          'pagination__button',
+          isNext ? 'pagination__button_active' : 'pagination__button_inactive',
+        ]"
+        type="arrow-right-circle"
+        @click.native="increasePage"
+      />
+    </div>
   </div>
 </template>
 
@@ -49,6 +54,11 @@ export default {
       default: "",
       required: true,
     },
+    count: {
+      type: Number,
+      default: 0,
+      required: true,
+    },
   },
   data: () => {
     return {};
@@ -69,11 +79,18 @@ export default {
         this[this.filePages] * this.config.get - this.config.get
       );
     },
+    showFrom() {
+      return this.config.skip === 0 ? 1 : this.config.skip + 1;
+    },
+    showTo() {
+      return this.showFrom + this.config.get > this.count
+        ? this.count
+        : this.showFrom + this.config.get - 1;
+    },
     config() {
       return this[this.filesConfig];
     },
   },
-  watch: {},
   methods: {
     decreasePage() {
       if (this.isPrev) {

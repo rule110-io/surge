@@ -1,3 +1,55 @@
 .file-hash {
-  width: 205px;
+  width: 160px;
+  cursor: pointer;
+  position: relative;
+  display: flex;
+  align-items: center;
+
+  &:after {
+    position: absolute;
+    top: -2px;
+    left: 0;
+    display: inline-block;
+    color: $primary;
+    white-space: nowrap;
+    text-align: center;
+    transform: translate3d(-50%, 0, 0);
+    -webkit-backface-visibility: hidden;
+    opacity: 0.001;
+    content: attr(data-label);
+    font-size: $fz-sm;
+  }
+
+  &_active {
+    &:after {
+      animation: floatup 0.5s ease-in-out;
+    }
+  }
+
+  &:hover & {
+    &__icon {
+      color: $primary;
+    }
+  }
+
+  &__icon {
+    height: 14px;
+    width: 14px;
+    position: relative;
+    transition: $transition-1;
+    margin-right: $padding-micro;
+  }
+
+  &__text {
+    flex: 1;
+  }
+}
+
+@keyframes floatup {
+  20% {
+    opacity: 0.999;
+  }
+  100% {
+    transform: translate3d(-50%, -17px, 0);
+  }
 }

@@ -25,7 +25,7 @@ export default {
     },
     scale: {
       type: Number,
-      default: 5,
+      default: 15,
     },
     type: {
       type: String,
@@ -44,8 +44,6 @@ export default {
       const avatar = createIcon({
         // All options are optional
         seed: this.seeder, // seed used to generate icon data, default: random
-        bgcolor: "#fff", // choose a different background color, default: white
-        color: "#02d2b3",
         size: this.size, // width/height of the icon in blocks, default: 10
         scale: this.scale, // width/height of each block in pixels, default: 5
       });
