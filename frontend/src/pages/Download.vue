@@ -4,13 +4,35 @@
       <h1 class="page__title">File Transfers</h1>
       <div class="table">
         <div class="table__row">
-          <div class="table__head">File</div>
-          <div class="table__head text_align_center">Down</div>
-          <div class="table__head text_align_center">Up</div>
-          <div class="table__head text_align_center">Status</div>
-          <div class="table__head">Remaining</div>
-          <div class="table__head">Seeds</div>
-          <div class="table__head"></div>
+          <div class="table__head" style="width: calc(100% - 646px);">
+            File
+          </div>
+          <div
+            class="table__head"
+            style="width: 110px; justify-content: center;"
+          >
+            Down
+          </div>
+          <div
+            class="table__head"
+            style="width: 110px; justify-content: center;"
+          >
+            Up
+          </div>
+          <div
+            class="table__head"
+            style="width: 156px; justify-content: center;"
+          >
+            Status
+          </div>
+          <div
+            class="table__head"
+            style="width: 120px; justify-content: center;"
+          >
+            Remaining
+          </div>
+          <div class="table__head" style="width: 70px;">Seeds</div>
+          <div class="table__head" style="width: 80px;"></div>
         </div>
         <TablePlaceholder v-if="!localFiles.length" type="transfer" />
         <template v-else>
@@ -19,23 +41,37 @@
             v-for="file in localFiles"
             :key="file.FileName"
           >
-            <div class="table__cell">
+            <div class="table__cell" style="width: calc(100% - 646px);">
               <FileInfo :file="file" />
             </div>
-            <div class="table__cell text_align_center">
+            <div
+              class="table__cell"
+              style="width: 110px; justify-content: center;"
+            >
               <FileDown :file="file" />
             </div>
-            <div class="table__cell text_align_center">
+            <div
+              class="table__cell"
+              style="width: 110px; justify-content: center;"
+            >
               <FileUp :file="file" />
             </div>
-            <div class="table__cell"><FileChunks :file="file" /></div>
-            <div class="table__cell">
+            <div class="table__cell" style="width: 156px;">
+              <FileChunks :file="file" />
+            </div>
+            <div
+              class="table__cell"
+              style="width: 120px; justify-content: center;"
+            >
               <FileTime :file="file" />
             </div>
-            <div class="table__cell">
+            <div class="table__cell" style="width: 70px;">
               {{ file.SeederCount }}
             </div>
-            <div class="table__cell text_align_right" style="min-width: 78px;">
+            <div
+              class="table__cell"
+              style="width: 80px; justify-content: flex-end;"
+            >
               <feather
                 class="table__action table__action_remove"
                 type="trash-2"

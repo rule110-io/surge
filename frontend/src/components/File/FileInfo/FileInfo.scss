@@ -10,6 +10,7 @@
     transition: $transition-1;
     cursor: pointer;
     margin-right: $padding-default;
+    flex-shrink: 0;
 
     @include dark-theme {
       color: white;
@@ -88,7 +89,7 @@
   &__size {
     color: $grey;
     margin-right: $padding-micro;
-    min-width: 80px;
+    min-width: 70px;
 
     @include dark-theme {
       color: color(dark, text-light);

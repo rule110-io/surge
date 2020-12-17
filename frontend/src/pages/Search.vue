@@ -45,10 +45,7 @@
             <div class="table__cell" style="width: 15%;">
               <FileHash :hash="file.FileHash" />
             </div>
-            <div
-              class="table__cell"
-              style="width: 90px; justify-content: center;"
-            >
+            <div class="table__cell" style="width: 90px;">
               {{ file.SeederCount }}
             </div>
             <div class="table__cell" style="width: 136px;">
@@ -131,7 +128,7 @@ export default {
           title: "Seeds",
           orderName: "SeederCount",
           sortable: true,
-          style: "width: 90px; justify-content: center;",
+          style: "width: 90px;",
         },
         {
           title: "Source",

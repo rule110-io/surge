@@ -194,7 +194,7 @@ func main() {
 
 	app := wails.CreateApp(&wails.AppConfig{
 		Width:     1144,
-		Height:    768,
+		Height:    790,
 		Resizable: true,
 		Title:     "Surge",
 		JS:        js,
