@@ -3,10 +3,11 @@ package main
 import (
 	"os"
 
+	"log"
+
 	"github.com/leaanthony/mewn"
 	"github.com/rule110-io/surge-ui/surge"
 	"github.com/rule110-io/surge-ui/surge/platform"
-	log "github.com/sirupsen/logrus"
 	"github.com/wailsapp/wails"
 )
 

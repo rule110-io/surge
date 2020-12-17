@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"path/filepath"
 
-	log "github.com/sirupsen/logrus"
+	"log"
 )
 
 // ShowNotification .

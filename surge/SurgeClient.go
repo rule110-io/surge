@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	"log"
+
 	nkn "github.com/nknorg/nkn-sdk-go"
 	"github.com/rule110-io/surge-ui/surge/platform"
-	log "github.com/sirupsen/logrus"
 )
 
 //ChunkSize is size of chunk in bytes (256 kB)

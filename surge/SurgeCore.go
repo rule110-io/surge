@@ -16,7 +16,7 @@ import (
 	"sync"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"log"
 
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
@@ -81,7 +81,7 @@ func RequestChunk(Session *Session, FileID string, ChunkID int32) bool {
 	} else {
 		err := SessionWrite(Session, msgSerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 		if err != nil {
-			log.Error("Failed to request chunk", err)
+			log.Fatal("Failed to request chunk", err)
 			return false
 		}
 	}
@@ -97,7 +97,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	fileWriteLock.Lock()
 	fileInfo, err := dbGetFile(FileID)
 	if err != nil {
-		log.Error("Error on transmit chunk - file not in db", err.Error())
+		log.Fatal("Error on transmit chunk - file not in db", err.Error())
 		return
 	}
 	fileInfo.ChunksShared++
@@ -108,7 +108,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 
 	//When we have an OS read error on the file mark the file as missing, stop down and uploads on it
 	if err != nil {
-		log.Error("Error on transmit chunk - file read failure", err.Error())
+		log.Fatal("Error on transmit chunk - file read failure", err.Error())
 
 		fileWriteLock.Lock()
 		fileInfo.IsMissing = true
@@ -128,7 +128,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 
 	if err != nil {
 		if err != io.EOF {
-			log.Error("Error on transmit chunk - read chunk failed: ", ChunkID, err.Error())
+			log.Fatal("Error on transmit chunk - read chunk failed: ", ChunkID, err.Error())
 			return
 		}
 	}
@@ -141,14 +141,14 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	}
 	dateReplySerialized, err := proto.Marshal(dataReply)
 	if err != nil {
-		log.Error("Error on transmit chunk - chunk serialization error", err.Error())
+		log.Fatal("Error on transmit chunk - chunk serialization error", err.Error())
 		return
 	}
 
 	//Transmit the chunk
 	err = SessionWrite(Session, dateReplySerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), dateReplySerialized, nil)
 	if err != nil {
-		log.Error("Error on transmit chunk - failed to write to session", err.Error())
+		log.Fatal("Error on transmit chunk - failed to write to session", err.Error())
 		return
 	}
 	log.Println("Chunk transmitted: ", bytesread, " bytes")

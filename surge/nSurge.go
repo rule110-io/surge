@@ -12,8 +12,9 @@ import (
 	"sync"
 	"time"
 
+	"log"
+
 	"github.com/rule110-io/surge-ui/surge/platform"
-	log "github.com/sirupsen/logrus"
 
 	bitmap "github.com/boljen/go-bitmap"
 	movavg "github.com/mxmCherry/movavg"

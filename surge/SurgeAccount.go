@@ -4,7 +4,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	log "github.com/sirupsen/logrus"
+	"log"
 
 	nkn "github.com/nknorg/nkn-sdk-go"
 	"github.com/rule110-io/surge-ui/surge/platform"

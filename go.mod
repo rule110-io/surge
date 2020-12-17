@@ -17,7 +17,6 @@ require (
 	github.com/nknorg/nkn-sdk-go v1.3.0
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/sirupsen/logrus v1.4.1
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/sqweek/dialog v0.0.0-20200601143742-43ea34326190
 	github.com/wailsapp/wails v1.9.1
@@ -27,6 +26,7 @@ require (
 	golang.org/x/sys v0.0.0-20200802091954-4b90ce9b60b3
 	google.golang.org/protobuf v1.25.0
 	gopkg.in/AlecAivazis/survey.v1 v1.8.8 // indirect
+	gopkg.in/natefinch/lumberjack.v2 v2.0.0
 	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )

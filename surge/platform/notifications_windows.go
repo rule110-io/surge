@@ -4,7 +4,8 @@ import (
 	"os"
 	"path/filepath"
 
-	log "github.com/sirupsen/logrus"
+	"log"
+
 	"gopkg.in/toast.v1"
 )
 

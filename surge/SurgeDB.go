@@ -4,8 +4,9 @@ import (
 	"encoding/json"
 	"os"
 
+	"log"
+
 	"github.com/rule110-io/surge-ui/surge/platform"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/xujiajun/nutsdb"
 )

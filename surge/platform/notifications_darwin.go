@@ -4,8 +4,9 @@ import (
 	"os"
 	"path/filepath"
 
+	"log"
+
 	notifier "github.com/deckarep/gosx-notifier"
-	log "github.com/sirupsen/logrus"
 )
 
 // ShowNotification .
