@@ -5,6 +5,7 @@ import (
 
 	"github.com/leaanthony/mewn"
 	"github.com/rule110-io/surge-ui/surge"
+	"github.com/rule110-io/surge-ui/surge/platform"
 	log "github.com/sirupsen/logrus"
 	"github.com/wailsapp/wails"
 )
@@ -118,7 +119,7 @@ func getNumberOfRemoteClient() RemoteClientOnlineModel {
 }
 
 func seedFile() bool {
-	path := surge.OpenFileDialog()
+	path := platform.OpenFileDialog()
 	if path == "" {
 		return false
 	}
