@@ -7,6 +7,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	nkn "github.com/nknorg/nkn-sdk-go"
+	"github.com/rule110-io/surge-ui/surge/platform"
 )
 
 const accountPath = "account.surge"
@@ -16,7 +17,7 @@ func InitializeAccount() *nkn.Account {
 	var seed []byte
 
 	var err error
-	var dir = GetSurgeDir()
+	var dir = platform.GetSurgeDir()
 
 	var accountPathOS = dir + string(os.PathSeparator) + accountPath
 

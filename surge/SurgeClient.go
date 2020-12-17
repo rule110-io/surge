@@ -70,17 +70,14 @@ func InitializeClient(args []string, waitForReconnect bool) bool {
 
 	go BuildSeedString(filesOnDisk)
 	for i := 0; i < len(filesOnDisk); i++ {
-		go restartDownload(filesOnDisk[i].FileHash)
+		if filesOnDisk[i].IsDownloading {
+			go restartDownload(filesOnDisk[i].FileHash)
+		}
 	}
 
 	go autoSubscribeWorker()
 
-	GetSubscriptions()
-	go queryRemoteForFiles()
-
 	go platform.WatchOSXHandler()
-
-	go rescanPeers()
 
 	//Insert new file from arguments and start download
 	if args != nil && len(args) > 0 && len(args[0]) > 0 {

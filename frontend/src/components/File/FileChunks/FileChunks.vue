@@ -1,8 +1,14 @@
 <template>
   <div class="file-chunks">
     <div class="file-chunks__title text_wrap_none">
+      <template v-if="file.IsMissing">
+        Missing
+      </template>
+      <template v-else-if="file.IsHashing">
+        Hashing
+      </template>
       <template
-        v-if="!file.IsDownloading && !file.IsUploading && !file.IsPaused"
+        v-else-if="!file.IsDownloading && !file.IsUploading && !file.IsPaused"
       >
         Finished
       </template>
@@ -15,6 +21,7 @@
       <template v-else> Downloading: {{ progress.toFixed(2) }}% </template>
     </div>
     <canvas
+      v-if="file.IsDownloading || file.IsPaused"
       class="file-chunks__progress"
       ref="canvas"
       width="156"

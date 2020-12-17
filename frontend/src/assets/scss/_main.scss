@@ -180,10 +180,35 @@ b {
     font-weight: normal;
     display: table-cell;
     padding: 0 $padding-small $padding-micro $padding-small;
-    vertical-align: middle;
     font-weight: 500;
     font-size: $fz-md;
     font-family: "Roboto";
+    transition: $transition-1;
+
+    &-action {
+      position: absolute;
+      top: 6px;
+      height: 15px;
+      width: 15px;
+      transition: $transition-1;
+      margin-left: $padding-xs;
+
+      &_asc {
+        transform: scaleY(-1);
+      }
+    }
+
+    &_active {
+      color: $primary !important;
+    }
+
+    &_sortable {
+      cursor: pointer;
+
+      &:hover {
+        color: $primary !important;
+      }
+    }
 
     @include dark-theme {
       color: color(dark, text-light);

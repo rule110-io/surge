@@ -3,6 +3,7 @@ package surge
 import (
 	"os"
 
+	"github.com/rule110-io/surge-ui/surge/platform"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -13,7 +14,7 @@ func InitializeLog() {
 
 	var err error
 
-	var dir = GetSurgeDir()
+	var dir = platform.GetSurgeDir()
 
 	var logPathOS = dir + string(os.PathSeparator) + logPath
 
@@ -35,7 +36,7 @@ func InitializeLog() {
 func OpenLogFile() {
 	var err error
 
-	var dir = GetSurgeDir()
+	var dir = platform.GetSurgeDir()
 
 	var logPathOS = dir + string(os.PathSeparator) + logPath
 

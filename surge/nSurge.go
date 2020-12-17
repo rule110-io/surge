@@ -6,7 +6,7 @@ import (
 	"math/rand"
 	"net"
 	"os"
-	"runtime"
+	"sort"
 	"strconv"
 	"strings"
 	"sync"
@@ -23,40 +23,6 @@ import (
 // SurgeActive is true when client is operational
 var SurgeActive bool = false
 var subscribers []string
-
-//OS folder permission bitflags
-const (
-	osRead       = 04
-	osWrite      = 02
-	osEx         = 01
-	osUserShift  = 6
-	osGroupShift = 3
-	osOthShift   = 0
-
-	osUserR   = osRead << osUserShift
-	osUserW   = osWrite << osUserShift
-	osUserX   = osEx << osUserShift
-	osUserRw  = osUserR | osUserW
-	osUserRwx = osUserRw | osUserX
-
-	osGroupR   = osRead << osGroupShift
-	osGroupW   = osWrite << osGroupShift
-	osGroupX   = osEx << osGroupShift
-	osGroupRw  = osGroupR | osGroupW
-	osGroupRwx = osGroupRw | osGroupX
-
-	osOthR   = osRead << osOthShift
-	osOthW   = osWrite << osOthShift
-	osOthX   = osEx << osOthShift
-	osOthRw  = osOthR | osOthW
-	osOthRwx = osOthRw | osOthX
-
-	osAllR   = osUserR | osGroupR | osOthR
-	osAllW   = osUserW | osGroupW | osOthW
-	osAllX   = osUserX | osGroupX | osOthX
-	osAllRw  = osAllR | osAllW
-	osAllRwx = osAllRw | osGroupX
-)
 
 var localFileName string
 var sendSize int64
@@ -105,6 +71,7 @@ type File struct {
 	IsUploading   bool
 	IsPaused      bool
 	IsMissing     bool
+	IsHashing     bool
 	ChunkMap      []byte
 	SeederCount   int
 	ChunksShared  int
@@ -183,8 +150,13 @@ func WailsBind(runtime *wails.Runtime) {
 
 	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
 
-	//Run gui update worker for frontend
+	//Get subs first synced then grab file queries for those subs
+	GetSubscriptions()
+	go queryRemoteForFiles()
+
+	//Startup async processes to continue processing subs/files and updating gui
 	go updateGUI()
+	go rescanPeers()
 }
 
 //SetVisualMode Sets the visualmode
@@ -212,7 +184,10 @@ func Start(args []string) {
 	chunksInTransit = make(map[string]bool)
 
 	//Initialize folder structures on os filesystem
-	newlyCreated := InitializeFolders()
+	newlyCreated, err := platform.InitializeFolders()
+	if err != nil {
+		pushError("Error on startup", err.Error())
+	}
 	if newlyCreated {
 		// seems like this is the first time starting the app
 		//set tour to active
@@ -434,6 +409,11 @@ func DownloadFile(Hash string) bool {
 
 	pushNotification("Download Started", file.FileName)
 
+	remoteFolder, err := platform.GetRemoteFolder()
+	if err != nil {
+		log.Println("Remote folder does not exist")
+	}
+
 	// If the file doesn't exist allocate it
 	var path = remoteFolder + string(os.PathSeparator) + file.FileName
 	AllocateFile(path, file.FileSize)
@@ -470,6 +450,7 @@ func DownloadFile(Hash string) bool {
 		defer terminate(terminateFlag)
 
 		for i := 0; i < numChunks; i++ {
+
 			newFileData := getListedFileByHash(Hash)
 			if newFileData != nil {
 				file = newFileData
@@ -489,6 +470,9 @@ func DownloadFile(Hash string) bool {
 				}
 			}
 
+			for workerCount >= NumWorkers {
+				time.Sleep(time.Millisecond)
+			}
 			workerCount++
 
 			//Create a async job to download a chunk
@@ -524,7 +508,6 @@ func DownloadFile(Hash string) bool {
 					mutateSeederLock.Unlock()
 
 					if len(downloadSessions) == 0 {
-						pushNotification("Download stopped, no more remote connections.", file.FileName)
 						return
 					}
 				}
@@ -556,7 +539,6 @@ func DownloadFile(Hash string) bool {
 					mutateSeederLock.Unlock()
 
 					if len(downloadSessions) == 0 {
-						pushNotification("Download stopped, no more remote connections.", file.FileName)
 						return
 					}
 				}
@@ -575,12 +557,6 @@ func DownloadFile(Hash string) bool {
 				seederAlternator = 0
 			}
 			mutateSeederLock.Unlock()
-
-			for workerCount >= NumWorkers {
-				time.Sleep(time.Millisecond)
-				//log.Println("Active Workers:", workerCount)
-				//fmt.Println("Active Workers:", workerCount)
-			}
 		}
 	}
 
@@ -617,7 +593,7 @@ func DownloadFile(Hash string) bool {
 					}
 
 					dbFile, err := dbGetFile(Hash)
-					if err != nil && dbFile != nil {
+					if err == nil && dbFile != nil {
 						//Prime the session with known bytes downloaded
 						surgeSession.Downloaded = int64(dbFile.NumChunks-len(randomChunks)) * ChunkSize
 						//If the last chunk is set, we want to deduct the missing bytes because its not a complete chunk
@@ -658,13 +634,13 @@ type LocalFilePageResult struct {
 }
 
 //SearchFile runs a paged query
-func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
+func SearchFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) SearchQueryResult {
 	defer RecoverAndLog()
 	var results []FileListing
 
 	ListedFilesLock.Lock()
 	for _, file := range ListedFiles {
-		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) {
+		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) {
 
 			result := FileListing{
 				FileName:    file.FileName,
@@ -685,6 +661,27 @@ func SearchFile(Query string, Skip int, Take int) SearchQueryResult {
 		}
 	}
 	ListedFilesLock.Unlock()
+
+	switch OrderBy {
+	case "FileName":
+		if !IsDesc {
+			sort.Sort(sortByFileNameAsc(results))
+		} else {
+			sort.Sort(sortByFileNameDesc(results))
+		}
+	case "FileSize":
+		if !IsDesc {
+			sort.Sort(sortByFileSizeAsc(results))
+		} else {
+			sort.Sort(sortByFileSizeDesc(results))
+		}
+	default:
+		if !IsDesc {
+			sort.Sort(sortBySeederCountAsc(results))
+		} else {
+			sort.Sort(sortBySeederCountDesc(results))
+		}
+	}
 
 	left := Skip
 	right := Skip + Take
@@ -815,9 +812,8 @@ func RemoveFile(Hash string, FromDisk bool) bool {
 		}
 		err = os.Remove(file.Path)
 		if err != nil {
-			log.Println("Error on remove file (remove from disk)", err.Error())
-			pushError("Error on remove file (remove from disk)", err.Error())
-			return false
+			log.Println("Error on remove file from disk - removing from surge", err.Error())
+			pushError("Error on remove file from disk - removing from surge", err.Error())
 		}
 	}
 
@@ -834,15 +830,6 @@ func RemoveFile(Hash string, FromDisk bool) bool {
 	go BuildSeedString(dbFiles)
 
 	return true
-}
-
-//GetSurgeDir returns the surge dir
-func GetSurgeDir() string {
-	defer RecoverAndLog()
-	if runtime.GOOS == "windows" {
-		return os.Getenv("APPDATA") + string(os.PathSeparator) + "Surge"
-	}
-	return os.Getenv("HOME") + string(os.PathSeparator) + ".surge"
 }
 
 //GetMyAddress returns current client address

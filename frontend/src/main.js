@@ -10,6 +10,7 @@ import VueLodash from "vue-lodash";
 import lodash from "lodash";
 import VueTour from "vue-tour";
 import VTooltip from "v-tooltip";
+import VueClipboard from "vue-clipboard2";
 
 import { store } from "./store/store.js";
 
@@ -24,6 +25,7 @@ Vue.use(VueMoment);
 Vue.use(VueLodash, { lodash: lodash });
 Vue.use(VueTour);
 Vue.use(VTooltip);
+Vue.use(VueClipboard);
 
 Wails.Init(() => {
   new Vue({
