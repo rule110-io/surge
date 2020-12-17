@@ -28,7 +28,7 @@ var client *nkn.MultiClient
 const subscriptionDuration = 180 // 180 is approximately one hour
 
 //InitializeClient initializes connection with nkn
-func InitializeClient(args []string, waitForReconnect bool) bool {
+func InitializeClient(waitForReconnect bool) bool {
 	var err error
 
 	account := InitializeAccount()
@@ -78,11 +78,6 @@ func InitializeClient(args []string, waitForReconnect bool) bool {
 	go autoSubscribeWorker()
 
 	go platform.WatchOSXHandler()
-
-	//Insert new file from arguments and start download
-	if args != nil && len(args) > 0 && len(args[0]) > 0 {
-		platform.AskUser("startDownloadMagnetLinks", "{files : ["+args[0]+"]}")
-	}
 
 	return true
 }

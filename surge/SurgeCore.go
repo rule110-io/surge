@@ -490,6 +490,9 @@ func processQueryResponse(Session *Session, Data []byte) {
 
 		log.Println("Query response new file: ", newListing.FileName, " seeder: ", seeder)
 
+		magnet := surgeGenerateMagnetLink(newListing.FileName, newListing.FileSize, newListing.FileHash, strings.Join(newListing.Seeders, ","))
+		fmt.Println("Magnet:", magnet)
+
 		//Test gui
 		//newButton := widget.NewButton(newListing.Filename+" | "+ByteCountSI(newListing.FileSize), func() {
 		//	downloadFile(newListing.Seeder, newListing.FileSize, newListing.Filename)
@@ -696,9 +699,6 @@ func BuildSeedString(dbFiles []File) {
 	defer RecoverAndLog()
 	newQueryPayload := ""
 	for _, dbFile := range dbFiles {
-		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, strings.Join(dbFile.Seeders, ","))
-		log.Println("Magnet:", magnet)
-
 		if dbFile.IsUploading {
 			//Add to payload
 			payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)

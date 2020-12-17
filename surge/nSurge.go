@@ -173,7 +173,7 @@ func SetVisualMode(visualMode int) {
 }
 
 // Start initializes surge
-func Start(args []string) {
+func Start() {
 
 	//Initialize all our global data maps
 	clientOnlineMap = make(map[string]bool)
@@ -197,9 +197,9 @@ func Start(args []string) {
 	}
 
 	//Initialize our surge nkn client
-	initialSuccess := InitializeClient(args, false)
+	initialSuccess := InitializeClient(false)
 	if !initialSuccess {
-		go InitializeClient(args, true)
+		go InitializeClient(true)
 	}
 }
 
