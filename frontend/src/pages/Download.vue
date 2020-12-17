@@ -4,7 +4,7 @@
       <h1 class="page__title">File Transfers</h1>
       <div class="table">
         <div class="table__row">
-          <div class="table__head" style="width: calc(100% - 646px);">
+          <div class="table__head" style="width: calc(100% - 666px);">
             File
           </div>
           <div
@@ -21,7 +21,7 @@
           </div>
           <div
             class="table__head"
-            style="width: 156px; justify-content: center;"
+            style="width: 176px; justify-content: center;"
           >
             Status
           </div>
@@ -56,7 +56,10 @@
             >
               <FileUp :file="file" />
             </div>
-            <div class="table__cell" style="width: 156px;">
+            <div
+              class="table__cell"
+              style="width: 176px; justify-content: center;"
+            >
               <FileChunks :file="file" />
             </div>
             <div
