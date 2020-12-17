@@ -7,6 +7,7 @@
           <div
             v-for="header in headers"
             :key="header.title"
+            :style="header.style"
             class="table__head"
             :class="[
               header.sortable ? 'table__head_sortable' : '',
@@ -32,22 +33,31 @@
             v-for="file in remoteFiles"
             :key="file.FileName"
           >
-            <div class="table__cell">
+            <div class="table__cell" style="width: calc(100% - 366px - 15%);">
               <FileInfo :file="file" :max="true" :icon="false" />
             </div>
-            <div class="table__cell text_align_center" style="min-width: 81px;">
+            <div
+              class="table__cell"
+              style="width: 90px; justify-content: center;"
+            >
               {{ file.NumChunks }}
             </div>
-            <div class="table__cell">
+            <div class="table__cell" style="width: 15%;">
               <FileHash :hash="file.FileHash" />
             </div>
-            <div class="table__cell text_align_center" style="min-width: 85px;">
+            <div
+              class="table__cell"
+              style="width: 90px; justify-content: center;"
+            >
               {{ file.SeederCount }}
             </div>
-            <div class="table__cell">
+            <div class="table__cell" style="width: 136px;">
               <FileSeeders :seeders="file.Seeders" />
             </div>
-            <div class="table__cell text_align_right">
+            <div
+              class="table__cell"
+              style="width: 50px; justify-content: flex-end;"
+            >
               <feather
                 v-if="!file.IsTracked"
                 class="table__action"
@@ -103,26 +113,37 @@ export default {
           title: "Name & size",
           orderName: "FileName",
           sortable: true,
+          style: "width: calc(100% - 366px - 15%);",
         },
         {
           title: "Chunks",
           orderName: "FileSize",
           sortable: true,
+          style: "width: 90px; justify-content: center;",
         },
         {
           title: "File Hash",
           orderName: "",
           sortable: false,
+          style: "width: 15%;",
         },
         {
           title: "Seeds",
           orderName: "SeederCount",
           sortable: true,
+          style: "width: 90px; justify-content: center;",
         },
         {
           title: "Source",
           orderName: "",
           sortable: false,
+          style: "width: 136px;",
+        },
+        {
+          title: "",
+          orderName: "",
+          sortable: false,
+          style: "width: 50px;",
         },
       ],
     };

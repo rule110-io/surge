@@ -1,6 +1,7 @@
 .file-info {
   display: flex;
   align-items: center;
+  width: 100%;
 
   &__control {
     height: 20px;
@@ -78,15 +79,6 @@
   &__title {
     font-weight: 600;
     color: $text-dark;
-    width: 165px;
-
-    &_full {
-      width: 234px;
-    }
-
-    &_max {
-      width: 300px;
-    }
 
     @include dark-theme {
       color: white;
