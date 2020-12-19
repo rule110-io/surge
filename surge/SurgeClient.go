@@ -42,7 +42,7 @@ func InitializeClient(args []string, waitForReconnect bool) bool {
 	}
 
 	for client == nil {
-		time.Sleep(5000)
+		time.Sleep(time.Second * 5)
 		client, _ = nkn.NewMultiClient(account, "", NumClients, false, nil)
 	}
 

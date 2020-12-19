@@ -8,7 +8,7 @@ func pushNotification(title string, text string) {
 
 		waitAndPush := func() {
 			for wailsRuntime == nil {
-				time.Sleep(50)
+				time.Sleep(time.Millisecond * 50)
 			}
 			wailsRuntime.Events.Emit("notificationEvent", title, text)
 		}
@@ -23,7 +23,7 @@ func pushError(title string, text string) {
 	if wailsRuntime == nil {
 		waitAndPush := func() {
 			for wailsRuntime == nil {
-				time.Sleep(50)
+				time.Sleep(time.Millisecond * 50)
 			}
 			wailsRuntime.Events.Emit("errorEvent", title, text)
 		}
