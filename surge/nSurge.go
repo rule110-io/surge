@@ -134,6 +134,9 @@ var numClientsOnline int = 0
 
 var numClientsStore *wails.Store
 
+//FrontendReady is a flag to check if frontend is ready
+var FrontendReady = false
+
 // WailsBind is a binding function at startup
 func WailsBind(runtime *wails.Runtime) {
 	wailsRuntime = runtime
@@ -157,6 +160,8 @@ func WailsBind(runtime *wails.Runtime) {
 	//Startup async processes to continue processing subs/files and updating gui
 	go updateGUI()
 	go rescanPeers()
+
+	FrontendReady = true
 }
 
 //SetVisualMode Sets the visualmode
