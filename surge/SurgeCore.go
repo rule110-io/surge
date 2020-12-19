@@ -79,6 +79,8 @@ func RequestChunk(Session *Session, FileID string, ChunkID int32) bool {
 	if err != nil {
 		log.Fatalln("Failed to encode surge message:", err)
 	} else {
+		fmt.Println(string("\033[31m"), "Request Chunk", FileID, ChunkID, string("\033[0m"))
+
 		err := SessionWrite(Session, msgSerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 		if err != nil {
 			log.Fatal("Failed to request chunk", err)
@@ -146,6 +148,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	}
 
 	//Transmit the chunk
+	fmt.Println(string("\033[31m"), "Transmit Chunk", FileID, ChunkID, string("\033[0m"))
 	err = SessionWrite(Session, dateReplySerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), dateReplySerialized, nil)
 	if err != nil {
 		log.Fatal("Error on transmit chunk - failed to write to session", err.Error())
@@ -212,6 +215,7 @@ func SendQueryRequest(Addr string, Query string) bool {
 		return false
 	}
 
+	fmt.Println(string("\033[31m"), "Send Query Request", Addr, string("\033[0m"))
 	err = SessionWrite(surgeSession, msgSerialized, surgeQueryRequestID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 	if err != nil {
 		log.Println("Failed to send Surge Request:", err)
@@ -225,6 +229,7 @@ func SendQueryRequest(Addr string, Query string) bool {
 func SendQueryResponse(Session *Session, Query string) {
 	defer RecoverAndLog()
 	b := []byte(queryPayload)
+	fmt.Println(string("\033[31m"), "Send Query Response", Session.session.RemoteAddr().String(), string("\033[0m"))
 	err := SessionWrite(Session, b, surgeQueryResponseID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 	if err != nil {
 		log.Println("Failed to send Surge Ruquest:", err)
@@ -294,6 +299,8 @@ func initiateSession(Session *Session) {
 	sessionsWriteLock.Unlock()
 
 	for true {
+		fmt.Println(string("\033[31m"), "Initiate Session - Session Read", Session.session.RemoteAddr().String(), string("\033[0m"))
+
 		data, chunkType, err := SessionRead(Session)
 		if err != nil {
 			log.Println("Session read failed, closing session error:", err)
