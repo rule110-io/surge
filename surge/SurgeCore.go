@@ -499,18 +499,6 @@ func processQueryResponse(Session *Session, Data []byte) {
 	ListedFilesLock.Unlock()
 }
 
-func distinctStringSlice(stringSlice []string) []string {
-	keys := make(map[string]bool)
-	list := []string{}
-	for _, entry := range stringSlice {
-		if _, value := keys[entry]; !value {
-			keys[entry] = true
-			list = append(list, entry)
-		}
-	}
-	return list
-}
-
 //ParsePayloadString parses payload of files
 func ParsePayloadString(s string) {
 	defer RecoverAndLog()

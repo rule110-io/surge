@@ -174,6 +174,27 @@ func GetSubscriptions() {
 func queryRemoteForFiles() {
 	defer RecoverAndLog()
 
+	//Clear out clients in online map which are no longer subscribed
+	for clientKey := range clientOnlineMap {
+		foundInSubs := false
+		for _, subscriberKey := range subscribers {
+			if clientKey == subscriberKey {
+				foundInSubs = true
+				break
+			}
+		}
+		if !foundInSubs {
+			setClientOnlineMap(clientKey, false)
+
+			ListedFilesLock.Lock()
+			for _, file := range ListedFiles {
+				file.Seeders = removeStringFromSlice(file.Seeders, clientKey)
+				file.SeederCount = len(file.Seeders)
+			}
+			ListedFilesLock.Unlock()
+		}
+	}
+
 	fmt.Println(string("\033[36m"), "Start sending file queries to remotes", len(subscribers), string("\033[0m"))
 	for _, address := range subscribers {
 		//Request
