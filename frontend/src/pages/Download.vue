@@ -41,7 +41,10 @@
             v-for="file in localFiles"
             :key="file.FileName"
           >
-            <div class="table__cell" style="width: calc(100% - 646px);">
+            <div
+              class="table__cell text_wrap_none"
+              style="width: calc(100% - 646px);"
+            >
               <FileInfo :file="file" />
             </div>
             <div
