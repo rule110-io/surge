@@ -242,15 +242,17 @@ func updateGUI() {
 					continue
 				}
 
-				if chunkMapFull(fileEntry.ChunkMap, fileEntry.NumChunks) {
-					platform.ShowNotification("Download Finished", "Download for "+fileEntry.FileName+" finished!")
-					pushNotification("Download Finished", fileEntry.FileName)
-					session.session.Close()
+				if fileEntry.IsDownloading {
+					if chunkMapFull(fileEntry.ChunkMap, fileEntry.NumChunks) {
+						platform.ShowNotification("Download Finished", "Download for "+fileEntry.FileName+" finished!")
+						pushNotification("Download Finished", fileEntry.FileName)
+						session.session.Close()
 
-					fileEntry.IsDownloading = false
-					fileEntry.IsUploading = true
-					dbInsertFile(*fileEntry)
-					go AddToSeedString(*fileEntry)
+						fileEntry.IsDownloading = false
+						fileEntry.IsUploading = true
+						dbInsertFile(*fileEntry)
+						go AddToSeedString(*fileEntry)
+					}
 				}
 			}
 		}
