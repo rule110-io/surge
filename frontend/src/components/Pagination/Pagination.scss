@@ -1,7 +1,6 @@
 .pagination {
-  position: absolute;
   width: 100%;
-  bottom: -70px;
+  margin-top: $padding-normal;
 
   &__descr {
     text-align: center;
