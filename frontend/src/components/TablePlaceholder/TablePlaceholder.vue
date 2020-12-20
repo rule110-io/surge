@@ -1,6 +1,6 @@
 <template>
   <div class="table-placeholder">
-    <td class="table-placeholder__title" colspan="100">
+    <div class="table-placeholder__title">
       <template v-if="type === 'transfer'">
         No files are currently being transferred. <br />
         Share something with the `+` icon below, or use search to browse.
@@ -17,7 +17,7 @@
         Currently there are no remote files. <br />
         Share something with the `+` icon below, or use search to browse.
       </template>
-    </td>
+    </div>
   </div>
 </template>
 
