@@ -1,6 +1,6 @@
 <template>
   <div class="network-stats">
-    <div class="network-stats__item">
+    <div class="network-stats__item text_wrap_none">
       <span class="network-stats__status" v-if="total === 0">
         <feather class="network-stats__loader" type="loader"></feather>
         Discovering network...
@@ -14,7 +14,7 @@
     </div>
     <BandwidthChart />
 
-    <div class="network-stats__item">
+    <div class="network-stats__item text_wrap_none">
       <span class="network-stats__avg">
         Avg Speed: {{ totalDown | prettyBytes(1) }}/s |
         {{ totalUp | prettyBytes(1) }}/s</span

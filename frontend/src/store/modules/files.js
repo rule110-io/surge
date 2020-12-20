@@ -8,14 +8,14 @@ const getDefaultState = () => {
     remotePages: 0,
     localFilesConfig: {
       skip: 0,
-      get: 6,
+      get: 8,
     },
     remoteFilesConfig: {
       search: "",
       orderBy: "SeederCount",
       isDesc: true,
       skip: 0,
-      get: 6,
+      get: 8,
     },
   };
 };

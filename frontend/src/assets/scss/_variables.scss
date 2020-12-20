@@ -1,3 +1,6 @@
+//size
+$size-lg: 1144px;
+
 // App Global Font Size
 $html-font-size: 16px;
 
@@ -53,15 +56,15 @@ $shadow-1: 0px 8px 32px rgba(36, 36, 36, 0.12);
 $shadow-2: 2px 12px 40px rgba(0, 0, 0, 0.24);
 
 // App Spacing
-$padding-xs: 4px;
-$padding-micro: 8px;
-$padding-small: 12px;
-$padding-default: 16px;
-$padding-lg: 18px;
-$padding-normal: 24px;
-$padding-medium: 32px;
-$padding-big: 40px;
-$padding-max: 64px;
+$padding-xs: 0.25rem; // 4px
+$padding-micro: 0.5rem; // 8px
+$padding-small: 0.75rem; // 12px
+$padding-default: 1rem; // 16px
+$padding-lg: 1.125rem; // 18px
+$padding-normal: 1.5rem; // 24px
+$padding-medium: 2rem; // 32px
+$padding-big: 2.5rem; // 40px
+$padding-max: 4rem; // 64px
 
 // App settings
 $app-br: 36px;

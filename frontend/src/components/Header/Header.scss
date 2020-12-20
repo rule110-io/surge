@@ -180,6 +180,7 @@
   &__right {
     display: flex;
     align-items: center;
+    padding-left: $padding-default;
   }
 
   &__item {
