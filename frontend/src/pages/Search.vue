@@ -33,7 +33,7 @@
             v-for="file in remoteFiles"
             :key="file.FileName"
           >
-            <div class="table__cell" style="width: calc(100% - 366px - 15%);">
+            <div class="table__cell" style="width: calc(100% - 390px - 15%);">
               <FileInfo :file="file" :max="true" :icon="false" />
             </div>
             <div
@@ -48,7 +48,7 @@
             <div class="table__cell" style="width: 90px;">
               {{ file.SeederCount }}
             </div>
-            <div class="table__cell" style="width: 136px;">
+            <div class="table__cell" style="width: 160px;">
               <FileSeeders :seeders="file.Seeders" />
             </div>
             <div
@@ -134,7 +134,7 @@ export default {
           title: "Source",
           orderName: "",
           sortable: false,
-          style: "width: 136px;",
+          style: "width: 160px;",
         },
         {
           title: "",
