@@ -47,7 +47,7 @@ const actions = {
   fetchLocalFiles({ commit, state }) {
     const { skip, get } = state.localFilesConfig;
 
-    window.backend.getLocalFiles(skip, get).then(({ Result, Count }) => {
+    window.backend.getLocalFiles("", "FileName", true, skip, get).then(({ Result, Count }) => {
       commit("setLocalFiles", { Result, Count });
     });
   },
