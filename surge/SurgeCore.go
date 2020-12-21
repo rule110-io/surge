@@ -16,7 +16,7 @@ import (
 	"sync"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"log"
 
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
@@ -79,9 +79,11 @@ func RequestChunk(Session *Session, FileID string, ChunkID int32) bool {
 	if err != nil {
 		log.Fatalln("Failed to encode surge message:", err)
 	} else {
+		fmt.Println(string("\033[31m"), "Request Chunk", FileID, ChunkID, string("\033[0m"))
+
 		err := SessionWrite(Session, msgSerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 		if err != nil {
-			log.Error("Failed to request chunk", err)
+			log.Fatal("Failed to request chunk", err)
 			return false
 		}
 	}
@@ -97,7 +99,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	fileWriteLock.Lock()
 	fileInfo, err := dbGetFile(FileID)
 	if err != nil {
-		log.Error("Error on transmit chunk - file not in db", err.Error())
+		log.Fatal("Error on transmit chunk - file not in db", err.Error())
 		return
 	}
 	fileInfo.ChunksShared++
@@ -108,7 +110,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 
 	//When we have an OS read error on the file mark the file as missing, stop down and uploads on it
 	if err != nil {
-		log.Error("Error on transmit chunk - file read failure", err.Error())
+		log.Fatal("Error on transmit chunk - file read failure", err.Error())
 
 		fileWriteLock.Lock()
 		fileInfo.IsMissing = true
@@ -128,7 +130,7 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 
 	if err != nil {
 		if err != io.EOF {
-			log.Error("Error on transmit chunk - read chunk failed: ", ChunkID, err.Error())
+			log.Fatal("Error on transmit chunk - read chunk failed: ", ChunkID, err.Error())
 			return
 		}
 	}
@@ -141,14 +143,15 @@ func TransmitChunk(Session *Session, FileID string, ChunkID int32) {
 	}
 	dateReplySerialized, err := proto.Marshal(dataReply)
 	if err != nil {
-		log.Error("Error on transmit chunk - chunk serialization error", err.Error())
+		log.Fatal("Error on transmit chunk - chunk serialization error", err.Error())
 		return
 	}
 
 	//Transmit the chunk
+	fmt.Println(string("\033[31m"), "Transmit Chunk", FileID, ChunkID, string("\033[0m"))
 	err = SessionWrite(Session, dateReplySerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), dateReplySerialized, nil)
 	if err != nil {
-		log.Error("Error on transmit chunk - failed to write to session", err.Error())
+		log.Fatal("Error on transmit chunk - failed to write to session", err.Error())
 		return
 	}
 	log.Println("Chunk transmitted: ", bytesread, " bytes")
@@ -212,6 +215,7 @@ func SendQueryRequest(Addr string, Query string) bool {
 		return false
 	}
 
+	fmt.Println(string("\033[31m"), "Send Query Request", Addr, string("\033[0m"))
 	err = SessionWrite(surgeSession, msgSerialized, surgeQueryRequestID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 	if err != nil {
 		log.Println("Failed to send Surge Request:", err)
@@ -225,6 +229,7 @@ func SendQueryRequest(Addr string, Query string) bool {
 func SendQueryResponse(Session *Session, Query string) {
 	defer RecoverAndLog()
 	b := []byte(queryPayload)
+	fmt.Println(string("\033[31m"), "Send Query Response", Session.session.RemoteAddr().String(), string("\033[0m"))
 	err := SessionWrite(Session, b, surgeQueryResponseID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 	if err != nil {
 		log.Println("Failed to send Surge Ruquest:", err)
@@ -294,6 +299,8 @@ func initiateSession(Session *Session) {
 	sessionsWriteLock.Unlock()
 
 	for true {
+		fmt.Println(string("\033[31m"), "Initiate Session - Session Read", Session.session.RemoteAddr().String(), string("\033[0m"))
+
 		data, chunkType, err := SessionRead(Session)
 		if err != nil {
 			log.Println("Session read failed, closing session error:", err)
@@ -497,18 +504,6 @@ func processQueryResponse(Session *Session, Data []byte) {
 		//fileBox.Append(newButton)
 	}
 	ListedFilesLock.Unlock()
-}
-
-func distinctStringSlice(stringSlice []string) []string {
-	keys := make(map[string]bool)
-	list := []string{}
-	for _, entry := range stringSlice {
-		if _, value := keys[entry]; !value {
-			keys[entry] = true
-			list = append(list, entry)
-		}
-	}
-	return list
 }
 
 //ParsePayloadString parses payload of files

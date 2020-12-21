@@ -9,7 +9,7 @@ import (
 	"net/url"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"log"
 )
 
 //export HandleURL

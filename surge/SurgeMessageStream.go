@@ -5,7 +5,7 @@ import (
 	"errors"
 	"io"
 
-	log "github.com/sirupsen/logrus"
+	"log"
 )
 
 // SessionWrite writes to session

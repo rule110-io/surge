@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"time"
 
+	"log"
+
 	nkn "github.com/nknorg/nkn-sdk-go"
 	"github.com/rule110-io/surge-ui/surge/platform"
-	log "github.com/sirupsen/logrus"
 )
 
 //ChunkSize is size of chunk in bytes (256 kB)
@@ -28,21 +29,15 @@ var client *nkn.MultiClient
 const subscriptionDuration = 180 // 180 is approximately one hour
 
 //InitializeClient initializes connection with nkn
-func InitializeClient(args []string, waitForReconnect bool) bool {
+func InitializeClient(args []string) bool {
 	var err error
 
 	account := InitializeAccount()
-	client, err = nkn.NewMultiClient(account, "", NumClients, false, nil)
+	client, err = nkn.NewMultiClient(account, "", NumClients, false, &nkn.ClientConfig{
+		ConnectRetries: 1000,
+	})
 	if err != nil {
-		if waitForReconnect {
-			return false
-		}
 		pushError(err.Error(), "do you have an active internet connection?")
-	}
-
-	for client == nil {
-		time.Sleep(5000)
-		client, _ = nkn.NewMultiClient(account, "", NumClients, false, nil)
 	}
 
 	<-client.OnConnect.C
@@ -150,7 +145,7 @@ func GetSubscriptions() {
 
 	subResponse, err := client.GetSubscribers(Topic, 0, 100, true, true)
 	if err != nil {
-		pushError("Error on get subscriptions", err.Error())
+		pushError(err.Error(), "do you have an active internet connection?")
 		return
 	}
 
@@ -172,6 +167,27 @@ func GetSubscriptions() {
 
 func queryRemoteForFiles() {
 	defer RecoverAndLog()
+
+	//Clear out clients in online map which are no longer subscribed
+	for clientKey := range clientOnlineMap {
+		foundInSubs := false
+		for _, subscriberKey := range subscribers {
+			if clientKey == subscriberKey {
+				foundInSubs = true
+				break
+			}
+		}
+		if !foundInSubs {
+			setClientOnlineMap(clientKey, false)
+
+			ListedFilesLock.Lock()
+			for _, file := range ListedFiles {
+				file.Seeders = removeStringFromSlice(file.Seeders, clientKey)
+				file.SeederCount = len(file.Seeders)
+			}
+			ListedFilesLock.Unlock()
+		}
+	}
 
 	fmt.Println(string("\033[36m"), "Start sending file queries to remotes", len(subscribers), string("\033[0m"))
 	for _, address := range subscribers {

@@ -6,14 +6,13 @@ import (
 	"math/rand"
 	"net"
 	"os"
-	"sort"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
+	"log"
+
 	"github.com/rule110-io/surge-ui/surge/platform"
-	log "github.com/sirupsen/logrus"
 
 	bitmap "github.com/boljen/go-bitmap"
 	movavg "github.com/mxmCherry/movavg"
@@ -150,6 +149,16 @@ func WailsBind(runtime *wails.Runtime) {
 
 	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
 
+	//Wait for our client to initialize, perhaps there is no internet connectivity
+	tryCount := 0
+	for !clientInitialized {
+		if tryCount%10 == 0 {
+			pushError("Connection to NKN not yet established", "do you have an active internet connection?")
+		}
+		time.Sleep(time.Second)
+		tryCount++
+	}
+
 	//Get subs first synced then grab file queries for those subs
 	GetSubscriptions()
 	go queryRemoteForFiles()
@@ -197,10 +206,7 @@ func Start(args []string) {
 	}
 
 	//Initialize our surge nkn client
-	initialSuccess := InitializeClient(args, false)
-	if !initialSuccess {
-		go InitializeClient(args, true)
-	}
+	go InitializeClient(args)
 }
 
 func chunkMapFull(s []byte, num int) bool {
@@ -241,15 +247,17 @@ func updateGUI() {
 					continue
 				}
 
-				if chunkMapFull(fileEntry.ChunkMap, fileEntry.NumChunks) {
-					platform.ShowNotification("Download Finished", "Download for "+fileEntry.FileName+" finished!")
-					pushNotification("Download Finished", fileEntry.FileName)
-					session.session.Close()
+				if fileEntry.IsDownloading {
+					if chunkMapFull(fileEntry.ChunkMap, fileEntry.NumChunks) {
+						platform.ShowNotification("Download Finished", "Download for "+fileEntry.FileName+" finished!")
+						pushNotification("Download Finished", fileEntry.FileName)
+						session.session.Close()
 
-					fileEntry.IsDownloading = false
-					fileEntry.IsUploading = true
-					dbInsertFile(*fileEntry)
-					go AddToSeedString(*fileEntry)
+						fileEntry.IsDownloading = false
+						fileEntry.IsUploading = true
+						dbInsertFile(*fileEntry)
+						go AddToSeedString(*fileEntry)
+					}
 				}
 			}
 		}
@@ -621,91 +629,6 @@ func DownloadFile(Hash string) bool {
 	return true
 }
 
-//SearchQueryResult is a paging query result for file searches
-type SearchQueryResult struct {
-	Result []FileListing
-	Count  int
-}
-
-//LocalFilePageResult is a paging query result for tracked files
-type LocalFilePageResult struct {
-	Result []File
-	Count  int
-}
-
-//SearchFile runs a paged query
-func SearchFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) SearchQueryResult {
-	defer RecoverAndLog()
-	var results []FileListing
-
-	ListedFilesLock.Lock()
-	for _, file := range ListedFiles {
-		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) {
-
-			result := FileListing{
-				FileName:    file.FileName,
-				FileHash:    file.FileHash,
-				FileSize:    file.FileSize,
-				Seeders:     file.Seeders,
-				NumChunks:   file.NumChunks,
-				SeederCount: len(file.Seeders),
-			}
-
-			tracked, err := dbGetFile(result.FileHash)
-
-			//only add non-local files to the result
-			if err != nil && tracked == nil {
-				results = append(results, result)
-			}
-
-		}
-	}
-	ListedFilesLock.Unlock()
-
-	switch OrderBy {
-	case "FileName":
-		if !IsDesc {
-			sort.Sort(sortByFileNameAsc(results))
-		} else {
-			sort.Sort(sortByFileNameDesc(results))
-		}
-	case "FileSize":
-		if !IsDesc {
-			sort.Sort(sortByFileSizeAsc(results))
-		} else {
-			sort.Sort(sortByFileSizeDesc(results))
-		}
-	default:
-		if !IsDesc {
-			sort.Sort(sortBySeederCountAsc(results))
-		} else {
-			sort.Sort(sortBySeederCountDesc(results))
-		}
-	}
-
-	left := Skip
-	right := Skip + Take
-
-	if left > len(results) {
-		left = len(results)
-	}
-
-	if right > len(results) {
-		right = len(results)
-	}
-
-	return SearchQueryResult{
-		Result: results[left:right],
-		Count:  len(results),
-	}
-}
-
-//GetTrackedFiles returns all files tracked in surge client
-func GetTrackedFiles() []File {
-	defer RecoverAndLog()
-	return dbGetAllFiles()
-}
-
 //GetFileChunkMapString returns the chunkmap in hex for a file given by hash
 func GetFileChunkMapString(file *File, Size int) string {
 	defer RecoverAndLog()
@@ -780,13 +703,6 @@ func SetFilePause(Hash string, State bool) {
 		msg = "Resumed"
 	}
 	pushNotification("Download "+msg, file.FileName)
-}
-
-//OpenFileDialog uses platform agnostic package for a file dialog
-func OpenFileDialog() string {
-	defer RecoverAndLog()
-	selectedFile := wailsRuntime.Dialog.SelectFile()
-	return selectedFile
 }
 
 //RemoveFile removes file from surge db and optionally from disk

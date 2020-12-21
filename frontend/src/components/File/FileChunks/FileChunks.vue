@@ -13,7 +13,7 @@
         Finished
       </template>
       <template v-else-if="file.IsUploading">
-        Seeding
+        Seeding: {{ shared.toFixed(2) }}x
       </template>
       <template v-else-if="file.IsPaused">
         Paused: {{ progress.toFixed(2) }}%
@@ -47,6 +47,7 @@ export default {
   data: () => {
     return {
       progress: 0,
+      shared: 0,
     };
   },
   computed: {
@@ -74,6 +75,7 @@ export default {
   mounted() {
     this.getChunkMap();
     this.progress = !this.file.IsPaused && !this.file.IsDownloading ? 100 : 0;
+    this.shared = this.file.ChunksShared / this.file.NumChunks;
   },
   methods: {
     getChunkMap() {
@@ -82,21 +84,23 @@ export default {
       });
     },
     drawProgress(bits) {
-      const canvas = this.$refs.canvas;
-      const ctx = canvas.getContext("2d");
-      const colours = [this.baseColor, "#5EC1FF", "#02d2b3"];
+      if (this.file.IsDownloading || this.file.IsPaused) {
+        const canvas = this.$refs.canvas;
+        const ctx = canvas.getContext("2d");
+        const colours = [this.baseColor, "#5EC1FF", "#02d2b3"];
 
-      const bitmap = `${bits}`.split("");
+        const bitmap = `${bits}`.split("");
 
-      bitmap.forEach((val, i) => {
-        ctx.beginPath();
-        ctx.strokeStyle = colours[parseFloat(val)];
-        ctx.lineWidth = 1;
-        ctx.moveTo(i, 0);
-        ctx.lineTo(i, 12);
-        ctx.closePath();
-        ctx.stroke();
-      });
+        bitmap.forEach((val, i) => {
+          ctx.beginPath();
+          ctx.strokeStyle = colours[parseFloat(val)];
+          ctx.lineWidth = 1;
+          ctx.moveTo(i, 0);
+          ctx.lineTo(i, 12);
+          ctx.closePath();
+          ctx.stroke();
+        });
+      }
     },
   },
 };
