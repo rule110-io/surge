@@ -13,7 +13,7 @@
         Finished
       </template>
       <template v-else-if="file.IsUploading">
-        Seeding
+        Seeding: {{shared.toFixed(2)}}x
       </template>
       <template v-else-if="file.IsPaused">
         Paused: {{ progress.toFixed(2) }}%
@@ -47,6 +47,7 @@ export default {
   data: () => {
     return {
       progress: 0,
+      shared: 0
     };
   },
   computed: {
@@ -74,6 +75,7 @@ export default {
   mounted() {
     this.getChunkMap();
     this.progress = !this.file.IsPaused && !this.file.IsDownloading ? 100 : 0;
+      this.shared = this.file.ChunksShared / this.file.NumChunks;
   },
   methods: {
     getChunkMap() {
