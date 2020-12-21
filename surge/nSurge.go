@@ -151,6 +151,16 @@ func WailsBind(runtime *wails.Runtime) {
 
 	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
 
+	//Wait for our client to initialize, perhaps there is no internet connectivity
+	tryCount := 0
+	for !clientInitialized {
+		if tryCount%10 == 0 {
+			pushError("Connection to NKN not yet established", "do you have an active internet connection?")
+		}
+		time.Sleep(time.Second)
+		tryCount++
+	}
+
 	//Get subs first synced then grab file queries for those subs
 	GetSubscriptions()
 	go queryRemoteForFiles()
@@ -198,10 +208,7 @@ func Start(args []string) {
 	}
 
 	//Initialize our surge nkn client
-	initialSuccess := InitializeClient(args, false)
-	if !initialSuccess {
-		go InitializeClient(args, true)
-	}
+	go InitializeClient(args)
 }
 
 func chunkMapFull(s []byte, num int) bool {
