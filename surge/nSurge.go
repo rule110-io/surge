@@ -6,9 +6,7 @@ import (
 	"math/rand"
 	"net"
 	"os"
-	"sort"
 	"strconv"
-	"strings"
 	"sync"
 	"time"
 
@@ -151,6 +149,16 @@ func WailsBind(runtime *wails.Runtime) {
 
 	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
 
+	//Wait for our client to initialize, perhaps there is no internet connectivity
+	tryCount := 0
+	for !clientInitialized {
+		if tryCount%10 == 0 {
+			pushError("Connection to NKN not yet established", "do you have an active internet connection?")
+		}
+		time.Sleep(time.Second)
+		tryCount++
+	}
+
 	//Get subs first synced then grab file queries for those subs
 	GetSubscriptions()
 	go queryRemoteForFiles()
@@ -198,10 +206,7 @@ func Start(args []string) {
 	}
 
 	//Initialize our surge nkn client
-	initialSuccess := InitializeClient(args, false)
-	if !initialSuccess {
-		go InitializeClient(args, true)
-	}
+	go InitializeClient(args)
 }
 
 func chunkMapFull(s []byte, num int) bool {
@@ -622,91 +627,6 @@ func DownloadFile(Hash string) bool {
 	go scanForSeeders(&terminateFlag)
 
 	return true
-}
-
-//SearchQueryResult is a paging query result for file searches
-type SearchQueryResult struct {
-	Result []FileListing
-	Count  int
-}
-
-//LocalFilePageResult is a paging query result for tracked files
-type LocalFilePageResult struct {
-	Result []File
-	Count  int
-}
-
-//SearchFile runs a paged query
-func SearchFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) SearchQueryResult {
-	defer RecoverAndLog()
-	var results []FileListing
-
-	ListedFilesLock.Lock()
-	for _, file := range ListedFiles {
-		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) {
-
-			result := FileListing{
-				FileName:    file.FileName,
-				FileHash:    file.FileHash,
-				FileSize:    file.FileSize,
-				Seeders:     file.Seeders,
-				NumChunks:   file.NumChunks,
-				SeederCount: len(file.Seeders),
-			}
-
-			tracked, err := dbGetFile(result.FileHash)
-
-			//only add non-local files to the result
-			if err != nil && tracked == nil {
-				results = append(results, result)
-			}
-
-		}
-	}
-	ListedFilesLock.Unlock()
-
-	switch OrderBy {
-	case "FileName":
-		if !IsDesc {
-			sort.Sort(sortByFileNameAsc(results))
-		} else {
-			sort.Sort(sortByFileNameDesc(results))
-		}
-	case "FileSize":
-		if !IsDesc {
-			sort.Sort(sortByFileSizeAsc(results))
-		} else {
-			sort.Sort(sortByFileSizeDesc(results))
-		}
-	default:
-		if !IsDesc {
-			sort.Sort(sortBySeederCountAsc(results))
-		} else {
-			sort.Sort(sortBySeederCountDesc(results))
-		}
-	}
-
-	left := Skip
-	right := Skip + Take
-
-	if left > len(results) {
-		left = len(results)
-	}
-
-	if right > len(results) {
-		right = len(results)
-	}
-
-	return SearchQueryResult{
-		Result: results[left:right],
-		Count:  len(results),
-	}
-}
-
-//GetTrackedFiles returns all files tracked in surge client
-func GetTrackedFiles() []File {
-	defer RecoverAndLog()
-	return dbGetAllFiles()
 }
 
 //GetFileChunkMapString returns the chunkmap in hex for a file given by hash

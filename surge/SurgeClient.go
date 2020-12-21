@@ -29,21 +29,15 @@ var client *nkn.MultiClient
 const subscriptionDuration = 180 // 180 is approximately one hour
 
 //InitializeClient initializes connection with nkn
-func InitializeClient(args []string, waitForReconnect bool) bool {
+func InitializeClient(args []string) bool {
 	var err error
 
 	account := InitializeAccount()
-	client, err = nkn.NewMultiClient(account, "", NumClients, false, nil)
+	client, err = nkn.NewMultiClient(account, "", NumClients, false, &nkn.ClientConfig{
+		ConnectRetries: 1000,
+	})
 	if err != nil {
-		if waitForReconnect {
-			return false
-		}
 		pushError(err.Error(), "do you have an active internet connection?")
-	}
-
-	for client == nil {
-		time.Sleep(time.Second * 5)
-		client, _ = nkn.NewMultiClient(account, "", NumClients, false, nil)
 	}
 
 	<-client.OnConnect.C
@@ -151,7 +145,7 @@ func GetSubscriptions() {
 
 	subResponse, err := client.GetSubscribers(Topic, 0, 100, true, true)
 	if err != nil {
-		pushError("Error on get subscriptions", err.Error())
+		pushError(err.Error(), "do you have an active internet connection?")
 		return
 	}
 

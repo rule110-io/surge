@@ -14,59 +14,12 @@ import (
 var wailsRuntime *wails.Runtime
 var arguments []string
 
-func getLocalFiles(Skip int, Take int) surge.LocalFilePageResult {
-
-	trackedFiles := surge.GetTrackedFiles()
-
-	totalNum := len(trackedFiles)
-
-	for i := 0; i < len(trackedFiles); i++ {
-		trackedFiles[i].ChunkMap = nil
-	}
-
-	left := Skip
-	right := Skip + Take
-
-	if left > len(trackedFiles) {
-		left = len(trackedFiles)
-	}
-
-	if right > len(trackedFiles) {
-		right = len(trackedFiles)
-	}
-
-	//Subset
-	trackedFiles = trackedFiles[left:right]
-
-	for i := 0; i < len(trackedFiles); i++ {
-		surge.ListedFilesLock.Lock()
-
-		for _, file := range surge.ListedFiles {
-			trackedFiles[i].Seeders = []string{surge.GetMyAddress()}
-			if file.FileHash == trackedFiles[i].FileHash {
-				trackedFiles[i].Seeders = file.Seeders
-				trackedFiles[i].Seeders = append(trackedFiles[i].Seeders, surge.GetMyAddress())
-				trackedFiles[i].SeederCount = len(trackedFiles[i].Seeders)
-				break
-			}
-		}
-
-		if len(trackedFiles[i].Seeders) == 0 && (trackedFiles[i].IsUploading || trackedFiles[i].IsHashing) {
-			trackedFiles[i].Seeders = []string{surge.GetMyAddress()}
-			trackedFiles[i].SeederCount = len(trackedFiles[i].Seeders)
-		}
-
-		surge.ListedFilesLock.Unlock()
-	}
-
-	return surge.LocalFilePageResult{
-		Result: trackedFiles,
-		Count:  totalNum,
-	}
+func getLocalFiles(Query string, OrderBy string, IsDesc bool, Skip int, Take int) surge.LocalFilePageResult {
+	return surge.SearchLocalFile(Query, OrderBy, IsDesc, Skip, Take)
 }
 
 func getRemoteFiles(Query string, OrderBy string, IsDesc bool, Skip int, Take int) surge.SearchQueryResult {
-	return surge.SearchFile(Query, OrderBy, IsDesc, Skip, Take)
+	return surge.SearchRemoteFile(Query, OrderBy, IsDesc, Skip, Take)
 }
 
 func getPublicKey() string {
