@@ -17,6 +17,6 @@ func GetRemoteFolder() (string, error) {
 		return "", err
 	}
 	homedir := myself.HomeDir
-	return homedir + string(os.PathSeparator) + "Downloads" + string(os.PathSeparator) + "surge_downloads", nil
+	return homedir + string(os.PathSeparator) + "surge_downloads", nil
 
 }
