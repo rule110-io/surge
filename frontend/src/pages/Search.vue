@@ -110,7 +110,7 @@ export default {
           title: "Name & size",
           orderName: "FileName",
           sortable: true,
-          style: "width: calc(100% - 366px - 15%);",
+          style: "width: calc(100% - 390px - 15%);",
         },
         {
           title: "Chunks",
