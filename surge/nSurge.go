@@ -197,6 +197,9 @@ func Start(args []string) {
 	if err != nil {
 		pushError("Error on startup", err.Error())
 	}
+	InitializeDb()
+	InitializeLog()
+	defer CloseDb()
 	if newlyCreated {
 		// seems like this is the first time starting the app
 		//set tour to active

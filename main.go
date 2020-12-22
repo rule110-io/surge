@@ -128,9 +128,6 @@ func main() {
 	//surge.HashFile("C:\\Users\\mitch\\Downloads\\surge_remote\\surge-0.2.0-beta.windows.zip")
 
 	stats := &Stats{}
-	surge.InitializeDb()
-	surge.InitializeLog()
-	defer surge.CloseDb()
 
 	argsWithProg := os.Args
 	argsWithoutProg := os.Args[1:]
