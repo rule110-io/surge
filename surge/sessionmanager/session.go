@@ -31,10 +31,12 @@ type Session struct {
 
 //A map to hold nkn sessions
 var sessionMap map[string]*Session
+var sessionLockMap map[string]*sync.Mutex
 
 //Initialize initializes the session manager
 func Initialize(nknClient *nkn.MultiClient, connectFunc func(session *Session), disconnectFunc func(addr string)) {
 	sessionMap = make(map[string]*Session)
+	sessionLockMap = make(map[string]*sync.Mutex)
 	fileMap = make(map[string]*os.File)
 	client = nknClient
 	onConnect = connectFunc
@@ -49,8 +51,8 @@ func GetSessionLength() int {
 //GetSession returns a session for given address
 func GetSession(Address string) (*Session, error) {
 	//Check for an existing session
-	sessionManagerLock.Lock()
-	defer sessionManagerLock.Unlock()
+	lockSession(Address)
+	defer unlockSession(Address)
 	session, exists := sessionMap[Address]
 
 	//create if it doesnt exist
@@ -80,18 +82,37 @@ func GetSession(Address string) (*Session, error) {
 	return session, nil
 }
 
+//GetExistingSession does not attempt to create a connection only returns existing
+func GetExistingSession(Address string, timeoutInSeconds int) (*Session, bool) {
+	session, exists := sessionMap[Address]
+
+	if exists {
+		//If the sessions exists, check if its still active, if not dump it and try to create a new one.
+		elapsedSinceLastActivity := time.Now().Unix() - session.lastActivityUnix
+		if elapsedSinceLastActivity > int64(timeoutInSeconds) {
+			closeSession(Address)
+
+			return nil, false
+		}
+	}
+
+	return session, exists
+}
+
 //CloseSession handles session termination and removes from map
 /*func CloseSession(address string) {
-	sessionManagerLock.Lock()
-	defer sessionManagerLock.Unlock()
+	lockSession(Address)
+	defer unlockSession(Address)
 
 	closeSession(address)
 }*/
 
 //AcceptSession accepts a incoming session connection
 func AcceptSession(acceptedConnection net.Conn) *Session {
-	sessionManagerLock.Lock()
-	defer sessionManagerLock.Unlock()
+	addr := acceptedConnection.RemoteAddr().String()
+
+	lockSession(addr)
+	defer unlockSession(addr)
 
 	listenReader := bufio.NewReader(acceptedConnection)
 	session := &Session{
@@ -99,8 +120,6 @@ func AcceptSession(acceptedConnection net.Conn) *Session {
 		Session:          acceptedConnection,
 		lastActivityUnix: time.Now().Unix(),
 	}
-
-	addr := acceptedConnection.RemoteAddr().String()
 
 	_, exists := sessionMap[addr]
 	if exists {
@@ -110,7 +129,7 @@ func AcceptSession(acceptedConnection net.Conn) *Session {
 
 	sessionMap[addr] = session
 
-	onConnect(session)
+	go onConnect(session)
 
 	return session
 }
@@ -150,7 +169,7 @@ func createSession(Address string) (*Session, error) {
 		lastActivityUnix: time.Now().Unix(),
 	}
 
-	onConnect(session)
+	go onConnect(session)
 
 	return session, nil
 }
@@ -174,5 +193,22 @@ func closeSession(address string) {
 	log.Println("Download Session closed for: ", address)
 	fmt.Println(string("\033[31m"), "Download Session closed for: ", address, string("\033[0m"))
 
-	onDisconnect(address)
+	go onDisconnect(address)
+}
+
+func lockSession(Addr string) {
+	lock, exists := sessionLockMap[Addr]
+	if !exists {
+		lock = &sync.Mutex{}
+		sessionLockMap[Addr] = lock
+	}
+	lock.Lock()
+}
+
+func unlockSession(Addr string) {
+	lock, exists := sessionLockMap[Addr]
+	if !exists {
+		panic("Unlocking session lock that does not exist!")
+	}
+	lock.Unlock()
 }

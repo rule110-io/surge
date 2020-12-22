@@ -96,7 +96,12 @@ func rescanPeers() {
 	for true {
 		time.Sleep(time.Minute)
 		GetSubscriptions()
-		go queryRemoteForFiles()
+
+		for _, addr := range subscribers {
+			fmt.Println(string("\033[36m"), "Client Connected", addr, string("\033[0m"))
+			go SendQueryRequest(addr, "Testing query functionality.")
+			fmt.Println(string("\033[36m"), "Finished sending file query", addr, string("\033[0m"))
+		}
 	}
 }
 
@@ -171,32 +176,6 @@ func GetSubscriptions() {
 	}
 }
 
-func queryRemoteForFiles() {
-	defer RecoverAndLog()
-
-	//Clear out clients in online map which are no longer subscribed
-	for clientKey := range clientOnlineMap {
-		foundInSubs := false
-		for _, subscriberKey := range subscribers {
-			if clientKey == subscriberKey {
-				foundInSubs = true
-				break
-			}
-		}
-		if !foundInSubs {
-			setClientOnlineMap(clientKey, false)
-
-			ListedFilesLock.Lock()
-			for _, file := range ListedFiles {
-				file.Seeders = removeStringFromSlice(file.Seeders, clientKey)
-				file.SeederCount = len(file.Seeders)
-			}
-			ListedFilesLock.Unlock()
-		}
-	}
-	time.Sleep(time.Second * 60)
-}
-
 func setClientOnlineMap(addr string, value bool) {
 	clientOnlineMapLock.Lock()
 	defer clientOnlineMapLock.Unlock()
@@ -240,11 +219,26 @@ func Listen() {
 }
 
 func onClientConnected(session *sessionmanager.Session) {
-	listenToSession(session)
+	addr := session.Session.RemoteAddr().String()
+	setClientOnlineMap(addr, true)
+
+	fmt.Println(string("\033[36m"), "Client Connected", addr, string("\033[0m"))
+	go SendQueryRequest(addr, "Testing query functionality.")
+	fmt.Println(string("\033[36m"), "Finished sending file query", addr, string("\033[0m"))
+
+	go listenToSession(session)
 }
 
 func onClientDisconnected(addr string) {
+	setClientOnlineMap(addr, false)
 
+	//Remove this address from remote file seeders
+	ListedFilesLock.Lock()
+	for _, file := range ListedFiles {
+		file.Seeders = removeStringFromSlice(file.Seeders, addr)
+		file.SeederCount = len(file.Seeders)
+	}
+	ListedFilesLock.Unlock()
 }
 
 func listenToSession(Session *sessionmanager.Session) {
@@ -253,16 +247,6 @@ func listenToSession(Session *sessionmanager.Session) {
 	addr := Session.Session.RemoteAddr().String()
 
 	fmt.Println(string("\033[31m"), "Initiate Session", addr, string("\033[0m"))
-
-	queryForFiles := func() {
-		for Session.Session != nil {
-			fmt.Println(string("\033[36m"), "Start sending file query to", len(subscribers), string("\033[0m"))
-			go SendQueryRequest(addr, "Testing query functionality.")
-			fmt.Println(string("\033[36m"), "Finished sending file query to remotes", len(subscribers), string("\033[0m"))
-			time.Sleep(time.Second * 60)
-		}
-	}
-	go queryForFiles()
 
 	for Session.Session != nil {
 		data, chunkType, err := SessionRead(Session)

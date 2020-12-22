@@ -170,7 +170,11 @@ func TransmitChunk(Session *sessionmanager.Session, FileID string, ChunkID int32
 func SendQueryRequest(Addr string, Query string) bool {
 	defer RecoverAndLog()
 
-	surgeSession, err := sessionmanager.GetSession(Addr)
+	surgeSession, exists := sessionmanager.GetExistingSession(Addr, 75)
+
+	if !exists {
+		return false
+	}
 
 	msg := &pb.SurgeQuery{
 		Query: Query,

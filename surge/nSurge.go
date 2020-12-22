@@ -149,7 +149,6 @@ func WailsBind(runtime *wails.Runtime) {
 
 	//Get subs first synced then grab file queries for those subs
 	GetSubscriptions()
-	go queryRemoteForFiles()
 
 	//Startup async processes to continue processing subs/files and updating gui
 	go updateGUI()
@@ -227,38 +226,6 @@ func updateGUI() {
 		//Create session aggregate maps for file
 		fileProgressMap := make(map[string]float32)
 
-		/*sessionsWriteLock.Lock()
-		for _, session := range Sessions {
-			//log.Println("Active session:", session.session.RemoteAddr().String())
-			if session.FileSize == 0 {
-				continue
-			}
-
-			fileProgressMap[session.FileHash] = float32(float64(session.Downloaded) / float64(session.FileSize))
-
-			if session.Downloaded >= session.FileSize {
-				fileEntry, err := dbGetFile(session.FileHash)
-				if err != nil {
-					pushError("Error on download complete", err.Error())
-					continue
-				}
-
-				if fileEntry.IsDownloading {
-					if chunkMapFull(fileEntry.ChunkMap, fileEntry.NumChunks) {
-						platform.ShowNotification("Download Finished", "Download for "+fileEntry.FileName+" finished!")
-						pushNotification("Download Finished", fileEntry.FileName)
-						session.Session.Close()
-
-						fileEntry.IsDownloading = false
-						fileEntry.IsUploading = true
-						dbInsertFile(*fileEntry)
-						go AddToSeedString(*fileEntry)
-					}
-				}
-			}
-		}
-		sessionsWriteLock.Unlock()*/
-
 		totalDown := 0
 		totalUp := 0
 
@@ -286,6 +253,7 @@ func updateGUI() {
 					file.IsUploading = true
 					dbInsertFile(file)
 					go AddToSeedString(file)
+					go sessionmanager.CloseFile(file.FileHash)
 				}
 			}
 
@@ -370,13 +338,6 @@ type Stats struct {
 	log *wails.CustomLogger
 }
 
-// WailsInit .
-func (s *Stats) WailsInit(runtime *wails.Runtime) error {
-	s.log = runtime.Log.New("Stats")
-	runtime.Events.Emit("notificationEvent", "Backend Init", "just a test")
-	return nil
-}
-
 func getListedFileByHash(Hash string) *File {
 
 	defer RecoverAndLog()
@@ -442,6 +403,7 @@ func DownloadFile(Hash string) bool {
 	appendChunkLock := sync.Mutex{}
 
 	downloadJob := func(terminateFlag *bool) {
+		defer RecoverAndLog()
 		//Used to terminate the rescanning of peers
 		terminate := func(flag *bool) {
 			*flag = true
@@ -484,9 +446,9 @@ func DownloadFile(Hash string) bool {
 				if len(fileSeeders) > seederAlternator {
 					//Get seeder
 					downloadSeederAddr = fileSeeders[seederAlternator]
-					session, err := sessionmanager.GetSession(downloadSeederAddr)
+					session, existing := sessionmanager.GetExistingSession(downloadSeederAddr, 60)
 
-					if err == nil {
+					if existing {
 						success = RequestChunk(session, file.FileHash, int32(chunkID))
 					} else {
 						success = false
@@ -518,9 +480,43 @@ func DownloadFile(Hash string) bool {
 				chunksInTransit[chunkKey] = true
 				chunkInTransitLock.Unlock()
 
-				//Sleep for 60 seconds, check if entry still exists in transit map.
-				time.Sleep(time.Second * 60)
-				inTransit := chunksInTransit[chunkKey]
+				//Sleep and check if entry still exists in transit map.
+				sleepWorker := true
+				inTransit := true
+				receiveTimeout := 30
+				receiveTimeoutCounter := 0
+
+				for sleepWorker {
+					time.Sleep(time.Second)
+					fmt.Println(string("\033[36m"), "Worker Sleeping", string("\033[0m"))
+
+					//Check if connection is lost
+					_, sessionExists := sessionmanager.GetExistingSession(downloadSeederAddr, 10)
+					if !sessionExists {
+						//if session no longer exists
+						fmt.Println(string("\033[36m"), "session no longer exists", string("\033[0m"))
+						inTransit = true
+						sleepWorker = false
+						break
+					}
+
+					//Check if received
+					isInTransit := chunksInTransit[chunkKey]
+					if !isInTransit {
+						//if no longer in transit, continue workers
+						fmt.Println(string("\033[36m"), "no longer in transit, continue workers", string("\033[0m"))
+						inTransit = false
+						sleepWorker = false
+						break
+					} else if receiveTimeoutCounter >= receiveTimeout {
+						//if timeout is triggered, leave in transit.
+						fmt.Println(string("\033[36m"), "timeout is triggered, leave in transit.", string("\033[0m"))
+						inTransit = true
+						sleepWorker = false
+						break
+					}
+					receiveTimeoutCounter++
+				}
 
 				//If its still in transit abort
 				if inTransit {
@@ -557,7 +553,8 @@ func DownloadFile(Hash string) bool {
 		}
 	}
 
-	/*scanForSeeders := func(terminateFlag *bool) {
+	scanForSeeders := func(terminateFlag *bool) {
+		defer RecoverAndLog()
 		//While we are not terminated scan for new peers
 		for *terminateFlag == false {
 			time.Sleep(time.Second * 5)
@@ -565,32 +562,22 @@ func DownloadFile(Hash string) bool {
 			newFile := getListedFileByHash(Hash)
 			if newFile != nil {
 				//Check for new sessions
+				mutateSeederLock.Lock()
+				fileSeeders = []string{}
 				for i := 0; i < len(newFile.Seeders); i++ {
-					//Check if the newFile seeder is not already part of the downloadSessions
-					alreadyAdded := false
-					for j := 0; j < len(fileSeeders); j++ {
-						if fileSeeders[j] == newFile.Seeders[i] {
-							alreadyAdded = true
-							break
-						}
+					_, existing := sessionmanager.GetExistingSession(newFile.Seeders[i], 60)
+					if existing {
+						fileSeeders = append(fileSeeders, newFile.Seeders[i])
 					}
-
-					//Skip this entry
-					if alreadyAdded {
-						continue
-					}
-
-					mutateSeederLock.Lock()
-					fileSeeders = append(fileSeeders, newFile.Seeders[i])
-					mutateSeederLock.Unlock()
 				}
+				mutateSeederLock.Unlock()
 			}
 		}
-	}*/
+	}
 
 	terminateFlag := false
 	go downloadJob(&terminateFlag)
-	//go scanForSeeders(&terminateFlag)
+	go scanForSeeders(&terminateFlag)
 
 	return true
 }
