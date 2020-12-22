@@ -13,7 +13,7 @@
 <script>
 import { mapState } from "vuex";
 import LineChart from "@/components/Charts/Bandwidth.js";
-import "chartjs-plugin-streaming";
+import "@taeuk-gang/chartjs-plugin-streaming";
 
 export default {
   components: {

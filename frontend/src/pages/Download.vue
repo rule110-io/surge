@@ -43,7 +43,7 @@
           >
             <div
               class="table__cell text_wrap_none"
-              style="width: calc(100% - 646px);"
+              style="width: calc(100% - 666px);"
             >
               <FileInfo :file="file" />
             </div>
