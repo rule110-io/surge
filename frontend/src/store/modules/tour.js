@@ -1,6 +1,6 @@
 const getDefaultState = () => {
   return {
-    tour: true,
+    tour: false,
   };
 };
 
