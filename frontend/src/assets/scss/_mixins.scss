@@ -28,3 +28,13 @@
 %dark-theme {
   @include dark-theme;
 }
+
+@mixin size-lg {
+  @media (min-width: $size-lg) {
+    @content;
+  }
+}
+
+%size-lg {
+  @include size-lg;
+}

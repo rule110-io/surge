@@ -2,14 +2,16 @@
 @import "./fonts";
 @import "~vue-tour/dist/vue-tour.css";
 
+html {
+  font-size: $html-font-size;
+}
+
 body {
   background: $background;
   font-family: "Source Code Pro";
   font-weight: 400;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  height: $app-height;
-  width: $app-width;
   -ms-overflow-style: none; /** IE11 */
 
   * {
@@ -19,6 +21,10 @@ body {
 
 b {
   font-weight: $fw-bold;
+}
+
+#app {
+  height: 100vh;
 }
 
 /*========== scroll ==========*/
@@ -102,8 +108,6 @@ b {
 /*========== main container ==========*/
 
 .main {
-  height: $app-height;
-  width: $app-width;
   margin: 0 auto;
 
   &__wrapper {
@@ -123,7 +127,6 @@ b {
     left: 0px;
     z-index: 1000;
     background: rgba(0, 0, 0, 0.4);
-    width: 1144px;
     height: 100%;
 
     @include dark-theme {
@@ -164,29 +167,34 @@ b {
 /*========== table ==========*/
 
 .table {
-  display: table;
   width: 100%;
-  margin-bottom: $padding-max;
+  margin-bottom: $padding-medium;
   position: relative;
   border-spacing: 0px 6px;
 
   &__row {
-    display: table-row;
+    display: flex;
+    width: 100%;
+
+    &:not(:last-child) {
+      margin-bottom: 6px;
+    }
   }
 
   &__head {
     color: $grey;
     font-size: 15px;
     font-weight: normal;
-    display: table-cell;
     padding: 0 $padding-small $padding-micro $padding-small;
     font-weight: 500;
     font-size: $fz-md;
     font-family: "Roboto";
     transition: $transition-1;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
 
     &-action {
-      position: absolute;
       top: 6px;
       height: 15px;
       width: 15px;
@@ -213,20 +221,16 @@ b {
     @include dark-theme {
       color: color(dark, text-light);
     }
-
-    &:first-child {
-      width: 200px;
-    }
   }
 
   &__cell {
-    display: table-cell;
-    vertical-align: middle;
+    display: flex;
     padding: $padding-micro $padding-small;
     font-size: $fz-sm;
     height: 51px;
     box-sizing: border-box;
     background: $grey-light;
+    align-items: center;
 
     @include dark-theme {
       background: $card-dark;

@@ -1,22 +1,22 @@
 {
-    "name": "Surge",
-    "description": "Enter your project description",
-    "author": {
-        "name": "Christian Busch",
-        "email": "kontakt@christian-busch.com"
-    },
-    "version": "0.2.2-beta",
-    "binaryname": "surge",
-    "frontend": {
-        "dir": "frontend",
-        "install": "npm install",
-        "build": "npm run build",
-        "bridge": "src",
-        "serve": "npm run serve"
-    },
-    "WailsVersion": "",
-    "CrossCompile": false,
-    "Platform": "",
-    "Architecture": "",
-    "LdFlags": ""
+  "name": "Surge",
+  "description": "Enter your project description",
+  "author": {
+    "name": "Christian Busch",
+    "email": "kontakt@christian-busch.com"
+  },
+  "version": "0.3.0-beta",
+  "binaryname": "surge",
+  "frontend": {
+    "dir": "frontend",
+    "install": "npm install",
+    "build": "npm run build",
+    "bridge": "src",
+    "serve": "npm run serve"
+  },
+  "WailsVersion": "",
+  "CrossCompile": false,
+  "Platform": "",
+  "Architecture": "",
+  "LdFlags": ""
 }

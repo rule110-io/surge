@@ -21,6 +21,7 @@
     }
 
     &-version {
+      margin-right: $padding-default;
     }
 
     &-support {
@@ -54,6 +55,7 @@
     justify-content: space-between;
     align-items: center;
     position: relative;
+    min-width: 380px;
 
     &-switch {
       position: absolute;

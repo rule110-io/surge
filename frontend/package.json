@@ -2,7 +2,7 @@
   "name": "surge",
   "author": "Christian Busch<kontakt@christian-busch.com>",
   "private": true,
-  "version": "0.2.2-beta",
+  "version": "0.3.0-beta",
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",

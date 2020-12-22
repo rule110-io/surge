@@ -180,19 +180,6 @@ func Start(args []string) {
 	fileBandwidthMap = make(map[string]BandwidthMA)
 	chunksInTransit = make(map[string]bool)
 
-	//Initialize folder structures on os filesystem
-	newlyCreated, err := platform.InitializeFolders()
-	if err != nil {
-		pushError("Error on startup", err.Error())
-	}
-	if newlyCreated {
-		// seems like this is the first time starting the app
-		//set tour to active
-		DbWriteSetting("Tour", "true")
-		//set default mode to light
-		DbWriteSetting("DarkMode", "false")
-	}
-
 	//Initialize our surge nkn client
 	go InitializeClient(args)
 }

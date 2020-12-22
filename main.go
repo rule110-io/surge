@@ -128,9 +128,6 @@ func main() {
 	//surge.HashFile("C:\\Users\\mitch\\Downloads\\surge_remote\\surge-0.2.0-beta.windows.zip")
 
 	stats := &Stats{}
-	surge.InitializeDb()
-	surge.InitializeLog()
-	defer surge.CloseDb()
 
 	argsWithProg := os.Args
 	argsWithoutProg := os.Args[1:]
@@ -142,6 +139,22 @@ func main() {
 		arguments = os.Args[1:]
 	}
 
+	//Initialize folder structures on os filesystem
+	newlyCreated, err := platform.InitializeFolders()
+	if err != nil {
+		log.Fatal("Error on startup", err.Error())
+	}
+	surge.InitializeDb()
+	surge.InitializeLog()
+	defer surge.CloseDb()
+	if newlyCreated {
+		// seems like this is the first time starting the app
+		//set tour to active
+		surge.DbWriteSetting("Tour", "true")
+		//set default mode to light
+		surge.DbWriteSetting("DarkMode", "false")
+	}
+
 	surge.Start(arguments)
 
 	js := mewn.String("./frontend/dist/app.js")
@@ -149,8 +162,8 @@ func main() {
 
 	app := wails.CreateApp(&wails.AppConfig{
 		Width:     1144,
-		Height:    768,
-		Resizable: false,
+		Height:    790,
+		Resizable: true,
 		Title:     "Surge",
 		JS:        js,
 		CSS:       css,
