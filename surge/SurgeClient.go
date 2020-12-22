@@ -8,6 +8,7 @@ import (
 
 	nkn "github.com/nknorg/nkn-sdk-go"
 	"github.com/rule110-io/surge-ui/surge/platform"
+	"github.com/rule110-io/surge-ui/surge/sessionmanager"
 )
 
 //ChunkSize is size of chunk in bytes (256 kB)
@@ -42,6 +43,7 @@ func InitializeClient(args []string) bool {
 
 	<-client.OnConnect.C
 	clientInitialized = true
+	sessionmanager.Initialize(client, onClientConnected, onClientDisconnected)
 
 	pushNotification("Client Connected", "Successfully connected to the NKN network")
 
@@ -163,6 +165,10 @@ func GetSubscriptions() {
 	}
 
 	fmt.Println(string("\033[36m"), "Get Subscriptions", len(subscribers), string("\033[0m"))
+
+	for _, sub := range subscribers {
+		sessionmanager.GetSession(sub)
+	}
 }
 
 func queryRemoteForFiles() {
@@ -188,16 +194,6 @@ func queryRemoteForFiles() {
 			ListedFilesLock.Unlock()
 		}
 	}
-
-	fmt.Println(string("\033[36m"), "Start sending file queries to remotes", len(subscribers), string("\033[0m"))
-	for _, address := range subscribers {
-		//Request
-		go SendQueryRequest(address, "Testing query functionality.")
-	}
-
-	//Wait till all requests resolve then sleep for a bit before rescanning
-	fmt.Println(string("\033[36m"), "Finished sending file queries to remotes", len(subscribers), string("\033[0m"))
-
 	time.Sleep(time.Second * 60)
 }
 
@@ -223,4 +219,81 @@ func setClientOnlineMap(addr string, value bool) {
 			Online:     numOnline,
 		}
 	})
+}
+
+func listenForIncomingSessions() {
+	defer RecoverAndLog()
+	for !client.IsClosed() {
+		listenSession, err := client.Accept()
+		if err != nil {
+			pushError("Error on client accept", err.Error())
+			continue
+		}
+
+		sessionmanager.AcceptSession(listenSession)
+	}
+}
+
+// Listen will listen to incoming requests for chunks
+func Listen() {
+	go listenForIncomingSessions()
+}
+
+func onClientConnected(session *sessionmanager.Session) {
+	listenToSession(session)
+}
+
+func onClientDisconnected(addr string) {
+
+}
+
+func listenToSession(Session *sessionmanager.Session) {
+	defer RecoverAndLog()
+
+	addr := Session.Session.RemoteAddr().String()
+
+	fmt.Println(string("\033[31m"), "Initiate Session", addr, string("\033[0m"))
+
+	queryForFiles := func() {
+		for Session.Session != nil {
+			fmt.Println(string("\033[36m"), "Start sending file query to", len(subscribers), string("\033[0m"))
+			go SendQueryRequest(addr, "Testing query functionality.")
+			fmt.Println(string("\033[36m"), "Finished sending file query to remotes", len(subscribers), string("\033[0m"))
+			time.Sleep(time.Second * 60)
+		}
+	}
+	go queryForFiles()
+
+	for Session.Session != nil {
+		data, chunkType, err := SessionRead(Session)
+		fmt.Println(string("\033[31m"), "Read data from session", addr, string("\033[0m"))
+
+		if err != nil {
+			log.Println("Session read failed, closing session error:", err)
+			break
+		}
+
+		sessionmanager.UpdateActivity(Session.Session.RemoteAddr().String())
+
+		switch chunkType {
+		case surgeChunkID:
+			//Write add to download internally after parsing data
+			processChunk(Session, data)
+			break
+		case surgeQueryRequestID:
+			processQueryRequest(Session, data)
+			//Write add to download
+			bandwidthAccumulatorMapLock.Lock()
+			downloadBandwidthAccumulator["DISCOVERY"] += len(data)
+			bandwidthAccumulatorMapLock.Unlock()
+			break
+		case surgeQueryResponseID:
+			processQueryResponse(Session, data)
+			//Write add to download
+			bandwidthAccumulatorMapLock.Lock()
+			downloadBandwidthAccumulator["DISCOVERY"] += len(data)
+			bandwidthAccumulatorMapLock.Unlock()
+			break
+		}
+	}
 }

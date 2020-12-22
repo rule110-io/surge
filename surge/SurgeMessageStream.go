@@ -6,12 +6,16 @@ import (
 	"io"
 
 	"log"
+
+	"github.com/rule110-io/surge-ui/surge/sessionmanager"
 )
 
 // SessionWrite writes to session
-func SessionWrite(Session *Session, Data []byte, ID byte) (err error) {
-	if Session == nil || Session.session == nil {
-		return errors.New("write to session error, session nil")
+func SessionWrite(Session *sessionmanager.Session, Data []byte, ID byte) (written int, err error) {
+	defer RecoverAndLog()
+
+	if Session == nil || Session.Session == nil {
+		return 0, errors.New("write to session error, session nil")
 	}
 	//Package identifier to know what we are sending
 	packID := make([]byte, 1)
@@ -28,22 +32,17 @@ func SessionWrite(Session *Session, Data []byte, ID byte) (err error) {
 	buff = append(buff, Data...)
 
 	//Session.session.SetWriteDeadline(time.Now().Add(60 * time.Second))
-	_, err = Session.session.Write(buff)
+	_, err = Session.Session.Write(buff)
 	if err != nil {
-		return err
+		return 0, err
 	}
 
-	//Write add to upload
-	bandwidthAccumulatorMapLock.Lock()
-	uploadBandwidthAccumulator[Session.FileHash] += len(Data)
-	bandwidthAccumulatorMapLock.Unlock()
-
-	return err
+	return len(buff), err
 }
 
 //SessionRead reads from session
-func SessionRead(Session *Session) (data []byte, ID byte, err error) {
-
+func SessionRead(Session *sessionmanager.Session) (data []byte, ID byte, err error) {
+	defer RecoverAndLog()
 	/*one := make([]byte, 1)
 	Session.session.SetReadDeadline(time.Now())
 	if _, err := Session.session.Read(one); err == io.EOF {
@@ -59,7 +58,7 @@ func SessionRead(Session *Session) (data []byte, ID byte, err error) {
 	headerBuffer := make([]byte, 5) //int32 size of header + 1 for packid
 
 	// the header of 4 bytes + 1 for packid
-	_, err = io.ReadFull(Session.reader, headerBuffer)
+	_, err = io.ReadFull(Session.Reader, headerBuffer)
 	if err != nil {
 		if err.Error() == "session closed" {
 			log.Println(err)
@@ -81,16 +80,11 @@ func SessionRead(Session *Session) (data []byte, ID byte, err error) {
 	data = make([]byte, size)
 
 	// read the full message, or return an error
-	_, err = io.ReadFull(Session.reader, data[:int(size)])
+	_, err = io.ReadFull(Session.Reader, data[:int(size)])
 	if err != nil {
 		log.Println(err)
 		return nil, 0x0, err
 	}
-
-	//Write add to download
-	bandwidthAccumulatorMapLock.Lock()
-	downloadBandwidthAccumulator[Session.FileHash] += int(size)
-	bandwidthAccumulatorMapLock.Unlock()
 
 	return data, packID, err
 }
