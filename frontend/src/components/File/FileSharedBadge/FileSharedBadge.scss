@@ -1,0 +1,23 @@
+.file-shared-badge {
+  height: 24px;
+  width: 54px;
+  font-weight: bold;
+  border-radius: 4px;
+  margin-left: $padding-micro;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $fz-xs;
+
+  &_theme {
+    &_default {
+      background: rgba($secondary, 0.2);
+      color: $secondary;
+    }
+
+    &_good {
+      background: rgba($primary, 0.2);
+      color: $primary;
+    }
+  }
+}

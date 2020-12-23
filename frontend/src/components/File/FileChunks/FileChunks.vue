@@ -13,7 +13,7 @@
         Finished
       </template>
       <template v-else-if="file.IsUploading">
-        Seeding: {{ shared.toFixed(2) }}x
+        Seeding: <FileSharedBadge :ratio="shared.toFixed(2)" />
       </template>
       <template v-else-if="file.IsPaused">
         Paused: {{ progress.toFixed(2) }}%
@@ -37,7 +37,12 @@
 <script>
 import { mapState } from "vuex";
 
+import FileSharedBadge from "@/components/File/FileSharedBadge/FileSharedBadge";
+
 export default {
+  components: {
+    FileSharedBadge,
+  },
   props: {
     file: {
       type: Object,
