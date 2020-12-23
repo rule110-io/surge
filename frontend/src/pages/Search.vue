@@ -158,7 +158,6 @@ export default {
   },
   methods: {
     setSorting(orderBy) {
-      console.log(orderBy);
       let newConfig = Object.assign({}, this.remoteFilesConfig);
       const currentOrder = newConfig.orderBy;
       const currentIsDesc = newConfig.isDesc;
