@@ -344,8 +344,6 @@ func processQueryResponse(Session *sessionmanager.Session, Data []byte) {
 
 	fmt.Println(string("\033[36m"), "file query response received", seeder, string("\033[0m"))
 
-	go setClientOnlineMap(seeder, true)
-
 	ListedFilesLock.Lock()
 
 	//Parse the response

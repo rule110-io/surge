@@ -105,11 +105,6 @@ func rescanPeers() {
 	}
 }
 
-//GetNumberOfRemoteClient returns number of clients and online clients
-func GetNumberOfRemoteClient() (int, int) {
-	return numClientsSubscribed, numClientsOnline
-}
-
 func autoSubscribeWorker() {
 
 	//As long as the client is running subscribe
@@ -174,26 +169,10 @@ func GetSubscriptions() {
 	}
 }
 
-func setClientOnlineMap(addr string, value bool) {
-	clientOnlineMapLock.Lock()
-	defer clientOnlineMapLock.Unlock()
-
-	clientOnlineMap[addr] = value
-
-	var numOnline = 0
-	//Count num online clients
-	//unix := time.Now().Unix()
-	for _, value := range clientOnlineMap {
-		//Needs to be here at least in the last 60
-		if value == true {
-			numOnline++
-		}
-	}
-
+func updateNumClientStore() {
 	numClientsStore.Update(func(data NumClientsStruct) NumClientsStruct {
 		return NumClientsStruct{
-			Subscribed: len(subscribers),
-			Online:     numOnline,
+			Online: sessionmanager.GetSessionLength(),
 		}
 	})
 }
@@ -218,7 +197,6 @@ func Listen() {
 
 func onClientConnected(session *sessionmanager.Session) {
 	addr := session.Session.RemoteAddr().String()
-	setClientOnlineMap(addr, true)
 
 	fmt.Println(string("\033[36m"), "Client Connected", addr, string("\033[0m"))
 	go SendQueryRequest(addr, "Testing query functionality.")
@@ -228,7 +206,6 @@ func onClientConnected(session *sessionmanager.Session) {
 }
 
 func onClientDisconnected(addr string) {
-	setClientOnlineMap(addr, false)
 
 	//Remove this address from remote file seeders
 	ListedFilesLock.Lock()

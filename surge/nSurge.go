@@ -78,8 +78,7 @@ type File struct {
 
 //NumClientsStruct .
 type NumClientsStruct struct {
-	Subscribed int
-	Online     int
+	Online int
 }
 
 // FileListing struct for all frontend file listing props
@@ -135,9 +134,6 @@ var ListedFiles []File
 
 var wailsRuntime *wails.Runtime
 
-var numClientsSubscribed int = 0
-var numClientsOnline int = 0
-
 var numClientsStore *wails.Store
 
 // WailsBind is a binding function at startup
@@ -150,8 +146,7 @@ func WailsBind(runtime *wails.Runtime) {
 	platform.SetVisualModeLikeOS()
 
 	numClients := NumClientsStruct{
-		Subscribed: 0,
-		Online:     0,
+		Online: 0,
 	}
 
 	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
@@ -241,6 +236,8 @@ func updateGUI() {
 
 		log.Println("Active Sessions:", sessionmanager.GetSessionLength())
 		fmt.Println("Active Sessions:", sessionmanager.GetSessionLength())
+
+		updateNumClientStore()
 
 		//Create session aggregate maps for file
 		fileProgressMap := make(map[string]float32)

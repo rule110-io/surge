@@ -63,15 +63,6 @@ type RemoteClientOnlineModel struct {
 	NumOnline int
 }
 
-func getNumberOfRemoteClient() RemoteClientOnlineModel {
-	total, online := surge.GetNumberOfRemoteClient()
-
-	return RemoteClientOnlineModel{
-		NumKnown:  total,
-		NumOnline: online,
-	}
-}
-
 func seedFile() bool {
 	path := platform.OpenFileDialog()
 	if path == "" {
@@ -181,7 +172,6 @@ func main() {
 	app.Bind(getFileChunkMap)
 	app.Bind(seedFile)
 	app.Bind(removeFile)
-	app.Bind(getNumberOfRemoteClient)
 	app.Bind(writeSetting)
 	app.Bind(readSetting)
 	app.Bind(startDownloadMagnetLinks)
