@@ -464,7 +464,7 @@ func WriteChunk(FileID string, ChunkID int32, Chunk []byte) {
 
 	fileInfo, err := dbGetFile(FileID)
 	if err != nil {
-		pushError("Error on write chunk (db get)", err.Error())
+		log.Println("Error on write chunk (db get)", err.Error())
 		return
 	}
 	remoteFolder, err := platform.GetRemoteFolder()
@@ -473,7 +473,9 @@ func WriteChunk(FileID string, ChunkID int32, Chunk []byte) {
 		return
 	}
 	path := remoteFolder + string(os.PathSeparator) + fileInfo.FileName
-	osFile, err := sessionmanager.GetFile(FileID, path)
+	osFile, err := os.OpenFile(path, os.O_RDWR, 0644)
+	defer osFile.Close()
+
 	if err != nil {
 		pushError("Error on write chunk (sessionmanager.GetFile)", err.Error())
 		return

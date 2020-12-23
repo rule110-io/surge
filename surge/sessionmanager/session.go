@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"os"
 	"sync"
 	"time"
 
@@ -39,7 +38,7 @@ var sessionLockMap map[string]*sync.Mutex
 func Initialize(nknClient *nkn.MultiClient, connectFunc func(session *Session), disconnectFunc func(addr string)) {
 	sessionMap = make(map[string]*Session)
 	sessionLockMap = make(map[string]*sync.Mutex)
-	fileMap = make(map[string]*os.File)
+	//fileMap = make(map[string]*os.File)
 	client = nknClient
 	onConnect = connectFunc
 	onDisconnect = disconnectFunc

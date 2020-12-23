@@ -272,7 +272,6 @@ func updateGUI() {
 					file.IsUploading = true
 					dbInsertFile(file)
 					go AddToSeedString(file)
-					go sessionmanager.CloseFile(file.FileHash)
 				}
 			}
 
@@ -375,8 +374,8 @@ func getListedFileByHash(Hash string) *File {
 
 //DownloadFile downloads the file
 func DownloadFile(Hash string) bool {
-	//Addr string, Size int64, FileID string
 
+	//Addr string, Size int64, FileID string
 	file := getListedFileByHash(Hash)
 	if file == nil {
 		pushError("Error on download file", "No listed file with hash: "+Hash)
@@ -683,8 +682,6 @@ func SetFilePause(Hash string, State bool) {
 //RemoveFile removes file from surge db and optionally from disk
 func RemoveFile(Hash string, FromDisk bool) bool {
 
-	sessionmanager.CloseFile(Hash)
-
 	fileWriteLock.Lock()
 
 	if FromDisk {
@@ -696,8 +693,8 @@ func RemoveFile(Hash string, FromDisk bool) bool {
 		}
 		err = os.Remove(file.Path)
 		if err != nil {
-			log.Println("Error on remove file from disk - removing from surge", err.Error())
-			pushError("Error on remove file from disk - removing from surge", err.Error())
+			log.Println("Error on remove file from disk", err.Error())
+			pushError("Error on remove file from disk", err.Error())
 		}
 	}
 
