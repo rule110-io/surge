@@ -348,28 +348,6 @@ func processQueryResponse(Session *sessionmanager.Session, Data []byte) {
 
 	ListedFilesLock.Lock()
 
-	//Remove seeders that match current seeder from file listings
-	for i := 0; i < len(ListedFiles); i++ {
-		for j := 0; j < len(ListedFiles[i].Seeders); j++ {
-			if ListedFiles[i].Seeders[j] == seeder {
-				// Remove the element at index i from a.
-				ListedFiles[i].Seeders[j] = ListedFiles[i].Seeders[len(ListedFiles[i].Seeders)-1] // Copy last element to index i.
-				ListedFiles[i].Seeders[len(ListedFiles[i].Seeders)-1] = ""                        // Erase last element (write zero value).
-				ListedFiles[i].Seeders = ListedFiles[i].Seeders[:len(ListedFiles[i].Seeders)-1]   // Truncate slice.
-			}
-		}
-	}
-
-	//Remove empty seeders listings
-	for i := 0; i < len(ListedFiles); i++ {
-		if len(ListedFiles[i].Seeders) == 0 {
-			// Remove the element at index i from a.
-			ListedFiles[i] = ListedFiles[len(ListedFiles)-1] // Copy last element to index i.
-			ListedFiles[len(ListedFiles)-1] = File{}         // Erase last element (write zero value).
-			ListedFiles = ListedFiles[:len(ListedFiles)-1]   // Truncate slice.
-		}
-	}
-
 	//Parse the response
 	payloadSplit := strings.Split(s, "surge://")
 	for j := 0; j < len(payloadSplit); j++ {
@@ -386,11 +364,11 @@ func processQueryResponse(Session *sessionmanager.Session, Data []byte) {
 			FileName:    data[2],
 			FileSize:    fileSize,
 			FileHash:    data[4],
-			Seeders:     []string{seeder},
+			seeders:     []string{seeder},
 			Path:        "",
 			NumChunks:   numChunks,
 			ChunkMap:    nil,
-			SeederCount: 1,
+			seederCount: 1,
 		}
 
 		//Replace existing, or remove.
@@ -399,9 +377,9 @@ func processQueryResponse(Session *sessionmanager.Session, Data []byte) {
 			if ListedFiles[l].FileHash == newListing.FileHash {
 
 				//if the seeder is unique add it as an additional seeder for the file
-				ListedFiles[l].Seeders = append(ListedFiles[l].Seeders, seeder)
-				ListedFiles[l].Seeders = distinctStringSlice(ListedFiles[l].Seeders)
-				ListedFiles[l].SeederCount = len(ListedFiles[l].Seeders)
+				ListedFiles[l].seeders = append(ListedFiles[l].seeders, seeder)
+				ListedFiles[l].seeders = distinctStringSlice(ListedFiles[l].seeders)
+				ListedFiles[l].seederCount = len(ListedFiles[l].seeders)
 
 				replace = true
 				break
@@ -445,7 +423,7 @@ func ParsePayloadString(s string) {
 			FileName:  data[2],
 			FileSize:  fileSize,
 			FileHash:  data[4],
-			Seeders:   seeder,
+			seeders:   seeder,
 			Path:      "",
 			NumChunks: numChunks,
 			ChunkMap:  nil,
@@ -457,7 +435,7 @@ func ParsePayloadString(s string) {
 		for l := 0; l < len(ListedFiles); l++ {
 			if ListedFiles[l].FileHash == newListing.FileHash {
 				//if the seeder is unique add it as an additional seeder for the file
-				ListedFiles[l].Seeders = append(ListedFiles[l].Seeders, seeder...)
+				ListedFiles[l].seeders = append(ListedFiles[l].seeders, seeder...)
 				replace = true
 				break
 			}
@@ -468,7 +446,7 @@ func ParsePayloadString(s string) {
 		}
 		ListedFilesLock.Unlock()
 
-		log.Println("Program paramater new file: ", newListing.FileName, " seeder: ", newListing.Seeders)
+		log.Println("Program paramater new file: ", newListing.FileName, " seeder: ", newListing.seeders)
 
 		go DownloadFile(newListing.FileHash)
 
@@ -596,7 +574,7 @@ func BuildSeedString(dbFiles []File) {
 	defer RecoverAndLog()
 	newQueryPayload := ""
 	for _, dbFile := range dbFiles {
-		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, strings.Join(dbFile.Seeders, ","))
+		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, client.Addr().String())
 		log.Println("Magnet:", magnet)
 
 		if dbFile.IsUploading {
@@ -655,7 +633,6 @@ func SeedFile(Path string) bool {
 		IsUploading:   false,
 		IsDownloading: false,
 		IsHashing:     true,
-		SeederCount:   0,
 	}
 
 	//Check if file is already seeded
@@ -692,7 +669,6 @@ func hashFileJob(randomHash string) {
 	dbFile.IsUploading = true
 	dbFile.IsHashing = false
 	dbFile.FileHash = hashString
-	dbFile.SeederCount = 1
 	dbInsertFile(*dbFile)
 
 	//Add to payload

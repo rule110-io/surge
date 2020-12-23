@@ -63,7 +63,6 @@ type File struct {
 	FileName      string
 	FileSize      int64
 	FileHash      string
-	Seeders       []string
 	Path          string
 	NumChunks     int
 	IsDownloading bool
@@ -72,8 +71,9 @@ type File struct {
 	IsMissing     bool
 	IsHashing     bool
 	ChunkMap      []byte
-	SeederCount   int
 	ChunksShared  int
+	seeders       []string
+	seederCount   int
 }
 
 //NumClientsStruct .
@@ -93,6 +93,24 @@ type FileListing struct {
 	IsAvailable  bool
 	SeederCount  int
 	ChunksShared int
+}
+
+// LocalFileListing is a wrapper for a local db file for the frontend
+type LocalFileListing struct {
+	FileName      string
+	FileSize      int64
+	FileHash      string
+	Path          string
+	NumChunks     int
+	IsDownloading bool
+	IsUploading   bool
+	IsPaused      bool
+	IsMissing     bool
+	IsHashing     bool
+	ChunkMap      []byte
+	ChunksShared  int
+	Seeders       []string
+	SeederCount   int
 }
 
 // FileStatusEvent holds update info on download progress
@@ -366,7 +384,7 @@ func DownloadFile(Hash string) bool {
 		pushError("Error on download file", "No listed file with hash: "+Hash)
 	}
 
-	fileSeeders := file.Seeders
+	fileSeeders := file.seeders
 
 	pushNotification("Download Started", file.FileName)
 
@@ -564,10 +582,10 @@ func DownloadFile(Hash string) bool {
 				//Check for new sessions
 				mutateSeederLock.Lock()
 				fileSeeders = []string{}
-				for i := 0; i < len(newFile.Seeders); i++ {
-					_, existing := sessionmanager.GetExistingSession(newFile.Seeders[i], 60)
+				for i := 0; i < len(newFile.seeders); i++ {
+					_, existing := sessionmanager.GetExistingSession(newFile.seeders[i], 60)
 					if existing {
-						fileSeeders = append(fileSeeders, newFile.Seeders[i])
+						fileSeeders = append(fileSeeders, newFile.seeders[i])
 					}
 				}
 				mutateSeederLock.Unlock()

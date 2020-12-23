@@ -234,23 +234,23 @@ func onClientDisconnected(addr string) {
 
 	//Remove this address from remote file seeders
 	ListedFilesLock.Lock()
-	for _, file := range ListedFiles {
-		file.Seeders = removeStringFromSlice(file.Seeders, addr)
-		file.SeederCount = len(file.Seeders)
-		fmt.Println(string("\033[31m"), "onClientDisconnected", file.FileName, "seeders remaining:", file.SeederCount, string("\033[0m"))
+	for i := 0; i < len(ListedFiles); i++ {
+		ListedFiles[i].seeders = removeStringFromSlice(ListedFiles[i].seeders, addr)
+		ListedFiles[i].seederCount = len(ListedFiles[i].seeders)
+		fmt.Println(string("\033[31m"), "onClientDisconnected", ListedFiles[i].FileName, "seeders remaining:", ListedFiles[i].seederCount, string("\033[0m"))
 	}
-	ListedFilesLock.Unlock()
 
-	dbFiles := dbGetAllFiles()
-	for _, file := range dbFiles {
-		initialLen := len(file.Seeders)
-		file.Seeders = removeStringFromSlice(file.Seeders, addr)
-		file.SeederCount = len(file.Seeders)
-
-		if file.SeederCount != initialLen {
-			dbInsertFile(file)
+	//Remove empty seeders listings
+	for i := 0; i < len(ListedFiles); i++ {
+		if len(ListedFiles[i].seeders) == 0 {
+			// Remove the element at index i from a.
+			ListedFiles[i] = ListedFiles[len(ListedFiles)-1] // Copy last element to index i.
+			ListedFiles[len(ListedFiles)-1] = File{}         // Erase last element (write zero value).
+			ListedFiles = ListedFiles[:len(ListedFiles)-1]   // Truncate slice.
 		}
 	}
+
+	ListedFilesLock.Unlock()
 }
 
 func listenToSession(Session *sessionmanager.Session) {

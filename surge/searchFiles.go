@@ -13,7 +13,7 @@ type SearchQueryResult struct {
 
 //LocalFilePageResult is a paging query result for tracked files
 type LocalFilePageResult struct {
-	Result []File
+	Result []LocalFileListing
 	Count  int
 }
 
@@ -30,9 +30,9 @@ func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take 
 				FileName:    file.FileName,
 				FileHash:    file.FileHash,
 				FileSize:    file.FileSize,
-				Seeders:     file.Seeders,
+				Seeders:     file.seeders,
 				NumChunks:   file.NumChunks,
-				SeederCount: len(file.Seeders),
+				SeederCount: len(file.seeders),
 			}
 
 			tracked, err := dbGetFile(result.FileHash)
@@ -137,30 +137,44 @@ func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take i
 
 	//Subset
 	resultFiles = resultFiles[left:right]
+	resultListings := []LocalFileListing{}
 
+	ListedFilesLock.Lock()
 	for i := 0; i < len(resultFiles); i++ {
-		ListedFilesLock.Lock()
+		listing := LocalFileListing{
+			ChunkMap:      resultFiles[i].ChunkMap,
+			ChunksShared:  resultFiles[i].ChunksShared,
+			FileHash:      resultFiles[i].FileHash,
+			FileName:      resultFiles[i].FileName,
+			FileSize:      resultFiles[i].FileSize,
+			IsDownloading: resultFiles[i].IsDownloading,
+			IsHashing:     resultFiles[i].IsHashing,
+			IsMissing:     resultFiles[i].IsMissing,
+			IsPaused:      resultFiles[i].IsPaused,
+			IsUploading:   resultFiles[i].IsUploading,
+			NumChunks:     resultFiles[i].NumChunks,
+			Path:          resultFiles[i].Path,
+		}
+
+		if listing.IsUploading {
+			listing.Seeders = []string{GetMyAddress()}
+		} else {
+			listing.Seeders = []string{}
+		}
 
 		for _, file := range ListedFiles {
-			resultFiles[i].Seeders = []string{GetMyAddress()}
-			if file.FileHash == resultFiles[i].FileHash {
-				resultFiles[i].Seeders = file.Seeders
-				resultFiles[i].Seeders = append(resultFiles[i].Seeders, GetMyAddress())
-				resultFiles[i].SeederCount = len(resultFiles[i].Seeders)
+			if file.FileHash == listing.FileHash {
+				listing.Seeders = append(listing.Seeders, file.seeders...)
 				break
 			}
 		}
-
-		if len(resultFiles[i].Seeders) == 0 && (resultFiles[i].IsUploading || resultFiles[i].IsHashing) {
-			resultFiles[i].Seeders = []string{GetMyAddress()}
-			resultFiles[i].SeederCount = len(resultFiles[i].Seeders)
-		}
-
-		ListedFilesLock.Unlock()
+		listing.SeederCount = len(listing.Seeders)
+		resultListings = append(resultListings, listing)
 	}
+	ListedFilesLock.Unlock()
 
 	return LocalFilePageResult{
-		Result: resultFiles,
+		Result: resultListings,
 		Count:  totalNum,
 	}
 }
