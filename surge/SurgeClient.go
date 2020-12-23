@@ -97,11 +97,6 @@ func rescanPeers() {
 	for true {
 		time.Sleep(constants.RescanPeerInterval)
 		GetSubscriptions()
-
-		for _, addr := range subscribers {
-			fmt.Println(string("\033[36m"), "Sending file query to subscriber", addr, string("\033[0m"))
-			go SendQueryRequest(addr, "Testing query functionality.")
-		}
 	}
 }
 
@@ -165,7 +160,12 @@ func GetSubscriptions() {
 	fmt.Println(string("\033[36m"), "Get Subscriptions", len(subscribers), string("\033[0m"))
 
 	for _, sub := range subscribers {
-		go sessionmanager.GetSession(sub, 100)
+		connectAndQueryJob := func(addr string) {
+			sessionmanager.GetSession(addr, 100)
+			fmt.Println(string("\033[36m"), "Sending file query to subscriber", addr, string("\033[0m"))
+			go SendQueryRequest(addr, "Testing query functionality.")
+		}
+		go connectAndQueryJob(sub)
 	}
 }
 
@@ -195,14 +195,17 @@ func Listen() {
 	go listenForIncomingSessions()
 }
 
-func onClientConnected(session *sessionmanager.Session) {
+func onClientConnected(session *sessionmanager.Session, isDialIn bool) {
 	addr := session.Session.RemoteAddr().String()
 
 	fmt.Println(string("\033[36m"), "Client Connected", addr, string("\033[0m"))
-	go SendQueryRequest(addr, "Testing query functionality.")
-	fmt.Println(string("\033[36m"), "Finished sending file query", addr, string("\033[0m"))
 
 	go listenToSession(session)
+
+	if isDialIn {
+		fmt.Println(string("\033[36m"), "Sending file query to accepted client", addr, string("\033[0m"))
+		go SendQueryRequest(addr, "Testing query functionality.")
+	}
 }
 
 func onClientDisconnected(addr string) {

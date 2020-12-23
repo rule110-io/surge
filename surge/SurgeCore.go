@@ -171,7 +171,7 @@ func TransmitChunk(Session *sessionmanager.Session, FileID string, ChunkID int32
 // SendQueryRequest sends a query to a client on session
 func SendQueryRequest(Addr string, Query string) bool {
 
-	surgeSession, exists := sessionmanager.GetExistingSession(Addr, 10)
+	surgeSession, exists := sessionmanager.GetExistingSession(Addr, constants.SendQueryRequestSessionTimeout)
 
 	if !exists {
 		return false

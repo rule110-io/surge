@@ -17,8 +17,8 @@ var client *nkn.MultiClient
 var listenFunc func(*Session)
 var sessionManagerLock = sync.Mutex{}
 
-//onConnect is a function called when a new connection is made
-var onConnect func(session *Session)
+//onConnect is a function called when a new connection is made, isDialIn is whether its dial out or dialing in
+var onConnect func(session *Session, isDialIn bool)
 
 //onDisconnect is a function called when a connection is lost
 var onDisconnect func(addr string)
@@ -35,7 +35,7 @@ var sessionMap map[string]*Session
 var sessionLockMap map[string]*sync.Mutex
 
 //Initialize initializes the session manager
-func Initialize(nknClient *nkn.MultiClient, connectFunc func(session *Session), disconnectFunc func(addr string)) {
+func Initialize(nknClient *nkn.MultiClient, connectFunc func(session *Session, isDialIn bool), disconnectFunc func(addr string)) {
 	sessionMap = make(map[string]*Session)
 	sessionLockMap = make(map[string]*sync.Mutex)
 	//fileMap = make(map[string]*os.File)
@@ -127,7 +127,7 @@ func AcceptSession(acceptedConnection net.Conn) *Session {
 
 	sessionMap[addr] = session
 
-	go onConnect(session)
+	go onConnect(session, true)
 
 	return session
 }
@@ -167,7 +167,7 @@ func createSession(Address string) (*Session, error) {
 		lastActivityUnix: time.Now().Unix(),
 	}
 
-	go onConnect(session)
+	go onConnect(session, false)
 
 	return session, nil
 }
