@@ -13,8 +13,11 @@ const (
 	WorkerChunkReceiveTimeout = 60 //seconds
 
 	//WorkerGetSessionTimeout when the session activity is older than this value the worker considers the session lost and moves on
-	WorkerGetSessionTimeout = 30 //seconds
+	WorkerGetSessionTimeout = 10 //seconds
 
 	//SendQueryRequestSessionTimeout when the session activity is older than this value the send query request is not sent
-	SendQueryRequestSessionTimeout = 75 //seconds
+	SendQueryRequestSessionTimeout = 60 //seconds
+
+	//GetSessionDialTimeout time till dial timeout
+	GetSessionDialTimeout = 60
 )

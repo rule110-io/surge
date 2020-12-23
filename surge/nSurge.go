@@ -416,6 +416,12 @@ func DownloadFile(Hash string) bool {
 	mutateSeederLock := sync.Mutex{}
 	appendChunkLock := sync.Mutex{}
 
+	//Give the seeder a fair start with timers when a download is initiated
+	//Potentionally this seeder was last queried 60 seconds ago for files and otherwise idle but online
+	for _, seeder := range fileSeeders {
+		sessionmanager.UpdateActivity(seeder)
+	}
+
 	downloadJob := func(terminateFlag *bool) {
 
 		//Used to terminate the rescanning of peers
@@ -466,7 +472,7 @@ func DownloadFile(Hash string) bool {
 				if len(fileSeeders) > seederAlternator {
 					//Get seeder
 					downloadSeederAddr = fileSeeders[seederAlternator]
-					session, existing := sessionmanager.GetExistingSession(downloadSeederAddr, 60)
+					session, existing := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout)
 
 					if existing {
 						success = RequestChunk(session, file.FileHash, int32(chunkID))

@@ -767,7 +767,7 @@ func restartDownload(Hash string) {
 				if len(fileSeeders) > seederAlternator {
 					//Get seeder
 					downloadSeederAddr = fileSeeders[seederAlternator]
-					session, existing := sessionmanager.GetExistingSession(downloadSeederAddr, 60)
+					session, existing := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout)
 
 					if existing {
 						success = RequestChunk(session, file.FileHash, int32(chunkID))
