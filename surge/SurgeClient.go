@@ -161,9 +161,11 @@ func GetSubscriptions() {
 
 	for _, sub := range subscribers {
 		connectAndQueryJob := func(addr string) {
-			sessionmanager.GetSession(addr, 100)
-			fmt.Println(string("\033[36m"), "Sending file query to subscriber", addr, string("\033[0m"))
-			go SendQueryRequest(addr, "Testing query functionality.")
+			_, err := sessionmanager.GetSession(addr, 100)
+			if err == nil {
+				fmt.Println(string("\033[36m"), "Sending file query to subscriber", addr, string("\033[0m"))
+				go SendQueryRequest(addr, "Testing query functionality.")
+			}
 		}
 		go connectAndQueryJob(sub)
 	}
@@ -231,6 +233,7 @@ func onClientDisconnected(addr string) {
 			ListedFiles[i] = ListedFiles[len(ListedFiles)-1] // Copy last element to index i.
 			ListedFiles[len(ListedFiles)-1] = File{}         // Erase last element (write zero value).
 			ListedFiles = ListedFiles[:len(ListedFiles)-1]   // Truncate slice.
+			i--
 		}
 	}
 

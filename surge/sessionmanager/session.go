@@ -156,6 +156,20 @@ func createSession(Address string) (*Session, error) {
 	if err != nil {
 		log.Println("Failed to create a session with ", Address, err)
 		fmt.Println(string("\033[31m"), "Failed to create a session with ", Address, err, string("\033[0m"))
+
+		//If we have a session that didnt come in after dial
+		_, dialupExists := GetExistingSession(Address, constants.NknClientDialTimeout)
+		if dialupExists {
+			fmt.Println(string("\033[31m"), "but inbound (accepted) dialup was received in the meantime", Address, err, string("\033[0m"))
+
+		} else {
+			fmt.Println(string("\033[31m"), "no inboud (accepted) dial up in the meantime closing all connections", Address, err, string("\033[0m"))
+
+			lockSession(Address)
+			closeSession(Address)
+			unlockSession(Address)
+		}
+
 		return nil, err
 	}
 	reader := bufio.NewReader(nknSession)
