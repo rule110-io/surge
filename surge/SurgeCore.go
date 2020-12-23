@@ -14,11 +14,13 @@ import (
 	"strconv"
 	"strings"
 	"sync"
+	"time"
 
 	"log"
 
 	bitmap "github.com/boljen/go-bitmap"
 	pb "github.com/rule110-io/surge-ui/payloads"
+	"github.com/rule110-io/surge-ui/surge/constants"
 	"github.com/rule110-io/surge-ui/surge/platform"
 	"github.com/rule110-io/surge-ui/surge/sessionmanager"
 	"google.golang.org/protobuf/proto"
@@ -678,347 +680,227 @@ func hashFileJob(randomHash string) {
 }
 
 func restartDownload(Hash string) {
-	/*
 
+	file, err := dbGetFile(Hash)
+	if err != nil {
+		pushError("Error on restart download", err.Error())
+		return
+	}
 
-		file, err := dbGetFile(Hash)
-		if err != nil {
-			pushError("Error on restart download", err.Error())
-			return
+	//Get missing chunk indices
+	var missingChunks []int
+	for i := 0; i < file.NumChunks; i++ {
+		if bitmap.Get(file.ChunkMap, i) == false {
+			missingChunks = append(missingChunks, i)
 		}
+	}
 
-		//If its not downloading we do not have to do anything
-		//if !file.IsDownloading {
-		//	return
-		//}
+	numChunks := len(missingChunks)
 
-		if file.IsPaused == true {
-			return
+	//Nothing more to download
+	if numChunks == 0 {
+		platform.ShowNotification("Download Finished", "Download for "+file.FileName+" finished!")
+		pushNotification("Download Finished", file.FileName)
+		file.IsDownloading = false
+		file.IsUploading = true
+		dbInsertFile(*file)
+		go AddToSeedString(*file)
+		return
+	}
+
+	rand.Seed(time.Now().UnixNano())
+	rand.Shuffle(numChunks, func(i, j int) { missingChunks[i], missingChunks[j] = missingChunks[j], missingChunks[i] })
+
+	log.Println("Restarting Download Creation Session for", file.FileName)
+
+	//On startup we have no seeders
+	fileSeeders := []string{}
+	seederAlternator := 0
+	mutateSeederLock := sync.Mutex{}
+	appendChunkLock := sync.Mutex{}
+
+	downloadJob := func(terminateFlag *bool) {
+
+		//Used to terminate the rescanning of peers
+		terminate := func(flag *bool) {
+			*flag = true
 		}
+		defer terminate(terminateFlag)
 
-		//TODO: Seed discovery?
+		for i := 0; i < numChunks; i++ {
 
-		//Early out if we have no seeder
-		//if len(file.Seeders) == 0 {
-		//	return
-		//}
-
-		//Get missing chunk indices
-		var missingChunks []int
-		for i := 0; i < file.NumChunks; i++ {
-			if bitmap.Get(file.ChunkMap, i) == false {
-				missingChunks = append(missingChunks, i)
+			newFileData := getListedFileByHash(Hash)
+			if newFileData != nil {
+				file = newFileData
 			}
-		}
 
-		//Nothing more to download
-		if len(missingChunks) == 0 {
-			platform.ShowNotification("Download Finished", "Download for "+file.FileName+" finished!")
-			pushNotification("Download Finished", file.FileName)
+			for len(fileSeeders) == 0 {
+				time.Sleep(time.Second * 5)
+			}
 
-			file.IsDownloading = false
-			file.IsUploading = true
-			dbInsertFile(*file)
-			go AddToSeedString(*file)
-			return
-		}
+			dbFile, err := dbGetFile(file.FileHash)
 
-		rand.Seed(time.Now().UnixNano())
-		rand.Shuffle(len(missingChunks), func(i, j int) { missingChunks[i], missingChunks[j] = missingChunks[j], missingChunks[i] })
-
-		log.Println("Restarting Download Creation Session for", file.FileName)
-
-		downloadSessions := []*sessionmanager.Session{}
-		// Create  sessions
-		for i := 0; i < len(file.Seeders); i++ {
-			surgeSession, err := createSession(file, file.Seeders[i])
+			//Check if file is still tracked in surge
 			if err != nil {
-				log.Println("Restarting Download Failed for", file.FileName, file.Seeders[i])
-				continue
+				log.Println("Download Job Treminated", "File no longer in DB")
+				return
 			}
 
-			//Prime the session with known bytes downloaded
-			surgeSession.Downloaded = int64(file.NumChunks-len(missingChunks)) * ChunkSize
-			//If the last chunk is set, we want to deduct the missing bytes because its not a complete chunk
-			lastChunkSet := bitmap.Get(file.ChunkMap, file.NumChunks-1)
-			if lastChunkSet {
-				overshotBytes := int64(file.NumChunks)*int64(ChunkSize) - file.FileSize
-				surgeSession.Downloaded -= overshotBytes
+			//Pause if file is paused
+			for err == nil && dbFile.IsPaused {
+				time.Sleep(time.Second * 5)
+				dbFile, err = dbGetFile(file.FileHash)
+				if err != nil {
+					break
+				}
 			}
 
-			go initiateSession(surgeSession)
-
-			downloadSessions = append(downloadSessions, surgeSession)
-		}
-
-		log.Println("Restarting Download for", file.FileName)
-		log.Println("Total Chunks", file.NumChunks)
-		log.Println("Remaining Chunks", len(missingChunks))
-
-		seederAlternator := 0
-		mutateSeederLock := sync.Mutex{}
-
-		appendChunkLock := sync.Mutex{}
-		chunksRemaining := len(missingChunks)
-
-		downloadJob := func(terminateFlag *bool) {
-			//Used to terminate the rescanning of peers
-			terminate := func(flag *bool) {
-				*flag = true
+			for workerCount >= NumWorkers {
+				time.Sleep(time.Millisecond)
 			}
-			defer terminate(terminateFlag)
+			workerCount++
 
-			for i := 0; i < chunksRemaining; i++ {
-				newFileData := getListedFileByHash(Hash)
-				if newFileData != nil {
-					file = newFileData
+			//Create a async job to download a chunk
+			requestChunkJob := func(chunkID int) {
+
+				success := false
+				downloadSeederAddr := ""
+
+				if len(fileSeeders) > seederAlternator {
+					//Get seeder
+					downloadSeederAddr = fileSeeders[seederAlternator]
+					session, existing := sessionmanager.GetExistingSession(downloadSeederAddr, 60)
+
+					if existing {
+						success = RequestChunk(session, file.FileHash, int32(chunkID))
+					} else {
+						success = false
+					}
 				}
 
-				for len(downloadSessions) == 0 {
-					time.Sleep(time.Second * 5)
+				//if download fails append the chunk to remaining to retry later
+				if !success {
+					appendChunkLock.Lock()
+					missingChunks = append(missingChunks, chunkID)
+					numChunks++
+					appendChunkLock.Unlock()
+
+					workerCount--
+
+					//TODO: Think about alternatives from straight dropping the seeder.
+					mutateSeederLock.Lock()
+					fileSeeders = removeStringFromSlice(fileSeeders, downloadSeederAddr)
+					mutateSeederLock.Unlock()
+
+					//return out of job
+					return
 				}
 
-				//Pause if file is paused
-				dbFile, err := dbGetFile(file.FileHash)
-				for err == nil && dbFile.IsPaused {
-					time.Sleep(time.Second * 5)
-					dbFile, err = dbGetFile(file.FileHash)
-					if err != nil {
+				//If chunk is requested add to transit map
+				chunkKey := file.FileHash + "_" + strconv.Itoa(chunkID)
+
+				chunkInTransitLock.Lock()
+				chunksInTransit[chunkKey] = true
+				chunkInTransitLock.Unlock()
+
+				//Sleep and check if entry still exists in transit map.
+				sleepWorker := true
+				inTransit := true
+				receiveTimeoutCounter := 0
+
+				for sleepWorker {
+					time.Sleep(time.Second)
+					fmt.Println(string("\033[36m"), "Worker Sleeping", string("\033[0m"))
+
+					//Check if connection is lost
+					_, sessionExists := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout)
+					if !sessionExists {
+						//if session no longer exists
+						fmt.Println(string("\033[36m"), "session no longer exists", string("\033[0m"))
+						inTransit = true
+						sleepWorker = false
 						break
 					}
+
+					//Check if received
+					isInTransit := chunksInTransit[chunkKey]
+					if !isInTransit {
+						//if no longer in transit, continue workers
+						fmt.Println(string("\033[36m"), "no longer in transit, continue workers", string("\033[0m"))
+						inTransit = false
+						sleepWorker = false
+						break
+					} else if receiveTimeoutCounter >= constants.WorkerChunkReceiveTimeout {
+						//if timeout is triggered, leave in transit.
+						fmt.Println(string("\033[36m"), "timeout is triggered, leave in transit.", string("\033[0m"))
+						inTransit = true
+						sleepWorker = false
+						break
+					}
+					receiveTimeoutCounter++
 				}
 
-				for workerCount >= NumWorkers {
-					time.Sleep(time.Millisecond)
+				//If its still in transit abort
+				if inTransit {
+					appendChunkLock.Lock()
+					missingChunks = append(missingChunks, chunkID)
+					numChunks++
+					appendChunkLock.Unlock()
+
+					workerCount--
+
+					//TODO: Think about alternatives from straight dropping the seeder.
+					mutateSeederLock.Lock()
+					fileSeeders = removeStringFromSlice(fileSeeders, downloadSeederAddr)
+					mutateSeederLock.Unlock()
+
+					//return out of job
+					return
 				}
-				workerCount++
+			}
 
-				//Create a async job to download a chunk
-				requestChunkJob := func(chunkID int) {
+			//get chunk id
+			appendChunkLock.Lock()
+			chunkid := missingChunks[i]
+			appendChunkLock.Unlock()
 
+			go requestChunkJob(chunkid)
 
-					success := false
-					downloadSeeder := &sessionmanager.Session{}
-					downloadSeederAddr := ""
+			mutateSeederLock.Lock()
+			seederAlternator++
+			if seederAlternator > len(fileSeeders)-1 {
+				seederAlternator = 0
+			}
+			mutateSeederLock.Unlock()
+		}
+	}
 
-					if len(downloadSessions) > seederAlternator {
-						//Get seeder
-						downloadSeeder = downloadSessions[seederAlternator]
-						if downloadSeeder != nil && downloadSeeder.Session != nil {
-							downloadSeederAddr = downloadSeeder.Session.RemoteAddr().String()
-							success = RequestChunk(downloadSeeder, file.FileHash, int32(chunkID))
-						}
-					}
+	scanForSeeders := func(terminateFlag *bool) {
 
-					//if download fails append the chunk to remaining to retry later
-					if !success {
-						appendChunkLock.Lock()
-						missingChunks = append(missingChunks, chunkID)
-						chunksRemaining++
-						appendChunkLock.Unlock()
+		//While we are not terminated scan for new peers
+		for *terminateFlag == false {
+			time.Sleep(time.Second * 5)
 
-						workerCount--
-
-						//Drop the seeder
-						mutateSeederLock.Lock()
-						downloadSessions = removeAndCloseSessionOrdered(downloadSessions, downloadSeederAddr)
-						log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
-						mutateSeederLock.Unlock()
-
-						if len(downloadSessions) == 0 {
-							return
-						}
-					}
-
-					//If chunk is requested add to transit map
-					chunkKey := file.FileHash + "_" + strconv.Itoa(chunkID)
-
-					chunkInTransitLock.Lock()
-					chunksInTransit[chunkKey] = true
-					chunkInTransitLock.Unlock()
-
-					//Sleep for 30 seconds, check if entry still exists in transit map.
-					time.Sleep(time.Second * 60)
-					inTransit := chunksInTransit[chunkKey]
-
-					//If its still in transit abort
-					if inTransit {
-						appendChunkLock.Lock()
-						missingChunks = append(missingChunks, chunkID)
-						chunksRemaining++
-						appendChunkLock.Unlock()
-
-						workerCount--
-
-						//Drop the seeder
-						mutateSeederLock.Lock()
-						downloadSessions = removeAndCloseSessionOrdered(downloadSessions, downloadSeederAddr)
-						log.Println("Lost connection", "Dropping 1 Session for Download "+file.FileName)
-						mutateSeederLock.Unlock()
-
-						if len(downloadSessions) == 0 {
-							return
-						}
-					}
-				}
-
-				//get chunk id
-				appendChunkLock.Lock()
-				chunkid := missingChunks[i]
-				appendChunkLock.Unlock()
-
-				go requestChunkJob(chunkid)
-
+			newFile := getListedFileByHash(Hash)
+			if newFile != nil {
+				//Check for new sessions
 				mutateSeederLock.Lock()
-				seederAlternator++
-				if seederAlternator > len(downloadSessions)-1 {
-					seederAlternator = 0
+				fileSeeders = []string{}
+				for i := 0; i < len(newFile.seeders); i++ {
+					_, existing := sessionmanager.GetExistingSession(newFile.seeders[i], 60)
+					if existing {
+						fileSeeders = append(fileSeeders, newFile.seeders[i])
+					}
 				}
 				mutateSeederLock.Unlock()
 			}
 		}
+	}
 
-		scanForSeeders := func(terminateFlag *bool) {
-			//While we are not terminated scan for new peers
-			for *terminateFlag == false {
-				time.Sleep(time.Second * 5)
-
-				newFile := getListedFileByHash(Hash)
-				if newFile != nil {
-					//Check for new sessions
-					for i := 0; i < len(newFile.Seeders); i++ {
-						//Check if the newFile seeder is not already part of the downloadSessions
-						alreadyAdded := false
-						for j := 0; j < len(downloadSessions); j++ {
-							if downloadSessions[j].Session == nil {
-								continue
-							}
-							if downloadSessions[j].Session.RemoteAddr().String() == newFile.Seeders[i] {
-								alreadyAdded = true
-								break
-							}
-						}
-
-						//Skip this entry
-						if alreadyAdded {
-							continue
-						}
-
-						surgeSession, err := createSession(newFile, newFile.Seeders[i])
-						if err != nil {
-							log.Println("Could not create session for download", Hash, newFile.Seeders[i])
-							continue
-						}
-
-						dbFile, err := dbGetFile(Hash)
-						if err == nil && dbFile != nil {
-							//Prime the session with known bytes downloaded
-							surgeSession.Downloaded = int64(dbFile.NumChunks-len(missingChunks)) * ChunkSize
-							//If the last chunk is set, we want to deduct the missing bytes because its not a complete chunk
-							lastChunkSet := bitmap.Get(dbFile.ChunkMap, dbFile.NumChunks-1)
-							if lastChunkSet {
-								overshotBytes := int64(dbFile.NumChunks)*int64(ChunkSize) - dbFile.FileSize
-								surgeSession.Downloaded -= overshotBytes
-							}
-
-							go initiateSession(surgeSession)
-
-							mutateSeederLock.Lock()
-							downloadSessions = append(downloadSessions, surgeSession)
-							mutateSeederLock.Unlock()
-						}
-					}
-				}
-			}
-		}
-
-		terminateFlag := false
-		go downloadJob(&terminateFlag)
-		go scanForSeeders(&terminateFlag)
-	*/
+	terminateFlag := false
+	go downloadJob(&terminateFlag)
+	go scanForSeeders(&terminateFlag)
 }
-
-/*
-func removeAndCloseSessionOrdered(slice []*sessionmanager.Session, s string) []*sessionmanager.Session {
-
-	//Find empty session
-	emptyIndex := -1
-	for i := 0; i < len(slice); i++ {
-		if slice[i] == nil || slice[i].Session == nil {
-			emptyIndex = i
-			break
-		}
-	}
-	if emptyIndex != -1 {
-		slice = append(slice[:emptyIndex], slice[emptyIndex+1:]...)
-	}
-
-	//Find target session
-	index := -1
-	for i := 0; i < len(slice); i++ {
-		//Find the target s
-		if slice[i] != nil && slice[i].Session != nil {
-			if slice[i].Session.RemoteAddr().String() == s {
-				index = i
-				break
-			}
-		}
-	}
-	if index != -1 {
-		closeSession(slice[index])
-		return append(slice[:index], slice[index+1:]...)
-	}
-	return slice
-}
-*/
-
-/*
-func createSession(File *File, Seeder string) (*sessionmanager.Session, error) {
-
-
-	//Check if nkn session exists with address
-	var downloadSession *sessionmanager.Session
-	//for i := 0; i < len(Sessions); i++ {
-	//	if Sessions[i].session.RemoteAddr().String() == File.Seeder {
-	//		downloadSession = Sessions[i]
-	//		break
-	//	}
-	//}
-
-	//There is no nkn session with this client yet, create a new session
-	if downloadSession == nil {
-		sessionConfing := nkn.GetDefaultSessionConfig()
-		sessionConfing.MTU = 16384
-		dialConfig := &nkn.DialConfig{
-			SessionConfig: sessionConfing,
-			DialTimeout:   nknClientDialTimeout,
-		}
-
-		downloadSession, err := client.DialWithConfig(Seeder, dialConfig)
-		if err != nil {
-			log.Println("Download Session timout for", File.FileName)
-			return nil, err
-		}
-		log.Println("Download Session created for: ", File.FileName)
-		downloadReader := bufio.NewReader(downloadSession)
-
-		return &sessionmanager.Session{
-			Reader:   downloadReader,
-			Session:  downloadSession,
-			FileSize: File.FileSize,
-			FileHash: File.FileHash,
-		}, nil
-	}
-
-	//nkn session already exists create a new file session and include existing nkn session
-	return &sessionmanager.Session{
-		Reader:   downloadSession.Reader,
-		Session:  downloadSession.Session,
-		FileSize: File.FileSize,
-		FileHash: File.FileHash,
-	}, nil
-}
-*/
 
 // FileExists checks if a file exists and is not a directory before we
 // try using it to prevent further errors.
