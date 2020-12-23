@@ -8,8 +8,7 @@ const state = getDefaultState();
 
 const mutations = {
   addClientStatus(state, event) {
-    const { online } = event;
-    state.online = online === 0 ? 1 : online;
+    state.online = event.online;
   },
 };
 

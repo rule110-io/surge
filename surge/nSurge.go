@@ -151,6 +151,8 @@ func WailsBind(runtime *wails.Runtime) {
 
 	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
 
+	updateNumClientStore()
+
 	//Wait for our client to initialize, perhaps there is no internet connectivity
 	tryCount := 0
 	for !clientInitialized {
@@ -160,6 +162,7 @@ func WailsBind(runtime *wails.Runtime) {
 		time.Sleep(time.Second)
 		tryCount++
 	}
+	updateNumClientStore()
 
 	//Get subs first synced then grab file queries for those subs
 	GetSubscriptions()
@@ -236,8 +239,6 @@ func updateGUI() {
 
 		log.Println("Active Sessions:", sessionmanager.GetSessionLength())
 		fmt.Println("Active Sessions:", sessionmanager.GetSessionLength())
-
-		updateNumClientStore()
 
 		//Create session aggregate maps for file
 		fileProgressMap := make(map[string]float32)
@@ -506,7 +507,7 @@ func DownloadFile(Hash string) bool {
 
 				for sleepWorker {
 					time.Sleep(time.Second)
-					fmt.Println(string("\033[36m"), "Worker Sleeping", string("\033[0m"))
+					//fmt.Println(string("\033[36m"), "Worker Sleeping", string("\033[0m"))
 
 					//Check if connection is lost
 					_, sessionExists := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout)

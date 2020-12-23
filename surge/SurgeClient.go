@@ -170,9 +170,13 @@ func GetSubscriptions() {
 }
 
 func updateNumClientStore() {
+	numConnections := sessionmanager.GetSessionLength()
+	if clientInitialized {
+		numConnections++
+	}
 	numClientsStore.Update(func(data NumClientsStruct) NumClientsStruct {
 		return NumClientsStruct{
-			Online: sessionmanager.GetSessionLength(),
+			Online: numConnections,
 		}
 	})
 }
@@ -196,6 +200,7 @@ func Listen() {
 }
 
 func onClientConnected(session *sessionmanager.Session, isDialIn bool) {
+	go updateNumClientStore()
 	addr := session.Session.RemoteAddr().String()
 
 	fmt.Println(string("\033[36m"), "Client Connected", addr, string("\033[0m"))
@@ -209,6 +214,7 @@ func onClientConnected(session *sessionmanager.Session, isDialIn bool) {
 }
 
 func onClientDisconnected(addr string) {
+	go updateNumClientStore()
 
 	//Remove this address from remote file seeders
 	ListedFilesLock.Lock()

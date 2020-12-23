@@ -808,7 +808,7 @@ func restartDownload(Hash string) {
 
 				for sleepWorker {
 					time.Sleep(time.Second)
-					fmt.Println(string("\033[36m"), "Worker Sleeping", string("\033[0m"))
+					//fmt.Println(string("\033[36m"), "Worker Sleeping", string("\033[0m"))
 
 					//Check if connection is lost
 					_, sessionExists := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout)

@@ -1,11 +1,11 @@
 <template>
   <div class="network-stats">
     <div class="network-stats__item text_wrap_none">
-      <span class="network-stats__status" v-if="total === 0">
+      <span class="network-stats__status" v-if="online === 0">
         <feather class="network-stats__loader" type="loader"></feather>
         Discovering network...
       </span>
-      <template v-else>Total clients connected: {{ online + 1 }} </template>
+      <template v-else>Total clients connected: {{ online }} </template>
     </div>
     <div class="network-stats__file" @click="seedFile">
       <div class="network-stats__file-wrapper">
@@ -40,7 +40,7 @@ export default {
     return {};
   },
   computed: {
-    ...mapState("clientStatus", ["total", "online"]),
+    ...mapState("clientStatus", ["online"]),
     ...mapState("globalBandwidth", ["totalDown", "totalUp"]),
   },
   methods: {
