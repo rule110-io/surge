@@ -34,7 +34,7 @@ func WatchOSXHandler() {
 			//do act
 			decodedMagetstring, err := url.QueryUnescape(magnetstring)
 			if err != nil {
-				log.Fatal(err)
+				log.Panic(err)
 				return
 			}
 			//go ParsePayloadString(decodedMagetstring)

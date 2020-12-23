@@ -10,8 +10,8 @@ const (
 	RescanPeerInterval = time.Minute
 
 	//WorkerChunkReceiveTimeout is the time till a chunk request is considered a timeout and the chunk is requeued
-	WorkerChunkReceiveTimeout = 30 //seconds
+	WorkerChunkReceiveTimeout = 60 //seconds
 
 	//WorkerGetSessionTimeout when the session activity is older than this value the worker considers the session lost and moves on
-	WorkerGetSessionTimeout = 10 //seconds
+	WorkerGetSessionTimeout = 30 //seconds
 )

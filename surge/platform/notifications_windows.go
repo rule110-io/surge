@@ -14,7 +14,7 @@ func ShowNotification(title string, text string) {
 
 	dir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	Icon := filepath.Join(dir, "appicon.png")
@@ -27,6 +27,6 @@ func ShowNotification(title string, text string) {
 	}
 	err = notification.Push()
 	if err != nil {
-		log.Fatalln(err)
+		log.Panic(err)
 	}
 }

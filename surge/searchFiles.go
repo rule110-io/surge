@@ -19,7 +19,7 @@ type LocalFilePageResult struct {
 
 //SearchRemoteFile runs a paged query
 func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) SearchQueryResult {
-	defer RecoverAndLog()
+	
 	var results []FileListing
 
 	ListedFilesLock.Lock()
@@ -86,7 +86,7 @@ func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take 
 
 //SearchLocalFile runs a paged query
 func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) LocalFilePageResult {
-	defer RecoverAndLog()
+	
 	var results []FileListing
 
 	resultFiles := []File{}

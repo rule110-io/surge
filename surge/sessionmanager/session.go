@@ -51,7 +51,7 @@ func GetSessionLength() int {
 }
 
 //GetSession returns a session for given address
-func GetSession(Address string) (*Session, error) {
+func GetSession(Address string, timeoutInSeconds int) (*Session, error) {
 	//Check for an existing session
 	lockSession(Address)
 	defer unlockSession(Address)
@@ -71,7 +71,7 @@ func GetSession(Address string) (*Session, error) {
 	if exists {
 		//If the sessions exists, check if its still active, if not dump it and try to create a new one.
 		elapsedSinceLastActivity := time.Now().Unix() - session.lastActivityUnix
-		if elapsedSinceLastActivity > 10 {
+		if elapsedSinceLastActivity > int64(timeoutInSeconds) {
 			closeSession(Address)
 
 			session, err = createSession(Address)

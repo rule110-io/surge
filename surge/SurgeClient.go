@@ -93,7 +93,7 @@ func Stop() {
 
 //Function that automatically grabs subscriptions for nkn topic
 func rescanPeers() {
-	defer RecoverAndLog()
+
 	for true {
 		time.Sleep(constants.RescanPeerInterval)
 		GetSubscriptions()
@@ -111,7 +111,6 @@ func GetNumberOfRemoteClient() (int, int) {
 }
 
 func autoSubscribeWorker() {
-	defer RecoverAndLog()
 
 	//As long as the client is running subscribe
 	for true {
@@ -146,7 +145,6 @@ func subscribeToSurgeTopic() {
 
 //GetSubscriptions .
 func GetSubscriptions() {
-	defer RecoverAndLog()
 
 	Topic := TopicEncode(TestTopic)
 
@@ -172,7 +170,7 @@ func GetSubscriptions() {
 	fmt.Println(string("\033[36m"), "Get Subscriptions", len(subscribers), string("\033[0m"))
 
 	for _, sub := range subscribers {
-		sessionmanager.GetSession(sub)
+		go sessionmanager.GetSession(sub, 100)
 	}
 }
 
@@ -201,7 +199,7 @@ func setClientOnlineMap(addr string, value bool) {
 }
 
 func listenForIncomingSessions() {
-	defer RecoverAndLog()
+
 	for !client.IsClosed() {
 		listenSession, err := client.Accept()
 		if err != nil {

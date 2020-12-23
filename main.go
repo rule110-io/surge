@@ -124,7 +124,7 @@ func (s *WailsRuntime) WailsShutdown() {
 }
 
 func main() {
-
+	defer surge.RecoverAndLog()
 	//surge.HashFile("C:\\Users\\mitch\\Downloads\\surge_remote\\surge-0.2.0-beta.windows.zip")
 
 	stats := &Stats{}
@@ -142,10 +142,10 @@ func main() {
 	//Initialize folder structures on os filesystem
 	newlyCreated, err := platform.InitializeFolders()
 	if err != nil {
-		log.Fatal("Error on startup", err.Error())
+		log.Panic("Error on startup", err.Error())
 	}
 	surge.InitializeDb()
-	surge.InitializeLog()
+	//surge.InitializeLog()
 	defer surge.CloseDb()
 	if newlyCreated {
 		// seems like this is the first time starting the app

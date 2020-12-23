@@ -24,7 +24,7 @@ func InitializeLog() {
 
 	//file, err := os.OpenFile(logPathOS, os.O_WRONLY|os.O_CREATE, 0644)
 	//if err != nil {
-	//	log.Fatal(err)
+	//	log.Panic(err)
 	//}
 
 	log.SetOutput(&lumberjack.Logger{

@@ -30,18 +30,18 @@ func InitializeAccount() *nkn.Account {
 
 		f, err := os.OpenFile(accountPathOS, os.O_WRONLY|os.O_CREATE, 0644)
 		if err != nil {
-			log.Fatal(err)
+			log.Panic(err)
 		}
 		if _, err := f.Write(seed); err != nil {
-			log.Fatal(err)
+			log.Panic(err)
 		}
 		if err := f.Close(); err != nil {
-			log.Fatal(err)
+			log.Panic(err)
 		}
 	} else { //else read seed from file
 		file, err := os.Open(accountPathOS)
 		if err != nil {
-			log.Fatal(err)
+			log.Panic(err)
 		}
 		defer file.Close()
 
@@ -50,7 +50,7 @@ func InitializeAccount() *nkn.Account {
 
 	account, err := nkn.NewAccount(seed)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	return account

@@ -232,7 +232,7 @@ func chunksDownloaded(s []byte, num int) int {
 }
 
 func updateGUI() {
-	defer RecoverAndLog()
+
 	for true {
 		time.Sleep(time.Second)
 
@@ -305,7 +305,7 @@ func updateGUI() {
 }
 
 func fileBandwidth(FileID string) (Download int, Upload int) {
-	defer RecoverAndLog()
+
 	//Get accumulator
 	bandwidthAccumulatorMapLock.Lock()
 	downAccu := downloadBandwidthAccumulator[FileID]
@@ -359,7 +359,6 @@ type Stats struct {
 
 func getListedFileByHash(Hash string) *File {
 
-	defer RecoverAndLog()
 	var selectedFile *File = nil
 
 	ListedFilesLock.Lock()
@@ -377,7 +376,6 @@ func getListedFileByHash(Hash string) *File {
 //DownloadFile downloads the file
 func DownloadFile(Hash string) bool {
 	//Addr string, Size int64, FileID string
-	defer RecoverAndLog()
 
 	file := getListedFileByHash(Hash)
 	if file == nil {
@@ -422,7 +420,7 @@ func DownloadFile(Hash string) bool {
 	appendChunkLock := sync.Mutex{}
 
 	downloadJob := func(terminateFlag *bool) {
-		defer RecoverAndLog()
+
 		//Used to terminate the rescanning of peers
 		terminate := func(flag *bool) {
 			*flag = true
@@ -440,8 +438,15 @@ func DownloadFile(Hash string) bool {
 				time.Sleep(time.Second * 5)
 			}
 
-			//Pause if file is paused
 			dbFile, err := dbGetFile(file.FileHash)
+
+			//Check if file is still tracked in surge
+			if err != nil {
+				log.Println("Download Job Treminated", "File no longer in DB")
+				return
+			}
+
+			//Pause if file is paused
 			for err == nil && dbFile.IsPaused {
 				time.Sleep(time.Second * 5)
 				dbFile, err = dbGetFile(file.FileHash)
@@ -457,7 +462,6 @@ func DownloadFile(Hash string) bool {
 
 			//Create a async job to download a chunk
 			requestChunkJob := func(chunkID int) {
-				defer RecoverAndLog()
 
 				success := false
 				downloadSeederAddr := ""
@@ -572,7 +576,7 @@ func DownloadFile(Hash string) bool {
 	}
 
 	scanForSeeders := func(terminateFlag *bool) {
-		defer RecoverAndLog()
+
 		//While we are not terminated scan for new peers
 		for *terminateFlag == false {
 			time.Sleep(time.Second * 5)
@@ -602,7 +606,7 @@ func DownloadFile(Hash string) bool {
 
 //GetFileChunkMapString returns the chunkmap in hex for a file given by hash
 func GetFileChunkMapString(file *File, Size int) string {
-	defer RecoverAndLog()
+
 	outputSize := Size
 	inputSize := file.NumChunks
 
@@ -648,7 +652,7 @@ func GetFileChunkMapString(file *File, Size int) string {
 
 //GetFileChunkMapStringByHash returns the chunkmap in hex for a file given by hash
 func GetFileChunkMapStringByHash(Hash string, Size int) string {
-	defer RecoverAndLog()
+
 	file, err := dbGetFile(Hash)
 	if err != nil {
 		return ""
@@ -658,7 +662,7 @@ func GetFileChunkMapStringByHash(Hash string, Size int) string {
 
 //SetFilePause sets a file IsPaused state for by file hash
 func SetFilePause(Hash string, State bool) {
-	defer RecoverAndLog()
+
 	fileWriteLock.Lock()
 	file, err := dbGetFile(Hash)
 	if err != nil {
@@ -678,7 +682,6 @@ func SetFilePause(Hash string, State bool) {
 
 //RemoveFile removes file from surge db and optionally from disk
 func RemoveFile(Hash string, FromDisk bool) bool {
-	defer RecoverAndLog()
 
 	sessionmanager.CloseFile(Hash)
 

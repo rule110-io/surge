@@ -24,7 +24,7 @@ func InitializeDb() {
 	opt.Dir = platform.GetSurgeDir() + string(os.PathSeparator) + "db"
 	db, err = nutsdb.Open(opt)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	dbGetAllFiles()
@@ -43,7 +43,7 @@ func dbInsertFile(File File) {
 			}
 			return nil
 		}); err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 }
 
