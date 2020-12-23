@@ -10,6 +10,7 @@ import (
 
 	"log"
 
+	"github.com/rule110-io/surge-ui/surge/constants"
 	"github.com/rule110-io/surge-ui/surge/platform"
 	"github.com/rule110-io/surge-ui/surge/sessionmanager"
 
@@ -483,7 +484,6 @@ func DownloadFile(Hash string) bool {
 				//Sleep and check if entry still exists in transit map.
 				sleepWorker := true
 				inTransit := true
-				receiveTimeout := 30
 				receiveTimeoutCounter := 0
 
 				for sleepWorker {
@@ -491,7 +491,7 @@ func DownloadFile(Hash string) bool {
 					fmt.Println(string("\033[36m"), "Worker Sleeping", string("\033[0m"))
 
 					//Check if connection is lost
-					_, sessionExists := sessionmanager.GetExistingSession(downloadSeederAddr, 10)
+					_, sessionExists := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout)
 					if !sessionExists {
 						//if session no longer exists
 						fmt.Println(string("\033[36m"), "session no longer exists", string("\033[0m"))
@@ -508,7 +508,7 @@ func DownloadFile(Hash string) bool {
 						inTransit = false
 						sleepWorker = false
 						break
-					} else if receiveTimeoutCounter >= receiveTimeout {
+					} else if receiveTimeoutCounter >= constants.WorkerChunkReceiveTimeout {
 						//if timeout is triggered, leave in transit.
 						fmt.Println(string("\033[36m"), "timeout is triggered, leave in transit.", string("\033[0m"))
 						inTransit = true

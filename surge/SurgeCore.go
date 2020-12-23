@@ -170,7 +170,7 @@ func TransmitChunk(Session *sessionmanager.Session, FileID string, ChunkID int32
 func SendQueryRequest(Addr string, Query string) bool {
 	defer RecoverAndLog()
 
-	surgeSession, exists := sessionmanager.GetExistingSession(Addr, 75)
+	surgeSession, exists := sessionmanager.GetExistingSession(Addr, 10)
 
 	if !exists {
 		return false
@@ -1014,7 +1014,7 @@ func createSession(File *File, Seeder string) (*sessionmanager.Session, error) {
 		sessionConfing.MTU = 16384
 		dialConfig := &nkn.DialConfig{
 			SessionConfig: sessionConfing,
-			DialTimeout:   60000,
+			DialTimeout:   nknClientDialTimeout,
 		}
 
 		downloadSession, err := client.DialWithConfig(Seeder, dialConfig)

@@ -7,6 +7,7 @@ import (
 	"log"
 
 	nkn "github.com/nknorg/nkn-sdk-go"
+	"github.com/rule110-io/surge-ui/surge/constants"
 	"github.com/rule110-io/surge-ui/surge/platform"
 	"github.com/rule110-io/surge-ui/surge/sessionmanager"
 )
@@ -94,13 +95,12 @@ func Stop() {
 func rescanPeers() {
 	defer RecoverAndLog()
 	for true {
-		time.Sleep(time.Minute)
+		time.Sleep(constants.RescanPeerInterval)
 		GetSubscriptions()
 
 		for _, addr := range subscribers {
-			fmt.Println(string("\033[36m"), "Client Connected", addr, string("\033[0m"))
+			fmt.Println(string("\033[36m"), "Sending file query to subscriber", addr, string("\033[0m"))
 			go SendQueryRequest(addr, "Testing query functionality.")
-			fmt.Println(string("\033[36m"), "Finished sending file query", addr, string("\033[0m"))
 		}
 	}
 }
@@ -237,8 +237,20 @@ func onClientDisconnected(addr string) {
 	for _, file := range ListedFiles {
 		file.Seeders = removeStringFromSlice(file.Seeders, addr)
 		file.SeederCount = len(file.Seeders)
+		fmt.Println(string("\033[31m"), "onClientDisconnected", file.FileName, "seeders remaining:", file.SeederCount, string("\033[0m"))
 	}
 	ListedFilesLock.Unlock()
+
+	dbFiles := dbGetAllFiles()
+	for _, file := range dbFiles {
+		initialLen := len(file.Seeders)
+		file.Seeders = removeStringFromSlice(file.Seeders, addr)
+		file.SeederCount = len(file.Seeders)
+
+		if file.SeederCount != initialLen {
+			dbInsertFile(file)
+		}
+	}
 }
 
 func listenToSession(Session *sessionmanager.Session) {

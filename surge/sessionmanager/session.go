@@ -9,6 +9,8 @@ import (
 	"sync"
 	"time"
 
+	"github.com/rule110-io/surge-ui/surge/constants"
+
 	nkn "github.com/nknorg/nkn-sdk-go"
 )
 
@@ -69,7 +71,7 @@ func GetSession(Address string) (*Session, error) {
 	if exists {
 		//If the sessions exists, check if its still active, if not dump it and try to create a new one.
 		elapsedSinceLastActivity := time.Now().Unix() - session.lastActivityUnix
-		if elapsedSinceLastActivity > 75 {
+		if elapsedSinceLastActivity > 10 {
 			closeSession(Address)
 
 			session, err = createSession(Address)
@@ -111,9 +113,6 @@ func GetExistingSession(Address string, timeoutInSeconds int) (*Session, bool) {
 func AcceptSession(acceptedConnection net.Conn) *Session {
 	addr := acceptedConnection.RemoteAddr().String()
 
-	lockSession(addr)
-	defer unlockSession(addr)
-
 	listenReader := bufio.NewReader(acceptedConnection)
 	session := &Session{
 		Reader:           listenReader,
@@ -151,7 +150,7 @@ func createSession(Address string) (*Session, error) {
 
 	dialConfig := &nkn.DialConfig{
 		SessionConfig: sessionConfig,
-		DialTimeout:   30000,
+		DialTimeout:   constants.NknClientDialTimeout,
 	}
 
 	nknSession, err := client.DialWithConfig(Address, dialConfig)
