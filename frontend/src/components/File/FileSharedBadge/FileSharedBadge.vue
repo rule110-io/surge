@@ -28,14 +28,5 @@ export default {
       default: 0,
     },
   },
-  data: () => {
-    return {};
-  },
-  watch: {
-    ratio(x) {
-      console.log(x);
-    },
-  },
-  methods: {},
 };
 </script>
