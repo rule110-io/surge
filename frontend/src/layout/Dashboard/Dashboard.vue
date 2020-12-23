@@ -46,8 +46,6 @@ export default {
 
     this.updateRemoteVersion();
 
-    this.getNumberOfRemoteClient();
-
     this.getPublicKey();
 
     this.remoteInterval = setInterval(this.fetchRemoteFiles, 10000);
@@ -77,16 +75,6 @@ export default {
     },
     updateRemoteVersion() {
       this.$store.dispatch("version/updateRemoteVersion");
-    },
-    getNumberOfRemoteClient() {
-      window.backend
-        .getNumberOfRemoteClient()
-        .then(({ NumKnown, NumOnline }) => {
-          this.$store.commit("clientStatus/addClientStatus", {
-            total: NumKnown,
-            online: NumOnline,
-          });
-        });
     },
     enableDarkThemeEvent() {
       window.wails.Events.On("darkThemeEvent", (bool) => {
@@ -123,9 +111,8 @@ export default {
     },
     enableClientStatusUpdate() {
       const clientsStore = runtime.Store.New("numClients");
-      clientsStore.subscribe(({ Online, Subscribed }) => {
+      clientsStore.subscribe(({ Online }) => {
         this.$store.commit("clientStatus/addClientStatus", {
-          total: Subscribed,
           online: Online,
         });
       });
