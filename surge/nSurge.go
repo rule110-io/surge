@@ -19,8 +19,8 @@ import (
 	"github.com/wailsapp/wails"
 )
 
-// SurgeActive is true when client is operational
-var SurgeActive bool = false
+//FrontendReady is a flag to check if frontend is ready
+var FrontendReady = false
 var subscribers []string
 
 var localFileName string
@@ -154,12 +154,12 @@ func WailsBind(runtime *wails.Runtime) {
 	updateNumClientStore()
 
 	//Wait for our client to initialize, perhaps there is no internet connectivity
-	tryCount := 0
+	tryCount := 1
 	for !clientInitialized {
-		if tryCount%10 == 0 {
-			pushError("Connection to NKN not yet established", "do you have an active internet connection?")
-		}
 		time.Sleep(time.Second)
+		if tryCount%10 == 0 {
+			pushError("Connection to NKN not yet established 0", "do you have an active internet connection?")
+		}
 		tryCount++
 	}
 	updateNumClientStore()
@@ -170,6 +170,8 @@ func WailsBind(runtime *wails.Runtime) {
 	//Startup async processes to continue processing subs/files and updating gui
 	go updateGUI()
 	go rescanPeers()
+
+	FrontendReady = true
 }
 
 //SetVisualMode Sets the visualmode

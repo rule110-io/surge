@@ -49,7 +49,6 @@ func InitializeClient(args []string) bool {
 	pushNotification("Client Connected", "Successfully connected to the NKN network")
 
 	client.Listen(nil)
-	SurgeActive = true
 	go Listen()
 
 	dbFiles := dbGetAllFiles()
