@@ -33,11 +33,13 @@ type Session struct {
 //A map to hold nkn sessions
 var sessionMap map[string]*Session
 var sessionLockMap map[string]*sync.Mutex
+var sessionLockMapLock sync.Mutex
 
 //Initialize initializes the session manager
 func Initialize(nknClient *nkn.MultiClient, connectFunc func(session *Session, isDialIn bool), disconnectFunc func(addr string)) {
 	sessionMap = make(map[string]*Session)
 	sessionLockMap = make(map[string]*sync.Mutex)
+	sessionLockMapLock = sync.Mutex{}
 	//fileMap = make(map[string]*os.File)
 	client = nknClient
 	onConnect = connectFunc
@@ -209,6 +211,8 @@ func closeSession(address string) {
 }
 
 func lockSession(Addr string) {
+	sessionLockMapLock.Lock()
+	defer sessionLockMapLock.Unlock()
 	lock, exists := sessionLockMap[Addr]
 	if !exists {
 		lock = &sync.Mutex{}
@@ -218,6 +222,8 @@ func lockSession(Addr string) {
 }
 
 func unlockSession(Addr string) {
+	sessionLockMapLock.Lock()
+	defer sessionLockMapLock.Unlock()
 	lock, exists := sessionLockMap[Addr]
 	if !exists {
 		panic("Unlocking session lock that does not exist!")
