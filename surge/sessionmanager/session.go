@@ -189,6 +189,9 @@ func createSession(Address string) (*Session, error) {
 }
 
 func closeSession(address string) {
+	sessionLockMapLock.Lock()
+	defer sessionLockMapLock.Unlock()
+
 	session, exists := sessionMap[address]
 
 	//Close nkn session, nill out the pointers
