@@ -116,6 +116,12 @@ func (s *WailsRuntime) WailsShutdown() {
 
 func main() {
 	defer surge.RecoverAndLog()
+
+	keepRunning := platform.ProcessStartupArgs(os.Args, &surge.FrontendReady)
+	if !keepRunning {
+		return
+	}
+
 	//surge.HashFile("C:\\Users\\mitch\\Downloads\\surge_remote\\surge-0.2.0-beta.windows.zip")
 
 	stats := &Stats{}

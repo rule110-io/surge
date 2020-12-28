@@ -43,15 +43,16 @@ export default {
       const links = this.links;
 
       window.backend.startDownloadMagnetLinks(links).then(() => {
-        this.closeModal();
         this.$store.dispatch("files/fetchLocalFiles");
         this.$store.dispatch("files/fetchRemoteFiles");
+        this.closeModal();
+        this.$router.replace("/download");
       });
     },
     initDownloadEvent() {
       window.wails.Events.On("userEvent", (context, payload) => {
         this.open = true;
-        this.links = payload.files;
+        this.links = payload;
       });
     },
   },

@@ -38,7 +38,7 @@ func WatchOSXHandler() {
 				return
 			}
 			//go ParsePayloadString(decodedMagetstring)
-			AskUser("startDownloadMagnetLinks", "{files : ["+decodedMagetstring+"]}")
+			AskUser("startDownloadMagnetLinks", decodedMagetstring)
 
 			//reregister URLHandler
 			C.StartURLHandler()
@@ -48,7 +48,7 @@ func WatchOSXHandler() {
 		if len(filestring) > 0 {
 			//decode file contents
 			//push in array
-			AskUser("startDownloadMagnetLinks", "{files : ["+filestring+"]}")
+			AskUser("startDownloadMagnetLinks", filestring)
 			//reregister URLHandler
 			filestring = ""
 		}
