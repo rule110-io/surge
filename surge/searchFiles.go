@@ -99,9 +99,6 @@ func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take i
 	}
 
 	totalNum := len(resultFiles)
-	for i := 0; i < len(resultFiles); i++ {
-		resultFiles[i].ChunkMap = nil
-	}
 
 	switch OrderBy {
 	case "FileName":
@@ -142,7 +139,6 @@ func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take i
 	ListedFilesLock.Lock()
 	for i := 0; i < len(resultFiles); i++ {
 		listing := LocalFileListing{
-			ChunkMap:      resultFiles[i].ChunkMap,
 			ChunksShared:  resultFiles[i].ChunksShared,
 			FileHash:      resultFiles[i].FileHash,
 			FileName:      resultFiles[i].FileName,
@@ -169,13 +165,14 @@ func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take i
 			}
 		}
 		listing.SeederCount = len(listing.Seeders)
-		resultListings = append(resultListings, listing)
-
 		//If file is downloading set progress
-		if listing.IsDownloading {
-			numChunksLocal := chunksDownloaded(listing.ChunkMap, listing.NumChunks)
+		if listing.IsDownloading || listing.IsPaused {
+			numChunksLocal := chunksDownloaded(resultFiles[i].ChunkMap, listing.NumChunks)
 			listing.Progress = float32(float64(numChunksLocal) / float64(listing.NumChunks))
 		}
+
+		resultListings = append(resultListings, listing)
+
 	}
 	ListedFilesLock.Unlock()
 

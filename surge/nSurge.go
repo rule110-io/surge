@@ -103,7 +103,6 @@ type LocalFileListing struct {
 	IsPaused      bool
 	IsMissing     bool
 	IsHashing     bool
-	ChunkMap      []byte
 	ChunksShared  int
 	Seeders       []string
 	SeederCount   int
