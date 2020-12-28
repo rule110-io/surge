@@ -119,6 +119,7 @@ type FileStatusEvent struct {
 	UploadBandwidth   int
 	NumChunks         int
 	ChunkMap          string
+	ChunksShared      int
 }
 
 //BandwidthMA tracks moving average for download and upload bandwidth
@@ -285,6 +286,7 @@ func updateGUI() {
 					UploadBandwidth:   up,
 					NumChunks:         file.NumChunks,
 					ChunkMap:          GetFileChunkMapString(&file, 156),
+					ChunksShared:      file.ChunksShared,
 				}
 				wailsRuntime.Events.Emit("fileStatusEvent", statusEvent)
 			}
