@@ -67,6 +67,7 @@ export default {
     downloadEvent(newEvent) {
       const { FileHash } = this.file;
       if (FileHash === newEvent.FileHash) {
+        this.shared = newEvent.ChunksShared / newEvent.NumChunks;
         this.progress = newEvent.Progress * 100;
         this.drawProgress(newEvent.ChunkMap);
       }
@@ -79,7 +80,7 @@ export default {
   },
   mounted() {
     this.getChunkMap();
-    this.progress = !this.file.IsPaused && !this.file.IsDownloading ? 100 : 0;
+    this.progress = this.file.Progress * 100;
     this.shared = this.file.ChunksShared / this.file.NumChunks;
   },
   methods: {
