@@ -107,6 +107,7 @@ type LocalFileListing struct {
 	ChunksShared  int
 	Seeders       []string
 	SeederCount   int
+	Progress      float32
 }
 
 // FileStatusEvent holds update info on download progress

@@ -19,7 +19,7 @@ type LocalFilePageResult struct {
 
 //SearchRemoteFile runs a paged query
 func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) SearchQueryResult {
-	
+
 	var results []FileListing
 
 	ListedFilesLock.Lock()
@@ -86,7 +86,7 @@ func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take 
 
 //SearchLocalFile runs a paged query
 func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) LocalFilePageResult {
-	
+
 	var results []FileListing
 
 	resultFiles := []File{}
@@ -170,6 +170,12 @@ func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take i
 		}
 		listing.SeederCount = len(listing.Seeders)
 		resultListings = append(resultListings, listing)
+
+		//If file is downloading set progress
+		if listing.IsDownloading {
+			numChunksLocal := chunksDownloaded(listing.ChunkMap, listing.NumChunks)
+			listing.Progress = float32(float64(numChunksLocal) / float64(listing.NumChunks))
+		}
 	}
 	ListedFilesLock.Unlock()
 
