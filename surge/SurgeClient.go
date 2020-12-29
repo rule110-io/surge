@@ -123,7 +123,7 @@ func autoSubscribeWorker() {
 }
 
 func subscribeToSurgeTopic() {
-	Topic := TopicEncode(TestTopic)
+	Topic := TopicEncode(constants.PublicTopic)
 	txnHash, err := client.Subscribe("", Topic, subscriptionDuration, "Surge Beta Client", nil)
 	if err != nil {
 		log.Println("Probably already subscribed", err)
@@ -135,7 +135,7 @@ func subscribeToSurgeTopic() {
 //GetSubscriptions .
 func GetSubscriptions() {
 
-	Topic := TopicEncode(TestTopic)
+	Topic := TopicEncode(constants.PublicTopic)
 
 	subResponse, err := client.GetSubscribers(Topic, 0, 100, true, true)
 	if err != nil {
@@ -258,18 +258,18 @@ func listenToSession(Session *sessionmanager.Session) {
 		sessionmanager.UpdateActivity(Session.Session.RemoteAddr().String())
 
 		switch chunkType {
-		case surgeChunkID:
+		case constants.SurgeChunkID:
 			//Write add to download internally after parsing data
 			processChunk(Session, data)
 			break
-		case surgeQueryRequestID:
+		case constants.SurgeQueryRequestID:
 			processQueryRequest(Session, data)
 			//Write add to download
 			bandwidthAccumulatorMapLock.Lock()
 			downloadBandwidthAccumulator["DISCOVERY"] += len(data)
 			bandwidthAccumulatorMapLock.Unlock()
 			break
-		case surgeQueryResponseID:
+		case constants.SurgeQueryResponseID:
 			processQueryResponse(Session, data)
 			//Write add to download
 			bandwidthAccumulatorMapLock.Lock()

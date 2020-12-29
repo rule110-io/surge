@@ -27,14 +27,6 @@ import (
 	open "github.com/skratchdot/open-golang/open"
 )
 
-//TestTopic only for testing
-const TestTopic = "privateTest"
-
-const surgeChunkID byte = 0x001
-const surgeQueryRequestID byte = 0x002
-const surgeQueryResponseID byte = 0x003
-
-var queryPayload = ""
 var fileWriteLock = &sync.Mutex{}
 
 //OpenOSPath Open a file, directory, or URI using the OS's default application for that object type. Don't wait for the open command to complete.
@@ -80,7 +72,7 @@ func RequestChunk(Session *sessionmanager.Session, FileID string, ChunkID int32)
 	} else {
 		fmt.Println(string("\033[31m"), "Request Chunk", FileID, ChunkID, string("\033[0m"))
 
-		written, err := SessionWrite(Session, msgSerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
+		written, err := SessionWrite(Session, msgSerialized, constants.SurgeChunkID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
 		if err != nil {
 			log.Println("Failed to request chunk", err)
 			return false
@@ -154,7 +146,7 @@ func TransmitChunk(Session *sessionmanager.Session, FileID string, ChunkID int32
 
 	//Transmit the chunk
 	fmt.Println(string("\033[31m"), "Transmit Chunk", FileID, ChunkID, string("\033[0m"))
-	written, err := SessionWrite(Session, dateReplySerialized, surgeChunkID) //Client.Send(nkn.NewStringArray(Addr), dateReplySerialized, nil)
+	written, err := SessionWrite(Session, dateReplySerialized, constants.SurgeChunkID) //Client.Send(nkn.NewStringArray(Addr), dateReplySerialized, nil)
 	if err != nil {
 		log.Println("Error on transmit chunk - failed to write to session", err.Error())
 		return
@@ -164,54 +156,6 @@ func TransmitChunk(Session *sessionmanager.Session, FileID string, ChunkID int32
 	//Write add to upload
 	bandwidthAccumulatorMapLock.Lock()
 	uploadBandwidthAccumulator[FileID] += written
-	bandwidthAccumulatorMapLock.Unlock()
-}
-
-// SendQueryRequest sends a query to a client on session
-func SendQueryRequest(Addr string, Query string) bool {
-
-	surgeSession, exists := sessionmanager.GetExistingSession(Addr, constants.SendQueryRequestSessionTimeout)
-
-	if !exists {
-		return false
-	}
-
-	msg := &pb.SurgeQuery{
-		Query: Query,
-	}
-	msgSerialized, err := proto.Marshal(msg)
-	if err != nil {
-		log.Panic("Failed to encode surge message:", err)
-		return false
-	}
-
-	fmt.Println(string("\033[31m"), "Send Query Request", Addr, string("\033[0m"))
-	written, err := SessionWrite(surgeSession, msgSerialized, surgeQueryRequestID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
-	if err != nil {
-		log.Println("Failed to send Surge Request:", err)
-		return false
-	}
-
-	//Write add to upload
-	bandwidthAccumulatorMapLock.Lock()
-	uploadBandwidthAccumulator["DISCOVERY"] += written
-	bandwidthAccumulatorMapLock.Unlock()
-
-	return true
-}
-
-// SendQueryResponse sends a query to a client on session
-func SendQueryResponse(Session *sessionmanager.Session, Query string) {
-
-	b := []byte(queryPayload)
-	fmt.Println(string("\033[31m"), "Send Query Response", Session.Session.RemoteAddr().String(), string("\033[0m"))
-	written, err := SessionWrite(Session, b, surgeQueryResponseID) //Client.Send(nkn.NewStringArray(Addr), msgSerialized, nil)
-	if err != nil {
-		log.Println("Failed to send Surge Ruquest:", err)
-	}
-	//Write add to upload
-	bandwidthAccumulatorMapLock.Lock()
-	uploadBandwidthAccumulator["DISCOVERY"] += written
 	bandwidthAccumulatorMapLock.Unlock()
 }
 
@@ -236,46 +180,6 @@ func AllocateFile(path string, size int64) {
 	}
 }
 
-/*func closeSession(Session *sessionmanager.Session) {
-
-	//find index in Sessions
-	sessionsWriteLock.Lock()
-	var index = -1
-	for i := 0; i < len(Sessions); i++ {
-		if Sessions[i] == Session {
-			index = i
-			break
-		}
-	}
-
-	if index == -1 {
-		log.Println("Session already removed")
-		sessionsWriteLock.Unlock()
-		return
-	}
-
-	//Close nkn session, nill out the pointers
-	Session.Session.Close()
-	Session.Session = nil
-	Session.Reader = nil
-	if Session.File != nil {
-		err := Session.File.Close()
-		if err != nil {
-			log.Println("File no longer exists")
-		}
-	}
-
-	//Replace index of session to be removed with last element in slice
-	Sessions[index] = Sessions[len(Sessions)-1]
-	//Nul out the pointer to the surge session
-	Sessions[len(Sessions)-1] = nil
-	//Slice off the last element
-	Sessions = Sessions[:len(Sessions)-1]
-	sessionsWriteLock.Unlock()
-
-	log.Println("-=Session closed=-")
-}*/
-
 func processChunk(Session *sessionmanager.Session, Data []byte) {
 
 	//Try to parse SurgeMessage
@@ -289,23 +193,6 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 	bandwidthAccumulatorMapLock.Lock()
 	downloadBandwidthAccumulator[surgeMessage.FileID] += len(Data)
 	bandwidthAccumulatorMapLock.Unlock()
-
-	//If this is the first file data over this session we need to set the session
-	/*if Session.FileHash == "" {
-		dbFile, err := dbGetFile(surgeMessage.FileID)
-		if err != nil {
-			log.Println("Chunk requested by someone for a file which we do not have in our db")
-			return
-		}
-
-		if !dbFile.IsUploading {
-			log.Println("Chunk requested by someone for a file which we have not marked as uploading")
-			return
-		}
-
-		Session.FileHash = dbFile.FileHash
-		Session.FileSize = dbFile.FileSize
-	}*/
 
 	//Data nill means its a request for data
 	if surgeMessage.Data == nil {
@@ -321,83 +208,6 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 
 		go WriteChunk(surgeMessage.FileID, surgeMessage.ChunkID, surgeMessage.Data)
 	}
-}
-
-func processQueryRequest(Session *sessionmanager.Session, Data []byte) {
-
-	//Try to parse SurgeMessage
-	surgeQuery := &pb.SurgeQuery{}
-	if err := proto.Unmarshal(Data, surgeQuery); err != nil {
-		log.Panic("Failed to parse surge message:", err)
-	}
-	log.Println("Query received", surgeQuery.Query)
-
-	SendQueryResponse(Session, surgeQuery.Query)
-}
-
-func processQueryResponse(Session *sessionmanager.Session, Data []byte) {
-
-	//Try to parse SurgeMessage
-	s := string(Data)
-	seeder := Session.Session.RemoteAddr().String()
-
-	fmt.Println(string("\033[36m"), "file query response received", seeder, string("\033[0m"))
-
-	ListedFilesLock.Lock()
-
-	//Parse the response
-	payloadSplit := strings.Split(s, "surge://")
-	for j := 0; j < len(payloadSplit); j++ {
-		data := strings.Split(payloadSplit[j], "|")
-
-		if len(data) < 3 {
-			continue
-		}
-
-		fileSize, _ := strconv.ParseInt(data[3], 10, 64)
-		numChunks := int((fileSize-1)/int64(ChunkSize)) + 1
-
-		newListing := File{
-			FileName:    data[2],
-			FileSize:    fileSize,
-			FileHash:    data[4],
-			seeders:     []string{seeder},
-			Path:        "",
-			NumChunks:   numChunks,
-			ChunkMap:    nil,
-			seederCount: 1,
-		}
-
-		//Replace existing, or remove.
-		var replace = false
-		for l := 0; l < len(ListedFiles); l++ {
-			if ListedFiles[l].FileHash == newListing.FileHash {
-
-				//if the seeder is unique add it as an additional seeder for the file
-				ListedFiles[l].seeders = append(ListedFiles[l].seeders, seeder)
-				ListedFiles[l].seeders = distinctStringSlice(ListedFiles[l].seeders)
-				ListedFiles[l].seederCount = len(ListedFiles[l].seeders)
-
-				replace = true
-				break
-			}
-		}
-		//Unique listing so we add
-		if replace == false {
-			ListedFiles = append(ListedFiles, newListing)
-		}
-
-		fmt.Println(string("\033[33m"), "Filename", newListing.FileName, "FileHash", newListing.FileHash, string("\033[0m"))
-
-		log.Println("Query response new file: ", newListing.FileName, " seeder: ", seeder)
-
-		//Test gui
-		//newButton := widget.NewButton(newListing.Filename+" | "+ByteCountSI(newListing.FileSize), func() {
-		//	downloadFile(newListing.Seeder, newListing.FileSize, newListing.Filename)
-		//})
-		//fileBox.Append(newButton)
-	}
-	ListedFilesLock.Unlock()
 }
 
 //ParsePayloadString parses payload of files
@@ -446,12 +256,6 @@ func ParsePayloadString(s string) {
 		log.Println("Program paramater new file: ", newListing.FileName, " seeder: ", newListing.seeders)
 
 		go DownloadFile(newListing.FileHash)
-
-		//Test gui
-		//newButton := widget.NewButton(newListing.Filename+" | "+ByteCountSI(newListing.FileSize), func() {
-		//	downloadFile(newListing.Seeder, newListing.FileSize, newListing.Filename)
-		//})
-		//fileBox.Append(newButton)
 	}
 }
 
