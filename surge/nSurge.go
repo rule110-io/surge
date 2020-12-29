@@ -254,9 +254,9 @@ func updateGUI() {
 			}
 			key := file.FileHash
 
-			if file.IsPaused {
-				continue
-			}
+			//if file.IsPaused {
+			//	continue
+			//}
 
 			if file.IsDownloading {
 				numChunksLocal := chunksDownloaded(file.ChunkMap, file.NumChunks)
@@ -292,6 +292,12 @@ func updateGUI() {
 
 			zeroBandwidthMap[key] = down+up == 0
 		}
+
+		//Add peer discovery global bandwidth
+		totalDown += downloadBandwidthAccumulator["DISCOVERY"]
+		totalUp += uploadBandwidthAccumulator["DISCOVERY"]
+		downloadBandwidthAccumulator["DISCOVERY"] = 0
+		uploadBandwidthAccumulator["DISCOVERY"] = 0
 
 		//log.Println("Emitting globalBandwidthUpdate: ", totalDown, totalUp)
 		if zeroBandwidthMap["total"] == false || totalDown+totalUp != 0 {
