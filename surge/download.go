@@ -174,7 +174,7 @@ func downloadChunks(file *File, randomChunks []int) {
 				if len(fileSeeders) > seederAlternator {
 					//Get seeder
 					downloadSeederAddr = fileSeeders[seederAlternator]
-					session, existing := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout)
+					session, existing := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout, "Get Download Session for Worker - WorkerGetSessionTimeout")
 
 					if existing {
 						success = RequestChunk(session, file.FileHash, int32(chunkID))
@@ -218,7 +218,7 @@ func downloadChunks(file *File, randomChunks []int) {
 					//fmt.Println(string("\033[36m"), "Worker Sleeping", string("\033[0m"))
 
 					//Check if connection is lost
-					_, sessionExists := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout)
+					_, sessionExists := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout, "Worker waiting for potential timeout get session - WorkerGetSessionTimeout")
 					if !sessionExists {
 						//if session no longer exists
 						fmt.Println(string("\033[36m"), "session no longer exists", string("\033[0m"))
@@ -292,7 +292,7 @@ func downloadChunks(file *File, randomChunks []int) {
 				mutateSeederLock.Lock()
 				fileSeeders = []string{}
 				for i := 0; i < len(newFile.seeders); i++ {
-					_, existing := sessionmanager.GetExistingSession(newFile.seeders[i], 60)
+					_, existing := sessionmanager.GetExistingSession(newFile.seeders[i], 60, "Scan for seeders in download session timeout")
 					if existing {
 						fileSeeders = append(fileSeeders, newFile.seeders[i])
 					}
