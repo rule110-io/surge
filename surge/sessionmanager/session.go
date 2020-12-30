@@ -183,7 +183,7 @@ func createSession(Address string) (*Session, error) {
 		if dialupExists {
 			fmt.Println(string("\033[31m"), "but inbound (accepted) dialup was received in the meantime", Address, err, string("\033[0m"))
 
-		} else {
+		} /*else {
 			fmt.Println(string("\033[31m"), "no inboud (accepted) dial up in the meantime closing all connections", Address, err, string("\033[0m"))
 
 			noBlockDialog := func() {
@@ -194,7 +194,7 @@ func createSession(Address string) (*Session, error) {
 			lockSession(Address)
 			closeSession(Address)
 			unlockSession(Address)
-		}
+		}*/
 
 		return nil, err
 	}
