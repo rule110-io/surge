@@ -100,7 +100,6 @@ func restartDownload(Hash string) {
 func downloadChunks(file *File, randomChunks []int) {
 	fileID := file.FileHash
 	file = getListedFileByHash(fileID)
-	fileName := file.FileName
 
 	for file == nil {
 		time.Sleep(time.Second)
@@ -131,7 +130,7 @@ func downloadChunks(file *File, randomChunks []int) {
 			file = getListedFileByHash(fileID)
 			for file == nil || len(file.seeders) == 0 {
 				time.Sleep(time.Second * 5)
-				fmt.Println(string("\033[36m"), "SLEEPING NO SEEDERS FOR FILE", fileName, string("\033[0m"))
+				fmt.Println(string("\033[36m"), "SLEEPING NO SEEDERS FOR FILE", string("\033[0m"))
 				file = getListedFileByHash(fileID)
 			}
 
