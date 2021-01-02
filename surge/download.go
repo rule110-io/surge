@@ -99,8 +99,14 @@ func restartDownload(Hash string) {
 
 func downloadChunks(file *File, randomChunks []int) {
 	fileID := file.FileHash
+	file = getListedFileByHash(fileID)
+
+	for file == nil {
+		time.Sleep(time.Second)
+		file = getListedFileByHash(fileID)
+	}
+
 	numChunks := len(randomChunks)
-	fileSeeders := file.seeders
 
 	seederAlternator := 0
 	mutateSeederLock := sync.Mutex{}
@@ -108,7 +114,7 @@ func downloadChunks(file *File, randomChunks []int) {
 
 	//Give the seeder a fair start with timers when a download is initiated
 	//Potentionally this seeder was last queried 60 seconds ago for files and otherwise idle but online
-	for _, seeder := range fileSeeders {
+	for _, seeder := range file.seeders {
 		sessionmanager.UpdateActivity(seeder)
 	}
 
@@ -121,14 +127,10 @@ func downloadChunks(file *File, randomChunks []int) {
 		defer terminate(terminateFlag)
 
 		for i := 0; i < numChunks; i++ {
-
-			newFileData := getListedFileByHash(fileID)
-			if newFileData != nil {
-				file = newFileData
-			}
-
-			for len(fileSeeders) == 0 {
+			for file == nil || len(file.seeders) == 0 {
 				time.Sleep(time.Second * 5)
+				fmt.Println(string("\033[36m"), "SLEEPING NO SEEDERS HERE", string("\033[0m"))
+				file = getListedFileByHash(fileID)
 			}
 
 			dbFile, err := dbGetFile(file.FileHash)
@@ -154,7 +156,7 @@ func downloadChunks(file *File, randomChunks []int) {
 				if !dbFile.IsPaused {
 					//Give the seeder a fair start with timers when a download is initiated
 					//Potentionally this seeder was last queried 60 seconds ago for files and otherwise idle but online
-					for _, seeder := range fileSeeders {
+					for _, seeder := range file.seeders {
 						sessionmanager.UpdateActivity(seeder)
 					}
 				}
@@ -171,10 +173,11 @@ func downloadChunks(file *File, randomChunks []int) {
 				success := false
 				downloadSeederAddr := ""
 
-				if len(fileSeeders) > seederAlternator {
+				mutateSeederLock.Lock()
+				if len(file.seeders) > seederAlternator {
 					//Get seeder
-					downloadSeederAddr = fileSeeders[seederAlternator]
-					session, existing := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout, "Get Download Session for Worker - WorkerGetSessionTimeout")
+					downloadSeederAddr = file.seeders[seederAlternator]
+					session, existing := sessionmanager.GetExistingSessionWithoutClosing(downloadSeederAddr, constants.WorkerGetSessionTimeout, "Get Download Session for Worker - WorkerGetSessionTimeout")
 
 					if existing {
 						success = RequestChunk(session, file.FileHash, int32(chunkID))
@@ -182,6 +185,7 @@ func downloadChunks(file *File, randomChunks []int) {
 						success = false
 					}
 				}
+				mutateSeederLock.Unlock()
 
 				//if download fails append the chunk to remaining to retry later
 				if !success {
@@ -194,7 +198,7 @@ func downloadChunks(file *File, randomChunks []int) {
 
 					//TODO: Think about alternatives from straight dropping the seeder.
 					mutateSeederLock.Lock()
-					fileSeeders = removeStringFromSlice(fileSeeders, downloadSeederAddr)
+					file.seeders = removeStringFromSlice(file.seeders, downloadSeederAddr)
 					mutateSeederLock.Unlock()
 
 					//return out of job
@@ -218,10 +222,12 @@ func downloadChunks(file *File, randomChunks []int) {
 					//fmt.Println(string("\033[36m"), "Worker Sleeping", string("\033[0m"))
 
 					//Check if connection is lost
-					_, sessionExists := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout, "Worker waiting for potential timeout get session - WorkerGetSessionTimeout")
+					_, sessionExists := sessionmanager.GetExistingSessionWithoutClosing(downloadSeederAddr, constants.WorkerGetSessionTimeout, "Worker waiting for potential timeout get session - WorkerGetSessionTimeout")
 					if !sessionExists {
 						//if session no longer exists
 						fmt.Println(string("\033[36m"), "session no longer exists", string("\033[0m"))
+						fmt.Println(string("\033[36m"), downloadSeederAddr, sessionmanager.GetSessionsString(), string("\033[0m"))
+
 						inTransit = true
 						sleepWorker = false
 						break
@@ -256,7 +262,7 @@ func downloadChunks(file *File, randomChunks []int) {
 
 					//TODO: Think about alternatives from straight dropping the seeder.
 					mutateSeederLock.Lock()
-					fileSeeders = removeStringFromSlice(fileSeeders, downloadSeederAddr)
+					file.seeders = removeStringFromSlice(file.seeders, downloadSeederAddr)
 					mutateSeederLock.Unlock()
 
 					//return out of job
@@ -273,14 +279,14 @@ func downloadChunks(file *File, randomChunks []int) {
 
 			mutateSeederLock.Lock()
 			seederAlternator++
-			if seederAlternator > len(fileSeeders)-1 {
+			if seederAlternator > len(file.seeders)-1 {
 				seederAlternator = 0
 			}
 			mutateSeederLock.Unlock()
 		}
 	}
 
-	scanForSeeders := func(terminateFlag *bool) {
+	/*scanForSeeders := func(terminateFlag *bool) {
 
 		//While we are not terminated scan for new peers
 		for *terminateFlag == false {
@@ -300,10 +306,9 @@ func downloadChunks(file *File, randomChunks []int) {
 				mutateSeederLock.Unlock()
 			}
 		}
-	}
+	}*/
 
 	terminateFlag := false
 	go downloadJob(&terminateFlag)
-	go scanForSeeders(&terminateFlag)
-
+	//go scanForSeeders(&terminateFlag)
 }
