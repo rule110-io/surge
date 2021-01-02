@@ -236,7 +236,10 @@ func downloadChunks(file *File, randomChunks []int) {
 					}
 
 					//Check if received
+					chunkInTransitLock.Lock()
 					isInTransit := chunksInTransit[chunkKey]
+					chunkInTransitLock.Unlock()
+
 					if !isInTransit {
 						//if no longer in transit, continue workers
 						fmt.Println(string("\033[36m"), "no longer in transit, continue workers", string("\033[0m"))
