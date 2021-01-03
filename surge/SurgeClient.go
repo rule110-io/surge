@@ -160,7 +160,7 @@ func GetSubscriptions() {
 
 	for _, sub := range subscribers {
 		connectAndQueryJob := func(addr string) {
-			_, err := sessionmanager.GetSession(addr, constants.GetSessionDialTimeout, "Get Subscriber Session - GetSessionDialTimeout")
+			_, err := sessionmanager.GetSession(addr, constants.GetSessionDialTimeout)
 			if err == nil {
 				fmt.Println(string("\033[36m"), "Sending file query to subscriber", addr, string("\033[0m"))
 				go SendQueryRequest(addr, "Testing query functionality.")
