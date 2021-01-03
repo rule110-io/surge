@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"strings"
 	"sync"
 	"time"
 
@@ -51,8 +52,17 @@ func GetSessionLength() int {
 	return len(sessionMap)
 }
 
+//GetSessionsString .
+func GetSessionsString() string {
+	arr := []string{}
+	for k := range sessionMap {
+		arr = append(arr, k)
+	}
+	return strings.Join(arr, ",")
+}
+
 //GetSession returns a session for given address
-func GetSession(Address string, timeoutInSeconds int) (*Session, error) {
+func GetSession(Address string, timeoutInSeconds int, debugContext string) (*Session, error) {
 	//Check for an existing session
 	lockSession(Address)
 	defer unlockSession(Address)
@@ -73,6 +83,12 @@ func GetSession(Address string, timeoutInSeconds int) (*Session, error) {
 		//If the sessions exists, check if its still active, if not dump it and try to create a new one.
 		elapsedSinceLastActivity := time.Now().Unix() - session.lastActivityUnix
 		if elapsedSinceLastActivity > int64(timeoutInSeconds) {
+
+			noBlockDialog := func() {
+				//dialog.Message("%s", debugContext).Title("Closed Session").Error()
+			}
+			go noBlockDialog()
+
 			closeSession(Address)
 
 			session, err = createSession(Address)
@@ -102,6 +118,21 @@ func GetExistingSession(Address string, timeoutInSeconds int) (*Session, bool) {
 	return session, exists
 }
 
+//GetExistingSessionWithoutClosing does not attempt to create a connection only returns existing
+func GetExistingSessionWithoutClosing(Address string, timeoutInSeconds int) (*Session, bool) {
+	session, exists := sessionMap[Address]
+
+	if exists {
+		//If the sessions exists, check if its still active, if not dump it and try to create a new one.
+		elapsedSinceLastActivity := time.Now().Unix() - session.lastActivityUnix
+		if elapsedSinceLastActivity > int64(timeoutInSeconds) {
+			return nil, false
+		}
+	}
+
+	return session, exists
+}
+
 //CloseSession handles session termination and removes from map
 /*func CloseSession(address string) {
 	lockSession(Address)
@@ -123,10 +154,12 @@ func AcceptSession(acceptedConnection net.Conn) *Session {
 
 	_, exists := sessionMap[addr]
 	if exists {
-		log.Println("Why are we receiving a dial when we already have a session?")
+		log.Println("New connection for existing client", acceptedConnection.RemoteAddr().String(), "remote likely restarted before we noticed it was down.")
 		closeSession(addr)
 	}
 
+	//Give it a 10 sec headstart, old session workers take up to 10 sec to timeout, then to fetch the new session this would then already be timedout.
+	session.lastActivityUnix = time.Now().Unix() + constants.WorkerGetSessionTimeout
 	sessionMap[addr] = session
 
 	go onConnect(session, true)
@@ -160,16 +193,10 @@ func createSession(Address string) (*Session, error) {
 		fmt.Println(string("\033[31m"), "Failed to create a session with ", Address, err, string("\033[0m"))
 
 		//If we have a session that didnt come in after dial
-		_, dialupExists := GetExistingSession(Address, constants.NknClientDialTimeout)
+		acceptedSession, dialupExists := GetExistingSession(Address, constants.NknClientDialTimeout)
 		if dialupExists {
 			fmt.Println(string("\033[31m"), "but inbound (accepted) dialup was received in the meantime", Address, err, string("\033[0m"))
-
-		} else {
-			fmt.Println(string("\033[31m"), "no inboud (accepted) dial up in the meantime closing all connections", Address, err, string("\033[0m"))
-
-			lockSession(Address)
-			closeSession(Address)
-			unlockSession(Address)
+			return acceptedSession, nil
 		}
 
 		return nil, err
