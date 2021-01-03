@@ -17,7 +17,7 @@ var queryPayload = ""
 // SendQueryRequest sends a query to a client on session
 func SendQueryRequest(Addr string, Query string) bool {
 
-	surgeSession, exists := sessionmanager.GetExistingSession(Addr, constants.SendQueryRequestSessionTimeout, "Send query request timeout - SendQueryRequestSessionTimeout")
+	surgeSession, exists := sessionmanager.GetExistingSession(Addr, constants.SendQueryRequestSessionTimeout)
 
 	if !exists {
 		return false
