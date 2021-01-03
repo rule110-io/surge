@@ -302,29 +302,6 @@ func downloadChunks(file *File, randomChunks []int) {
 		}
 	}
 
-	/*scanForSeeders := func(terminateFlag *bool) {
-
-		//While we are not terminated scan for new peers
-		for *terminateFlag == false {
-			time.Sleep(time.Second * 5)
-
-			newFile := getListedFileByHash(fileID)
-			if newFile != nil {
-				//Check for new sessions
-				mutateSeederLock.Lock()
-				fileSeeders = []string{}
-				for i := 0; i < len(newFile.seeders); i++ {
-					_, existing := sessionmanager.GetExistingSession(newFile.seeders[i], 60, "Scan for seeders in download session timeout")
-					if existing {
-						fileSeeders = append(fileSeeders, newFile.seeders[i])
-					}
-				}
-				mutateSeederLock.Unlock()
-			}
-		}
-	}*/
-
 	terminateFlag := false
 	go downloadJob(&terminateFlag)
-	//go scanForSeeders(&terminateFlag)
 }
