@@ -4,35 +4,28 @@
       <h1 class="page__title">File Transfers</h1>
       <div class="table">
         <div class="table__row">
-          <div class="table__head" style="width: calc(100% - 666px);">
-            File
-          </div>
           <div
+            v-for="header in headers"
+            :key="header.title"
+            :style="header.style"
             class="table__head"
-            style="width: 110px; justify-content: center;"
+            :class="[
+              header.sortable ? 'table__head_sortable' : '',
+              header.orderName === localFilesConfig.orderBy
+                ? 'table__head_active'
+                : '',
+            ]"
+            @click="header.sortable ? setSorting(header.orderName) : false"
           >
-            Down
+            {{ header.title }}
+
+            <feather
+              v-if="header.orderName === localFilesConfig.orderBy"
+              class="table__head-action"
+              :class="!localFilesConfig.isDesc ? 'table__head-action_asc' : ''"
+              type="chevron-down"
+            ></feather>
           </div>
-          <div
-            class="table__head"
-            style="width: 110px; justify-content: center;"
-          >
-            Up
-          </div>
-          <div
-            class="table__head"
-            style="width: 176px; justify-content: center;"
-          >
-            Status
-          </div>
-          <div
-            class="table__head"
-            style="width: 120px; justify-content: center;"
-          >
-            Remaining
-          </div>
-          <div class="table__head" style="width: 70px;">Seeds</div>
-          <div class="table__head" style="width: 80px;"></div>
         </div>
         <template v-if="localFiles.length">
           <div
@@ -139,6 +132,50 @@ export default {
     return {
       isRemoveFileModal: false,
       activeFile: {},
+      headers: [
+        {
+          title: "File",
+          orderName: "FileName",
+          sortable: true,
+          style: "width: calc(100% - 666px);",
+        },
+        {
+          title: "Down",
+          orderName: "",
+          sortable: false,
+          style: "width: 110px; justify-content: center;",
+        },
+        {
+          title: "Up",
+          orderName: "",
+          sortable: false,
+          style: "width: 110px; justify-content: center;",
+        },
+        {
+          title: "Status",
+          orderName: "",
+          sortable: false,
+          style: "width: 176px; justify-content: center;",
+        },
+        {
+          title: "Remaining",
+          orderName: "",
+          sortable: false,
+          style: "width: 120px; justify-content: center;",
+        },
+        {
+          title: "Seeds",
+          orderName: "",
+          sortable: false,
+          style: "width: 70px;",
+        },
+        {
+          title: "",
+          orderName: "",
+          sortable: false,
+          style: "width: 80px;",
+        },
+      ],
     };
   },
   computed: {
@@ -148,6 +185,17 @@ export default {
     this.$store.dispatch("files/fetchLocalFiles");
   },
   methods: {
+    setSorting(orderBy) {
+      let newConfig = Object.assign({}, this.localFilesConfig);
+      const currentOrder = newConfig.orderBy;
+      const currentIsDesc = newConfig.isDesc;
+
+      newConfig.isDesc = currentOrder === orderBy ? !currentIsDesc : true;
+      newConfig.orderBy = orderBy;
+
+      this.$store.commit("files/setLocalFilesConfig", newConfig);
+      this.$store.dispatch("files/fetchLocalFiles");
+    },
     toggleRemoveFileModal(bool) {
       this.isRemoveFileModal = bool;
     },
