@@ -8,8 +8,9 @@ import (
 	"strings"
 	"time"
 
+	"log"
+
 	"github.com/rule110-io/surge-ui/mailslot"
-	log "github.com/sirupsen/logrus"
 	"github.com/sqweek/dialog"
 )
 

@@ -45,3 +45,15 @@ type sortByFileSizeDesc []FileListing
 func (a sortByFileSizeDesc) Len() int           { return len(a) }
 func (a sortByFileSizeDesc) Less(i, j int) bool { return a[i].FileSize > a[j].FileSize }
 func (a sortByFileSizeDesc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+type sortLocalByFileNameAsc []File
+
+func (a sortLocalByFileNameAsc) Len() int           { return len(a) }
+func (a sortLocalByFileNameAsc) Less(i, j int) bool { return a[i].FileName < a[j].FileName }
+func (a sortLocalByFileNameAsc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+
+type sortLocalByFileNameDesc []File
+
+func (a sortLocalByFileNameDesc) Len() int           { return len(a) }
+func (a sortLocalByFileNameDesc) Less(i, j int) bool { return a[i].FileName > a[j].FileName }
+func (a sortLocalByFileNameDesc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }

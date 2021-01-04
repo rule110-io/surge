@@ -87,8 +87,6 @@ func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take 
 //SearchLocalFile runs a paged query
 func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) LocalFilePageResult {
 
-	var results []FileListing
-
 	resultFiles := []File{}
 
 	allFiles := dbGetAllFiles()
@@ -101,23 +99,11 @@ func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take i
 	totalNum := len(resultFiles)
 
 	switch OrderBy {
-	case "FileName":
-		if !IsDesc {
-			sort.Sort(sortByFileNameAsc(results))
-		} else {
-			sort.Sort(sortByFileNameDesc(results))
-		}
-	case "FileSize":
-		if !IsDesc {
-			sort.Sort(sortByFileSizeAsc(results))
-		} else {
-			sort.Sort(sortByFileSizeDesc(results))
-		}
 	default:
 		if !IsDesc {
-			sort.Sort(sortBySeederCountAsc(results))
+			sort.Sort(sortLocalByFileNameAsc(resultFiles))
 		} else {
-			sort.Sort(sortBySeederCountDesc(results))
+			sort.Sort(sortLocalByFileNameDesc(resultFiles))
 		}
 	}
 
