@@ -1,6 +1,11 @@
 <template>
   <div class="file-down text_wrap_none">
-    {{ downloadBandwidth | prettyBytes(0) }}/s
+    <template v-if="downloadBandwidth > 0">
+      {{ downloadBandwidth | prettyBytes(0) }}/s
+    </template>
+    <template v-else>
+      -
+    </template>
   </div>
 </template>
 

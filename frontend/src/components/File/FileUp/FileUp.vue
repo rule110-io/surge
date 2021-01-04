@@ -1,6 +1,11 @@
 <template>
   <div class="file-up text_wrap_none">
-    {{ uploadBandwidth | prettyBytes(0) }}/s
+    <template v-if="uploadBandwidth > 0">
+      {{ uploadBandwidth | prettyBytes(0) }}/s
+    </template>
+    <template v-else>
+      -
+    </template>
   </div>
 </template>
 
