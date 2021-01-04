@@ -7,6 +7,9 @@ const getDefaultState = () => {
     localPages: 0,
     remotePages: 0,
     localFilesConfig: {
+      search: "",
+      orderBy: "FileName",
+      isDesc: true,
       skip: 0,
       get: 8,
     },
@@ -45,11 +48,13 @@ const mutations = {
 
 const actions = {
   fetchLocalFiles({ commit, state }) {
-    const { skip, get } = state.localFilesConfig;
+    const { search, skip, get, orderBy, isDesc } = state.localFilesConfig;
 
-    window.backend.getLocalFiles("", "FileName", true, skip, get).then(({ Result, Count }) => {
-      commit("setLocalFiles", { Result, Count });
-    });
+    window.backend
+      .getLocalFiles(search, orderBy, isDesc, skip, get)
+      .then(({ Result, Count }) => {
+        commit("setLocalFiles", { Result, Count });
+      });
   },
   fetchRemoteFiles({ commit, state }) {
     const { search, skip, get, orderBy, isDesc } = state.remoteFilesConfig;

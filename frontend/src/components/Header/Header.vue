@@ -12,7 +12,11 @@
           @focus="focus = true"
           @blur="focus = false"
           v-model.trim="searchQuery"
-          @input="search(searchQuery)"
+          @input="
+            currentRoute === 'download'
+              ? localSearch(searchQuery)
+              : remoteSearch(searchQuery)
+          "
         />
         <div class="header__search-right">
           <feather class="header__search-icon" type="search"></feather>
@@ -71,30 +75,47 @@ export default {
       active: true,
       focus: false,
       searchQuery: "",
-      search: () => {},
+      remoteSearch: () => {},
+      localSearch: () => {},
     };
   },
   computed: {
     ...mapState("notifications", ["counter", "open"]),
-    ...mapState("files", ["remoteFilesConfig"]),
+    ...mapState("files", ["remoteFilesConfig", "localFilesConfig"]),
     ...mapState("darkTheme", ["darkTheme"]),
+    currentRoute() {
+      return this.$route.name;
+    },
   },
   created() {
-    this.search = this._.debounce((search) => {
-      if (this.$router.currentRoute.name !== "search") {
-        this.$router.replace("/search");
-      }
-
-      let newConfig = Object.assign({}, this.remoteFilesConfig);
-      newConfig.skip = 0;
-      newConfig.search = search;
-
-      this.$store.commit("files/setRemoteFilesConfig", newConfig);
-      this.$store.dispatch("files/fetchRemoteFiles");
-    }, 500);
+    this.initRemoteSearch();
+    this.initLocalSearch();
   },
-  mounted() {},
   methods: {
+    initRemoteSearch() {
+      this.remoteSearch = this._.debounce((search) => {
+        if (this.currentRoute !== "search") {
+          this.$router.replace("/search");
+        }
+
+        let newConfig = Object.assign({}, this.remoteFilesConfig);
+        newConfig.skip = 0;
+        newConfig.search = search;
+
+        this.$store.commit("files/setRemoteFilesConfig", newConfig);
+        this.$store.dispatch("files/fetchRemoteFiles");
+      }, 500);
+    },
+    initLocalSearch() {
+      this.localSearch = this._.debounce((search) => {
+        let newConfig = Object.assign({}, this.localFilesConfig);
+        newConfig.skip = 0;
+        newConfig.search = search;
+
+        this.$store.commit("files/setLocalFilesConfig", newConfig);
+        this.$store.dispatch("files/fetchLocalFiles");
+      }, 500);
+    },
     toggleTheme() {
       this.$store.dispatch("darkTheme/toggleDarkTheme");
     },
