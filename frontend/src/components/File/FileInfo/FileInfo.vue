@@ -39,6 +39,16 @@
           class="file-info__control file-info__control_active"
           type="check-circle"
         ></feather>
+        <feather
+          class="file-info__control"
+          type="copy"
+          v-tooltip="{
+            content: 'Click to copy file hash',
+            placement: 'bottom-start',
+            offset: 5,
+          }"
+          v-clipboard:copy="file.FileHash"
+        ></feather>
       </template>
     </template>
     <div class="file-info__size text_wrap_none">
