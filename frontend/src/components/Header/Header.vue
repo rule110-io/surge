@@ -8,7 +8,7 @@
         <input
           type="text"
           class="header__search-input"
-          placeholder="Search for remote files..."
+          placeholder="Search for file name or hash..."
           @focus="focus = true"
           @blur="focus = false"
           v-model.trim="searchQuery"
