@@ -6,7 +6,7 @@
         Share something with the `+` icon below, or use search to browse.
       </template>
       <template v-if="type === 'search'">
-        No search results for '{{ remoteFilesConfig.search }}'. <br />
+        No search results for '{{ search }}'. <br />
         But you can share something with the `+` icon below.
       </template>
       <template v-if="type === 'local'">
@@ -37,7 +37,12 @@ export default {
   },
   components: {},
   computed: {
-    ...mapState("files", ["remoteFilesConfig"]),
+    ...mapState("files", ["remoteFilesConfig", "localFilesConfig"]),
+    search() {
+      return this.$route.name === "download"
+        ? this.localFilesConfig.search
+        : this.remoteFilesConfig.search;
+    },
   },
   data: () => {
     return {};

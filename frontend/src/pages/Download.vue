@@ -34,8 +34,7 @@
           <div class="table__head" style="width: 70px;">Seeds</div>
           <div class="table__head" style="width: 80px;"></div>
         </div>
-        <TablePlaceholder v-if="!localFiles.length" type="transfer" />
-        <template v-else>
+        <template v-if="localFiles.length">
           <div
             class="table__row"
             v-for="file in localFiles"
@@ -98,6 +97,11 @@
             :count="localCount"
           />
         </template>
+        <TablePlaceholder
+          v-else-if="localFilesConfig.search.length > 0"
+          type="search"
+        />
+        <TablePlaceholder v-else type="local" />
       </div>
     </div>
     <RemoveFileModal
@@ -138,7 +142,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("files", ["localFiles", "localCount"]),
+    ...mapState("files", ["localFiles", "localCount", "localFilesConfig"]),
   },
   mounted() {
     this.$store.dispatch("files/fetchLocalFiles");
