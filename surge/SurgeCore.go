@@ -264,6 +264,9 @@ func WriteChunk(FileID string, ChunkID int32, Chunk []byte) {
 	defer RecoverAndLog()
 
 	workerCount--
+	if workerCount < 0 {
+		workerCount = 0
+	}
 
 	fileInfo, err := dbGetFile(FileID)
 	if err != nil {

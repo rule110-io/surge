@@ -198,6 +198,10 @@ func downloadChunks(file *File, randomChunks []int) {
 					appendChunkLock.Unlock()
 
 					workerCount--
+					//TODO: Remove this clamp, dont double count timeouted arrivals
+					if workerCount < 0 {
+						workerCount = 0
+					}
 
 					//This file was not available at this time from this seeder, drop seeder for file.
 					mutateSeederLock.Lock()
@@ -271,6 +275,10 @@ func downloadChunks(file *File, randomChunks []int) {
 					appendChunkLock.Unlock()
 
 					workerCount--
+					//TODO: Remove this clamp, dont double count timeouted arrivals
+					if workerCount < 0 {
+						workerCount = 0
+					}
 
 					//This file was not available at this time from this seeder, drop seeder for file.
 					mutateSeederLock.Lock()
