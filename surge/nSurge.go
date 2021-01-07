@@ -246,6 +246,8 @@ func updateGUI() {
 		totalDown := 0
 		totalUp := 0
 
+		statusBundle := []FileStatusEvent{}
+
 		//Insert uploads
 		allFiles := dbGetAllFiles()
 		for _, file := range allFiles {
@@ -287,7 +289,7 @@ func updateGUI() {
 					ChunkMap:          GetFileChunkMapString(&file, 156),
 					ChunksShared:      file.ChunksShared,
 				}
-				wailsRuntime.Events.Emit("fileStatusEvent", statusEvent)
+				statusBundle = append(statusBundle, statusEvent)
 			}
 
 			zeroBandwidthMap[key] = down+up == 0
@@ -301,7 +303,7 @@ func updateGUI() {
 
 		//log.Println("Emitting globalBandwidthUpdate: ", totalDown, totalUp)
 		if zeroBandwidthMap["total"] == false || totalDown+totalUp != 0 {
-			wailsRuntime.Events.Emit("globalBandwidthUpdate", totalDown, totalUp)
+			wailsRuntime.Events.Emit("globalBandwidthUpdate", statusBundle, totalDown, totalUp)
 		}
 
 		zeroBandwidthMap["total"] = totalDown+totalUp == 0
