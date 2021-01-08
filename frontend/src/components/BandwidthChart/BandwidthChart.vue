@@ -20,7 +20,7 @@ export default {
     LineChart,
   },
   computed: {
-    ...mapState("globalBandwidth", ["totalDown", "totalUp"]),
+    ...mapState("globalBandwidth", ["statusBundle", "totalDown", "totalUp"]),
   },
   watch: {},
   data() {

@@ -41,7 +41,7 @@ export default {
   },
   computed: {
     ...mapState("clientStatus", ["online"]),
-    ...mapState("globalBandwidth", ["totalDown", "totalUp"]),
+    ...mapState("globalBandwidth", ["statusBundle", "totalDown", "totalUp"]),
   },
   methods: {
     seedFile() {

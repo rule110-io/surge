@@ -102,12 +102,16 @@ export default {
       });
     },
     enableGlobalBandwidthEvents() {
-      window.wails.Events.On("globalBandwidthUpdate", (totalDown, totalUp) => {
-        this.$store.commit("globalBandwidth/addGlobalBandwidth", {
-          totalDown,
-          totalUp,
-        });
-      });
+      window.wails.Events.On(
+        "globalBandwidthUpdate",
+        (statusBundle, totalDown, totalUp) => {
+          this.$store.commit("globalBandwidth/addGlobalBandwidth", {
+            statusBundle,
+            totalDown,
+            totalUp,
+          });
+        }
+      );
     },
     enableClientStatusUpdate() {
       const clientsStore = runtime.Store.New("numClients");

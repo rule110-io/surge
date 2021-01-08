@@ -1,5 +1,6 @@
 const getDefaultState = () => {
   return {
+    statusBundle: "",
     totalDown: 0,
     totalUp: 0,
   };
@@ -9,7 +10,8 @@ const state = getDefaultState();
 
 const mutations = {
   addGlobalBandwidth(state, event) {
-    const { totalDown, totalUp } = event;
+    const { statusBundle, totalDown, totalUp } = event;
+    state.statusBundle = statusBundle;
     state.totalDown = totalDown;
     state.totalUp = totalUp;
   },

@@ -3,9 +3,7 @@
     <template v-if="downloadBandwidth > 0">
       {{ downloadBandwidth | prettyBytes(0) }}/s
     </template>
-    <template v-else>
-      -
-    </template>
+    <template v-else> - </template>
   </div>
 </template>
 
@@ -30,14 +28,17 @@ export default {
   },
   mounted() {},
   computed: {
-    ...mapState("downloadEvents", ["downloadEvent"]),
+    ...mapState("globalBandwidth", ["statusBundle"]),
   },
   watch: {
-    downloadEvent(newEvent) {
+    statusBundle(newEvent) {
       const { FileHash } = this.file;
-      if (FileHash === newEvent.FileHash) {
-        this.downloadBandwidth = newEvent.DownloadBandwidth;
-      }
+      var self = this;
+      newEvent.forEach(function (file) {
+        if (FileHash === file.FileHash) {
+          self.downloadBandwidth = file.DownloadBandwidth;
+        }
+      });
     },
   },
 

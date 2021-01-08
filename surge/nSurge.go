@@ -301,7 +301,6 @@ func updateGUI() {
 		downloadBandwidthAccumulator["DISCOVERY"] = 0
 		uploadBandwidthAccumulator["DISCOVERY"] = 0
 
-		//log.Println("Emitting globalBandwidthUpdate: ", totalDown, totalUp)
 		if zeroBandwidthMap["total"] == false || totalDown+totalUp != 0 {
 			wailsRuntime.Events.Emit("globalBandwidthUpdate", statusBundle, totalDown, totalUp)
 		}
