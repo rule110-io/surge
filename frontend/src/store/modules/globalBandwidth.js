@@ -1,6 +1,6 @@
 const getDefaultState = () => {
   return {
-    statusBundle: "",
+    statusBundle: [],
     totalDown: 0,
     totalUp: 0,
   };

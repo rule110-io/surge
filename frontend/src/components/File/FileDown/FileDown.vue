@@ -33,12 +33,12 @@ export default {
   watch: {
     statusBundle(newEvent) {
       const { FileHash } = this.file;
-      var self = this;
-      newEvent.forEach(function (file) {
-        if (FileHash === file.FileHash) {
-          self.downloadBandwidth = file.DownloadBandwidth;
-        }
-      });
+      const newFileHash = this._.find(newEvent, { FileHash });
+      const isNewFileHash = !this._.isEmpty(newFileHash);
+
+      if (isNewFileHash) {
+        this.downloadBandwidth = newFileHash.DownloadBandwidth;
+      }
     },
   },
 
