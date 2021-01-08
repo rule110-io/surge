@@ -36,7 +36,7 @@ export default {
     this.progress = !this.file.IsPaused && !this.file.IsDownloading ? 100 : 0;
   },
   computed: {
-    ...mapState("downloadEvents", ["downloadEvent"]),
+    ...mapState("globalBandwidth", ["statusBundle"]),
   },
   watch: {
     progress(x) {
@@ -44,12 +44,16 @@ export default {
         this.$store.dispatch("files/fetchLocalFiles");
       }
     },
-    downloadEvent(newEvent) {
-      if (this.file.FileHash === newEvent.FileHash) {
+    statusBundle(newEvent) {
+      const { FileHash } = this.file;
+      const newFileHash = this._.find(newEvent, { FileHash });
+      const isNewFileHash = !this._.isEmpty(newFileHash);
+
+      if (isNewFileHash) {
         this.seconds =
-          (this.file.FileSize - this.file.FileSize * newEvent.Progress) /
-          newEvent.DownloadBandwidth;
-        this.progress = newEvent.Progress * 100;
+          (this.file.FileSize - this.file.FileSize * newFileHash.Progress) /
+          newFileHash.DownloadBandwidth;
+        this.progress = newFileHash.Progress * 100;
       }
     },
   },

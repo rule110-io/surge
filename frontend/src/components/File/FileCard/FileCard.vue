@@ -32,12 +32,16 @@ export default {
     },
   },
   computed: {
-    ...mapState("downloadEvents", ["downloadEvent"]),
+    ...mapState("globalBandwidth", ["statusBundle"]),
   },
   watch: {
-    downloadEvent(newEvent) {
-      if (this.file.FileHash === newEvent.FileHash) {
-        this.progress = newEvent.Progress * 100;
+    statusBundle(newEvent) {
+      const { FileHash } = this.file;
+      const newFileHash = this._.find(newEvent, { FileHash });
+      const isNewFileHash = !this._.isEmpty(newFileHash);
+
+      if (isNewFileHash) {
+        this.progress = newFileHash.Progress * 100;
       }
     },
   },

@@ -30,13 +30,16 @@ export default {
   },
   mounted() {},
   computed: {
-    ...mapState("downloadEvents", ["downloadEvent"]),
+    ...mapState("globalBandwidth", ["statusBundle"]),
   },
   watch: {
-    downloadEvent(newEvent) {
+    statusBundle(newEvent) {
       const { FileHash } = this.file;
-      if (FileHash === newEvent.FileHash) {
-        this.uploadBandwidth = newEvent.UploadBandwidth;
+      const newFileHash = this._.find(newEvent, { FileHash });
+      const isNewFileHash = !this._.isEmpty(newFileHash);
+
+      if (isNewFileHash) {
+        this.uploadBandwidth = newFileHash.UploadBandwidth;
       }
     },
   },

@@ -33,7 +33,6 @@ export default {
   },
   mounted() {
     this.enableNotifications();
-    this.enableDownloadEvents();
     this.enableClientStatusUpdate();
     this.enableGlobalBandwidthEvents();
     this.enableErrorEvents();
@@ -94,11 +93,6 @@ export default {
           color: "error",
           timeout: false,
         });
-      });
-    },
-    enableDownloadEvents() {
-      window.wails.Events.On("fileStatusEvent", (event) => {
-        this.$store.commit("downloadEvents/addDownloadEvent", event);
       });
     },
     enableGlobalBandwidthEvents() {

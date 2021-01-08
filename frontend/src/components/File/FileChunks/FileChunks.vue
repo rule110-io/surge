@@ -56,7 +56,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("downloadEvents", ["downloadEvent"]),
+    ...mapState("globalBandwidth", ["statusBundle"]),
     baseColor() {
       return document.getElementById("app").classList.contains("theme_dark")
         ? "#ebebeb"
@@ -64,12 +64,15 @@ export default {
     },
   },
   watch: {
-    downloadEvent(newEvent) {
+    statusBundle(newEvent) {
       const { FileHash } = this.file;
-      if (FileHash === newEvent.FileHash) {
-        this.shared = newEvent.ChunksShared / newEvent.NumChunks;
-        this.progress = newEvent.Progress * 100;
-        this.drawProgress(newEvent.ChunkMap);
+      const newFileHash = this._.find(newEvent, { FileHash });
+      const isNewFileHash = !this._.isEmpty(newFileHash);
+
+      if (isNewFileHash) {
+        this.shared = newFileHash.ChunksShared / newFileHash.NumChunks;
+        this.progress = newFileHash.Progress * 100;
+        this.drawProgress(newFileHash.ChunkMap);
       }
     },
     progress(x) {
