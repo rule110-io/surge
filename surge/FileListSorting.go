@@ -1,5 +1,7 @@
 package surge
 
+import "strings"
+
 /*type Interface interface {
 	// Len is the number of elements in the collection.
 	Len() int
@@ -24,15 +26,19 @@ func (a sortBySeederCountDesc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 type sortByFileNameAsc []FileListing
 
-func (a sortByFileNameAsc) Len() int           { return len(a) }
-func (a sortByFileNameAsc) Less(i, j int) bool { return a[i].FileName < a[j].FileName }
-func (a sortByFileNameAsc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a sortByFileNameAsc) Len() int { return len(a) }
+func (a sortByFileNameAsc) Less(i, j int) bool {
+	return strings.ToLower(a[i].FileName) < strings.ToLower(a[j].FileName)
+}
+func (a sortByFileNameAsc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 type sortByFileNameDesc []FileListing
 
-func (a sortByFileNameDesc) Len() int           { return len(a) }
-func (a sortByFileNameDesc) Less(i, j int) bool { return a[i].FileName > a[j].FileName }
-func (a sortByFileNameDesc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a sortByFileNameDesc) Len() int { return len(a) }
+func (a sortByFileNameDesc) Less(i, j int) bool {
+	return strings.ToLower(a[i].FileName) > strings.ToLower(a[j].FileName)
+}
+func (a sortByFileNameDesc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 type sortByFileSizeAsc []FileListing
 
@@ -48,12 +54,16 @@ func (a sortByFileSizeDesc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
 type sortLocalByFileNameAsc []File
 
-func (a sortLocalByFileNameAsc) Len() int           { return len(a) }
-func (a sortLocalByFileNameAsc) Less(i, j int) bool { return a[i].FileName < a[j].FileName }
-func (a sortLocalByFileNameAsc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a sortLocalByFileNameAsc) Len() int { return len(a) }
+func (a sortLocalByFileNameAsc) Less(i, j int) bool {
+	return strings.ToLower(a[i].FileName) < strings.ToLower(a[j].FileName)
+}
+func (a sortLocalByFileNameAsc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 type sortLocalByFileNameDesc []File
 
-func (a sortLocalByFileNameDesc) Len() int           { return len(a) }
-func (a sortLocalByFileNameDesc) Less(i, j int) bool { return a[i].FileName > a[j].FileName }
-func (a sortLocalByFileNameDesc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a sortLocalByFileNameDesc) Len() int { return len(a) }
+func (a sortLocalByFileNameDesc) Less(i, j int) bool {
+	return strings.ToLower(a[i].FileName) > strings.ToLower(a[j].FileName)
+}
+func (a sortLocalByFileNameDesc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }

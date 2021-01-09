@@ -141,7 +141,6 @@ func downloadChunks(file *File, randomChunks []int) {
 			//Check if file is still tracked in surge
 			if err != nil {
 				log.Println("Download Job Terminated", "File no longer in DB")
-				pushError("Download Job Terminated", "File no longer in DB")
 				return
 			}
 
@@ -151,7 +150,6 @@ func downloadChunks(file *File, randomChunks []int) {
 				dbFile, err = dbGetFile(file.FileHash)
 				if err != nil {
 					log.Println("Download Job Terminated", "File no longer in DB")
-					pushError("Download Job Terminated", "File no longer in DB")
 					return
 				}
 
