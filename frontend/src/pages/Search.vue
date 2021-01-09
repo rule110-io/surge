@@ -31,7 +31,7 @@
           <div
             class="table__row"
             v-for="file in remoteFiles"
-            :key="file.FileName"
+            :key="file.FileHash"
           >
             <div class="table__cell" style="width: calc(100% - 390px - 15%);">
               <FileInfo :file="file" :max="true" :icon="false" />

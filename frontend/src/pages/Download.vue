@@ -31,7 +31,7 @@
           <div
             class="table__row"
             v-for="file in localFiles"
-            :key="file.FileName"
+            :key="file.FileHash"
           >
             <div
               class="table__cell text_wrap_none"
