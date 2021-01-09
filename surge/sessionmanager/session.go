@@ -234,9 +234,7 @@ func closeSession(address string) {
 	sessionLockMapLock.Lock()
 	defer sessionLockMapLock.Unlock()
 
-	sessionLockMapLock.Lock()
 	session, exists := sessionMap[address]
-	sessionLockMapLock.Unlock()
 
 	//Close nkn session, nill out the pointers
 	if exists {
@@ -249,9 +247,7 @@ func closeSession(address string) {
 	session = nil
 
 	//Delete from the map
-	sessionLockMapLock.Lock()
 	delete(sessionMap, address)
-	sessionLockMapLock.Unlock()
 
 	log.Println("Download Session closed for: ", address)
 	fmt.Println(string("\033[31m"), "Download Session closed for: ", address, string("\033[0m"))
