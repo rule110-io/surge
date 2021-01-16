@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Surge"
-#define MyAppVersion "0.3.1-beta"
+#define MyAppVersion "0.3.2-beta"
 #define MyAppPublisher "Rule110"
 #define MyAppURL "http://rule110.io/"
 #define MyAppExeName "surge.exe"
