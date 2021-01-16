@@ -296,10 +296,12 @@ func updateGUI() {
 		}
 
 		//Add peer discovery global bandwidth
+		bandwidthAccumulatorMapLock.Lock()
 		totalDown += downloadBandwidthAccumulator["DISCOVERY"]
 		totalUp += uploadBandwidthAccumulator["DISCOVERY"]
 		downloadBandwidthAccumulator["DISCOVERY"] = 0
 		uploadBandwidthAccumulator["DISCOVERY"] = 0
+		bandwidthAccumulatorMapLock.Unlock()
 
 		if zeroBandwidthMap["total"] == false || totalDown+totalUp != 0 {
 			wailsRuntime.Events.Emit("globalBandwidthUpdate", statusBundle, totalDown, totalUp)
