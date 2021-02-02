@@ -1,9 +1,7 @@
 <template>
   <div :class="['modal__wrapper', isOpen ? 'modal__wrapper_open' : null]">
     <div class="modal">
-      <h2 class="modal__title">
-        Delete File
-      </h2>
+      <h2 class="modal__title">Delete File</h2>
       <p class="modal__descr">
         Attention! You are going to remove <b>{{ file.FileName }}</b> from Surge
         - are you sure?
@@ -22,9 +20,7 @@
 
         <div class="modal__footer-controls">
           <Button :click="closeModal" theme="default"> Cancel </Button>
-          <Button :click="removeFile" theme="error">
-            Delete
-          </Button>
+          <Button :click="removeFile" theme="error"> Delete </Button>
         </div>
       </div>
     </div>
@@ -68,7 +64,10 @@ export default {
       this.$emit("toggleRemoveFileModal", false);
     },
     removeFile() {
-      window.backend.removeFile(this.file.FileHash, this.fromDisk).then(() => {
+      window.backend.MiddlewareFunctions.RemoveFile(
+        this.file.FileHash,
+        this.fromDisk
+      ).then(() => {
         let newConfig = Object.assign({}, this.localFilesConfig);
         newConfig.skip = 0;
         this.$store.commit("files/setLocalFilesConfig", newConfig);

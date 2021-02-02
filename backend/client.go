@@ -279,7 +279,7 @@ func listenToSession(Session *sessionmanager.Session) {
 }
 
 //DownloadFile downloads the file
-func DownloadFile(Hash string) bool {
+func DownloadFileByHash(Hash string) bool {
 
 	//Addr string, Size int64, FileID string
 	file := getListedFileByHash(Hash)

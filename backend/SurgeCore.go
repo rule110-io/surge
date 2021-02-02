@@ -255,7 +255,7 @@ func ParsePayloadString(s string) {
 
 		log.Println("Program paramater new file: ", newListing.FileName, " seeder: ", newListing.seeders)
 
-		go DownloadFile(newListing.FileHash)
+		go DownloadFileByHash(newListing.FileHash)
 	}
 }
 
@@ -407,7 +407,7 @@ func AddToSeedString(dbFile File) {
 }
 
 //SeedFile generates everything needed to seed a file
-func SeedFile(Path string) bool {
+func SeedFilepath(Path string) bool {
 
 	log.Println("Seeding file", Path)
 

@@ -51,7 +51,7 @@ const actions = {
     const { search, skip, get, orderBy, isDesc } = state.localFilesConfig;
 
     window.backend
-      .getLocalFiles(search, orderBy, isDesc, skip, get)
+      .MiddlewareFunctions.GetLocalFiles(search, orderBy, isDesc, skip, get)
       .then(({ Result, Count }) => {
         commit("setLocalFiles", { Result, Count });
       });
@@ -60,7 +60,7 @@ const actions = {
     const { search, skip, get, orderBy, isDesc } = state.remoteFilesConfig;
 
     window.backend
-      .getRemoteFiles(search, orderBy, isDesc, skip, get)
+      .MiddlewareFunctions.GetRemoteFiles(search, orderBy, isDesc, skip, get)
       .then(({ Result, Count }) => {
         commit("setRemoteFiles", { Result, Count });
       });

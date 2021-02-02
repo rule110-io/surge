@@ -33,27 +33,27 @@
             v-for="file in remoteFiles"
             :key="file.FileHash"
           >
-            <div class="table__cell" style="width: calc(100% - 390px - 15%);">
+            <div class="table__cell" style="width: calc(100% - 390px - 15%)">
               <FileInfo :file="file" :max="true" :icon="false" />
             </div>
             <div
               class="table__cell"
-              style="width: 90px; justify-content: center;"
+              style="width: 90px; justify-content: center"
             >
               {{ file.NumChunks }}
             </div>
-            <div class="table__cell" style="width: 15%;">
+            <div class="table__cell" style="width: 15%">
               <FileHash :hash="file.FileHash" />
             </div>
-            <div class="table__cell" style="width: 90px;">
+            <div class="table__cell" style="width: 90px">
               {{ file.SeederCount }}
             </div>
-            <div class="table__cell" style="width: 160px;">
+            <div class="table__cell" style="width: 160px">
               <FileSeeders :seeders="file.Seeders" />
             </div>
             <div
               class="table__cell"
-              style="width: 50px; justify-content: flex-end;"
+              style="width: 50px; justify-content: flex-end"
             >
               <feather
                 v-if="!file.IsTracked"
@@ -169,7 +169,7 @@ export default {
       this.$store.dispatch("files/fetchRemoteFiles");
     },
     download(hash) {
-      window.backend.downloadFile(hash).then(() => {
+      window.backend.MiddlewareFunctions.DownloadFile(hash).then(() => {
         this.$store.dispatch("files/fetchLocalFiles");
         this.$store.dispatch("files/fetchRemoteFiles");
         this.$router.replace("/download");

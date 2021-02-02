@@ -155,7 +155,7 @@ export default {
   },
   methods: {
     download(hash) {
-      window.backend.downloadFile(hash).then(() => {
+      window.backend.MiddlewareFunctions.DownloadFile(hash).then(() => {
         this.$store.dispatch("files/fetchLocalFiles");
         this.$store.dispatch("files/fetchRemoteFiles");
       });

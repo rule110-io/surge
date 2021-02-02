@@ -14,81 +14,10 @@ import (
 var wailsRuntime *wails.Runtime
 var arguments []string
 
-func getLocalFiles(Query string, OrderBy string, IsDesc bool, Skip int, Take int) surge.LocalFilePageResult {
-	return surge.SearchLocalFile(Query, OrderBy, IsDesc, Skip, Take)
-}
-
-func getRemoteFiles(Query string, OrderBy string, IsDesc bool, Skip int, Take int) surge.SearchQueryResult {
-	return surge.SearchRemoteFile(Query, OrderBy, IsDesc, Skip, Take)
-}
-
-func getPublicKey() string {
-	return surge.GetMyAddress()
-}
-
-func getFileChunkMap(Hash string, Size int) string {
-	if Size == 0 {
-		Size = 400
-	}
-	return surge.GetFileChunkMapStringByHash(Hash, Size)
-}
-
-func downloadFile(Hash string) bool {
-	return surge.DownloadFile(Hash)
-}
-
-func setDownloadPause(Hash string, State bool) {
-	surge.SetFilePause(Hash, State)
-}
-
-func openFile(Hash string) {
-	surge.OpenFileByHash(Hash)
-}
-
-func openLink(Link string) {
-	surge.OpenOSPath(Link)
-}
-
-func openLog() {
-	surge.OpenLogFile()
-}
-
-func openFolder(Hash string) {
-	surge.OpenFolderByHash(Hash)
-}
-
 //RemoteClientOnlineModel holds info of remote clients
 type RemoteClientOnlineModel struct {
 	NumKnown  int
 	NumOnline int
-}
-
-func seedFile() bool {
-	path := platform.OpenFileDialog()
-	if path == "" {
-		return false
-	}
-	return surge.SeedFile(path)
-}
-
-func removeFile(Hash string, FromDisk bool) bool {
-	return surge.RemoveFile(Hash, FromDisk)
-}
-
-func writeSetting(Key string, Value string) bool {
-	err := surge.DbWriteSetting(Key, Value)
-	return err != nil
-}
-
-func readSetting(Key string) string {
-	val, _ := surge.DbReadSetting(Key)
-	return val
-}
-
-func startDownloadMagnetLinks(Magnetlinks string) bool {
-	//need to parse Magnetlinks array and download all of them
-	go surge.ParsePayloadString(Magnetlinks)
-	return true
 }
 
 // Stats .
@@ -167,21 +96,7 @@ func main() {
 		Colour:    "#131313",
 	})
 	app.Bind(stats)
-	app.Bind(getLocalFiles)
-	app.Bind(getRemoteFiles)
-	app.Bind(downloadFile)
-	app.Bind(setDownloadPause)
-	app.Bind(openFile)
-	app.Bind(openLink)
-	app.Bind(openLog)
-	app.Bind(openFolder)
-	app.Bind(getFileChunkMap)
-	app.Bind(seedFile)
-	app.Bind(removeFile)
-	app.Bind(writeSetting)
-	app.Bind(readSetting)
-	app.Bind(startDownloadMagnetLinks)
-	app.Bind(getPublicKey)
+	app.Bind(&surge.MiddlewareFunctions{})
 
 	app.Run()
 

@@ -435,7 +435,7 @@ func SetFilePause(Hash string, State bool) {
 }
 
 //RemoveFile removes file from surge db and optionally from disk
-func RemoveFile(Hash string, FromDisk bool) bool {
+func RemoveFileByHash(Hash string, FromDisk bool) bool {
 
 	fileWriteLock.Lock()
 

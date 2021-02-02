@@ -45,7 +45,7 @@ export default {
   },
   methods: {
     seedFile() {
-      window.backend.seedFile().then(() => {
+      window.backend.MiddlewareFunctions.SeedFile().then(() => {
         this.$store.dispatch("files/fetchLocalFiles");
         this.$store.dispatch("files/fetchRemoteFiles");
         this.$router.replace("/download");

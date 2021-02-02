@@ -1,12 +1,8 @@
 <template>
   <div class="file-chunks">
     <div class="file-chunks__title text_wrap_none">
-      <template v-if="file.IsMissing">
-        Missing
-      </template>
-      <template v-else-if="file.IsHashing">
-        Hashing
-      </template>
+      <template v-if="file.IsMissing"> Missing </template>
+      <template v-else-if="file.IsHashing"> Hashing </template>
       <template
         v-else-if="!file.IsDownloading && !file.IsUploading && !file.IsPaused"
       >
@@ -88,7 +84,10 @@ export default {
   },
   methods: {
     getChunkMap() {
-      window.backend.getFileChunkMap(this.file.FileHash, 156).then((bits) => {
+      window.backend.MiddlewareFunctions.GetFileChunkMap(
+        this.file.FileHash,
+        156
+      ).then((bits) => {
         this.drawProgress(bits);
       });
     },

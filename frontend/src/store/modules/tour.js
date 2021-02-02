@@ -14,7 +14,7 @@ const mutations = {
 
 const actions = {
   offTour({ commit }) {
-    window.backend.writeSetting("Tour", "false").then(() => {
+    window.backend.MiddlewareFunctions.WriteSetting("Tour", "false").then(() => {
       commit("setTour", "false");
     });
   },
