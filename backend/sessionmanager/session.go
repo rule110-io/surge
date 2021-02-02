@@ -9,7 +9,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rule110-io/surge-ui/surge/constants"
+	"github.com/rule110-io/surge/backend/constants"
 
 	nkn "github.com/nknorg/nkn-sdk-go"
 )

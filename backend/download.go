@@ -10,9 +10,9 @@ import (
 	"time"
 
 	bitmap "github.com/boljen/go-bitmap"
-	"github.com/rule110-io/surge-ui/surge/constants"
-	"github.com/rule110-io/surge-ui/surge/platform"
-	"github.com/rule110-io/surge-ui/surge/sessionmanager"
+	"github.com/rule110-io/surge/backend/constants"
+	"github.com/rule110-io/surge/backend/platform"
+	"github.com/rule110-io/surge/backend/sessionmanager"
 )
 
 //DownloadFile downloads the file

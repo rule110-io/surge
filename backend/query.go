@@ -6,9 +6,9 @@ import (
 	"strconv"
 	"strings"
 
-	pb "github.com/rule110-io/surge-ui/payloads"
-	"github.com/rule110-io/surge-ui/surge/constants"
-	"github.com/rule110-io/surge-ui/surge/sessionmanager"
+	"github.com/rule110-io/surge/backend/constants"
+	"github.com/rule110-io/surge/backend/sessionmanager"
+	pb "github.com/rule110-io/surge/payloads"
 	"google.golang.org/protobuf/proto"
 )
 

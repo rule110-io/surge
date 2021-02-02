@@ -7,12 +7,11 @@ import (
 
 	"log"
 
-	"github.com/rule110-io/surge-ui/surge/sessionmanager"
+	"github.com/rule110-io/surge/backend/sessionmanager"
 )
 
 // SessionWrite writes to session
 func SessionWrite(Session *sessionmanager.Session, Data []byte, ID byte) (written int, err error) {
-	
 
 	if Session == nil || Session.Session == nil {
 		return 0, errors.New("write to session error, session nil")
@@ -42,7 +41,7 @@ func SessionWrite(Session *sessionmanager.Session, Data []byte, ID byte) (writte
 
 //SessionRead reads from session
 func SessionRead(Session *sessionmanager.Session) (data []byte, ID byte, err error) {
-	
+
 	headerBuffer := make([]byte, 5) //int32 size of header + 1 for packid
 
 	// the header of 4 bytes + 1 for packid

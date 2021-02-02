@@ -10,7 +10,7 @@ import (
 
 	"log"
 
-	"github.com/rule110-io/surge-ui/mailslot"
+	"github.com/rule110-io/surge/mailslot"
 	"github.com/sqweek/dialog"
 )
 

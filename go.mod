@@ -1,4 +1,4 @@
-module github.com/rule110-io/surge-ui
+module github.com/rule110-io/surge
 
 go 1.14
 

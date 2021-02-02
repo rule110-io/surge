@@ -7,7 +7,7 @@ import (
 	"log"
 
 	nkn "github.com/nknorg/nkn-sdk-go"
-	"github.com/rule110-io/surge-ui/surge/platform"
+	"github.com/rule110-io/surge/backend/platform"
 )
 
 const accountPath = "account.surge"

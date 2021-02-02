@@ -18,10 +18,10 @@ import (
 	"log"
 
 	bitmap "github.com/boljen/go-bitmap"
-	pb "github.com/rule110-io/surge-ui/payloads"
-	"github.com/rule110-io/surge-ui/surge/constants"
-	"github.com/rule110-io/surge-ui/surge/platform"
-	"github.com/rule110-io/surge-ui/surge/sessionmanager"
+	"github.com/rule110-io/surge/backend/constants"
+	"github.com/rule110-io/surge/backend/platform"
+	"github.com/rule110-io/surge/backend/sessionmanager"
+	pb "github.com/rule110-io/surge/payloads"
 	"google.golang.org/protobuf/proto"
 
 	open "github.com/skratchdot/open-golang/open"

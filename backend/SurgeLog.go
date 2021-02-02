@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/rule110-io/surge-ui/surge/platform"
+	"github.com/rule110-io/surge/backend/platform"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 

@@ -7,9 +7,9 @@ import (
 	"log"
 
 	nkn "github.com/nknorg/nkn-sdk-go"
-	"github.com/rule110-io/surge-ui/surge/constants"
-	"github.com/rule110-io/surge-ui/surge/platform"
-	"github.com/rule110-io/surge-ui/surge/sessionmanager"
+	"github.com/rule110-io/surge/backend/constants"
+	"github.com/rule110-io/surge/backend/platform"
+	"github.com/rule110-io/surge/backend/sessionmanager"
 )
 
 //ChunkSize is size of chunk in bytes (256 kB)

@@ -47,7 +47,7 @@
       <div v-if="!isNewVersion">Latest version installed</div>
       <div
         v-else
-        @click="openLink('https://github.com/rule110-io/surge-ui/releases')"
+        @click="openLink('https://github.com/rule110-io/surge/releases')"
         class="settings__item-link"
       >
         Get {{ remoteVersion }}

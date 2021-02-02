@@ -8,8 +8,8 @@ import (
 
 	"log"
 
-	"github.com/rule110-io/surge-ui/surge/platform"
-	"github.com/rule110-io/surge-ui/surge/sessionmanager"
+	"github.com/rule110-io/surge/backend/platform"
+	"github.com/rule110-io/surge/backend/sessionmanager"
 
 	bitmap "github.com/boljen/go-bitmap"
 	movavg "github.com/mxmCherry/movavg"

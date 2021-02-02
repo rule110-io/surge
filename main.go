@@ -6,8 +6,8 @@ import (
 	"log"
 
 	"github.com/leaanthony/mewn"
-	"github.com/rule110-io/surge-ui/surge"
-	"github.com/rule110-io/surge-ui/surge/platform"
+	surge "github.com/rule110-io/surge/backend"
+	"github.com/rule110-io/surge/backend/platform"
 	"github.com/wailsapp/wails"
 )
 
