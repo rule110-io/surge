@@ -2,15 +2,26 @@ package surge
 
 import "strings"
 
-/*type Interface interface {
-	// Len is the number of elements in the collection.
-	Len() int
-	// Less reports whether the element with
-	// index i should sort before the element with index j.
-	Less(i, j int) bool
-	// Swap swaps the elements with indexes i and j.
-	Swap(i, j int)
-}*/
+func removeStringFromSlice(s []string, r string) []string {
+	for i, v := range s {
+		if v == r {
+			return append(s[:i], s[i+1:]...)
+		}
+	}
+	return s
+}
+
+func distinctStringSlice(stringSlice []string) []string {
+	keys := make(map[string]bool)
+	list := []string{}
+	for _, entry := range stringSlice {
+		if _, value := keys[entry]; !value {
+			keys[entry] = true
+			list = append(list, entry)
+		}
+	}
+	return list
+}
 
 type sortBySeederCountAsc []FileListing
 

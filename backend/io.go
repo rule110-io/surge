@@ -3,7 +3,7 @@ package surge
 import "time"
 
 func pushNotification(title string, text string) {
-	//If wails frontend is not yet binded, we wait in a task to not block main thread
+	//If wails frontend is not yet bound, we wait in a task to not block main thread
 	if !FrontendReady {
 		waitAndPush := func() {
 			for !FrontendReady {
@@ -18,7 +18,7 @@ func pushNotification(title string, text string) {
 }
 
 func pushError(title string, text string) {
-	//If wails frontend is not yet binded, we wait in a task to not block main thread
+	//If wails frontend is not yet bound, we wait in a task to not block main thread
 	if !FrontendReady {
 		waitAndPush := func() {
 			for !FrontendReady {

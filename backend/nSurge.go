@@ -8,6 +8,7 @@ import (
 
 	"log"
 
+	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/platform"
 	"github.com/rule110-io/surge/backend/sessionmanager"
 
@@ -31,7 +32,7 @@ var clientOnlineMap map[string]bool
 var downloadBandwidthAccumulator map[string]int
 var uploadBandwidthAccumulator map[string]int
 
-var fileBandwidthMap map[string]BandwidthMA
+var fileBandwidthMap map[string]models.BandwidthMA
 
 var zeroBandwidthMap map[string]bool
 
@@ -109,24 +110,6 @@ type LocalFileListing struct {
 	Progress      float32
 }
 
-// FileStatusEvent holds update info on download progress
-type FileStatusEvent struct {
-	FileHash          string
-	Progress          float32
-	Status            string
-	DownloadBandwidth int
-	UploadBandwidth   int
-	NumChunks         int
-	ChunkMap          string
-	ChunksShared      int
-}
-
-//BandwidthMA tracks moving average for download and upload bandwidth
-type BandwidthMA struct {
-	Download movavg.MA
-	Upload   movavg.MA
-}
-
 //ListedFiles are remote files that can be downloaded
 var ListedFiles []File
 
@@ -193,7 +176,7 @@ func Start(args []string) {
 	downloadBandwidthAccumulator = make(map[string]int)
 	uploadBandwidthAccumulator = make(map[string]int)
 	zeroBandwidthMap = make(map[string]bool)
-	fileBandwidthMap = make(map[string]BandwidthMA)
+	fileBandwidthMap = make(map[string]models.BandwidthMA)
 	chunksInTransit = make(map[string]bool)
 
 	//Initialize our surge nkn client
@@ -246,7 +229,7 @@ func updateGUI() {
 		totalDown := 0
 		totalUp := 0
 
-		statusBundle := []FileStatusEvent{}
+		statusBundle := []models.FileStatusEvent{}
 
 		//Insert uploads
 		allFiles := dbGetAllFiles()
@@ -280,7 +263,7 @@ func updateGUI() {
 			totalUp += up
 
 			if zeroBandwidthMap[key] == false || down+up != 0 {
-				statusEvent := FileStatusEvent{
+				statusEvent := models.FileStatusEvent{
 					FileHash:          key,
 					Progress:          fileProgressMap[key],
 					DownloadBandwidth: down,
@@ -323,7 +306,7 @@ func fileBandwidth(FileID string) (Download int, Upload int) {
 	bandwidthAccumulatorMapLock.Unlock()
 
 	if fileBandwidthMap[FileID].Download == nil {
-		fileBandwidthMap[FileID] = BandwidthMA{
+		fileBandwidthMap[FileID] = models.BandwidthMA{
 			Download: movavg.ThreadSafe(movavg.NewSMA(10)),
 			Upload:   movavg.ThreadSafe(movavg.NewSMA(10)),
 		}
@@ -357,11 +340,6 @@ func getFileSize(path string) (size int64) {
 	}
 	// get the size
 	return fi.Size()
-}
-
-// Stats .
-type Stats struct {
-	log *wails.CustomLogger
 }
 
 func getListedFileByHash(Hash string) *File {

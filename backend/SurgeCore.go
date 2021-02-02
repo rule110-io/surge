@@ -19,9 +19,9 @@ import (
 
 	bitmap "github.com/boljen/go-bitmap"
 	"github.com/rule110-io/surge/backend/constants"
+	pb "github.com/rule110-io/surge/backend/payloads"
 	"github.com/rule110-io/surge/backend/platform"
 	"github.com/rule110-io/surge/backend/sessionmanager"
-	pb "github.com/rule110-io/surge/payloads"
 	"google.golang.org/protobuf/proto"
 
 	open "github.com/skratchdot/open-golang/open"
@@ -121,8 +121,8 @@ func TransmitChunk(Session *sessionmanager.Session, FileID string, ChunkID int32
 	defer file.Close()
 
 	//Read the requested chunk
-	chunkOffset := int64(ChunkID) * ChunkSize
-	buffer := make([]byte, ChunkSize)
+	chunkOffset := int64(ChunkID) * constants.ChunkSize
+	buffer := make([]byte, constants.ChunkSize)
 	bytesread, err := file.ReadAt(buffer, chunkOffset)
 
 	if err != nil {
@@ -222,7 +222,7 @@ func ParsePayloadString(s string) {
 		}
 
 		fileSize, _ := strconv.ParseInt(data[3], 10, 64)
-		numChunks := int((fileSize-1)/int64(ChunkSize)) + 1
+		numChunks := int((fileSize-1)/int64(constants.ChunkSize)) + 1
 
 		seeder := strings.Split(data[5], ",")
 
@@ -287,7 +287,7 @@ func WriteChunk(FileID string, ChunkID int32, Chunk []byte) {
 		return
 	}
 
-	chunkOffset := int64(ChunkID) * ChunkSize
+	chunkOffset := int64(ChunkID) * constants.ChunkSize
 	bytesWritten, err := osFile.WriteAt(Chunk, chunkOffset)
 	if err != nil {
 		pushError("Error on write chunk (file write)", err.Error())
@@ -421,7 +421,7 @@ func SeedFile(Path string) bool {
 
 	fileName := filepath.Base(Path)
 	fileSize := surgeGetFileSize(Path)
-	numChunks := int((fileSize-1)/int64(ChunkSize)) + 1
+	numChunks := int((fileSize-1)/int64(constants.ChunkSize)) + 1
 	chunkMap := bitmap.NewSlice(numChunks)
 
 	//Local files are always fully available, set all chunks to 1
