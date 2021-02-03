@@ -56,6 +56,7 @@ type File struct {
 	FileName      string
 	FileSize      int64
 	FileHash      string
+	seeders       []string
 	Path          string
 	NumChunks     int
 	IsDownloading bool
@@ -63,10 +64,12 @@ type File struct {
 	IsPaused      bool
 	IsMissing     bool
 	IsHashing     bool
-	ChunkMap      []byte
-	ChunksShared  int
-	seeders       []string
-	seederCount   int
+	//	IsTracked    bool
+	//	IsAvailable  bool
+	ChunkMap     []byte
+	ChunksShared int
+	seederCount  int
+	//	Progress     float32
 }
 
 //NumClientsStruct .
@@ -76,15 +79,23 @@ type NumClientsStruct struct {
 
 // FileListing struct for all frontend file listing props
 type FileListing struct {
-	FileName     string
-	FileSize     int64
-	FileHash     string
-	Seeders      []string
-	NumChunks    int
-	IsTracked    bool
-	IsAvailable  bool
-	SeederCount  int
+	FileName string
+	FileSize int64
+	FileHash string
+	Seeders  []string
+	//	Path          string
+	NumChunks int
+	// 	IsDownloading bool
+	// 	IsUploading   bool
+	//	IsPaused      bool
+	//	IsMissing     bool
+	//	IsHashing     bool
+	IsTracked   bool
+	IsAvailable bool
+	//	ChunkMap      []byte
 	ChunksShared int
+	SeederCount  int
+	//	Progress     float32
 }
 
 // LocalFileListing is a wrapper for a local db file for the frontend
@@ -92,6 +103,7 @@ type LocalFileListing struct {
 	FileName      string
 	FileSize      int64
 	FileHash      string
+	Seeders       []string
 	Path          string
 	NumChunks     int
 	IsDownloading bool
@@ -99,10 +111,12 @@ type LocalFileListing struct {
 	IsPaused      bool
 	IsMissing     bool
 	IsHashing     bool
-	ChunksShared  int
-	Seeders       []string
-	SeederCount   int
-	Progress      float32
+	//	IsTracked    bool
+	//	IsAvailable  bool
+	//	ChunkMap      []byte
+	ChunksShared int
+	SeederCount  int
+	Progress     float32
 }
 
 //ListedFiles are remote files that can be downloaded
