@@ -31,13 +31,14 @@ func ParsePayloadString(s string) {
 		seeder := strings.Split(data[5], ",")
 
 		newListing := models.GeneralFile{
-			FileName:  data[2],
-			FileSize:  fileSize,
-			FileHash:  data[4],
-			Seeders:   seeder,
-			Path:      "",
-			NumChunks: numChunks,
-			ChunkMap:  nil,
+			FileLocation: "remote",
+			FileName:     data[2],
+			FileSize:     fileSize,
+			FileHash:     data[4],
+			Seeders:      seeder,
+			Path:         "",
+			NumChunks:    numChunks,
+			ChunkMap:     nil,
 		}
 
 		ListedFilesLock.Lock()

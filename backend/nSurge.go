@@ -51,27 +51,6 @@ var sessionsWriteLock = &sync.Mutex{}
 //ListedFilesLock lock this whenever you're reading or mutating the ListedFiles collection
 var ListedFilesLock = &sync.Mutex{}
 
-// File holds all info of a tracked file in surge
-type File struct {
-	FileName      string
-	FileSize      int64
-	FileHash      string
-	seeders       []string
-	Path          string
-	NumChunks     int
-	IsDownloading bool
-	IsUploading   bool
-	IsPaused      bool
-	IsMissing     bool
-	IsHashing     bool
-	//	IsTracked    bool
-	//	IsAvailable  bool
-	ChunkMap     []byte
-	ChunksShared int
-	seederCount  int
-	//	Progress     float32
-}
-
 //NumClientsStruct .
 type NumClientsStruct struct {
 	Online int
