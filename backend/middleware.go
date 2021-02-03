@@ -26,7 +26,7 @@ func (s *MiddlewareFunctions) SetDownloadPause(Hash string, State bool) {
 }
 
 func (s *MiddlewareFunctions) GetPublicKey() string {
-	return GetMyAddress()
+	return GetAccountAddress()
 }
 
 func (s *MiddlewareFunctions) GetFileChunkMap(Hash string, Size int) string {

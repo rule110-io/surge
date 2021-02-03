@@ -1,8 +1,18 @@
+// Copyright 2021 rule101. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+/*
+	This is the surge account management code
+	It takes care of initializing an account as well as getting specific information about a users account
+*/
+
 package surge
 
 import (
 	"io/ioutil"
 	"os"
+	"time"
 
 	"log"
 
@@ -12,7 +22,7 @@ import (
 
 const accountPath = "account.surge"
 
-// InitializeAccount will either create or fetch existing account
+// InitializeAccount will create an account file and return it. If there is already an account in place it will just return the existing account.
 func InitializeAccount() *nkn.Account {
 	var seed []byte
 
@@ -54,4 +64,12 @@ func InitializeAccount() *nkn.Account {
 	}
 
 	return account
+}
+
+//GetMyAddress returns current client address
+func GetAccountAddress() string {
+	for !clientInitialized {
+		time.Sleep(time.Millisecond * 50)
+	}
+	return client.Addr().String()
 }

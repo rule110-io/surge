@@ -1,8 +1,11 @@
 package surge
 
 import (
+	"bufio"
+	"fmt"
 	"log"
 	"os"
+	"runtime"
 
 	"github.com/rule110-io/surge/backend/platform"
 	"gopkg.in/natefinch/lumberjack.v2"
@@ -53,4 +56,27 @@ func OpenLogFile() {
 	}
 
 	OpenOSPath(logPathOS)
+}
+
+//RecoverAndLog Recovers and then logs the stack
+func RecoverAndLog() {
+	if r := recover(); r != nil {
+		fmt.Println("Panic digested from ", r)
+
+		log.Printf("Internal error: %v", r)
+		buf := make([]byte, 1<<16)
+		stackSize := runtime.Stack(buf, true)
+		//log.Printf("%s\n", string(buf[0:stackSize]))
+
+		var dir = platform.GetSurgeDir()
+		var logPathOS = dir + string(os.PathSeparator) + "paniclog.txt"
+		f, _ := os.OpenFile(logPathOS, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+		w := bufio.NewWriter(f)
+		w.WriteString(string(buf[0:stackSize]))
+		w.Flush()
+
+		pushError("Panic", "Please check your log file and paniclog for more info")
+
+		panic("Panic dumped but not digested, please check your log")
+	}
 }

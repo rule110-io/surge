@@ -14,18 +14,17 @@ import (
 var wailsRuntime *wails.Runtime
 var arguments []string
 
-//RemoteClientOnlineModel holds info of remote clients
-type RemoteClientOnlineModel struct {
-	NumKnown  int
-	NumOnline int
-}
-
-// Stats .
+// Stats
 type Stats struct {
 	log *wails.CustomLogger
 }
 
-// WailsInit .
+//WailsRuntime
+type WailsRuntime struct {
+	runtime *wails.Runtime
+}
+
+// WailsInit
 func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 	s.log = runtime.Log.New("Stats")
 	go surge.WailsBind(runtime)
@@ -33,14 +32,9 @@ func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 	return nil
 }
 
-//WailsRuntime .
-type WailsRuntime struct {
-	runtime *wails.Runtime
-}
-
-//WailsShutdown .
+//WailsShutdown
 func (s *WailsRuntime) WailsShutdown() {
-	surge.Stop()
+	surge.StopClient()
 }
 
 func main() {
@@ -75,13 +69,12 @@ func main() {
 	defer surge.CloseDb()
 	if newlyCreated {
 		// seems like this is the first time starting the app
-		//set tour to active
+		//set tour to active and default mode to light
 		surge.DbWriteSetting("Tour", "true")
-		//set default mode to light
 		surge.DbWriteSetting("DarkMode", "false")
 	}
 
-	surge.Start(arguments)
+	surge.StartClient(arguments)
 
 	js := mewn.String("./frontend/dist/app.js")
 	css := mewn.String("./frontend/dist/app.css")
@@ -95,6 +88,7 @@ func main() {
 		CSS:       css,
 		Colour:    "#131313",
 	})
+
 	app.Bind(stats)
 	app.Bind(&surge.MiddlewareFunctions{})
 
