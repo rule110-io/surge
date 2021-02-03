@@ -13,6 +13,7 @@ import (
 	"os"
 
 	bitmap "github.com/boljen/go-bitmap"
+	"github.com/rule110-io/surge/backend/models"
 )
 
 func getFileSize(path string) (size int64) {
@@ -24,9 +25,9 @@ func getFileSize(path string) (size int64) {
 	return fi.Size()
 }
 
-func getListedFileByHash(Hash string) *File {
+func getListedFileByHash(Hash string) *models.GeneralFile {
 
-	var selectedFile *File = nil
+	var selectedFile *models.GeneralFile = nil
 
 	ListedFilesLock.Lock()
 	for _, file := range ListedFiles {
@@ -41,7 +42,7 @@ func getListedFileByHash(Hash string) *File {
 }
 
 //GetFileChunkMapString returns the chunkmap in hex for a file given by hash
-func GetFileChunkMapString(file *File, Size int) string {
+func GetFileChunkMapString(file *models.GeneralFile, Size int) string {
 
 	outputSize := Size
 	inputSize := file.NumChunks

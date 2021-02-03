@@ -8,6 +8,7 @@ import (
 
 	"log"
 
+	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/platform"
 
 	"github.com/xujiajun/nutsdb"
@@ -38,7 +39,7 @@ func CloseDb() {
 	db.Close()
 }
 
-func dbInsertFile(File File) {
+func dbInsertFile(File models.GeneralFile) {
 	if err := db.Update(
 		func(tx *nutsdb.Tx) error {
 
@@ -54,8 +55,8 @@ func dbInsertFile(File File) {
 	}
 }
 
-func dbGetFile(Key string) (*File, error) {
-	result := &File{}
+func dbGetFile(Key string) (*models.GeneralFile, error) {
+	result := &models.GeneralFile{}
 
 	if err := db.View(
 		func(tx *nutsdb.Tx) error {
@@ -74,8 +75,8 @@ func dbGetFile(Key string) (*File, error) {
 	return result, nil
 }
 
-func dbGetAllFiles() []File {
-	files := []File{}
+func dbGetAllFiles() []models.GeneralFile {
+	files := []models.GeneralFile{}
 
 	if err := db.View(
 		func(tx *nutsdb.Tx) error {
@@ -86,7 +87,7 @@ func dbGetAllFiles() []File {
 
 			for _, entry := range entries {
 
-				newFile := &File{}
+				newFile := &models.GeneralFile{}
 				json.Unmarshal(entry.Value, newFile)
 				files = append(files, *newFile)
 			}
@@ -155,32 +156,32 @@ func DbReadSetting(Name string) (string, error) {
 
 //SearchQueryResult is a paging query result for file searches
 type SearchQueryResult struct {
-	Result []FileListing
+	Result []models.GeneralFile
 	Count  int
 }
 
 //LocalFilePageResult is a paging query result for tracked files
 type LocalFilePageResult struct {
-	Result []LocalFileListing
+	Result []models.GeneralFile
 	Count  int
 }
 
 //SearchRemoteFile runs a paged query
 func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) SearchQueryResult {
 
-	var results []FileListing
+	var results []models.GeneralFile
 
 	ListedFilesLock.Lock()
 	for _, file := range ListedFiles {
-		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) {
+		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) && file.FileLocation == "remote" {
 
-			result := FileListing{
+			result := models.GeneralFile{
 				FileName:    file.FileName,
 				FileHash:    file.FileHash,
 				FileSize:    file.FileSize,
-				Seeders:     file.seeders,
+				Seeders:     file.Seeders,
 				NumChunks:   file.NumChunks,
-				SeederCount: len(file.seeders),
+				SeederCount: len(file.Seeders),
 			}
 
 			tracked, err := dbGetFile(result.FileHash)
@@ -235,11 +236,11 @@ func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take 
 //SearchLocalFile runs a paged query
 func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) LocalFilePageResult {
 
-	resultFiles := []File{}
+	resultFiles := []models.GeneralFile{}
 
 	allFiles := dbGetAllFiles()
 	for _, file := range allFiles {
-		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) {
+		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) && file.FileLocation == "local" {
 			resultFiles = append(resultFiles, file)
 		}
 	}
@@ -249,9 +250,9 @@ func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take i
 	switch OrderBy {
 	default:
 		if !IsDesc {
-			sort.Sort(sortLocalByFileNameAsc(resultFiles))
+			sort.Sort(sortByFileNameAsc(resultFiles))
 		} else {
-			sort.Sort(sortLocalByFileNameDesc(resultFiles))
+			sort.Sort(sortByFileNameDesc(resultFiles))
 		}
 	}
 
@@ -268,11 +269,11 @@ func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take i
 
 	//Subset
 	resultFiles = resultFiles[left:right]
-	resultListings := []LocalFileListing{}
+	resultListings := []models.GeneralFile{}
 
 	ListedFilesLock.Lock()
 	for i := 0; i < len(resultFiles); i++ {
-		listing := LocalFileListing{
+		listing := models.GeneralFile{
 			ChunksShared:  resultFiles[i].ChunksShared,
 			FileHash:      resultFiles[i].FileHash,
 			FileName:      resultFiles[i].FileName,
@@ -294,7 +295,7 @@ func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take i
 
 		for _, file := range ListedFiles {
 			if file.FileHash == listing.FileHash {
-				listing.Seeders = append(listing.Seeders, file.seeders...)
+				listing.Seeders = append(listing.Seeders, file.Seeders...)
 				break
 			}
 		}

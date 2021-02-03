@@ -52,7 +52,7 @@ func (s *MiddlewareFunctions) OpenFolder(Hash string) {
 	OpenFolderByHash(Hash)
 }
 
-func SeedFile() bool {
+func (s *MiddlewareFunctions) SeedFile() bool {
 	path := platform.OpenFileDialog()
 	if path == "" {
 		return false

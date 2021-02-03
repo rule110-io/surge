@@ -8,6 +8,7 @@ import (
 	"log"
 
 	"github.com/rule110-io/surge/backend/constants"
+	"github.com/rule110-io/surge/backend/models"
 )
 
 var fileWriteLock = &sync.Mutex{}
@@ -29,11 +30,11 @@ func ParsePayloadString(s string) {
 
 		seeder := strings.Split(data[5], ",")
 
-		newListing := File{
+		newListing := models.GeneralFile{
 			FileName:  data[2],
 			FileSize:  fileSize,
 			FileHash:  data[4],
-			seeders:   seeder,
+			Seeders:   seeder,
 			Path:      "",
 			NumChunks: numChunks,
 			ChunkMap:  nil,
@@ -45,7 +46,7 @@ func ParsePayloadString(s string) {
 		for l := 0; l < len(ListedFiles); l++ {
 			if ListedFiles[l].FileHash == newListing.FileHash {
 				//if the seeder is unique add it as an additional seeder for the file
-				ListedFiles[l].seeders = append(ListedFiles[l].seeders, seeder...)
+				ListedFiles[l].Seeders = append(ListedFiles[l].Seeders, seeder...)
 				replace = true
 				break
 			}
@@ -56,7 +57,7 @@ func ParsePayloadString(s string) {
 		}
 		ListedFilesLock.Unlock()
 
-		log.Println("Program paramater new file: ", newListing.FileName, " seeder: ", newListing.seeders)
+		log.Println("Program paramater new file: ", newListing.FileName, " seeder: ", newListing.Seeders)
 
 		go DownloadFileByHash(newListing.FileHash)
 	}

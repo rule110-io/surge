@@ -77,50 +77,8 @@ type NumClientsStruct struct {
 	Online int
 }
 
-// FileListing struct for all frontend file listing props
-type FileListing struct {
-	FileName string
-	FileSize int64
-	FileHash string
-	Seeders  []string
-	//	Path          string
-	NumChunks int
-	// 	IsDownloading bool
-	// 	IsUploading   bool
-	//	IsPaused      bool
-	//	IsMissing     bool
-	//	IsHashing     bool
-	IsTracked   bool
-	IsAvailable bool
-	//	ChunkMap      []byte
-	ChunksShared int
-	SeederCount  int
-	//	Progress     float32
-}
-
-// LocalFileListing is a wrapper for a local db file for the frontend
-type LocalFileListing struct {
-	FileName      string
-	FileSize      int64
-	FileHash      string
-	Seeders       []string
-	Path          string
-	NumChunks     int
-	IsDownloading bool
-	IsUploading   bool
-	IsPaused      bool
-	IsMissing     bool
-	IsHashing     bool
-	//	IsTracked    bool
-	//	IsAvailable  bool
-	//	ChunkMap      []byte
-	ChunksShared int
-	SeederCount  int
-	Progress     float32
-}
-
 //ListedFiles are remote files that can be downloaded
-var ListedFiles []File
+var ListedFiles []models.GeneralFile
 
 var wailsRuntime *wails.Runtime
 

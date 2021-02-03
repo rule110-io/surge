@@ -55,7 +55,7 @@ func InitializeClient(args []string) bool {
 	go Listen()
 
 	dbFiles := dbGetAllFiles()
-	var filesOnDisk []File
+	var filesOnDisk []models.GeneralFile
 
 	for i := 0; i < len(dbFiles); i++ {
 		if FileExists(dbFiles[i].Path) {
@@ -243,18 +243,18 @@ func onClientDisconnected(addr string) {
 	//Remove this address from remote file seeders
 	ListedFilesLock.Lock()
 	for i := 0; i < len(ListedFiles); i++ {
-		ListedFiles[i].seeders = removeStringFromSlice(ListedFiles[i].seeders, addr)
-		ListedFiles[i].seederCount = len(ListedFiles[i].seeders)
-		fmt.Println(string("\033[31m"), "onClientDisconnected", ListedFiles[i].FileName, "seeders remaining:", ListedFiles[i].seederCount, string("\033[0m"))
+		ListedFiles[i].Seeders = removeStringFromSlice(ListedFiles[i].Seeders, addr)
+		ListedFiles[i].SeederCount = len(ListedFiles[i].Seeders)
+		fmt.Println(string("\033[31m"), "onClientDisconnected", ListedFiles[i].FileName, "seeders remaining:", ListedFiles[i].SeederCount, string("\033[0m"))
 	}
 
 	//Remove empty seeders listings
 	for i := 0; i < len(ListedFiles); i++ {
-		if len(ListedFiles[i].seeders) == 0 {
+		if len(ListedFiles[i].Seeders) == 0 {
 			// Remove the element at index i from a.
-			ListedFiles[i] = ListedFiles[len(ListedFiles)-1] // Copy last element to index i.
-			ListedFiles[len(ListedFiles)-1] = File{}         // Erase last element (write zero value).
-			ListedFiles = ListedFiles[:len(ListedFiles)-1]   // Truncate slice.
+			ListedFiles[i] = ListedFiles[len(ListedFiles)-1]       // Copy last element to index i.
+			ListedFiles[len(ListedFiles)-1] = models.GeneralFile{} // Erase last element (write zero value).
+			ListedFiles = ListedFiles[:len(ListedFiles)-1]         // Truncate slice.
 			i--
 		}
 	}
@@ -303,7 +303,7 @@ func listenToSession(Session *sessionmanager.Session) {
 	}
 }
 
-func downloadChunks(file *File, randomChunks []int) {
+func downloadChunks(file *models.GeneralFile, randomChunks []int) {
 	fileID := file.FileHash
 	file = getListedFileByHash(fileID)
 
@@ -320,7 +320,7 @@ func downloadChunks(file *File, randomChunks []int) {
 
 	//Give the seeder a fair start with timers when a download is initiated
 	//Potentionally this seeder was last queried 60 seconds ago for files and otherwise idle but online
-	for _, seeder := range file.seeders {
+	for _, seeder := range file.Seeders {
 		sessionmanager.UpdateActivity(seeder)
 	}
 
@@ -336,7 +336,7 @@ func downloadChunks(file *File, randomChunks []int) {
 			fmt.Println(string("\033[36m"), "Preparing Chunk Fetch", string("\033[0m"))
 			file = getListedFileByHash(fileID)
 
-			for file == nil || len(file.seeders) == 0 {
+			for file == nil || len(file.Seeders) == 0 {
 				time.Sleep(time.Second * 5)
 				fmt.Println(string("\033[36m"), "SLEEPING NO SEEDERS FOR FILE", string("\033[0m"))
 				file = getListedFileByHash(fileID)
@@ -363,7 +363,7 @@ func downloadChunks(file *File, randomChunks []int) {
 				if !dbFile.IsPaused {
 					//Give the seeder a fair start with timers when a download is initiated
 					//Potentionally this seeder was last queried 60 seconds ago for files and otherwise idle but online
-					for _, seeder := range file.seeders {
+					for _, seeder := range file.Seeders {
 						sessionmanager.UpdateActivity(seeder)
 					}
 				}
@@ -381,9 +381,9 @@ func downloadChunks(file *File, randomChunks []int) {
 				downloadSeederAddr := ""
 
 				mutateSeederLock.Lock()
-				if len(file.seeders) > seederAlternator {
+				if len(file.Seeders) > seederAlternator {
 					//Get seeder
-					downloadSeederAddr = file.seeders[seederAlternator]
+					downloadSeederAddr = file.Seeders[seederAlternator]
 					session, existing := sessionmanager.GetExistingSessionWithoutClosing(downloadSeederAddr, constants.WorkerGetSessionTimeout)
 
 					if existing {
@@ -411,8 +411,8 @@ func downloadChunks(file *File, randomChunks []int) {
 					mutateSeederLock.Lock()
 					for i := 0; i < len(ListedFiles); i++ {
 						if ListedFiles[i].FileHash == fileID {
-							ListedFiles[i].seeders = removeStringFromSlice(ListedFiles[i].seeders, downloadSeederAddr)
-							ListedFiles[i].seederCount = len(ListedFiles[i].seeders)
+							ListedFiles[i].Seeders = removeStringFromSlice(ListedFiles[i].Seeders, downloadSeederAddr)
+							ListedFiles[i].SeederCount = len(ListedFiles[i].Seeders)
 							file = &ListedFiles[i]
 							break
 						}
@@ -488,8 +488,8 @@ func downloadChunks(file *File, randomChunks []int) {
 					mutateSeederLock.Lock()
 					for i := 0; i < len(ListedFiles); i++ {
 						if ListedFiles[i].FileHash == fileID {
-							ListedFiles[i].seeders = removeStringFromSlice(ListedFiles[i].seeders, downloadSeederAddr)
-							ListedFiles[i].seederCount = len(ListedFiles[i].seeders)
+							ListedFiles[i].Seeders = removeStringFromSlice(ListedFiles[i].Seeders, downloadSeederAddr)
+							ListedFiles[i].SeederCount = len(ListedFiles[i].Seeders)
 							file = &ListedFiles[i]
 							break
 						}
@@ -508,7 +508,7 @@ func downloadChunks(file *File, randomChunks []int) {
 			go requestChunkJob(chunkid)
 
 			seederAlternator++
-			if seederAlternator > len(file.seeders)-1 {
+			if seederAlternator > len(file.Seeders)-1 {
 				seederAlternator = 0
 			}
 		}
@@ -600,15 +600,16 @@ func processQueryResponse(Session *sessionmanager.Session, Data []byte) {
 		fileSize, _ := strconv.ParseInt(data[3], 10, 64)
 		numChunks := int((fileSize-1)/int64(constants.ChunkSize)) + 1
 
-		newListing := File{
-			FileName:    data[2],
-			FileSize:    fileSize,
-			FileHash:    data[4],
-			seeders:     []string{seeder},
-			Path:        "",
-			NumChunks:   numChunks,
-			ChunkMap:    nil,
-			seederCount: 1,
+		newListing := models.GeneralFile{
+			FileLocation: "remote",
+			FileName:     data[2],
+			FileSize:     fileSize,
+			FileHash:     data[4],
+			Seeders:      []string{seeder},
+			Path:         "",
+			NumChunks:    numChunks,
+			ChunkMap:     nil,
+			SeederCount:  1,
 		}
 
 		//Replace existing, or remove.
@@ -617,9 +618,9 @@ func processQueryResponse(Session *sessionmanager.Session, Data []byte) {
 			if ListedFiles[l].FileHash == newListing.FileHash {
 
 				//if the seeder is unique add it as an additional seeder for the file
-				ListedFiles[l].seeders = append(ListedFiles[l].seeders, seeder)
-				ListedFiles[l].seeders = distinctStringSlice(ListedFiles[l].seeders)
-				ListedFiles[l].seederCount = len(ListedFiles[l].seeders)
+				ListedFiles[l].Seeders = append(ListedFiles[l].Seeders, seeder)
+				ListedFiles[l].Seeders = distinctStringSlice(ListedFiles[l].Seeders)
+				ListedFiles[l].SeederCount = len(ListedFiles[l].Seeders)
 
 				replace = true
 				break
@@ -860,7 +861,8 @@ func SeedFilepath(Path string) bool {
 	}
 
 	//Append to local files
-	localFile := File{
+	localFile := models.GeneralFile{
+		FileLocation:  "local",
 		FileName:      fileName,
 		FileSize:      fileSize,
 		FileHash:      randomHash,
@@ -889,7 +891,7 @@ func SeedFilepath(Path string) bool {
 }
 
 //BuildSeedString builds a string of seeded files to share with clients
-func BuildSeedString(dbFiles []File) {
+func BuildSeedString(dbFiles []models.GeneralFile) {
 
 	newQueryPayload := ""
 	for _, dbFile := range dbFiles {
@@ -907,7 +909,7 @@ func BuildSeedString(dbFiles []File) {
 }
 
 //AddToSeedString adds to existing seed string
-func AddToSeedString(dbFile File) {
+func AddToSeedString(dbFile models.GeneralFile) {
 
 	//Add to payload
 	payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)

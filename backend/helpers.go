@@ -6,6 +6,8 @@ import (
 	"log"
 	"strconv"
 	"strings"
+
+	"github.com/rule110-io/surge/backend/models"
 )
 
 func removeStringFromSlice(s []string, r string) []string {
@@ -29,19 +31,19 @@ func distinctStringSlice(stringSlice []string) []string {
 	return list
 }
 
-type sortBySeederCountAsc []FileListing
+type sortBySeederCountAsc []models.GeneralFile
 
 func (a sortBySeederCountAsc) Len() int           { return len(a) }
 func (a sortBySeederCountAsc) Less(i, j int) bool { return a[i].SeederCount < a[j].SeederCount }
 func (a sortBySeederCountAsc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
-type sortBySeederCountDesc []FileListing
+type sortBySeederCountDesc []models.GeneralFile
 
 func (a sortBySeederCountDesc) Len() int           { return len(a) }
 func (a sortBySeederCountDesc) Less(i, j int) bool { return a[i].SeederCount > a[j].SeederCount }
 func (a sortBySeederCountDesc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
-type sortByFileNameAsc []FileListing
+type sortByFileNameAsc []models.GeneralFile
 
 func (a sortByFileNameAsc) Len() int { return len(a) }
 func (a sortByFileNameAsc) Less(i, j int) bool {
@@ -49,7 +51,7 @@ func (a sortByFileNameAsc) Less(i, j int) bool {
 }
 func (a sortByFileNameAsc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type sortByFileNameDesc []FileListing
+type sortByFileNameDesc []models.GeneralFile
 
 func (a sortByFileNameDesc) Len() int { return len(a) }
 func (a sortByFileNameDesc) Less(i, j int) bool {
@@ -57,13 +59,13 @@ func (a sortByFileNameDesc) Less(i, j int) bool {
 }
 func (a sortByFileNameDesc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type sortByFileSizeAsc []FileListing
+type sortByFileSizeAsc []models.GeneralFile
 
 func (a sortByFileSizeAsc) Len() int           { return len(a) }
 func (a sortByFileSizeAsc) Less(i, j int) bool { return a[i].FileSize < a[j].FileSize }
 func (a sortByFileSizeAsc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
-type sortByFileSizeDesc []FileListing
+type sortByFileSizeDesc []models.GeneralFile
 
 func (a sortByFileSizeDesc) Len() int           { return len(a) }
 func (a sortByFileSizeDesc) Less(i, j int) bool { return a[i].FileSize > a[j].FileSize }

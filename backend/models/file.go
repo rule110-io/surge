@@ -1,6 +1,5 @@
 package models
 
-// declaring a student struct
 type GeneralFile struct {
 	FileLocation  string
 	FileName      string
