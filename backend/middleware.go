@@ -76,6 +76,9 @@ func (s *MiddlewareFunctions) ReadSetting(Key string) string {
 
 func (s *MiddlewareFunctions) StartDownloadMagnetLinks(Magnetlinks string) bool {
 	//need to parse Magnetlinks array and download all of them
-	go ParsePayloadString(Magnetlinks)
+	files := ParsePayloadString(Magnetlinks)
+	for i := 0; i < len(files); i++ {
+		go DownloadFileByHash(files[i].FileHash)
+	}
 	return true
 }

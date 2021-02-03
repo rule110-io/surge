@@ -17,6 +17,8 @@ import (
 	"github.com/rule110-io/surge/backend/sessionmanager"
 )
 
+var subscribers []string
+
 //Function that automatically grabs subscriptions for nkn topic
 func rescanPeers() {
 

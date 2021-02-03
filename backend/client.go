@@ -23,8 +23,21 @@ import (
 	pb "github.com/rule110-io/surge/backend/payloads"
 	"github.com/rule110-io/surge/backend/platform"
 	"github.com/rule110-io/surge/backend/sessionmanager"
+	"github.com/wailsapp/wails"
 	"google.golang.org/protobuf/proto"
 )
+
+type NumClientsStruct struct {
+	Online int
+}
+
+var FrontendReady = false
+var workerCount = 0
+
+//ListedFiles are remote files that can be downloaded
+var ListedFiles []models.GeneralFile
+
+var wailsRuntime *wails.Runtime
 
 //whether the nkn client is initialized
 var clientInitialized = false
@@ -33,6 +46,50 @@ var clientInitialized = false
 var client *nkn.MultiClient
 
 var queryPayload = ""
+
+var clientOnlineMap map[string]bool
+
+//NumClientsStruct .
+
+var numClientsStore *wails.Store
+
+// WailsBind is a binding function at startup
+func WailsBind(runtime *wails.Runtime) {
+	wailsRuntime = runtime
+	platform.SetWailsRuntime(wailsRuntime, SetVisualMode)
+
+	//Mac specific functions
+	go platform.InitOSHandler()
+	platform.SetVisualModeLikeOS()
+
+	numClients := NumClientsStruct{
+		Online: 0,
+	}
+
+	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
+
+	updateNumClientStore()
+
+	//Wait for our client to initialize, perhaps there is no internet connectivity
+	tryCount := 1
+	for !clientInitialized {
+		time.Sleep(time.Second)
+		if tryCount%10 == 0 {
+			pushError("Connection to NKN not yet established 0", "do you have an active internet connection?")
+		}
+		tryCount++
+	}
+	updateNumClientStore()
+
+	//Get subs first synced then grab file queries for those subs
+	GetSubscriptions()
+
+	//Startup async processes to continue processing subs/files and updating gui
+	go updateFileDataWorker()
+	go rescanPeers()
+
+	FrontendReady = true
+}
 
 // Initiates the surge client and instantiates connection with the NKN network
 func InitializeClient(args []string) bool {
