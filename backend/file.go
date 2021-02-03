@@ -14,6 +14,7 @@ import (
 
 	bitmap "github.com/boljen/go-bitmap"
 	"github.com/rule110-io/surge/backend/models"
+	"github.com/rule110-io/surge/backend/mutexes"
 )
 
 func getFileSize(path string) (size int64) {
@@ -29,14 +30,14 @@ func getListedFileByHash(Hash string) *models.GeneralFile {
 
 	var selectedFile *models.GeneralFile = nil
 
-	ListedFilesLock.Lock()
+	mutexes.ListedFilesLock.Lock()
 	for _, file := range ListedFiles {
 		if file.FileHash == Hash {
 			selectedFile = &file
 			break
 		}
 	}
-	ListedFilesLock.Unlock()
+	mutexes.ListedFilesLock.Unlock()
 
 	return selectedFile
 }
@@ -90,7 +91,7 @@ func GetFileChunkMapString(file *models.GeneralFile, Size int) string {
 //SetFilePause sets a file IsPaused state for by file hash
 func SetFilePause(Hash string, State bool) {
 
-	fileWriteLock.Lock()
+	mutexes.FileWriteLock.Lock()
 	file, err := dbGetFile(Hash)
 	if err != nil {
 		pushNotification("Failed To Pause", "Could not find the file to pause.")
@@ -98,7 +99,7 @@ func SetFilePause(Hash string, State bool) {
 	}
 	file.IsPaused = State
 	dbInsertFile(*file)
-	fileWriteLock.Unlock()
+	mutexes.FileWriteLock.Unlock()
 
 	msg := "Paused"
 	if State == false {
@@ -110,7 +111,7 @@ func SetFilePause(Hash string, State bool) {
 //RemoveFile removes file from surge db and optionally from disk
 func RemoveFileByHash(Hash string, FromDisk bool) bool {
 
-	fileWriteLock.Lock()
+	mutexes.FileWriteLock.Lock()
 
 	if FromDisk {
 		file, err := dbGetFile(Hash)
@@ -132,7 +133,7 @@ func RemoveFileByHash(Hash string, FromDisk bool) bool {
 		pushError("Error on remove file (read db)", err.Error())
 		return false
 	}
-	fileWriteLock.Unlock()
+	mutexes.FileWriteLock.Unlock()
 
 	//Rebuild entirely
 	dbFiles := dbGetAllFiles()

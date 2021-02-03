@@ -3,15 +3,13 @@ package surge
 import (
 	"strconv"
 	"strings"
-	"sync"
 
 	"log"
 
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
+	"github.com/rule110-io/surge/backend/mutexes"
 )
-
-var fileWriteLock = &sync.Mutex{}
 
 // needs to be rewritten! Should only parse the payload string and return the file objects. No download start!
 // ParsePayloadString parses payload of files
@@ -41,7 +39,7 @@ func ParsePayloadString(s string) {
 			ChunkMap:     nil,
 		}
 
-		ListedFilesLock.Lock()
+		mutexes.ListedFilesLock.Lock()
 		//Replace existing, or remove.
 		var replace = false
 		for l := 0; l < len(ListedFiles); l++ {
@@ -56,7 +54,7 @@ func ParsePayloadString(s string) {
 		if replace == false {
 			ListedFiles = append(ListedFiles, newListing)
 		}
-		ListedFilesLock.Unlock()
+		mutexes.ListedFilesLock.Unlock()
 
 		log.Println("Program paramater new file: ", newListing.FileName, " seeder: ", newListing.Seeders)
 

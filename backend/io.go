@@ -20,6 +20,7 @@ import (
 
 	bitmap "github.com/boljen/go-bitmap"
 	"github.com/rule110-io/surge/backend/constants"
+	"github.com/rule110-io/surge/backend/mutexes"
 	"github.com/rule110-io/surge/backend/platform"
 	"github.com/skratchdot/open-golang/open"
 )
@@ -106,7 +107,7 @@ func WriteChunk(FileID string, ChunkID int32, Chunk []byte) {
 
 	//Update bitmap async as this has a lock in it but does not have to be waited for
 	setBitMap := func() {
-		fileWriteLock.Lock()
+		mutexes.FileWriteLock.Lock()
 
 		//Set chunk to available in the map
 		fileInfo, err := dbGetFile(FileID)
@@ -117,7 +118,7 @@ func WriteChunk(FileID string, ChunkID int32, Chunk []byte) {
 		bitmap.Set(fileInfo.ChunkMap, int(ChunkID), true)
 		dbInsertFile(*fileInfo)
 
-		fileWriteLock.Unlock()
+		mutexes.FileWriteLock.Unlock()
 	}
 	go setBitMap()
 }

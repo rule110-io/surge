@@ -9,6 +9,7 @@ import (
 	"log"
 
 	"github.com/rule110-io/surge/backend/models"
+	"github.com/rule110-io/surge/backend/mutexes"
 	"github.com/rule110-io/surge/backend/platform"
 
 	"github.com/xujiajun/nutsdb"
@@ -171,7 +172,7 @@ func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take 
 
 	var results []models.GeneralFile
 
-	ListedFilesLock.Lock()
+	mutexes.ListedFilesLock.Lock()
 	for _, file := range ListedFiles {
 		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) && file.FileLocation == "remote" {
 
@@ -193,7 +194,7 @@ func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take 
 
 		}
 	}
-	ListedFilesLock.Unlock()
+	mutexes.ListedFilesLock.Unlock()
 
 	switch OrderBy {
 	case "FileName":
@@ -271,7 +272,7 @@ func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take i
 	resultFiles = resultFiles[left:right]
 	resultListings := []models.GeneralFile{}
 
-	ListedFilesLock.Lock()
+	mutexes.ListedFilesLock.Lock()
 	for i := 0; i < len(resultFiles); i++ {
 		listing := models.GeneralFile{
 			ChunksShared:  resultFiles[i].ChunksShared,
@@ -309,7 +310,7 @@ func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take i
 		resultListings = append(resultListings, listing)
 
 	}
-	ListedFilesLock.Unlock()
+	mutexes.ListedFilesLock.Unlock()
 
 	return LocalFilePageResult{
 		Result: resultListings,

@@ -19,6 +19,7 @@ import (
 	nkn "github.com/nknorg/nkn-sdk-go"
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
+	"github.com/rule110-io/surge/backend/mutexes"
 	pb "github.com/rule110-io/surge/backend/payloads"
 	"github.com/rule110-io/surge/backend/platform"
 	"github.com/rule110-io/surge/backend/sessionmanager"
@@ -241,7 +242,7 @@ func onClientDisconnected(addr string) {
 	go updateNumClientStore()
 
 	//Remove this address from remote file seeders
-	ListedFilesLock.Lock()
+	mutexes.ListedFilesLock.Lock()
 	for i := 0; i < len(ListedFiles); i++ {
 		ListedFiles[i].Seeders = removeStringFromSlice(ListedFiles[i].Seeders, addr)
 		ListedFiles[i].SeederCount = len(ListedFiles[i].Seeders)
@@ -259,7 +260,7 @@ func onClientDisconnected(addr string) {
 		}
 	}
 
-	ListedFilesLock.Unlock()
+	mutexes.ListedFilesLock.Unlock()
 }
 
 func listenToSession(Session *sessionmanager.Session) {
@@ -288,16 +289,16 @@ func listenToSession(Session *sessionmanager.Session) {
 		case constants.SurgeQueryRequestID:
 			processQueryRequest(Session, data)
 			//Write add to download
-			bandwidthAccumulatorMapLock.Lock()
+			mutexes.BandwidthAccumulatorMapLock.Lock()
 			downloadBandwidthAccumulator["DISCOVERY"] += len(data)
-			bandwidthAccumulatorMapLock.Unlock()
+			mutexes.BandwidthAccumulatorMapLock.Unlock()
 			break
 		case constants.SurgeQueryResponseID:
 			processQueryResponse(Session, data)
 			//Write add to download
-			bandwidthAccumulatorMapLock.Lock()
+			mutexes.BandwidthAccumulatorMapLock.Lock()
 			downloadBandwidthAccumulator["DISCOVERY"] += len(data)
-			bandwidthAccumulatorMapLock.Unlock()
+			mutexes.BandwidthAccumulatorMapLock.Unlock()
 			break
 		}
 	}
@@ -426,9 +427,9 @@ func downloadChunks(file *models.GeneralFile, randomChunks []int) {
 				//If chunk is requested add to transit map
 				chunkKey := file.FileHash + "_" + strconv.Itoa(chunkID)
 
-				chunkInTransitLock.Lock()
+				mutexes.ChunkInTransitLock.Lock()
 				chunksInTransit[chunkKey] = true
-				chunkInTransitLock.Unlock()
+				mutexes.ChunkInTransitLock.Unlock()
 
 				//Sleep and check if entry still exists in transit map.
 				sleepWorker := true
@@ -451,9 +452,9 @@ func downloadChunks(file *models.GeneralFile, randomChunks []int) {
 					}
 
 					//Check if received
-					chunkInTransitLock.Lock()
+					mutexes.ChunkInTransitLock.Lock()
 					isInTransit := chunksInTransit[chunkKey]
-					chunkInTransitLock.Unlock()
+					mutexes.ChunkInTransitLock.Unlock()
 
 					if !isInTransit {
 						//if no longer in transit, continue workers
@@ -544,9 +545,9 @@ func SendQueryRequest(Addr string, Query string) bool {
 	}
 
 	//Write add to upload
-	bandwidthAccumulatorMapLock.Lock()
+	mutexes.BandwidthAccumulatorMapLock.Lock()
 	uploadBandwidthAccumulator["DISCOVERY"] += written
-	bandwidthAccumulatorMapLock.Unlock()
+	mutexes.BandwidthAccumulatorMapLock.Unlock()
 
 	return true
 }
@@ -561,9 +562,9 @@ func SendQueryResponse(Session *sessionmanager.Session, Query string) {
 		log.Println("Failed to send Surge Ruquest:", err)
 	}
 	//Write add to upload
-	bandwidthAccumulatorMapLock.Lock()
+	mutexes.BandwidthAccumulatorMapLock.Lock()
 	uploadBandwidthAccumulator["DISCOVERY"] += written
-	bandwidthAccumulatorMapLock.Unlock()
+	mutexes.BandwidthAccumulatorMapLock.Unlock()
 }
 
 func processQueryRequest(Session *sessionmanager.Session, Data []byte) {
@@ -586,7 +587,7 @@ func processQueryResponse(Session *sessionmanager.Session, Data []byte) {
 
 	fmt.Println(string("\033[36m"), "file query response received", seeder, string("\033[0m"))
 
-	ListedFilesLock.Lock()
+	mutexes.ListedFilesLock.Lock()
 
 	//Parse the response
 	payloadSplit := strings.Split(s, "surge://")
@@ -635,7 +636,7 @@ func processQueryResponse(Session *sessionmanager.Session, Data []byte) {
 
 		log.Println("Query response new file: ", newListing.FileName, " seeder: ", seeder)
 	}
-	ListedFilesLock.Unlock()
+	mutexes.ListedFilesLock.Unlock()
 }
 
 // RequestChunk sends a request to an address for a specific chunk of a specific file
@@ -661,9 +662,9 @@ func RequestChunk(Session *sessionmanager.Session, FileID string, ChunkID int32)
 		}
 
 		//Write add to upload
-		bandwidthAccumulatorMapLock.Lock()
+		mutexes.BandwidthAccumulatorMapLock.Lock()
 		uploadBandwidthAccumulator[FileID] += written
-		bandwidthAccumulatorMapLock.Unlock()
+		mutexes.BandwidthAccumulatorMapLock.Unlock()
 	}
 
 	return true
@@ -675,7 +676,7 @@ func TransmitChunk(Session *sessionmanager.Session, FileID string, ChunkID int32
 
 	//Open file
 
-	fileWriteLock.Lock()
+	mutexes.FileWriteLock.Lock()
 	fileInfo, err := dbGetFile(FileID)
 	if err != nil {
 		log.Println("Error on transmit chunk - file not in db", err.Error())
@@ -683,7 +684,7 @@ func TransmitChunk(Session *sessionmanager.Session, FileID string, ChunkID int32
 	}
 	fileInfo.ChunksShared++
 	dbInsertFile(*fileInfo)
-	fileWriteLock.Unlock()
+	mutexes.FileWriteLock.Unlock()
 
 	file, err := os.Open(fileInfo.Path)
 
@@ -691,12 +692,12 @@ func TransmitChunk(Session *sessionmanager.Session, FileID string, ChunkID int32
 	if err != nil {
 		log.Println("Error on transmit chunk - file read failure", err.Error())
 
-		fileWriteLock.Lock()
+		mutexes.FileWriteLock.Lock()
 		fileInfo.IsMissing = true
 		fileInfo.IsDownloading = false
 		fileInfo.IsUploading = false
 		dbInsertFile(*fileInfo)
-		fileWriteLock.Unlock()
+		mutexes.FileWriteLock.Unlock()
 
 		return
 	}
@@ -736,9 +737,9 @@ func TransmitChunk(Session *sessionmanager.Session, FileID string, ChunkID int32
 	log.Println("Chunk transmitted: ", bytesread, " bytes")
 
 	//Write add to upload
-	bandwidthAccumulatorMapLock.Lock()
+	mutexes.BandwidthAccumulatorMapLock.Lock()
 	uploadBandwidthAccumulator[FileID] += written
-	bandwidthAccumulatorMapLock.Unlock()
+	mutexes.BandwidthAccumulatorMapLock.Unlock()
 }
 
 func processChunk(Session *sessionmanager.Session, Data []byte) {
@@ -751,9 +752,9 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 	fmt.Println(string("\033[31m"), "PROCESSING CHUNK", string("\033[0m"))
 
 	//Write add to download
-	bandwidthAccumulatorMapLock.Lock()
+	mutexes.BandwidthAccumulatorMapLock.Lock()
 	downloadBandwidthAccumulator[surgeMessage.FileID] += len(Data)
-	bandwidthAccumulatorMapLock.Unlock()
+	mutexes.BandwidthAccumulatorMapLock.Unlock()
 
 	//Data nill means its a request for data
 	if surgeMessage.Data == nil {
@@ -763,9 +764,9 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 		//When we receive a chunk mark it as no longer in transit
 		chunkKey := surgeMessage.FileID + "_" + strconv.Itoa(int(surgeMessage.ChunkID))
 
-		chunkInTransitLock.Lock()
+		mutexes.ChunkInTransitLock.Lock()
 		chunksInTransit[chunkKey] = false
-		chunkInTransitLock.Unlock()
+		mutexes.ChunkInTransitLock.Unlock()
 
 		go WriteChunk(surgeMessage.FileID, surgeMessage.ChunkID, surgeMessage.Data)
 	}

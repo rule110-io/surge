@@ -1,10 +1,10 @@
 package surge
 
 import (
-	"sync"
 	"time"
 
 	"github.com/rule110-io/surge/backend/models"
+	"github.com/rule110-io/surge/backend/mutexes"
 	"github.com/rule110-io/surge/backend/platform"
 
 	bitmap "github.com/boljen/go-bitmap"
@@ -15,12 +15,6 @@ import (
 //FrontendReady is a flag to check if frontend is ready
 var FrontendReady = false
 var subscribers []string
-
-var localFileName string
-var sendSize int64
-var receivedSize int64
-
-var startTime = time.Now()
 
 var clientOnlineMap map[string]bool
 
@@ -33,23 +27,12 @@ var zeroBandwidthMap map[string]bool
 
 var chunksInTransit map[string]bool
 
-var clientOnlineMapLock = &sync.Mutex{}
-var clientOnlineRefreshingLock = &sync.Mutex{}
-var bandwidthAccumulatorMapLock = &sync.Mutex{}
-var chunkInTransitLock = &sync.Mutex{}
-
 //Sessions .
 //var Sessions []*sessionmanager.Session
 
 //var testReader *bufio.Reader
 
 var workerCount = 0
-
-//Sessions collection lock
-var sessionsWriteLock = &sync.Mutex{}
-
-//ListedFilesLock lock this whenever you're reading or mutating the ListedFiles collection
-var ListedFilesLock = &sync.Mutex{}
 
 //NumClientsStruct .
 type NumClientsStruct struct {
@@ -101,20 +84,6 @@ func WailsBind(runtime *wails.Runtime) {
 	FrontendReady = true
 }
 
-func chunkMapFull(s []byte, num int) bool {
-	//No chunkmap means no download was initiated, all chunks are local
-	if s == nil {
-		return true
-	}
-
-	for i := 0; i < num; i++ {
-		if bitmap.Get(s, i) == false {
-			return false
-		}
-	}
-	return true
-}
-
 func chunksDownloaded(s []byte, num int) int {
 	//No chunkmap means no download was initiated, all chunks are local
 	if s == nil {
@@ -133,13 +102,13 @@ func chunksDownloaded(s []byte, num int) int {
 func fileBandwidth(FileID string) (Download int, Upload int) {
 
 	//Get accumulator
-	bandwidthAccumulatorMapLock.Lock()
+	mutexes.BandwidthAccumulatorMapLock.Lock()
 	downAccu := downloadBandwidthAccumulator[FileID]
 	downloadBandwidthAccumulator[FileID] = 0
 
 	upAccu := uploadBandwidthAccumulator[FileID]
 	uploadBandwidthAccumulator[FileID] = 0
-	bandwidthAccumulatorMapLock.Unlock()
+	mutexes.BandwidthAccumulatorMapLock.Unlock()
 
 	if fileBandwidthMap[FileID].Download == nil {
 		fileBandwidthMap[FileID] = models.BandwidthMA{

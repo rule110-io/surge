@@ -16,6 +16,7 @@ import (
 
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
+	"github.com/rule110-io/surge/backend/mutexes"
 	"github.com/rule110-io/surge/backend/platform"
 	"github.com/rule110-io/surge/backend/sessionmanager"
 )
@@ -112,12 +113,12 @@ func updateFileDataWorker() {
 		}
 
 		//Add peer discovery global bandwidth
-		bandwidthAccumulatorMapLock.Lock()
+		mutexes.BandwidthAccumulatorMapLock.Lock()
 		totalDown += downloadBandwidthAccumulator["DISCOVERY"]
 		totalUp += uploadBandwidthAccumulator["DISCOVERY"]
 		downloadBandwidthAccumulator["DISCOVERY"] = 0
 		uploadBandwidthAccumulator["DISCOVERY"] = 0
-		bandwidthAccumulatorMapLock.Unlock()
+		mutexes.BandwidthAccumulatorMapLock.Unlock()
 
 		if zeroBandwidthMap["total"] == false || totalDown+totalUp != 0 {
 			wailsRuntime.Events.Emit("globalBandwidthUpdate", statusBundle, totalDown, totalUp)
