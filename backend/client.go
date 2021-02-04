@@ -112,10 +112,13 @@ func InitializeClient(args []string) bool {
 	client.Listen(nil)
 	go Listen()
 
+	//get all files in the DB
 	dbFiles := dbGetAllFiles()
 	var filesOnDisk []models.File
 
+	//for each file in DB
 	for i := 0; i < len(dbFiles); i++ {
+		//if local path of file is still valid
 		if FileExists(dbFiles[i].Path) {
 			filesOnDisk = append(filesOnDisk, dbFiles[i])
 		} else {
@@ -191,6 +194,7 @@ func DownloadFileByHash(Hash string) bool {
 	dbFile, err := dbGetFile(Hash)
 	log.Println(dbFile)
 	if err != nil {
+		file.FileLocation = "local"
 		file.Path = path
 		file.NumChunks = numChunks
 		file.ChunkMap = bitmap.NewSlice(numChunks)
