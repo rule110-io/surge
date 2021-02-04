@@ -35,7 +35,7 @@ var FrontendReady = false
 var workerCount = 0
 
 //ListedFiles are remote files that can be downloaded
-var ListedFiles []models.GeneralFile
+var ListedFiles []models.File
 
 var wailsRuntime *wails.Runtime
 
@@ -113,7 +113,7 @@ func InitializeClient(args []string) bool {
 	go Listen()
 
 	dbFiles := dbGetAllFiles()
-	var filesOnDisk []models.GeneralFile
+	var filesOnDisk []models.File
 
 	for i := 0; i < len(dbFiles); i++ {
 		if FileExists(dbFiles[i].Path) {
@@ -310,9 +310,9 @@ func onClientDisconnected(addr string) {
 	for i := 0; i < len(ListedFiles); i++ {
 		if len(ListedFiles[i].Seeders) == 0 {
 			// Remove the element at index i from a.
-			ListedFiles[i] = ListedFiles[len(ListedFiles)-1]       // Copy last element to index i.
-			ListedFiles[len(ListedFiles)-1] = models.GeneralFile{} // Erase last element (write zero value).
-			ListedFiles = ListedFiles[:len(ListedFiles)-1]         // Truncate slice.
+			ListedFiles[i] = ListedFiles[len(ListedFiles)-1] // Copy last element to index i.
+			ListedFiles[len(ListedFiles)-1] = models.File{}  // Erase last element (write zero value).
+			ListedFiles = ListedFiles[:len(ListedFiles)-1]   // Truncate slice.
 			i--
 		}
 	}
@@ -361,7 +361,7 @@ func listenToSession(Session *sessionmanager.Session) {
 	}
 }
 
-func downloadChunks(file *models.GeneralFile, randomChunks []int) {
+func downloadChunks(file *models.File, randomChunks []int) {
 	fileID := file.FileHash
 	file = getListedFileByHash(fileID)
 
@@ -658,7 +658,7 @@ func processQueryResponse(Session *sessionmanager.Session, Data []byte) {
 		fileSize, _ := strconv.ParseInt(data[3], 10, 64)
 		numChunks := int((fileSize-1)/int64(constants.ChunkSize)) + 1
 
-		newListing := models.GeneralFile{
+		newListing := models.File{
 			FileLocation: "remote",
 			FileName:     data[2],
 			FileSize:     fileSize,
@@ -919,7 +919,7 @@ func SeedFilepath(Path string) bool {
 	}
 
 	//Append to local files
-	localFile := models.GeneralFile{
+	localFile := models.File{
 		FileLocation:  "local",
 		FileName:      fileName,
 		FileSize:      fileSize,
@@ -949,7 +949,7 @@ func SeedFilepath(Path string) bool {
 }
 
 //BuildSeedString builds a string of seeded files to share with clients
-func BuildSeedString(dbFiles []models.GeneralFile) {
+func BuildSeedString(dbFiles []models.File) {
 
 	newQueryPayload := ""
 	for _, dbFile := range dbFiles {
@@ -967,7 +967,7 @@ func BuildSeedString(dbFiles []models.GeneralFile) {
 }
 
 //AddToSeedString adds to existing seed string
-func AddToSeedString(dbFile models.GeneralFile) {
+func AddToSeedString(dbFile models.File) {
 
 	//Add to payload
 	payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)

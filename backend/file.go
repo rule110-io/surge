@@ -26,9 +26,9 @@ func getFileSize(path string) (size int64) {
 	return fi.Size()
 }
 
-func getListedFileByHash(Hash string) *models.GeneralFile {
+func getListedFileByHash(Hash string) *models.File {
 
-	var selectedFile *models.GeneralFile = nil
+	var selectedFile *models.File = nil
 
 	mutexes.ListedFilesLock.Lock()
 	for _, file := range ListedFiles {
@@ -43,7 +43,7 @@ func getListedFileByHash(Hash string) *models.GeneralFile {
 }
 
 //GetFileChunkMapString returns the chunkmap in hex for a file given by hash
-func GetFileChunkMapString(file *models.GeneralFile, Size int) string {
+func GetFileChunkMapString(file *models.File, Size int) string {
 
 	outputSize := Size
 	inputSize := file.NumChunks

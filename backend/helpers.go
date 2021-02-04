@@ -33,19 +33,19 @@ func distinctStringSlice(stringSlice []string) []string {
 	return list
 }
 
-type sortBySeederCountAsc []models.GeneralFile
+type sortBySeederCountAsc []models.File
 
 func (a sortBySeederCountAsc) Len() int           { return len(a) }
 func (a sortBySeederCountAsc) Less(i, j int) bool { return a[i].SeederCount < a[j].SeederCount }
 func (a sortBySeederCountAsc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
-type sortBySeederCountDesc []models.GeneralFile
+type sortBySeederCountDesc []models.File
 
 func (a sortBySeederCountDesc) Len() int           { return len(a) }
 func (a sortBySeederCountDesc) Less(i, j int) bool { return a[i].SeederCount > a[j].SeederCount }
 func (a sortBySeederCountDesc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
-type sortByFileNameAsc []models.GeneralFile
+type sortByFileNameAsc []models.File
 
 func (a sortByFileNameAsc) Len() int { return len(a) }
 func (a sortByFileNameAsc) Less(i, j int) bool {
@@ -53,7 +53,7 @@ func (a sortByFileNameAsc) Less(i, j int) bool {
 }
 func (a sortByFileNameAsc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type sortByFileNameDesc []models.GeneralFile
+type sortByFileNameDesc []models.File
 
 func (a sortByFileNameDesc) Len() int { return len(a) }
 func (a sortByFileNameDesc) Less(i, j int) bool {
@@ -61,13 +61,13 @@ func (a sortByFileNameDesc) Less(i, j int) bool {
 }
 func (a sortByFileNameDesc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
-type sortByFileSizeAsc []models.GeneralFile
+type sortByFileSizeAsc []models.File
 
 func (a sortByFileSizeAsc) Len() int           { return len(a) }
 func (a sortByFileSizeAsc) Less(i, j int) bool { return a[i].FileSize < a[j].FileSize }
 func (a sortByFileSizeAsc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
 
-type sortByFileSizeDesc []models.GeneralFile
+type sortByFileSizeDesc []models.File
 
 func (a sortByFileSizeDesc) Len() int           { return len(a) }
 func (a sortByFileSizeDesc) Less(i, j int) bool { return a[i].FileSize > a[j].FileSize }
@@ -136,9 +136,9 @@ func hashFile(randomHash string) {
 }
 
 // ParsePayloadString parses payload of files
-func ParsePayloadString(s string) []models.GeneralFile {
+func ParsePayloadString(s string) []models.File {
 
-	files := []models.GeneralFile{}
+	files := []models.File{}
 	payloadSplit := strings.Split(s, "surge://")
 	for j := 0; j < len(payloadSplit); j++ {
 		data := strings.Split(payloadSplit[j], "|")
@@ -152,7 +152,7 @@ func ParsePayloadString(s string) []models.GeneralFile {
 
 		seeder := strings.Split(data[5], ",")
 
-		newListing := models.GeneralFile{
+		newListing := models.File{
 			FileLocation: "remote",
 			FileName:     data[2],
 			FileSize:     fileSize,

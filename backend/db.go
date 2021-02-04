@@ -40,7 +40,7 @@ func CloseDb() {
 	db.Close()
 }
 
-func dbInsertFile(File models.GeneralFile) {
+func dbInsertFile(File models.File) {
 	if err := db.Update(
 		func(tx *nutsdb.Tx) error {
 
@@ -56,8 +56,8 @@ func dbInsertFile(File models.GeneralFile) {
 	}
 }
 
-func dbGetFile(Key string) (*models.GeneralFile, error) {
-	result := &models.GeneralFile{}
+func dbGetFile(Key string) (*models.File, error) {
+	result := &models.File{}
 
 	if err := db.View(
 		func(tx *nutsdb.Tx) error {
@@ -76,8 +76,8 @@ func dbGetFile(Key string) (*models.GeneralFile, error) {
 	return result, nil
 }
 
-func dbGetAllFiles() []models.GeneralFile {
-	files := []models.GeneralFile{}
+func dbGetAllFiles() []models.File {
+	files := []models.File{}
 
 	if err := db.View(
 		func(tx *nutsdb.Tx) error {
@@ -88,7 +88,7 @@ func dbGetAllFiles() []models.GeneralFile {
 
 			for _, entry := range entries {
 
-				newFile := &models.GeneralFile{}
+				newFile := &models.File{}
 				json.Unmarshal(entry.Value, newFile)
 				files = append(files, *newFile)
 			}
@@ -157,26 +157,26 @@ func DbReadSetting(Name string) (string, error) {
 
 //SearchQueryResult is a paging query result for file searches
 type SearchQueryResult struct {
-	Result []models.GeneralFile
+	Result []models.File
 	Count  int
 }
 
 //LocalFilePageResult is a paging query result for tracked files
 type LocalFilePageResult struct {
-	Result []models.GeneralFile
+	Result []models.File
 	Count  int
 }
 
 //SearchRemoteFile runs a paged query
 func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) SearchQueryResult {
 
-	var results []models.GeneralFile
+	var results []models.File
 
 	mutexes.ListedFilesLock.Lock()
 	for _, file := range ListedFiles {
 		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) && file.FileLocation == "remote" {
 
-			result := models.GeneralFile{
+			result := models.File{
 				FileName:    file.FileName,
 				FileHash:    file.FileHash,
 				FileSize:    file.FileSize,
@@ -237,7 +237,7 @@ func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take 
 //SearchLocalFile runs a paged query
 func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) LocalFilePageResult {
 
-	resultFiles := []models.GeneralFile{}
+	resultFiles := []models.File{}
 
 	allFiles := dbGetAllFiles()
 	for _, file := range allFiles {
@@ -270,11 +270,11 @@ func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take i
 
 	//Subset
 	resultFiles = resultFiles[left:right]
-	resultListings := []models.GeneralFile{}
+	resultListings := []models.File{}
 
 	mutexes.ListedFilesLock.Lock()
 	for i := 0; i < len(resultFiles); i++ {
-		listing := models.GeneralFile{
+		listing := models.File{
 			ChunksShared:  resultFiles[i].ChunksShared,
 			FileHash:      resultFiles[i].FileHash,
 			FileName:      resultFiles[i].FileName,
