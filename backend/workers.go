@@ -21,6 +21,14 @@ import (
 	"github.com/rule110-io/surge/backend/sessionmanager"
 )
 
+//Function that automatically grabs subscriptions for nkn topic
+func rescanPeersWorker() {
+	for true {
+		time.Sleep(constants.RescanPeerInterval)
+		GetSubscriptions()
+	}
+}
+
 // makes sure the client is regularly subscribed to the surge topic
 func autoSubscribeWorker() {
 

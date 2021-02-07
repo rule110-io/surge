@@ -9,11 +9,11 @@ type MiddlewareFunctions struct {
 	r *wails.Runtime
 }
 
-func (s *MiddlewareFunctions) GetLocalFiles(Query string, OrderBy string, IsDesc bool, Skip int, Take int) LocalFilePageResult {
+func (s *MiddlewareFunctions) GetLocalFiles(Query string, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryResult {
 	return SearchLocalFile(Query, OrderBy, IsDesc, Skip, Take)
 }
 
-func (s *MiddlewareFunctions) GetRemoteFiles(Query string, OrderBy string, IsDesc bool, Skip int, Take int) SearchQueryResult {
+func (s *MiddlewareFunctions) GetRemoteFiles(Query string, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryResult {
 	return SearchRemoteFile(Query, OrderBy, IsDesc, Skip, Take)
 }
 

@@ -11,7 +11,6 @@ package surge
 import (
 	"fmt"
 	"log"
-	"time"
 
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/sessionmanager"
@@ -19,21 +18,9 @@ import (
 
 var subscribers []string
 
-//Function that automatically grabs subscriptions for nkn topic
-func rescanPeers() {
-
-	for true {
-		time.Sleep(constants.RescanPeerInterval)
-		GetSubscriptions()
-	}
-}
-
 //GetSubscriptions .
 func GetSubscriptions() {
-
-	Topic := TopicEncode(constants.PublicTopic)
-
-	subResponse, err := client.GetSubscribers(Topic, 0, 100, true, true)
+	subResponse, err := client.GetSubscribers(TopicEncode(constants.PublicTopic), 0, 100, true, true)
 	if err != nil {
 		pushError(err.Error(), "do you have an active internet connection?")
 		return
@@ -67,8 +54,7 @@ func GetSubscriptions() {
 }
 
 func subscribeToSurgeTopic() {
-	Topic := TopicEncode(constants.PublicTopic)
-	txnHash, err := client.Subscribe("", Topic, constants.SubscriptionDuration, "Surge Beta Client", nil)
+	txnHash, err := client.Subscribe("", TopicEncode(constants.PublicTopic), constants.SubscriptionDuration, "Surge Beta Client", nil)
 	if err != nil {
 		log.Println("Probably already subscribed", err)
 	} else {

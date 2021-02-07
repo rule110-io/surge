@@ -1,3 +1,12 @@
+// Copyright 2021 rule101. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
+
+/*
+	This file contains DB related functions
+	It takes care of initializing the db as well as querying and processing DB entries
+*/
+
 package surge
 
 import (
@@ -30,9 +39,6 @@ func InitializeDb() {
 	if err != nil {
 		log.Panic(err)
 	}
-
-	dbGetAllFiles()
-
 }
 
 //CloseDb .
@@ -40,42 +46,7 @@ func CloseDb() {
 	db.Close()
 }
 
-func dbInsertFile(File models.File) {
-	if err := db.Update(
-		func(tx *nutsdb.Tx) error {
-
-			fileKey := []byte(File.FileHash)
-			fileBytes, _ := json.Marshal(File)
-
-			if err := tx.Put(fileBucketName, fileKey, fileBytes, 0); err != nil {
-				return err
-			}
-			return nil
-		}); err != nil {
-		log.Panic(err)
-	}
-}
-
-func dbGetFile(Key string) (*models.File, error) {
-	result := &models.File{}
-
-	if err := db.View(
-		func(tx *nutsdb.Tx) error {
-			fileKey := []byte(Key)
-			e, err := tx.Get(fileBucketName, fileKey)
-			if err != nil {
-				return err
-			}
-
-			err = json.Unmarshal(e.Value, result)
-			return err
-		}); err != nil {
-		return nil, err
-	}
-
-	return result, nil
-}
-
+// Gets all Files in the DB
 func dbGetAllFiles() []models.File {
 	files := []models.File{}
 
@@ -102,6 +73,45 @@ func dbGetAllFiles() []models.File {
 	return files
 }
 
+// Gets a File by providing the fileHash
+func dbGetFile(Hash string) (*models.File, error) {
+	result := &models.File{}
+
+	if err := db.View(
+		func(tx *nutsdb.Tx) error {
+			fileKey := []byte(Hash)
+			e, err := tx.Get(fileBucketName, fileKey)
+			if err != nil {
+				return err
+			}
+
+			err = json.Unmarshal(e.Value, result)
+			return err
+		}); err != nil {
+		return nil, err
+	}
+
+	return result, nil
+}
+
+// Inserts a File to the DB
+func dbInsertFile(File models.File) {
+	if err := db.Update(
+		func(tx *nutsdb.Tx) error {
+
+			fileKey := []byte(File.FileHash)
+			fileBytes, _ := json.Marshal(File)
+
+			if err := tx.Put(fileBucketName, fileKey, fileBytes, 0); err != nil {
+				return err
+			}
+			return nil
+		}); err != nil {
+		log.Panic(err)
+	}
+}
+
+// Deletes a File by providing the fileHash
 func dbDeleteFile(Hash string) error {
 	if err := db.Update(
 		func(tx *nutsdb.Tx) error {
@@ -155,20 +165,14 @@ func DbReadSetting(Name string) (string, error) {
 	return result, nil
 }
 
-//SearchQueryResult is a paging query result for file searches
-type SearchQueryResult struct {
-	Result []models.File
-	Count  int
-}
-
-//LocalFilePageResult is a paging query result for tracked files
-type LocalFilePageResult struct {
+//PagedQueryResult is a paging query result for file searches
+type PagedQueryResult struct {
 	Result []models.File
 	Count  int
 }
 
 //SearchRemoteFile runs a paged query
-func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) SearchQueryResult {
+func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryResult {
 
 	var results []models.File
 
@@ -228,14 +232,14 @@ func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take 
 		right = len(results)
 	}
 
-	return SearchQueryResult{
+	return PagedQueryResult{
 		Result: results[left:right],
 		Count:  len(results),
 	}
 }
 
 //SearchLocalFile runs a paged query
-func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) LocalFilePageResult {
+func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryResult {
 
 	resultFiles := []models.File{}
 
@@ -312,7 +316,7 @@ func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take i
 	}
 	mutexes.ListedFilesLock.Unlock()
 
-	return LocalFilePageResult{
+	return PagedQueryResult{
 		Result: resultListings,
 		Count:  totalNum,
 	}
