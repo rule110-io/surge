@@ -23,10 +23,12 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+//NumClientsStruct struct to hold number of online clients
 type NumClientsStruct struct {
 	Online int
 }
 
+//FrontendReady flags whether frontend is ready to receive events etc
 var FrontendReady = false
 var workerCount = 0
 
@@ -87,7 +89,7 @@ func WailsBind(runtime *wails.Runtime) {
 	FrontendReady = true
 }
 
-// Initiates the surge client and instantiates connection with the NKN network
+//InitializeClient Initiates the surge client and instantiates connection with the NKN network
 func InitializeClient(args []string) bool {
 	var err error
 
@@ -144,7 +146,7 @@ func InitializeClient(args []string) bool {
 	return true
 }
 
-// Starts the surge client
+//StartClient Starts the surge client
 func StartClient(args []string) {
 
 	//Initialize all our global data maps
@@ -159,13 +161,13 @@ func StartClient(args []string) {
 	go InitializeClient(args)
 }
 
-// Stops the surge client and cleans up
+//StopClient Stops the surge client and cleans up
 func StopClient() {
 	client.Close()
 	client = nil
 }
 
-// Downloads a file by providing a hash
+//DownloadFileByHash Downloads a file by providing a hash
 func DownloadFileByHash(Hash string) bool {
 
 	//Addr string, Size int64, FileID string
@@ -463,7 +465,7 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 	}
 }
 
-//SeedFile generates everything needed to seed a file
+//SeedFilepath generates everything needed to seed a file
 func SeedFilepath(Path string) bool {
 
 	log.Println("Seeding file", Path)

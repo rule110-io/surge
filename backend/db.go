@@ -127,7 +127,7 @@ func dbDeleteFile(Hash string) error {
 	return nil
 }
 
-// Stores or updates a key with a given value
+//DbWriteSetting Stores or updates a key with a given value
 func DbWriteSetting(Name string, value string) error {
 	err := db.Update(
 		func(tx *nutsdb.Tx) error {
@@ -143,7 +143,7 @@ func DbWriteSetting(Name string, value string) error {
 	return err
 }
 
-// Reads a key and returns value
+//DbReadSetting Reads a key and returns value
 func DbReadSetting(Name string) (string, error) {
 	result := ""
 	key := []byte(Name)
