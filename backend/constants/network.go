@@ -36,4 +36,7 @@ const (
 
 	//GetSessionDialTimeout time till dial timeout
 	GetSessionDialTimeout = 60
+
+	//DefaultRPCAddress default RPC endpoint if no bootstrap is available
+	DefaultRPCAddress = "http://seed.nkn.org:30003"
 )

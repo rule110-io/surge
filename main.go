@@ -32,10 +32,10 @@ func (s *Stats) WailsInit(runtime *wails.Runtime) error {
 	return nil
 }
 
-//WailsShutdown
-func (s *WailsRuntime) WailsShutdown() {
+//WailsShutdown (does not trigger in debug environment, found end of main to be more reliable)
+/*func (s *WailsRuntime) WailsShutdown() {
 	surge.StopClient()
-}
+}*/
 
 func main() {
 	defer surge.RecoverAndLog()
@@ -94,4 +94,5 @@ func main() {
 
 	app.Run()
 
+	surge.StopClient()
 }

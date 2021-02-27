@@ -95,7 +95,8 @@ func InitializeClient(args []string) bool {
 
 	account := InitializeAccount()
 	client, err = nkn.NewMultiClient(account, "", constants.NumClients, false, &nkn.ClientConfig{
-		ConnectRetries: 1000,
+		ConnectRetries:    1000,
+		SeedRPCServerAddr: GetBootstrapRPC(),
 	})
 	if err != nil {
 		pushError(err.Error(), "do you have an active internet connection?")
@@ -163,8 +164,11 @@ func StartClient(args []string) {
 
 //StopClient Stops the surge client and cleans up
 func StopClient() {
+
+	//Persist our connections for future bootstraps
+	PersistRPC(client)
+
 	client.Close()
-	client = nil
 }
 
 //DownloadFileByHash Downloads a file by providing a hash
