@@ -13,9 +13,9 @@ require (
 	github.com/leaanthony/slicer v1.4.1 // indirect
 	github.com/mattn/go-colorable v0.1.7 // indirect
 	github.com/mxmCherry/movavg v1.1.0
-	github.com/nknorg/nkn-sdk-go v1.3.0
+	github.com/nknorg/nkn-sdk-go v1.3.5
+	github.com/nknorg/nkn/v2 v2.0.6
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/sqweek/dialog v0.0.0-20200601143742-43ea34326190
 	github.com/wailsapp/wails v1.11.0
@@ -28,4 +28,5 @@ require (
 	gopkg.in/toast.v1 v1.0.0-20180812000517-0a84660828b2
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )
+
 replace github.com/wailsapp/wails v1.11.0 => ../wails
