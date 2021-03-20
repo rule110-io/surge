@@ -30,7 +30,8 @@ type NumClientsStruct struct {
 
 //FrontendReady flags whether frontend is ready to receive events etc
 var FrontendReady = false
-var workerCount = 0
+
+var workerMap map[string]int
 
 //ListedFiles are remote files that can be downloaded
 var ListedFiles []models.File
@@ -152,6 +153,7 @@ func StartClient(args []string) {
 
 	//Initialize all our global data maps
 	clientOnlineMap = make(map[string]bool)
+	workerMap = make(map[string]int)
 	downloadBandwidthAccumulator = make(map[string]int)
 	uploadBandwidthAccumulator = make(map[string]int)
 	zeroBandwidthMap = make(map[string]bool)
@@ -464,6 +466,13 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 		mutexes.ChunkInTransitLock.Lock()
 		chunksInTransit[chunkKey] = false
 		mutexes.ChunkInTransitLock.Unlock()
+
+		mutexes.WorkerMapLock.Lock()
+		workerMap[Session.Session.RemoteAddr().String()]--
+		if workerMap[Session.Session.RemoteAddr().String()] < 0 {
+			workerMap[Session.Session.RemoteAddr().String()] = 0
+		}
+		mutexes.WorkerMapLock.Unlock()
 
 		go WriteChunk(surgeMessage.FileID, surgeMessage.ChunkID, surgeMessage.Data)
 	}

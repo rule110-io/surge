@@ -121,29 +121,21 @@ func downloadChunks(file *models.File, randomChunks []int) {
 				}
 			}
 
-			for workerCount >= constants.NumWorkers {
-				time.Sleep(time.Millisecond)
-			}
-			workerCount++
-
 			//Create a async job to download a chunk
-			requestChunkJob := func(chunkID int) {
+			requestChunkJob := func(chunkID int, downloadSeederAddr string) {
 
 				success := false
-				downloadSeederAddr := ""
 
 				mutateSeederLock.Lock()
-				if len(file.Seeders) > seederAlternator {
-					//Get seeder
-					downloadSeederAddr = file.Seeders[seederAlternator]
-					session, existing := sessionmanager.GetExistingSessionWithoutClosing(downloadSeederAddr, constants.WorkerGetSessionTimeout)
 
-					if existing {
-						success = RequestChunk(session, file.FileHash, int32(chunkID))
-					} else {
-						success = false
-					}
+				session, existing := sessionmanager.GetExistingSessionWithoutClosing(downloadSeederAddr, constants.WorkerGetSessionTimeout)
+
+				if existing {
+					success = RequestChunk(session, file.FileHash, int32(chunkID))
+				} else {
+					success = false
 				}
+
 				mutateSeederLock.Unlock()
 
 				//if download fails append the chunk to remaining to retry later
@@ -153,11 +145,13 @@ func downloadChunks(file *models.File, randomChunks []int) {
 					numChunks++
 					appendChunkLock.Unlock()
 
-					workerCount--
 					//TODO: Remove this clamp, dont double count timeouted arrivals
-					if workerCount < 0 {
-						workerCount = 0
+					mutexes.WorkerMapLock.Lock()
+					workerMap[downloadSeederAddr]--
+					if workerMap[downloadSeederAddr] < 0 {
+						workerMap[downloadSeederAddr] = 0
 					}
+					mutexes.WorkerMapLock.Unlock()
 
 					//This file was not available at this time from this seeder, drop seeder for file.
 					mutateSeederLock.Lock()
@@ -230,11 +224,13 @@ func downloadChunks(file *models.File, randomChunks []int) {
 					numChunks++
 					appendChunkLock.Unlock()
 
-					workerCount--
 					//TODO: Remove this clamp, dont double count timeouted arrivals
-					if workerCount < 0 {
-						workerCount = 0
+					mutexes.WorkerMapLock.Lock()
+					workerMap[downloadSeederAddr]--
+					if workerMap[downloadSeederAddr] < 0 {
+						workerMap[downloadSeederAddr] = 0
 					}
+					mutexes.WorkerMapLock.Unlock()
 
 					//This file was not available at this time from this seeder, drop seeder for file.
 					mutateSeederLock.Lock()
@@ -252,17 +248,41 @@ func downloadChunks(file *models.File, randomChunks []int) {
 				}
 			}
 
+			downloadSeederAddr := ""
+
+			//spin to seeder with workers available
+			spinForSeeder := true
+			for spinForSeeder {
+				downloadSeederAddr = file.Seeders[seederAlternator]
+
+				//If seeder selected exceeds worker limit skip
+				mutexes.WorkerMapLock.Lock()
+				seedWorkerNum := workerMap[downloadSeederAddr]
+				mutexes.WorkerMapLock.Unlock()
+
+				if seedWorkerNum >= constants.NumWorkers {
+					seederAlternator++
+					if seederAlternator > len(file.Seeders)-1 {
+						seederAlternator = 0
+
+						//When weve spun a complete seeder cycle we sleep
+						time.Sleep(time.Millisecond)
+					}
+				} else {
+					//If the seeder has room for more workers we accept
+					spinForSeeder = false
+					mutexes.WorkerMapLock.Lock()
+					workerMap[downloadSeederAddr]++
+					mutexes.WorkerMapLock.Unlock()
+				}
+			}
+
 			//get chunk id
 			appendChunkLock.Lock()
 			chunkid := randomChunks[i]
 			appendChunkLock.Unlock()
 
-			go requestChunkJob(chunkid)
-
-			seederAlternator++
-			if seederAlternator > len(file.Seeders)-1 {
-				seederAlternator = 0
-			}
+			go requestChunkJob(chunkid, downloadSeederAddr)
 		}
 	}
 
