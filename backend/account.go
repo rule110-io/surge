@@ -66,7 +66,7 @@ func InitializeAccount() *nkn.Account {
 	return account
 }
 
-//GetMyAddress returns current client address
+//GetAccountAddress returns current client address
 func GetAccountAddress() string {
 	for !clientInitialized {
 		time.Sleep(time.Millisecond * 50)
