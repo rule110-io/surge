@@ -1,9 +1,7 @@
 <template>
   <div class="main__wrapper">
     <div class="main__tour" v-if="tour"></div>
-    <Sidebar />
     <Dashboard />
-    <Tour v-if="tour" />
   </div>
 </template>
 <script>
@@ -12,14 +10,10 @@ const runtime = require("@wailsapp/runtime");
 import { mapState } from "vuex";
 
 import Dashboard from "@/components/Dashboard/Dashboard";
-import Sidebar from "@/components/Sidebar/Sidebar";
-import Tour from "@/components/Tour/Tour";
 
 export default {
   components: {
     Dashboard,
-    Sidebar,
-    Tour,
   },
   computed: {
     ...mapState("tour", ["tour"]),

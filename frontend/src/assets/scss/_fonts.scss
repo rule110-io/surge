@@ -1,108 +1,49 @@
 @font-face {
-  font-family: "Source Code Pro";
-  src: url("../fonts/SourceCodePro/SourceCodePro-Light.eot");
-  src: url("../fonts/SourceCodePro/SourceCodePro-Light.eot?#iefix")
-      format("embedded-opentype"),
-    url("../fonts/SourceCodePro/SourceCodePro-Light.woff2") format("woff2"),
-    url("../fonts/SourceCodePro/SourceCodePro-Light.woff") format("woff"),
-    url("../fonts/SourceCodePro/SourceCodePro-Light.ttf") format("truetype");
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Source Code Pro";
-  src: url("../fonts/SourceCodePro/SourceCodePro-Black.eot");
-  src: url("../fonts/SourceCodePro/SourceCodePro-Black.eot?#iefix")
-      format("embedded-opentype"),
-    url("../fonts/SourceCodePro/SourceCodePro-Black.woff2") format("woff2"),
-    url("../fonts/SourceCodePro/SourceCodePro-Black.woff") format("woff"),
-    url("../fonts/SourceCodePro/SourceCodePro-Black.ttf") format("truetype");
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Source Code Pro";
-  src: url("../fonts/SourceCodePro/SourceCodePro-Semibold.eot");
-  src: url("../fonts/SourceCodePro/SourceCodePro-Semibold.eot?#iefix")
-      format("embedded-opentype"),
-    url("../fonts/SourceCodePro/SourceCodePro-Semibold.woff2") format("woff2"),
-    url("../fonts/SourceCodePro/SourceCodePro-Semibold.woff") format("woff"),
-    url("../fonts/SourceCodePro/SourceCodePro-Semibold.ttf") format("truetype");
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Source Code Pro";
-  src: url("../fonts/SourceCodePro/SourceCodePro-Medium.eot");
-  src: url("../fonts/SourceCodePro/SourceCodePro-Medium.eot?#iefix")
-      format("embedded-opentype"),
-    url("../fonts/SourceCodePro/SourceCodePro-Medium.woff2") format("woff2"),
-    url("../fonts/SourceCodePro/SourceCodePro-Medium.woff") format("woff"),
-    url("../fonts/SourceCodePro/SourceCodePro-Medium.ttf") format("truetype");
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Source Code Pro";
-  src: url("../fonts/SourceCodePro/SourceCodePro-ExtraLight.eot");
-  src: url("../fonts/SourceCodePro/SourceCodePro-ExtraLight.eot?#iefix")
-      format("embedded-opentype"),
-    url("../fonts/SourceCodePro/SourceCodePro-ExtraLight.woff2") format("woff2"),
-    url("../fonts/SourceCodePro/SourceCodePro-ExtraLight.woff") format("woff"),
-    url("../fonts/SourceCodePro/SourceCodePro-ExtraLight.ttf")
-      format("truetype");
-  font-weight: 200;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: "Source Code Pro";
-  src: url("../fonts/SourceCodePro/SourceCodePro-Bold.eot");
-  src: url("../fonts/SourceCodePro/SourceCodePro-Bold.eot?#iefix")
-      format("embedded-opentype"),
-    url("../fonts/SourceCodePro/SourceCodePro-Bold.woff2") format("woff2"),
-    url("../fonts/SourceCodePro/SourceCodePro-Bold.woff") format("woff"),
-    url("../fonts/SourceCodePro/SourceCodePro-Bold.ttf") format("truetype");
+  font-family: "Inter";
+  src: url("../fonts/Inter/Inter-Bold.eot");
+  src: url("../fonts/Inter/Inter-Bold.eot?#iefix") format("embedded-opentype"),
+    url("../fonts/Inter/Inter-Bold.woff2") format("woff2"),
+    url("../fonts/Inter/Inter-Bold.woff") format("woff"),
+    url("../fonts/Inter/Inter-Bold.ttf") format("truetype");
   font-weight: bold;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Source Code Pro";
-  src: url("../fonts/SourceCodePro/SourceCodePro-Regular.eot");
-  src: url("../fonts/SourceCodePro/SourceCodePro-Regular.eot?#iefix")
-      format("embedded-opentype"),
-    url("../fonts/SourceCodePro/SourceCodePro-Regular.woff2") format("woff2"),
-    url("../fonts/SourceCodePro/SourceCodePro-Regular.woff") format("woff"),
-    url("../fonts/SourceCodePro/SourceCodePro-Regular.ttf") format("truetype");
-  font-weight: normal;
+  font-family: "Inter";
+  src: url("../fonts/Inter/Inter-Medium.eot");
+  src: url("../fonts/Inter/Inter-Medium.eot?#iefix") format("embedded-opentype"),
+    url("../fonts/Inter/Inter-Medium.woff2") format("woff2"),
+    url("../fonts/Inter/Inter-Medium.woff") format("woff"),
+    url("../fonts/Inter/Inter-Medium.ttf") format("truetype");
+  font-weight: 500;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: "Roboto";
-  font-style: normal;
-  font-weight: 400;
-  src: url("../fonts/roboto/roboto-v18-latin-regular.eot"); /* IE9 Compat Modes */
-  src: local("Roboto"), local("Roboto-Regular"),
-    url("../fonts/roboto/roboto-v18-latin-regular.eot?#iefix")
+  font-family: "Inter";
+  src: url("../fonts/Inter/Inter-SemiBold.eot");
+  src: url("../fonts/Inter/Inter-SemiBold.eot?#iefix")
       format("embedded-opentype"),
-    /* IE6-IE8 */ url("../fonts/roboto/roboto-v18-latin-regular.woff2")
-      format("woff2"),
-    /* Super Modern Browsers */
-      url("../fonts/roboto/roboto-v18-latin-regular.woff") format("woff"),
-    /* Modern Browsers */ url("../fonts/roboto/roboto-v18-latin-regular.ttf")
-      format("truetype");
-  /* Safari, Android, iOS */
+    url("../fonts/Inter/Inter-SemiBold.woff2") format("woff2"),
+    url("../fonts/Inter/Inter-SemiBold.woff") format("woff"),
+    url("../fonts/Inter/Inter-SemiBold.ttf") format("truetype");
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Inter";
+  src: url("../fonts/Inter/Inter-Regular.eot");
+  src: url("../fonts/Inter/Inter-Regular.eot?#iefix")
+      format("embedded-opentype"),
+    url("../fonts/Inter/Inter-Regular.woff2") format("woff2"),
+    url("../fonts/Inter/Inter-Regular.woff") format("woff"),
+    url("../fonts/Inter/Inter-Regular.ttf") format("truetype");
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
 }

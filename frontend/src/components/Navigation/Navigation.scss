@@ -1,0 +1,58 @@
+.navigation {
+  display: flex;
+  margin-left: $padding-md;
+  position: relative;
+  top: 18px;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    padding: 0 $padding-sm $padding-xl $padding-sm;
+    transition: $transition-1;
+    cursor: pointer;
+    position: relative;
+    font-weight: $fw-semi-bold;
+
+    &:after {
+      content: "";
+      display: block;
+      position: absolute;
+      bottom: 3px;
+      height: 3px;
+      width: 100%;
+      background: transparent;
+      left: 0;
+      transition: $transition-1;
+      border-radius: $br-xs;
+    }
+
+    &:hover {
+      color: $white;
+
+      & path {
+        stroke: $white;
+      }
+    }
+
+    &.active {
+      color: $white;
+
+      &:after {
+        background: $primary-gradient;
+      }
+
+      & path {
+        stroke: $white;
+      }
+    }
+  }
+
+  &__icon {
+    transition: $transition-1;
+    margin-right: $padding-xs;
+
+    path {
+      transition: $transition-1;
+    }
+  }
+}

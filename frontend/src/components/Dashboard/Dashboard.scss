@@ -1,12 +1,6 @@
 .dashboard {
-  background: $base;
-  height: calc(100% - #{$padding-big});
-  margin-left: $sidebar-width;
-  padding: 0 0 $padding-big $padding-big;
+  background: $darkest;
   position: relative;
   overflow: hidden;
-
-  @include dark-theme {
-    background: color(dark, base);
-  }
+  height: 100%;
 }
