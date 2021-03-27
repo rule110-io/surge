@@ -1,0 +1,60 @@
+.tabs {
+  box-shadow: $shadow-1;
+  backdrop-filter: $blur;
+  border-radius: $br-md;
+  background: $dark-gradient;
+  display: flex;
+  align-items: flex-end;
+  height: 48px;
+  box-sizing: border-box;
+  padding-left: $padding-md;
+  padding-right: $padding-llg;
+
+  &__title {
+    font-weight: $fw-semi-bold;
+    color: $white;
+    margin: 0 $padding-xl $padding-md 0;
+  }
+
+  &__items {
+    display: flex;
+    position: relative;
+  }
+
+  &__item {
+    padding: 0 $padding-sm $padding-md $padding-sm;
+    transition: $transition-1;
+    cursor: pointer;
+    position: relative;
+    box-sizing: border-box;
+
+    &:after {
+      content: "";
+      display: block;
+      position: absolute;
+      bottom: 0;
+      height: 3px;
+      width: 100%;
+      background: transparent;
+      left: 0;
+      transition: $transition-1;
+      border-radius: $br-xs;
+    }
+
+    &:hover {
+      color: $white;
+    }
+
+    &_active {
+      color: $white;
+
+      &:after {
+        background: $primary-gradient;
+      }
+    }
+
+    &:not(:last-child) {
+      margin-right: $padding-sm;
+    }
+  }
+}

@@ -2,7 +2,7 @@
   display: flex;
   margin-left: $padding-md;
   position: relative;
-  top: 18px;
+  top: 15px;
 
   &__item {
     display: flex;
@@ -17,7 +17,7 @@
       content: "";
       display: block;
       position: absolute;
-      bottom: 3px;
+      bottom: 0;
       height: 3px;
       width: 100%;
       background: transparent;

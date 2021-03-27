@@ -9,6 +9,7 @@
   display: flex;
   align-items: center;
   padding: $padding-sm $padding-md;
+  height: 48px;
 
   &_readonly {
     border-color: transparent !important;

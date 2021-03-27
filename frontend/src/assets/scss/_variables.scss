@@ -8,6 +8,11 @@ $font-family: "Inter", sans-serif;
 // Colors
 $darkest: #0e0e10;
 $dark: #131416;
+$dark-gradient: linear-gradient(
+  0deg,
+  rgba(255, 255, 255, 0.03),
+  rgba(255, 255, 255, 0.03)
+);
 $semi-dark: #212228;
 $white: #fff;
 $white-ghost: rgba(255, 255, 255, 0.15);
