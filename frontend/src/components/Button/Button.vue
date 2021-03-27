@@ -1,39 +1,15 @@
 <template>
-  <button
-    v-if="type == 'button'"
-    :class="[
-      'button',
-      theme ? `button_theme_${theme}` : null,
-      full ? `button_full` : null,
-      disabled === true ? 'button_disabled' : null,
-    ]"
-    @click="onClickButton"
+  <component
+    :is="type"
+    class="button"
+    :class="[`button_theme_${theme}`, `button_size_${size}`]"
+    :to="to"
+    :disabled="disabled"
+    v-on="!disabled ? $listeners : false"
   >
-    <slot />
-  </button>
-  <a
-    v-else-if="type === 'link'"
-    :href="url"
-    target="_blank"
-    :class="[
-      'button',
-      theme ? `button_theme_${theme}` : null,
-      full ? `button_full` : null,
-    ]"
-  >
-    <slot />
-  </a>
-  <nuxt-link
-    v-else-if="type === 'router'"
-    :to="localePath(url)"
-    :class="[
-      'button',
-      theme ? `button_theme_${theme}` : null,
-      full ? `button_full` : null,
-    ]"
-  >
-    <slot />
-  </nuxt-link>
+    <component :is="icon" v-if="icon" class="button__icon"> </component>
+    <slot></slot>
+  </component>
 </template>
 
 <style lang="scss">
@@ -46,7 +22,11 @@ export default {
   props: {
     theme: {
       type: String,
-      default: "primary",
+      default: "default",
+    },
+    size: {
+      type: String,
+      default: "md",
     },
     disabled: {
       type: Boolean,
@@ -56,35 +36,19 @@ export default {
       type: String,
       default: "button",
     },
-    url: {
+    to: {
       type: String,
       default: "",
-    },
-    full: {
-      type: Boolean,
-      default: false,
     },
     icon: {
       type: String,
       default: "",
-    },
-    click: {
-      type: Function,
-      default: () => {},
     },
   },
   data: () => {
     return {};
   },
   mounted() {},
-  methods: {
-    onClickButton(event) {
-      if (this.disabled !== true) {
-        this.click();
-      } else {
-        event.preventDefault();
-      }
-    },
-  },
+  methods: {},
 };
 </script>

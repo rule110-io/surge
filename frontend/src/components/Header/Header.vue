@@ -7,6 +7,7 @@
 
     <div class="header__right">
       <Input
+        class="header__search"
         :value="searchQuery"
         icon="SearchIcon"
         placeholder="Search or enter file hash"
@@ -16,6 +17,7 @@
             : remoteSearch(searchQuery)
         "
       />
+      <Button theme="primary">Add file</Button>
     </div>
   </header>
 </template>
@@ -30,11 +32,12 @@ import { mixin as clickaway } from "vue-clickaway";
 
 import Navigation from "@/components/Navigation/Navigation";
 import Input from "@/components/Controls/Input/Input";
+import Button from "@/components/Button/Button";
 
 import Logo from "@/assets/icons/Logo.svg";
 
 export default {
-  components: { Logo, Navigation, Input },
+  components: { Logo, Navigation, Input, Button },
   mixins: [clickaway],
   data: () => {
     return {
