@@ -27,7 +27,7 @@ export default {
       items: [
         {
           text: "Transfers",
-          route: "download",
+          route: "transfers",
           icon: "TransfersIcon",
         },
         {

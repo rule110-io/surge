@@ -1,14 +1,15 @@
 <template>
-  <div>
-    page
-  </div>
+  <ContentWrapper> <TransfersHeader /> </ContentWrapper>
 </template>
 <script>
 import { mapState } from "vuex";
 
+import ContentWrapper from "@/components/ContentWrapper/ContentWrapper";
+import TransfersHeader from "@/components/Widgets/Transfers/TransfersHeader/TransfersHeader";
+
 export default {
   name: "download",
-  components: {},
+  components: { ContentWrapper, TransfersHeader },
   data: () => {
     return {
       isRemoveFileModal: false,

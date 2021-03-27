@@ -1,16 +1,16 @@
 import Dashboard from "@/layout/Dashboard/Dashboard.vue";
-import Download from "@/pages/Download.vue";
+import Transfers from "@/pages/Transfers.vue";
 
 const routes = [
   {
     path: "/",
     component: Dashboard,
-    redirect: "/download",
+    redirect: "/transfers",
     children: [
       {
-        path: "download",
-        name: "download",
-        component: Download,
+        path: "transfers",
+        name: "transfers",
+        component: Transfers,
       },
     ],
   },
