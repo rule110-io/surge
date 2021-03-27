@@ -19,6 +19,8 @@
       />
       <Button theme="primary" class="header__button">Add file</Button>
       <Divider />
+      <Icon class="header__icon" icon="NotificationsIcon" />
+      <Icon class="header__icon" icon="SettingsIcon" />
     </div>
   </header>
 </template>
@@ -35,11 +37,12 @@ import Navigation from "@/components/Navigation/Navigation";
 import Input from "@/components/Controls/Input/Input";
 import Button from "@/components/Button/Button";
 import Divider from "@/components/Divider/Divider";
+import Icon from "@/components/Icon/Icon";
 
 import Logo from "@/assets/icons/Logo.svg";
 
 export default {
-  components: { Logo, Navigation, Input, Button, Divider },
+  components: { Logo, Navigation, Input, Button, Divider, Icon },
   mixins: [clickaway],
   data: () => {
     return {

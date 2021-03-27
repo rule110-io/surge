@@ -7,7 +7,7 @@
       v-for="item in items"
       :key="item.route"
     >
-      <component class="navigation__icon" :is="item.icon"></component>
+      <Icon class="navigation__icon" :icon="item.icon"></Icon>
       {{ item.text }}
     </router-link>
   </div>
@@ -18,11 +18,10 @@
 </style>
 
 <script>
-import TransfersIcon from "@/assets/icons/TransfersIcon.svg";
-import DiscoverIcon from "@/assets/icons/DiscoverIcon.svg";
+import Icon from "@/components/Icon/Icon";
 
 export default {
-  components: { TransfersIcon, DiscoverIcon },
+  components: { Icon },
   data: () => {
     return {
       items: [

@@ -29,7 +29,8 @@
     &:hover {
       color: $white;
 
-      & path {
+      & path,
+      circle {
         stroke: $white;
       }
     }
@@ -41,18 +42,14 @@
         background: $primary-gradient;
       }
 
-      & path {
+      & path,
+      circle {
         stroke: $white;
       }
     }
   }
 
   &__icon {
-    transition: $transition-1;
     margin-right: $padding-xs;
-
-    path {
-      transition: $transition-1;
-    }
   }
 }

@@ -7,7 +7,7 @@
     :disabled="disabled"
     v-on="!disabled ? $listeners : false"
   >
-    <component :is="icon" v-if="icon" class="button__icon"> </component>
+    <Icon :icon="icon" v-if="icon" class="button__icon"> </Icon>
     <slot></slot>
   </component>
 </template>
@@ -17,8 +17,10 @@
 </style>
 
 <script>
+import Icon from "@/components/Icon/Icon";
+
 export default {
-  components: {},
+  components: { Icon },
   props: {
     theme: {
       type: String,
