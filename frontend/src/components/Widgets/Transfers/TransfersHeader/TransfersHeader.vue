@@ -2,6 +2,7 @@
   <div class="transfers-header">
     <Tabs title="Status" :tabs="statuses" :active-tab.sync="activeStatus" />
     <Input
+      class="transfers-header__search"
       :value="searchQuery"
       icon="SearchIcon"
       placeholder="Filter files..."

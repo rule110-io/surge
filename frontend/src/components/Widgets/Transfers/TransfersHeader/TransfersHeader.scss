@@ -3,4 +3,8 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: $padding-md;
+
+  &__search {
+    width: 408px;
+  }
 }
