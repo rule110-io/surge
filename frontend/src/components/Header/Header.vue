@@ -17,7 +17,8 @@
             : remoteSearch(searchQuery)
         "
       />
-      <Button theme="primary">Add file</Button>
+      <Button theme="primary" class="header__button">Add file</Button>
+      <Divider />
     </div>
   </header>
 </template>
@@ -33,11 +34,12 @@ import { mixin as clickaway } from "vue-clickaway";
 import Navigation from "@/components/Navigation/Navigation";
 import Input from "@/components/Controls/Input/Input";
 import Button from "@/components/Button/Button";
+import Divider from "@/components/Divider/Divider";
 
 import Logo from "@/assets/icons/Logo.svg";
 
 export default {
-  components: { Logo, Navigation, Input, Button },
+  components: { Logo, Navigation, Input, Button, Divider },
   mixins: [clickaway],
   data: () => {
     return {

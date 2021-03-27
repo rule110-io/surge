@@ -13,11 +13,12 @@
     align-items: center;
   }
 
-  &__search {
-    margin-right: $padding-llg;
+  &__button {
+    margin: 0 $padding-llg;
   }
 
   &__right {
+    height: 48px;
     display: flex;
     align-items: center;
   }

@@ -8,6 +8,7 @@ $font-family: "Inter", sans-serif;
 // Colors
 $darkest: #0e0e10;
 $dark: #131416;
+$semi-dark: #212228;
 $white: #fff;
 $white-ghost: rgba(255, 255, 255, 0.15);
 $primary: #0a9795;
@@ -72,4 +73,4 @@ $br-sm: 5px;
 $br-md: 9px;
 $br-lg: 22px;
 
-$border: 1px solid #212228;
+$border: 1px solid $semi-dark;
