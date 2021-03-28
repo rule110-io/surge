@@ -1,9 +1,13 @@
 <template>
   <div class="dashboard">
     <Header />
-    <router-view
-      v-if="remoteFiles !== false && localFiles !== false"
-    ></router-view>
+    <div class="dashboard__content">
+      <router-view
+        v-if="remoteFiles !== false && localFiles !== false"
+      ></router-view>
+    </div>
+
+    <NetworkStats />
   </div>
 </template>
 
@@ -15,9 +19,10 @@
 import { mapState } from "vuex";
 
 import Header from "@/components/Header/Header";
+import NetworkStats from "@/components/NetworkStats/NetworkStats";
 
 export default {
-  components: { Header },
+  components: { Header, NetworkStats },
   data: () => {
     return {};
   },

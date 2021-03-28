@@ -1,26 +1,21 @@
 .network-stats {
-  height: 40px;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  height: 48px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: $fz-xs;
-  color: $grey;
-  background: #e9eaea;
-  position: relative;
-  bottom: -8px;
-  left: -20px;
-  width: calc(100% - 40px);
-  margin: 0 auto;
-  border-top-left-radius: 18px;
-  border-top-right-radius: 18px;
-
-  @include dark-theme {
-    background: color(dark, darkest);
-    color: white;
-  }
+  background: $black-light;
+  box-shadow: $shadow-2;
+  backdrop-filter: $blur-2;
 
   &__item {
-    margin: 0 $padding-normal;
+    mix-blend-mode: luminosity;
+    font-size: $fz-sm;
+    font-weight: $fw-semi-bold;
+    color: $white;
+    margin: 0 $padding-llg;
     display: inline-flex;
     align-items: center;
     z-index: 1;
@@ -29,76 +24,5 @@
 
   &__avg {
     text-align: right;
-  }
-
-  &__status {
-    display: inline-flex;
-    align-items: center;
-  }
-
-  &__loader {
-    margin: 0 4px;
-    animation: spinner 2s linear infinite;
-    height: 14px;
-    width: 14px;
-
-    @include dark-theme {
-      color: white;
-    }
-  }
-
-  &__file {
-    height: 52px;
-    width: 52px;
-    border-radius: 42px;
-    position: absolute;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: $padding-big;
-    margin-right: $padding-default;
-    background: white;
-    transition: $transition-1;
-    cursor: pointer;
-    left: 44%;
-    top: -24px;
-    z-index: 1;
-
-    @include dark-theme {
-      background: color(dark, base);
-    }
-
-    &:hover {
-      transform: scale(1.1);
-    }
-
-    &-wrapper {
-      background: $primary;
-      height: 42px;
-      width: 42px;
-      border-radius: 42px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    &-icon {
-      height: 18px;
-      color: white;
-      transition: $transition-1;
-
-      @include dark-theme {
-        color: color(dark, darkest);
-      }
-    }
-  }
-}
-
-@keyframes spinner {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
   }
 }

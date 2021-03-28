@@ -17,7 +17,9 @@
             : remoteSearch(searchQuery)
         "
       />
-      <Button theme="primary" class="header__button">Add file</Button>
+      <Button theme="primary" class="header__button" @click="seedFile"
+        >Add file</Button
+      >
       <Divider />
       <Icon class="header__icon" icon="NotificationsIcon" />
       <Icon class="header__icon" icon="SettingsIcon" />
@@ -89,6 +91,13 @@ export default {
         this.$store.commit("files/setLocalFilesConfig", newConfig);
         this.$store.dispatch("files/fetchLocalFiles");
       }, 500);
+    },
+    seedFile() {
+      window.backend.MiddlewareFunctions.SeedFile().then(() => {
+        this.$store.dispatch("files/fetchLocalFiles");
+        this.$store.dispatch("files/fetchRemoteFiles");
+        this.$router.replace("/transfers");
+      });
     },
     toggleTheme() {
       this.$store.dispatch("darkTheme/toggleDarkTheme");

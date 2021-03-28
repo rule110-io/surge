@@ -3,4 +3,10 @@
   position: relative;
   overflow: hidden;
   height: 100%;
+
+  &__content {
+    margin-top: 88px;
+    height: calc(100% - 88px - 48px);
+    overflow-y: scroll;
+  }
 }

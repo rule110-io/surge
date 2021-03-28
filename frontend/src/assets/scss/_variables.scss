@@ -19,6 +19,7 @@ $white-ghost: rgba(255, 255, 255, 0.15);
 $primary: #0a9795;
 $primary-gradient: linear-gradient(92.64deg, #0aa292 0.31%, #084b9c 129.25%);
 $grey: #7b7d82;
+$black-light: rgba(255, 255, 255, 0.03);
 
 $themes: (
   dark: (
@@ -57,6 +58,7 @@ $shadow-3: 0px 0px 0px 3px rgba(10, 158, 146, 0.12),
   inset 0px 0px 6px rgba(10, 158, 146, 0.03);
 
 $blur: blur(17px);
+$blur-2: blur(14px);
 
 // App Spacing
 $padding-xxs: 0.25rem; // 4px
