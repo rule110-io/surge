@@ -1,17 +1,19 @@
 <template>
   <div class="network-stats">
-    <div class="network-stats__item text_wrap_none">
+    <div class="network-stats__left text_wrap_none">
       <template v-if="online === 0">
         Discovering network...
       </template>
       <template v-else>Total Clients Connected: {{ online }} </template>
     </div>
 
-    <div class="network-stats__item text_wrap_none">
-      <span class="network-stats__avg">
-        Avg Speed: {{ totalDown | prettyBytes(1) }}/s |
-        {{ totalUp | prettyBytes(1) }}/s</span
-      >
+    <div class="network-stats__right">
+      <div class="network-stats__item text_wrap_none">
+        Download: {{ totalDown | prettyBytes(1) }}/s
+      </div>
+      <div class="network-stats__item text_wrap_none">
+        Upload: {{ totalUp | prettyBytes(1) }}/s
+      </div>
     </div>
   </div>
 </template>

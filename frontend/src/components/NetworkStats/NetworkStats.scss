@@ -9,20 +9,24 @@
   background: $black-light;
   box-shadow: $shadow-2;
   backdrop-filter: $blur-2;
+  mix-blend-mode: luminosity;
+  font-size: $fz-sm;
+  font-weight: $fw-semi-bold;
+  color: $white;
 
-  &__item {
-    mix-blend-mode: luminosity;
-    font-size: $fz-sm;
-    font-weight: $fw-semi-bold;
-    color: $white;
-    margin: 0 $padding-llg;
-    display: inline-flex;
-    align-items: center;
-    z-index: 1;
-    position: relative;
+  &__left {
+    margin-left: $padding-llg;
   }
 
-  &__avg {
-    text-align: right;
+  &__right {
+    margin-right: $padding-xxl;
+    display: flex;
+    align-items: center;
+  }
+
+  &__item {
+    &:not(:last-child) {
+      margin-right: $padding-xl;
+    }
   }
 }
