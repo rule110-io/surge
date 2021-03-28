@@ -35,6 +35,36 @@ a {
   height: 100vh;
 }
 
+.text {
+  &_wrap {
+    &_none {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+
+  &_align {
+    &_left {
+      text-align: left;
+    }
+
+    &_center {
+      text-align: center;
+    }
+
+    &_right {
+      text-align: right;
+    }
+  }
+
+  &_weight {
+    &_bold {
+      font-weight: $fw-bold;
+    }
+  }
+}
+
 /*========== scroll ==========*/
 
 ::-webkit-scrollbar {
@@ -181,4 +211,42 @@ a {
     opacity: 1;
     transition: opacity 0.15s;
   }
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0 $padding-xxs;
+}
+
+tbody {
+  tr {
+    background: $dark;
+    box-shadow: $shadow-2;
+    backdrop-filter: $blur;
+    border-radius: $br-xxs;
+  }
+
+  td {
+    font-feature-settings: "salt" on;
+    color: $white;
+  }
+}
+
+th,
+td {
+  height: 48px;
+  box-sizing: border-box;
+  padding: 0 $padding-md;
+  vertical-align: middle;
+}
+
+th {
+  font-weight: $fw-bold;
+  font-size: $fz-xs;
+  line-height: 16px;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  font-feature-settings: "salt" on;
+  color: $grey;
 }

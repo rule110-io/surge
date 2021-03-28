@@ -1,0 +1,15 @@
+.file-name {
+  display: flex;
+  align-items: center;
+  width: 100%;
+
+  &__title {
+    width: 285px;
+  }
+
+  &__icon {
+    height: 20px;
+    width: 20px;
+    margin-right: $padding-md;
+  }
+}
