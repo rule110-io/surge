@@ -19,14 +19,18 @@
         <td>
           <FileName :file="file" />
         </td>
+        <td class="text_align_right">
+          <FileSize :file="file" />
+        </td>
+        <td>
+          <FileProgress :file="file" />
+        </td>
         <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+        <td class="text_align_right"></td>
+        <td class="text_align_right"></td>
+        <td class="text_align_right"></td>
+        <td class="text_align_right"></td>
+        <td class="text_align_right"></td>
         <td></td>
       </tr>
     </tbody>
@@ -41,9 +45,11 @@
 import { mapState } from "vuex";
 
 import FileName from "@/components/File/FileName/FileName";
+import FileSize from "@/components/File/FileSize/FileSize";
+import FileProgress from "@/components/File/FileProgress/FileProgress";
 
 export default {
-  components: { FileName },
+  components: { FileName, FileSize, FileProgress },
   data: () => {
     return {};
   },
