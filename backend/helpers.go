@@ -185,3 +185,12 @@ func ParsePayloadString(s string) []models.File {
 	}
 	return files
 }
+
+func filterFile(ss []models.File, test func(models.File) bool) (ret []models.File) {
+	for _, s := range ss {
+		if test(s) {
+			ret = append(ret, s)
+		}
+	}
+	return
+}

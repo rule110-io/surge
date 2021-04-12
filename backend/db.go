@@ -29,6 +29,16 @@ const settingBucketName = "settingsBucket"
 
 var db *nutsdb.DB
 
+type FileFilterState int
+
+const (
+	All = iota
+	Downloading
+	Seeding
+	Completed
+	Paused
+)
+
 //InitializeDb initializes db
 func InitializeDb() {
 	var err error
@@ -239,7 +249,7 @@ func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take 
 }
 
 //SearchLocalFile runs a paged query
-func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryResult {
+func SearchLocalFile(Query string, filterState FileFilterState, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryResult {
 
 	resultFiles := []models.File{}
 
@@ -249,6 +259,29 @@ func SearchLocalFile(Query string, OrderBy string, IsDesc bool, Skip int, Take i
 			resultFiles = append(resultFiles, file)
 		}
 	}
+
+	fileFilterFunc := func(f models.File) bool { return true }
+
+	//Filter files on filter state
+	switch filterState {
+	/*case All: //added for clarity
+	fileFilterFunc = func(f models.File) bool { return true }
+	break*/
+	case Downloading:
+		fileFilterFunc = func(f models.File) bool { return f.IsDownloading }
+		break
+	case Seeding:
+		fileFilterFunc = func(f models.File) bool { return f.IsUploading }
+		break
+	case Completed:
+		fileFilterFunc = func(f models.File) bool { return f.IsAvailable }
+		break
+	case Paused:
+		fileFilterFunc = func(f models.File) bool { return f.IsPaused }
+		break
+	}
+
+	resultFiles = filterFile(resultFiles, fileFilterFunc)
 
 	totalNum := len(resultFiles)
 

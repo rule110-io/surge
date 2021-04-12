@@ -51,7 +51,7 @@ const actions = {
     const { search, skip, get, orderBy, isDesc } = state.localFilesConfig;
 
     window.backend
-      .MiddlewareFunctions.GetLocalFiles(search, orderBy, isDesc, skip, get)
+      .MiddlewareFunctions.GetLocalFiles(search, 0, orderBy, isDesc, skip, get)
       .then(({ Result, Count }) => {
         commit("setLocalFiles", { Result, Count });
       });
