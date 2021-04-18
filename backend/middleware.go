@@ -1,6 +1,7 @@
 package surge
 
 import (
+	"github.com/rule110-io/surge/backend/mutexes"
 	"github.com/rule110-io/surge/backend/platform"
 	"github.com/wailsapp/wails"
 )
@@ -81,4 +82,24 @@ func (s *MiddlewareFunctions) StartDownloadMagnetLinks(Magnetlinks string) bool 
 		go DownloadFileByHash(files[i].FileHash)
 	}
 	return true
+}
+
+func (s *MiddlewareFunctions) SubscribeToTopic(Topic string) {
+	subscribeToSurgeTopic(Topic)
+}
+
+func (s *MiddlewareFunctions) UnsubscribeFromTopic(Topic string) {
+	unsubscribeFromSurgeTopic(Topic)
+}
+
+func (s *MiddlewareFunctions) GetTopicSubscriptions() []string {
+	topicNames := []string{}
+
+	mutexes.TopicsMapLock.Lock()
+	for _, v := range topicsMap {
+		topicNames = append(topicNames, v.Name)
+	}
+	mutexes.TopicsMapLock.Unlock()
+
+	return topicNames
 }

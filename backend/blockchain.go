@@ -70,3 +70,12 @@ func subscribeToPubSub(topic string) {
 		log.Println("Subscribed: ", txnHash)
 	}
 }
+
+func unsubscribeToPubSub(topic string) {
+	txnHash, err := client.Unsubscribe("", topic, nil)
+	if err != nil {
+		log.Println("Probably already subscribed", err)
+	} else {
+		log.Println("Subscribed: ", txnHash)
+	}
+}
