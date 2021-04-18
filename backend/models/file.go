@@ -28,4 +28,5 @@ type File struct {
 	ChunksShared  int
 	SeederCount   int
 	Progress      float32 //only for remote
+	Topic         string
 }

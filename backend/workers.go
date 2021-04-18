@@ -46,7 +46,7 @@ func autoSubscribeWorker() {
 		}
 
 		if hosting {
-			subscribeToSurgeTopic()
+			resubscribeToTopics()
 		}
 
 		time.Sleep(time.Second * 20 * constants.SubscriptionDuration)

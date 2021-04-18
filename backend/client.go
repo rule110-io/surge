@@ -77,6 +77,8 @@ func WailsBind(runtime *wails.Runtime) {
 	}
 	updateNumClientStore()
 
+	InitializeTopicsManager()
+
 	//Get subs first synced then grab file queries for those subs
 	GetSubscriptions()
 
@@ -405,6 +407,7 @@ func processQueryResponse(Session *sessionmanager.Session, Data []byte) {
 			NumChunks:    numChunks,
 			ChunkMap:     nil,
 			SeederCount:  1,
+			Topic:        data[5],
 		}
 
 		//Replace existing, or remove.
@@ -464,7 +467,7 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 }
 
 //SeedFile generates everything needed to seed a file
-func SeedFilepath(Path string) bool {
+func SeedFilepath(Path string, Topic string) bool {
 
 	log.Println("Seeding file", Path)
 
@@ -498,6 +501,7 @@ func SeedFilepath(Path string) bool {
 		IsUploading:   false,
 		IsDownloading: false,
 		IsHashing:     true,
+		Topic:         Topic,
 	}
 
 	//Check if file is already seeded
@@ -521,12 +525,12 @@ func BuildSeedString(dbFiles []models.File) {
 
 	newQueryPayload := ""
 	for _, dbFile := range dbFiles {
-		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, client.Addr().String())
+		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, client.Addr().String(), dbFile.Topic)
 		log.Println("Magnet:", magnet)
 
 		if dbFile.IsUploading {
 			//Add to payload
-			payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)
+			payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Topic)
 			//log.Println(payload)
 			newQueryPayload += payload
 		}
@@ -538,10 +542,10 @@ func BuildSeedString(dbFiles []models.File) {
 func AddToSeedString(dbFile models.File) {
 
 	//Add to payload
-	payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)
+	payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Topic)
 	//log.Println(payload)
 	queryPayload += payload
 
 	//Make sure you're subscribed when seeding a file
-	go subscribeToSurgeTopic()
+	go subscribeToSurgeTopic(dbFile.Topic)
 }

@@ -93,21 +93,21 @@ func TopicEncode(topic string) string {
 	return "SRG_" + strings.ReplaceAll(b64.StdEncoding.EncodeToString([]byte(topic)), "=", "-")
 }
 
-func surgeGenerateTopicPayload(fileName string, sizeInBytes int64, hash string) string {
+func surgeGenerateTopicPayload(fileName string, sizeInBytes int64, hash string, topic string) string {
 	//Example payload
 	//surge://|file|The_Two_Towers-The_Purist_Edit-Trailer.avi|14997504|965c013e991ee246d63d45ea71954c4d|/
 
-	return "surge://|file|" + fileName + "|" + strconv.FormatInt(sizeInBytes, 10) + "|" + hash + "|/"
+	return "surge://|file|" + fileName + "|" + strconv.FormatInt(sizeInBytes, 10) + "|" + hash + "|" + topic + "|/"
 }
 
-func surgeGenerateMagnetLink(fileName string, sizeInBytes int64, hash string, seeder string) string {
+func surgeGenerateMagnetLink(fileName string, sizeInBytes int64, hash string, seeder string, topic string) string {
 	//Example payload
 	//surge://|file|The_Two_Towers-The_Purist_Edit-Trailer.avi|14997504|965c013e991ee246d63d45ea71954c4d|/
 	if seeder == "" {
 		seeder = client.Addr().String()
 	}
 
-	return "surge://|file|" + fileName + "|" + strconv.FormatInt(sizeInBytes, 10) + "|" + hash + "|" + seeder + "|/"
+	return "surge://|file|" + fileName + "|" + strconv.FormatInt(sizeInBytes, 10) + "|" + hash + "|" + seeder + "|" + topic + "|/"
 }
 
 func hashFile(randomHash string) {
@@ -161,6 +161,7 @@ func ParsePayloadString(s string) []models.File {
 			Path:         "",
 			NumChunks:    numChunks,
 			ChunkMap:     nil,
+			Topic:        data[5],
 		}
 
 		mutexes.ListedFilesLock.Lock()

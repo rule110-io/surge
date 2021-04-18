@@ -52,12 +52,12 @@ func (s *MiddlewareFunctions) OpenFolder(Hash string) {
 	OpenFolderByHash(Hash)
 }
 
-func (s *MiddlewareFunctions) SeedFile() bool {
+func (s *MiddlewareFunctions) SeedFile(Topic string) bool {
 	path := platform.OpenFileDialog()
 	if path == "" {
 		return false
 	}
-	return SeedFilepath(path)
+	return SeedFilepath(path, Topic)
 }
 
 func (s *MiddlewareFunctions) RemoveFile(Hash string, FromDisk bool) bool {

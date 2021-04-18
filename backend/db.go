@@ -197,6 +197,7 @@ func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take 
 				Seeders:     file.Seeders,
 				NumChunks:   file.NumChunks,
 				SeederCount: len(file.Seeders),
+				Topic:       file.Topic,
 			}
 
 			tracked, err := dbGetFile(result.FileHash)
@@ -323,6 +324,7 @@ func SearchLocalFile(Query string, filterState FileFilterState, OrderBy string, 
 			IsUploading:   resultFiles[i].IsUploading,
 			NumChunks:     resultFiles[i].NumChunks,
 			Path:          resultFiles[i].Path,
+			Topic:         resultFiles[i].Topic,
 		}
 
 		if listing.IsUploading {
