@@ -79,6 +79,8 @@ func WailsBind(runtime *wails.Runtime) {
 
 	InitializeTopicsManager()
 
+	subscribeToSurgeTopic(constants.PublicTopic)
+
 	//Get subs first synced then grab file queries for those subs
 	GetSubscriptions()
 

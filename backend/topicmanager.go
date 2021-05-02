@@ -23,8 +23,6 @@ func InitializeTopicsManager() {
 		if err != nil {
 			log.Println("Failed to unmarshal setting for topics", err)
 		}
-	} else {
-		log.Println("Failed to read setting for topics", err)
 	}
 }
 
