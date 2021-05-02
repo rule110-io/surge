@@ -59,8 +59,12 @@ func updateFileDataWorker() {
 	for true {
 		time.Sleep(time.Second)
 
-		log.Println("Active Workers:", workerCount)
-		fmt.Println("Active Workers:", workerCount)
+		mutexes.WorkerMapLock.Lock()
+		for k, v := range workerMap {
+			log.Println("Active Workers:", k, v)
+			fmt.Println("Active Workers:", k, v)
+		}
+		mutexes.WorkerMapLock.Unlock()
 
 		log.Println("Active Sessions:", sessionmanager.GetSessionLength())
 		fmt.Println("Active Sessions:", sessionmanager.GetSessionLength())

@@ -23,12 +23,15 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+//NumClientsStruct struct to hold number of online clients
 type NumClientsStruct struct {
 	Online int
 }
 
+//FrontendReady flags whether frontend is ready to receive events etc
 var FrontendReady = false
-var workerCount = 0
+
+var workerMap map[string]int
 
 //ListedFiles are remote files that can be downloaded
 var ListedFiles []models.File
@@ -91,13 +94,14 @@ func WailsBind(runtime *wails.Runtime) {
 	FrontendReady = true
 }
 
-// Initiates the surge client and instantiates connection with the NKN network
+//InitializeClient Initiates the surge client and instantiates connection with the NKN network
 func InitializeClient(args []string) bool {
 	var err error
 
 	account := InitializeAccount()
 	client, err = nkn.NewMultiClient(account, "", constants.NumClients, false, &nkn.ClientConfig{
-		ConnectRetries: 1000,
+		ConnectRetries:    1000,
+		SeedRPCServerAddr: GetBootstrapRPC(),
 	})
 	if err != nil {
 		pushError(err.Error(), "do you have an active internet connection?")
@@ -148,11 +152,12 @@ func InitializeClient(args []string) bool {
 	return true
 }
 
-// Starts the surge client
+//StartClient Starts the surge client
 func StartClient(args []string) {
 
 	//Initialize all our global data maps
 	clientOnlineMap = make(map[string]bool)
+	workerMap = make(map[string]int)
 	downloadBandwidthAccumulator = make(map[string]int)
 	uploadBandwidthAccumulator = make(map[string]int)
 	zeroBandwidthMap = make(map[string]bool)
@@ -163,13 +168,16 @@ func StartClient(args []string) {
 	go InitializeClient(args)
 }
 
-// Stops the surge client and cleans up
+//StopClient Stops the surge client and cleans up
 func StopClient() {
+
+	//Persist our connections for future bootstraps
+	PersistRPC(client)
+
 	client.Close()
-	client = nil
 }
 
-// Downloads a file by providing a hash
+//DownloadFileByHash Downloads a file by providing a hash
 func DownloadFileByHash(Hash string) bool {
 
 	//Addr string, Size int64, FileID string
@@ -464,11 +472,18 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 		chunksInTransit[chunkKey] = false
 		mutexes.ChunkInTransitLock.Unlock()
 
+		mutexes.WorkerMapLock.Lock()
+		workerMap[Session.Session.RemoteAddr().String()]--
+		if workerMap[Session.Session.RemoteAddr().String()] < 0 {
+			workerMap[Session.Session.RemoteAddr().String()] = 0
+		}
+		mutexes.WorkerMapLock.Unlock()
+
 		go WriteChunk(surgeMessage.FileID, surgeMessage.ChunkID, surgeMessage.Data)
 	}
 }
 
-//SeedFile generates everything needed to seed a file
+//SeedFilepath generates everything needed to seed a file
 func SeedFilepath(Path string, Topic string) bool {
 
 	log.Println("Seeding file", Path)
