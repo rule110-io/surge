@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
 	"log"
@@ -87,12 +86,8 @@ func WailsBind(runtime *wails.Runtime) {
 
 	subscribeToSurgeTopic(constants.PublicTopic)
 
-	//Get subs first synced then grab file queries for those subs
-	GetSubscriptions()
-
 	//Startup async processes to continue processing subs/files and updating gui
 	go updateFileDataWorker()
-	go rescanPeersWorker()
 
 	FrontendReady = true
 }
@@ -303,11 +298,6 @@ func onClientConnected(session *sessionmanager.Session, isDialIn bool) {
 	fmt.Println(string("\033[36m"), "Client Connected", addr, string("\033[0m"))
 
 	go listenToSession(session)
-
-	if isDialIn {
-		fmt.Println(string("\033[36m"), "Sending file query to accepted client", addr, string("\033[0m"))
-		go SendQueryRequest(addr, "Testing query functionality.")
-	}
 }
 
 func onClientDisconnected(addr string) {
@@ -358,93 +348,8 @@ func listenToSession(Session *sessionmanager.Session) {
 			//Write add to download internally after parsing data
 			processChunk(Session, data)
 			break
-		case constants.SurgeQueryRequestID:
-			processQueryRequest(Session, data)
-			//Write add to download
-			mutexes.BandwidthAccumulatorMapLock.Lock()
-			downloadBandwidthAccumulator["DISCOVERY"] += len(data)
-			mutexes.BandwidthAccumulatorMapLock.Unlock()
-			break
-		case constants.SurgeQueryResponseID:
-			processQueryResponse(Session.Session.RemoteAddr().String(), data)
-			//Write add to download
-			mutexes.BandwidthAccumulatorMapLock.Lock()
-			downloadBandwidthAccumulator["DISCOVERY"] += len(data)
-			mutexes.BandwidthAccumulatorMapLock.Unlock()
-			break
 		}
 	}
-}
-
-func processQueryRequest(Session *sessionmanager.Session, Data []byte) {
-
-	//Try to parse SurgeMessage
-	surgeQuery := &pb.SurgeQuery{}
-	if err := proto.Unmarshal(Data, surgeQuery); err != nil {
-		log.Panic("Failed to parse surge message:", err)
-	}
-	log.Println("Query received", surgeQuery.Query)
-
-	SendQueryResponse(Session, surgeQuery.Query)
-}
-
-func processQueryResponse(seeder string, Data []byte) {
-
-	//Try to parse SurgeMessage
-	s := string(Data)
-	fmt.Println(string("\033[36m"), "file query response received", seeder, string("\033[0m"))
-
-	mutexes.ListedFilesLock.Lock()
-
-	//Parse the response
-	payloadSplit := strings.Split(s, "surge://")
-	for j := 0; j < len(payloadSplit); j++ {
-		data := strings.Split(payloadSplit[j], "|")
-
-		if len(data) < 3 {
-			continue
-		}
-
-		fileSize, _ := strconv.ParseInt(data[3], 10, 64)
-		numChunks := int((fileSize-1)/int64(constants.ChunkSize)) + 1
-
-		newListing := models.File{
-			FileLocation: "remote",
-			FileName:     data[2],
-			FileSize:     fileSize,
-			FileHash:     data[4],
-			Seeders:      []string{seeder},
-			Path:         "",
-			NumChunks:    numChunks,
-			ChunkMap:     nil,
-			SeederCount:  1,
-			Topic:        data[5],
-		}
-
-		//Replace existing, or remove.
-		var replace = false
-		for l := 0; l < len(ListedFiles); l++ {
-			if ListedFiles[l].FileHash == newListing.FileHash {
-
-				//if the seeder is unique add it as an additional seeder for the file
-				ListedFiles[l].Seeders = append(ListedFiles[l].Seeders, seeder)
-				ListedFiles[l].Seeders = distinctStringSlice(ListedFiles[l].Seeders)
-				ListedFiles[l].SeederCount = len(ListedFiles[l].Seeders)
-
-				replace = true
-				break
-			}
-		}
-		//Unique listing so we add
-		if replace == false {
-			ListedFiles = append(ListedFiles, newListing)
-		}
-
-		fmt.Println(string("\033[33m"), "Filename", newListing.FileName, "FileHash", newListing.FileHash, string("\033[0m"))
-
-		log.Println("Query response new file: ", newListing.FileName, " seeder: ", seeder)
-	}
-	mutexes.ListedFilesLock.Unlock()
 }
 
 func processChunk(Session *sessionmanager.Session, Data []byte) {

@@ -30,28 +30,26 @@ func subscribeToSurgeTopic(topicName string) {
 	mutexes.TopicsMapLock.Lock()
 	defer mutexes.TopicsMapLock.Unlock()
 
-	if _, ok := topicsMap[topicName]; ok {
-		//Already subscribed to this topic
-		return
-	}
-
 	topicEncoded := TopicEncode(topicName)
 
-	topicModel := models.Topic{
-		Name:        topicName,
-		NameEncoded: topicEncoded,
+	if _, ok := topicsMap[topicName]; !ok {
+		topicModel := models.Topic{
+			Name:        topicName,
+			NameEncoded: topicEncoded,
+		}
+
+		topicsMap[topicName] = topicModel
+
+		//Save to our bucket
+		mapBytes, err := json.Marshal(topicsMap)
+		if err == nil {
+			mapString := string(mapBytes)
+			DbWriteSetting(topicsMapBucketKey, mapString)
+		}
+
+		subscribeToPubSub(topicEncoded)
 	}
-
-	topicsMap[topicName] = topicModel
-
-	//Save to our bucket
-	mapBytes, err := json.Marshal(topicsMap)
-	if err == nil {
-		mapString := string(mapBytes)
-		DbWriteSetting(topicsMapBucketKey, mapString)
-	}
-
-	subscribeToPubSub(topicEncoded)
+	RequestFiles(topicEncoded)
 }
 
 func unsubscribeFromSurgeTopic(topicName string) {
