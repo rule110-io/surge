@@ -14,6 +14,7 @@ import (
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
 	"github.com/rule110-io/surge/backend/constants"
+	"github.com/rule110-io/surge/backend/messaging"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
 	pb "github.com/rule110-io/surge/backend/payloads"
@@ -81,6 +82,8 @@ func WailsBind(runtime *wails.Runtime) {
 	updateNumClientStore()
 
 	InitializeTopicsManager()
+
+	messaging.Initialize(client, client.Account(), MessageReceived)
 
 	subscribeToSurgeTopic(constants.PublicTopic)
 
@@ -363,7 +366,7 @@ func listenToSession(Session *sessionmanager.Session) {
 			mutexes.BandwidthAccumulatorMapLock.Unlock()
 			break
 		case constants.SurgeQueryResponseID:
-			processQueryResponse(Session, data)
+			processQueryResponse(Session.Session.RemoteAddr().String(), data)
 			//Write add to download
 			mutexes.BandwidthAccumulatorMapLock.Lock()
 			downloadBandwidthAccumulator["DISCOVERY"] += len(data)
@@ -385,12 +388,10 @@ func processQueryRequest(Session *sessionmanager.Session, Data []byte) {
 	SendQueryResponse(Session, surgeQuery.Query)
 }
 
-func processQueryResponse(Session *sessionmanager.Session, Data []byte) {
+func processQueryResponse(seeder string, Data []byte) {
 
 	//Try to parse SurgeMessage
 	s := string(Data)
-	seeder := Session.Session.RemoteAddr().String()
-
 	fmt.Println(string("\033[36m"), "file query response received", seeder, string("\033[0m"))
 
 	mutexes.ListedFilesLock.Lock()
