@@ -17,9 +17,18 @@ export default {
   },
   computed: {
     ...mapState("tour", ["tour"]),
+    ...mapState("files", ["remoteFilesConfig"]),
   },
   data: () => {
     return {};
+  },
+  watch: {
+    remoteFilesConfig: {
+      deep: true,
+      handler() {
+        this.fetchRemoteFiles();
+      },
+    },
   },
   destroyed() {
     clearInterval(this.remoteInterval);
@@ -33,6 +42,7 @@ export default {
     this.enableDarkThemeEvent();
 
     this.fetchLocalFiles();
+    this.fetchTopics();
     this.fetchRemoteFiles();
     this.fetchDarkTheme();
     this.fetchTour();
@@ -52,6 +62,9 @@ export default {
     },
     fetchLocalFiles() {
       this.$store.dispatch("files/fetchLocalFiles");
+    },
+    fetchTopics() {
+      this.$store.dispatch("topics/fetchTopics");
     },
     fetchRemoteFiles() {
       this.$store.dispatch("files/fetchRemoteFiles");

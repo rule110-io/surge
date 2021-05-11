@@ -6,7 +6,7 @@
     </div>
 
     <div class="header__right">
-      <Input
+      <CustomInput
         class="header__search"
         :value="searchQuery"
         icon="SearchIcon"
@@ -17,7 +17,11 @@
             : remoteSearch(searchQuery)
         "
       />
-      <Button theme="primary" class="header__button" @click="seedFile"
+      <input placeholder="topic name" type="text" v-model="topicName" />
+      <Button
+        theme="primary"
+        class="header__button"
+        @click="seedFile(topicName)"
         >Add file</Button
       >
       <Divider />
@@ -36,7 +40,7 @@ import { mapState } from "vuex";
 import { mixin as clickaway } from "vue-clickaway";
 
 import Navigation from "@/components/Navigation/Navigation";
-import Input from "@/components/Controls/Input/Input";
+import CustomInput from "@/components/Controls/Input/Input";
 import Button from "@/components/Button/Button";
 import Divider from "@/components/Divider/Divider";
 import Icon from "@/components/Icon/Icon";
@@ -44,10 +48,11 @@ import Icon from "@/components/Icon/Icon";
 import Logo from "@/assets/icons/Logo.svg";
 
 export default {
-  components: { Logo, Navigation, Input, Button, Divider, Icon },
+  components: { Logo, Navigation, CustomInput, Button, Divider, Icon },
   mixins: [clickaway],
   data: () => {
     return {
+      topicName: "",
       active: true,
       focus: false,
       searchQuery: "",
@@ -92,11 +97,10 @@ export default {
         this.$store.dispatch("files/fetchLocalFiles");
       }, 500);
     },
-    seedFile() {
-      window.backend.MiddlewareFunctions.SeedFile().then(() => {
+    seedFile(topicName) {
+      window.backend.MiddlewareFunctions.SeedFile(topicName).then(() => {
         this.$store.dispatch("files/fetchLocalFiles");
         this.$store.dispatch("files/fetchRemoteFiles");
-        this.$router.replace("/transfers");
       });
     },
     toggleTheme() {

@@ -1,18 +1,31 @@
 <template>
   <div class="sidebar">
-    <Logo v-if="!darkTheme" class="sidebar__logo" />
-    <LogoGradient v-else class="sidebar__logo" />
-    <div class="sidebar__nav">
-      <router-link to="/search" id="search" class="sidebar__item">
-        <feather class="sidebar__item-icon" type="search"></feather>
-      </router-link>
-      <router-link to="/download" id="download" class="sidebar__item">
-        <feather class="sidebar__item-icon" type="folder"></feather>
-      </router-link>
+    <div class="sidebar__title">
+      Topics
     </div>
-    <router-link to="/settings" id="settings" class="sidebar__item">
-      <feather class="sidebar__item-icon" type="settings"></feather>
-    </router-link>
+    <div style="display: flex;">
+      <input
+        style="width: 80px;"
+        type="text"
+        v-model.trim="topicName"
+        placeholder="topic name"
+      />
+      <button @click="subscribeToTopic(topicName)">subscribe</button>
+    </div>
+
+    <div class="sidebar__items">
+      <div
+        class="sidebar__item"
+        v-for="(topic, i) in topics"
+        :key="i"
+        @click="setRemoteFilesTopic(topic)"
+        :class="
+          remoteFilesConfig.topicName === topic ? 'sidebar__item_active' : null
+        "
+      >
+        {{ topic }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -21,15 +34,27 @@
 </style>
 
 <script>
-import { mapState } from "vuex";
-
-import Logo from "@/assets/images/Logo.svg";
-import LogoGradient from "@/assets/images/LogoGradient.svg";
+import { mapState, mapActions, mapMutations } from "vuex";
 
 export default {
-  components: { Logo, LogoGradient },
+  components: {},
+  data: () => {
+    return {
+      topicName: "",
+    };
+  },
   computed: {
-    ...mapState("darkTheme", ["darkTheme"]),
+    ...mapState("topics", ["topics", "activeTopic"]),
+    ...mapState("files", ["remoteFilesConfig"]),
+  },
+  mounted() {},
+  methods: {
+    ...mapActions({
+      subscribeToTopic: "topics/subscribeToTopic",
+    }),
+    ...mapMutations({
+      setRemoteFilesTopic: "files/setRemoteFilesTopic",
+    }),
   },
 };
 </script>

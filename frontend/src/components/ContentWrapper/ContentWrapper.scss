@@ -1,3 +1,9 @@
 .content-wrapper {
   padding: $padding-llg;
+
+  &_type {
+    &_sidebar {
+      margin-left: $sidebar-width;
+    }
+  }
 }

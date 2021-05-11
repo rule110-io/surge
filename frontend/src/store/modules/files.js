@@ -14,6 +14,7 @@ const getDefaultState = () => {
       get: 8,
     },
     remoteFilesConfig: {
+      topicName: "",
       search: "",
       orderBy: "SeederCount",
       isDesc: true,
@@ -38,6 +39,9 @@ const mutations = {
     state.remoteCount = Count;
     state.remotePages = Math.ceil(Count / state.remoteFilesConfig.get);
   },
+  setRemoteFilesTopic(state, topicName) {
+    state.remoteFilesConfig.topicName = topicName;
+  },
   setRemoteFilesConfig(state, payload) {
     state.remoteFilesConfig = payload;
   },
@@ -50,20 +54,37 @@ const actions = {
   fetchLocalFiles({ commit, state }) {
     const { search, skip, get, orderBy, isDesc } = state.localFilesConfig;
 
-    window.backend
-      .MiddlewareFunctions.GetLocalFiles(search, 0, orderBy, isDesc, skip, get)
-      .then(({ Result, Count }) => {
-        commit("setLocalFiles", { Result, Count });
-      });
+    window.backend.MiddlewareFunctions.GetLocalFiles(
+      search,
+      0,
+      orderBy,
+      isDesc,
+      skip,
+      get
+    ).then(({ Result, Count }) => {
+      commit("setLocalFiles", { Result, Count });
+    });
   },
   fetchRemoteFiles({ commit, state }) {
-    const { search, skip, get, orderBy, isDesc } = state.remoteFilesConfig;
+    const {
+      topicName,
+      search,
+      skip,
+      get,
+      orderBy,
+      isDesc,
+    } = state.remoteFilesConfig;
 
-    window.backend
-      .MiddlewareFunctions.GetRemoteFiles(search, orderBy, isDesc, skip, get)
-      .then(({ Result, Count }) => {
-        commit("setRemoteFiles", { Result, Count });
-      });
+    window.backend.MiddlewareFunctions.GetRemoteFiles(
+      topicName,
+      search,
+      orderBy,
+      isDesc,
+      skip,
+      get
+    ).then(({ Result, Count }) => {
+      commit("setRemoteFiles", { Result, Count });
+    });
   },
 };
 

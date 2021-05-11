@@ -1,5 +1,6 @@
 import Dashboard from "@/layout/Dashboard/Dashboard.vue";
 import Transfers from "@/pages/Transfers.vue";
+import Discover from "@/pages/Discover.vue";
 
 const routes = [
   {
@@ -11,6 +12,11 @@ const routes = [
         path: "transfers",
         name: "transfers",
         component: Transfers,
+      },
+      {
+        path: "discover",
+        name: "discover",
+        component: Discover,
       },
     ],
   },
