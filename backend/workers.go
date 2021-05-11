@@ -21,14 +21,6 @@ import (
 	"github.com/rule110-io/surge/backend/sessionmanager"
 )
 
-//Function that automatically grabs subscriptions for nkn topic
-func rescanPeersWorker() {
-	for true {
-		time.Sleep(constants.RescanPeerInterval)
-		GetSubscriptions()
-	}
-}
-
 // makes sure the client is regularly subscribed to the surge topic
 func autoSubscribeWorker() {
 
@@ -46,7 +38,7 @@ func autoSubscribeWorker() {
 		}
 
 		if hosting {
-			subscribeToSurgeTopic()
+			resubscribeToTopics()
 		}
 
 		time.Sleep(time.Second * 20 * constants.SubscriptionDuration)
@@ -59,8 +51,12 @@ func updateFileDataWorker() {
 	for true {
 		time.Sleep(time.Second)
 
-		log.Println("Active Workers:", workerCount)
-		fmt.Println("Active Workers:", workerCount)
+		mutexes.WorkerMapLock.Lock()
+		for k, v := range workerMap {
+			log.Println("Active Workers:", k, v)
+			fmt.Println("Active Workers:", k, v)
+		}
+		mutexes.WorkerMapLock.Unlock()
 
 		log.Println("Active Sessions:", sessionmanager.GetSessionLength())
 		fmt.Println("Active Sessions:", sessionmanager.GetSessionLength())

@@ -21,3 +21,7 @@ var FileWriteLock = &sync.Mutex{}
 
 // Mutex for reading or mutating the ListedFiles collection
 var ListedFilesLock = &sync.Mutex{}
+
+var WorkerMapLock = &sync.Mutex{}
+// Mutex for reading or mutating the TopicsMap collection
+var TopicsMapLock = &sync.Mutex{}

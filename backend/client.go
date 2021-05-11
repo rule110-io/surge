@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"time"
 
 	"log"
@@ -14,6 +13,7 @@ import (
 	bitmap "github.com/boljen/go-bitmap"
 	nkn "github.com/nknorg/nkn-sdk-go"
 	"github.com/rule110-io/surge/backend/constants"
+	"github.com/rule110-io/surge/backend/messaging"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
 	pb "github.com/rule110-io/surge/backend/payloads"
@@ -23,12 +23,15 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+//NumClientsStruct struct to hold number of online clients
 type NumClientsStruct struct {
 	Online int
 }
 
+//FrontendReady flags whether frontend is ready to receive events etc
 var FrontendReady = false
-var workerCount = 0
+
+var workerMap map[string]int
 
 //ListedFiles are remote files that can be downloaded
 var ListedFiles []models.File
@@ -77,23 +80,26 @@ func WailsBind(runtime *wails.Runtime) {
 	}
 	updateNumClientStore()
 
-	//Get subs first synced then grab file queries for those subs
-	GetSubscriptions()
+	InitializeTopicsManager()
+
+	messaging.Initialize(client, client.Account(), MessageReceived)
+
+	subscribeToSurgeTopic(constants.PublicTopic)
 
 	//Startup async processes to continue processing subs/files and updating gui
 	go updateFileDataWorker()
-	go rescanPeersWorker()
 
 	FrontendReady = true
 }
 
-// Initiates the surge client and instantiates connection with the NKN network
+//InitializeClient Initiates the surge client and instantiates connection with the NKN network
 func InitializeClient(args []string) bool {
 	var err error
 
 	account := InitializeAccount()
 	client, err = nkn.NewMultiClient(account, "", constants.NumClients, false, &nkn.ClientConfig{
-		ConnectRetries: 1000,
+		ConnectRetries:    1000,
+		SeedRPCServerAddr: GetBootstrapRPC(),
 	})
 	if err != nil {
 		pushError(err.Error(), "do you have an active internet connection?")
@@ -144,11 +150,12 @@ func InitializeClient(args []string) bool {
 	return true
 }
 
-// Starts the surge client
+//StartClient Starts the surge client
 func StartClient(args []string) {
 
 	//Initialize all our global data maps
 	clientOnlineMap = make(map[string]bool)
+	workerMap = make(map[string]int)
 	downloadBandwidthAccumulator = make(map[string]int)
 	uploadBandwidthAccumulator = make(map[string]int)
 	zeroBandwidthMap = make(map[string]bool)
@@ -159,13 +166,16 @@ func StartClient(args []string) {
 	go InitializeClient(args)
 }
 
-// Stops the surge client and cleans up
+//StopClient Stops the surge client and cleans up
 func StopClient() {
+
+	//Persist our connections for future bootstraps
+	PersistRPC(client)
+
 	client.Close()
-	client = nil
 }
 
-// Downloads a file by providing a hash
+//DownloadFileByHash Downloads a file by providing a hash
 func DownloadFileByHash(Hash string) bool {
 
 	//Addr string, Size int64, FileID string
@@ -288,11 +298,6 @@ func onClientConnected(session *sessionmanager.Session, isDialIn bool) {
 	fmt.Println(string("\033[36m"), "Client Connected", addr, string("\033[0m"))
 
 	go listenToSession(session)
-
-	if isDialIn {
-		fmt.Println(string("\033[36m"), "Sending file query to accepted client", addr, string("\033[0m"))
-		go SendQueryRequest(addr, "Testing query functionality.")
-	}
 }
 
 func onClientDisconnected(addr string) {
@@ -343,94 +348,8 @@ func listenToSession(Session *sessionmanager.Session) {
 			//Write add to download internally after parsing data
 			processChunk(Session, data)
 			break
-		case constants.SurgeQueryRequestID:
-			processQueryRequest(Session, data)
-			//Write add to download
-			mutexes.BandwidthAccumulatorMapLock.Lock()
-			downloadBandwidthAccumulator["DISCOVERY"] += len(data)
-			mutexes.BandwidthAccumulatorMapLock.Unlock()
-			break
-		case constants.SurgeQueryResponseID:
-			processQueryResponse(Session, data)
-			//Write add to download
-			mutexes.BandwidthAccumulatorMapLock.Lock()
-			downloadBandwidthAccumulator["DISCOVERY"] += len(data)
-			mutexes.BandwidthAccumulatorMapLock.Unlock()
-			break
 		}
 	}
-}
-
-func processQueryRequest(Session *sessionmanager.Session, Data []byte) {
-
-	//Try to parse SurgeMessage
-	surgeQuery := &pb.SurgeQuery{}
-	if err := proto.Unmarshal(Data, surgeQuery); err != nil {
-		log.Panic("Failed to parse surge message:", err)
-	}
-	log.Println("Query received", surgeQuery.Query)
-
-	SendQueryResponse(Session, surgeQuery.Query)
-}
-
-func processQueryResponse(Session *sessionmanager.Session, Data []byte) {
-
-	//Try to parse SurgeMessage
-	s := string(Data)
-	seeder := Session.Session.RemoteAddr().String()
-
-	fmt.Println(string("\033[36m"), "file query response received", seeder, string("\033[0m"))
-
-	mutexes.ListedFilesLock.Lock()
-
-	//Parse the response
-	payloadSplit := strings.Split(s, "surge://")
-	for j := 0; j < len(payloadSplit); j++ {
-		data := strings.Split(payloadSplit[j], "|")
-
-		if len(data) < 3 {
-			continue
-		}
-
-		fileSize, _ := strconv.ParseInt(data[3], 10, 64)
-		numChunks := int((fileSize-1)/int64(constants.ChunkSize)) + 1
-
-		newListing := models.File{
-			FileLocation: "remote",
-			FileName:     data[2],
-			FileSize:     fileSize,
-			FileHash:     data[4],
-			Seeders:      []string{seeder},
-			Path:         "",
-			NumChunks:    numChunks,
-			ChunkMap:     nil,
-			SeederCount:  1,
-		}
-
-		//Replace existing, or remove.
-		var replace = false
-		for l := 0; l < len(ListedFiles); l++ {
-			if ListedFiles[l].FileHash == newListing.FileHash {
-
-				//if the seeder is unique add it as an additional seeder for the file
-				ListedFiles[l].Seeders = append(ListedFiles[l].Seeders, seeder)
-				ListedFiles[l].Seeders = distinctStringSlice(ListedFiles[l].Seeders)
-				ListedFiles[l].SeederCount = len(ListedFiles[l].Seeders)
-
-				replace = true
-				break
-			}
-		}
-		//Unique listing so we add
-		if replace == false {
-			ListedFiles = append(ListedFiles, newListing)
-		}
-
-		fmt.Println(string("\033[33m"), "Filename", newListing.FileName, "FileHash", newListing.FileHash, string("\033[0m"))
-
-		log.Println("Query response new file: ", newListing.FileName, " seeder: ", seeder)
-	}
-	mutexes.ListedFilesLock.Unlock()
 }
 
 func processChunk(Session *sessionmanager.Session, Data []byte) {
@@ -459,12 +378,19 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 		chunksInTransit[chunkKey] = false
 		mutexes.ChunkInTransitLock.Unlock()
 
+		mutexes.WorkerMapLock.Lock()
+		workerMap[Session.Session.RemoteAddr().String()]--
+		if workerMap[Session.Session.RemoteAddr().String()] < 0 {
+			workerMap[Session.Session.RemoteAddr().String()] = 0
+		}
+		mutexes.WorkerMapLock.Unlock()
+
 		go WriteChunk(surgeMessage.FileID, surgeMessage.ChunkID, surgeMessage.Data)
 	}
 }
 
-//SeedFile generates everything needed to seed a file
-func SeedFilepath(Path string) bool {
+//SeedFilepath generates everything needed to seed a file
+func SeedFilepath(Path string, Topic string) bool {
 
 	log.Println("Seeding file", Path)
 
@@ -498,6 +424,7 @@ func SeedFilepath(Path string) bool {
 		IsUploading:   false,
 		IsDownloading: false,
 		IsHashing:     true,
+		Topic:         Topic,
 	}
 
 	//Check if file is already seeded
@@ -521,12 +448,12 @@ func BuildSeedString(dbFiles []models.File) {
 
 	newQueryPayload := ""
 	for _, dbFile := range dbFiles {
-		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, client.Addr().String())
+		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, client.Addr().String(), dbFile.Topic)
 		log.Println("Magnet:", magnet)
 
 		if dbFile.IsUploading {
 			//Add to payload
-			payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)
+			payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Topic)
 			//log.Println(payload)
 			newQueryPayload += payload
 		}
@@ -538,10 +465,10 @@ func BuildSeedString(dbFiles []models.File) {
 func AddToSeedString(dbFile models.File) {
 
 	//Add to payload
-	payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash)
+	payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Topic)
 	//log.Println(payload)
 	queryPayload += payload
 
 	//Make sure you're subscribed when seeding a file
-	go subscribeToSurgeTopic()
+	go subscribeToSurgeTopic(dbFile.Topic)
 }

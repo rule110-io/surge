@@ -108,7 +108,7 @@ func SetFilePause(Hash string, State bool) {
 	pushNotification("Download "+msg, file.FileName)
 }
 
-//RemoveFile removes file from surge db and optionally from disk
+//RemoveFileByHash removes file from surge db and optionally from disk
 func RemoveFileByHash(Hash string, FromDisk bool) bool {
 
 	mutexes.FileWriteLock.Lock()

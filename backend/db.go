@@ -137,7 +137,7 @@ func dbDeleteFile(Hash string) error {
 	return nil
 }
 
-// Stores or updates a key with a given value
+//DbWriteSetting Stores or updates a key with a given value
 func DbWriteSetting(Name string, value string) error {
 	err := db.Update(
 		func(tx *nutsdb.Tx) error {
@@ -153,7 +153,7 @@ func DbWriteSetting(Name string, value string) error {
 	return err
 }
 
-// Reads a key and returns value
+//DbReadSetting Reads a key and returns value
 func DbReadSetting(Name string) (string, error) {
 	result := ""
 	key := []byte(Name)
@@ -197,6 +197,7 @@ func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take 
 				Seeders:     file.Seeders,
 				NumChunks:   file.NumChunks,
 				SeederCount: len(file.Seeders),
+				Topic:       file.Topic,
 			}
 
 			tracked, err := dbGetFile(result.FileHash)
@@ -323,6 +324,7 @@ func SearchLocalFile(Query string, filterState FileFilterState, OrderBy string, 
 			IsUploading:   resultFiles[i].IsUploading,
 			NumChunks:     resultFiles[i].NumChunks,
 			Path:          resultFiles[i].Path,
+			Topic:         resultFiles[i].Topic,
 		}
 
 		if listing.IsUploading {
