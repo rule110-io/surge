@@ -15,11 +15,14 @@ $dark-gradient: linear-gradient(
 );
 $semi-dark: #212228;
 $white: #fff;
-$white-ghost: rgba(255, 255, 255, 0.15);
+$white-ghost: rgba(255, 255, 255, 0.05);
 $primary: #0a9795;
 $primary-gradient: linear-gradient(92.64deg, #0aa292 0.31%, #084b9c 129.25%);
 $grey: #7b7d82;
+$grey-light: #7e8084;
+$red: #eb5757;
 $black-light: rgba(255, 255, 255, 0.03);
+$text-white: rgba(255, 255, 255, 0.8);
 
 $themes: (
   dark: (
@@ -82,3 +85,5 @@ $br-md: 9px;
 $br-lg: 22px;
 
 $border: 1px solid $semi-dark;
+
+$sidebar-width: 224px;

@@ -34,7 +34,6 @@ export default {
   },
   computed: {
     icon() {
-      console.log(this.file);
       if (this.file.IsDownloading) {
         return "DownloadIcon";
       } else if (this.file.IsUploading) {

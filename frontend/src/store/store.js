@@ -9,6 +9,7 @@ import DarkTheme from "./modules/darkTheme";
 import Version from "./modules/version";
 import PubKey from "./modules/pubKey";
 import Tour from "./modules/tour";
+import Topics from "./modules/topics";
 
 import Files from "./modules/files";
 
@@ -26,6 +27,7 @@ export const store = new Vuex.Store({
     version: Version,
     tour: Tour,
     pubKey: PubKey,
+    topics: Topics,
   },
 });
 
