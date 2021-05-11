@@ -18,7 +18,7 @@
     "compare-versions": "^3.6.0",
     "core-js": "^3.6.4",
     "feather-icons": "^4.28.0",
-    "lodash": "^4.17.19",
+    "lodash": "^4.17.21",
     "regenerator-runtime": "^0.13.3",
     "v-tooltip": "^2.0.3",
     "vue": "^2.6.11",
