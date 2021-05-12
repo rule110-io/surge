@@ -14,7 +14,7 @@
     "@wailsapp/runtime": "^1.1.1",
     "axios": "^0.21.1",
     "babel-plugin-transform-remove-strict-mode": "0.0.2",
-    "chart.js": "^2.9.3",
+    "chart.js": "^2.9.4",
     "compare-versions": "^3.6.0",
     "core-js": "^3.6.4",
     "feather-icons": "^4.28.0",
