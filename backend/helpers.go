@@ -21,6 +21,18 @@ func removeStringFromSlice(s []string, r string) []string {
 	return s
 }
 
+func removeStringFromSlicePtr(sPtr *[]string, r string) {
+	s := *sPtr
+
+	for i, v := range s {
+		if v == r {
+			s = append(s[:i], s[i+1:]...)
+		}
+	}
+
+	*sPtr = s
+}
+
 func distinctStringSlice(stringSlice []string) []string {
 	keys := make(map[string]bool)
 	list := []string{}
@@ -132,6 +144,8 @@ func hashFile(randomHash string) {
 
 	//Add to payload
 	AddToSeedString(*dbFile)
+	AnnounceNewFile(*&dbFile)
+
 	pushNotification("Now seeding", dbFile.FileName)
 }
 

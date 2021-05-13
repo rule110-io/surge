@@ -230,6 +230,13 @@ func createSession(Address string) (*Session, error) {
 	return session, nil
 }
 
+func IsExistingSession(address string) bool {
+	sessionLockMapLock.Lock()
+	defer sessionLockMapLock.Unlock()
+	_, exists := sessionMap[address]
+	return exists
+}
+
 func closeSession(address string) {
 	sessionLockMapLock.Lock()
 	defer sessionLockMapLock.Unlock()

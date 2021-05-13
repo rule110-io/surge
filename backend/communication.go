@@ -15,6 +15,7 @@ import (
 const (
 	MessageIDAnnounceFiles = iota
 	MessageIDAnnounceFilesReply
+	MessageIDAnnounceNewFile
 )
 
 func MessageReceived(msg *messaging.MessageReceivedObj) {
@@ -27,6 +28,10 @@ func MessageReceived(msg *messaging.MessageReceivedObj) {
 		processQueryResponse(msg.Sender, msg.Data)
 		break
 	case MessageIDAnnounceFilesReply:
+		//process file data
+		processQueryResponse(msg.Sender, msg.Data)
+		break
+	case MessageIDAnnounceNewFile:
 		//process file data
 		processQueryResponse(msg.Sender, msg.Data)
 		break
@@ -55,6 +60,22 @@ func SendAnnounceFilesReply(msg *messaging.MessageReceivedObj) {
 		Data:  []byte(queryPayload),
 	}
 	msg.Reply(&dataObj)
+}
+
+func AnnounceNewFile(file *models.File) {
+	fmt.Println(string("\033[36m"), "ANNOUNCE NEW FILE FOR TOPIC", file.Topic)
+
+	//Create payload
+	payload := surgeGenerateTopicPayload(file.FileName, file.FileSize, file.FileHash, file.Topic)
+
+	//Create the data object
+	dataObj := messaging.MessageObj{
+		Type:  MessageIDAnnounceNewFile,
+		Topic: file.Topic,
+		Data:  []byte(payload),
+	}
+
+	messaging.Broadcast(&dataObj)
 }
 
 func processQueryResponse(seeder string, Data []byte) {
