@@ -13,8 +13,8 @@ import (
 )
 
 const (
-	MessageIDRequestFiles = iota
-	MessageIDReplyFiles
+	MessageIDAnnounceFiles = iota
+	MessageIDAnnounceFilesReply
 )
 
 func MessageReceived(msg *messaging.MessageReceivedObj) {
@@ -22,10 +22,11 @@ func MessageReceived(msg *messaging.MessageReceivedObj) {
 	fmt.Println(msg.Data)
 
 	switch msg.Type {
-	case MessageIDRequestFiles:
-		SendRequestFilesReply(msg)
+	case MessageIDAnnounceFiles:
+		SendAnnounceFilesReply(msg)
+		processQueryResponse(msg.Sender, msg.Data)
 		break
-	case MessageIDReplyFiles:
+	case MessageIDAnnounceFilesReply:
 		//process file data
 		processQueryResponse(msg.Sender, msg.Data)
 		break
@@ -33,22 +34,23 @@ func MessageReceived(msg *messaging.MessageReceivedObj) {
 
 }
 
-func RequestFiles(topic string) {
+func AnnounceFiles(topic string) {
 	fmt.Println(string("\033[36m"), "REQUESTING FILES FOR TOPIC", topic)
 	//Create the data object
 	dataObj := messaging.MessageObj{
-		Type:  MessageIDRequestFiles,
+		Type:  MessageIDAnnounceFiles,
 		Topic: topic,
+		Data:  []byte(queryPayload),
 	}
 
 	messaging.Broadcast(&dataObj)
 }
 
-func SendRequestFilesReply(msg *messaging.MessageReceivedObj) {
+func SendAnnounceFilesReply(msg *messaging.MessageReceivedObj) {
 	fmt.Println(string("\033[36m"), "SENDING FILE REQUEST REPLY", msg.Topic, msg.Sender)
 	//Create the data object
 	dataObj := messaging.MessageObj{
-		Type:  MessageIDReplyFiles,
+		Type:  MessageIDAnnounceFilesReply,
 		Topic: msg.Topic,
 		Data:  []byte(queryPayload),
 	}

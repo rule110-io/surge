@@ -16,8 +16,8 @@ func (s *MiddlewareFunctions) GetLocalFiles(Query string, filterState FileFilter
 }
 
 //GetRemoteFiles gets remote files
-func (s *MiddlewareFunctions) GetRemoteFiles(Query string, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryResult {
-	return SearchRemoteFile(Query, OrderBy, IsDesc, Skip, Take)
+func (s *MiddlewareFunctions) GetRemoteFiles(Topic string, Query string, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryResult {
+	return SearchRemoteFile(Topic, Query, OrderBy, IsDesc, Skip, Take)
 }
 
 //DownloadFile download file by hash
@@ -99,7 +99,7 @@ func (s *MiddlewareFunctions) StartDownloadMagnetLinks(Magnetlinks string) bool 
 }
 
 func (s *MiddlewareFunctions) SubscribeToTopic(Topic string) {
-	subscribeToSurgeTopic(Topic)
+	subscribeToSurgeTopic(Topic, true)
 }
 
 func (s *MiddlewareFunctions) UnsubscribeFromTopic(Topic string) {
