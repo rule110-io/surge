@@ -2,31 +2,26 @@
   <div>
     <Sidebar />
     <ContentWrapper type="sidebar">
-      {{ remoteFiles }}
+      <DiscoverTable />
     </ContentWrapper>
   </div>
 </template>
 <script>
-import { mapState } from "vuex";
-
 import ContentWrapper from "@/components/ContentWrapper/ContentWrapper";
 import Sidebar from "@/components/Sidebar/Sidebar";
+import DiscoverTable from "@/components/Widgets/Discover/DiscoverTable/DiscoverTable";
 
 export default {
   name: "download",
-  components: { ContentWrapper, Sidebar },
+  components: { ContentWrapper, Sidebar, DiscoverTable },
   data: () => {
     return {
       isRemoveFileModal: false,
       activeFile: {},
     };
   },
-  computed: {
-    ...mapState("files", ["remoteFiles"]),
-  },
-  mounted() {
-    this.$store.dispatch("files/fetchLocalFiles");
-  },
+  computed: {},
+  mounted() {},
   methods: {},
 };
 </script>
