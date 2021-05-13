@@ -80,12 +80,6 @@ func WailsBind(runtime *wails.Runtime) {
 	}
 	updateNumClientStore()
 
-	InitializeTopicsManager()
-
-	messaging.Initialize(client, client.Account(), MessageReceived)
-
-	subscribeToSurgeTopic(constants.PublicTopic)
-
 	//Startup async processes to continue processing subs/files and updating gui
 	go updateFileDataWorker()
 
@@ -131,13 +125,16 @@ func InitializeClient(args []string) bool {
 		}
 	}
 
-	go BuildSeedString(filesOnDisk)
+	BuildSeedString(filesOnDisk)
+
 	for i := 0; i < len(filesOnDisk); i++ {
 		if filesOnDisk[i].IsDownloading {
 			go restartDownload(filesOnDisk[i].FileHash)
 		}
 	}
 
+	InitializeTopicsManager()
+	messaging.Initialize(client, client.Account(), MessageReceived)
 	go autoSubscribeWorker()
 
 	go platform.WatchOSXHandler()
@@ -470,5 +467,5 @@ func AddToSeedString(dbFile models.File) {
 	queryPayload += payload
 
 	//Make sure you're subscribed when seeding a file
-	go subscribeToSurgeTopic(dbFile.Topic)
+	go subscribeToSurgeTopic(dbFile.Topic, true)
 }

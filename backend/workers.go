@@ -26,21 +26,7 @@ func autoSubscribeWorker() {
 
 	//As long as the client is running subscribe
 	for true {
-		//Only subscribe when this client is hosting anything
-		hosting := false
-
-		files := dbGetAllFiles()
-		for i := 0; i < len(files); i++ {
-			if files[i].IsUploading {
-				hosting = true
-				break
-			}
-		}
-
-		if hosting {
-			resubscribeToTopics()
-		}
-
+		resubscribeToTopics()
 		time.Sleep(time.Second * 20 * constants.SubscriptionDuration)
 	}
 }

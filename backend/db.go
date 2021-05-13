@@ -182,31 +182,35 @@ type PagedQueryResult struct {
 }
 
 //SearchRemoteFile runs a paged query
-func SearchRemoteFile(Query string, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryResult {
+func SearchRemoteFile(Topic string, Query string, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryResult {
 
 	var results []models.File
 
 	mutexes.ListedFilesLock.Lock()
 	for _, file := range ListedFiles {
-		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) && file.FileLocation == "remote" {
 
-			result := models.File{
-				FileName:    file.FileName,
-				FileHash:    file.FileHash,
-				FileSize:    file.FileSize,
-				Seeders:     file.Seeders,
-				NumChunks:   file.NumChunks,
-				SeederCount: len(file.Seeders),
-				Topic:       file.Topic,
+		if file.Topic == Topic {
+
+			if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) && file.FileLocation == "remote" {
+
+				result := models.File{
+					FileName:    file.FileName,
+					FileHash:    file.FileHash,
+					FileSize:    file.FileSize,
+					Seeders:     file.Seeders,
+					NumChunks:   file.NumChunks,
+					SeederCount: len(file.Seeders),
+					Topic:       file.Topic,
+				}
+
+				tracked, err := dbGetFile(result.FileHash)
+
+				//only add non-local files to the result
+				if err != nil && tracked == nil {
+					results = append(results, result)
+				}
+
 			}
-
-			tracked, err := dbGetFile(result.FileHash)
-
-			//only add non-local files to the result
-			if err != nil && tracked == nil {
-				results = append(results, result)
-			}
-
 		}
 	}
 	mutexes.ListedFilesLock.Unlock()
