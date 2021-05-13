@@ -11,7 +11,7 @@
     v-clipboard:copy="hash"
     v-clipboard:success="onCopy"
   >
-    <feather class="file-hash__icon" type="copy"></feather>
+    <Icon icon="CopyIcon" class="file-hash__icon" />
     <div class="file-hash__text text_wrap_none">{{ hash }}</div>
   </div>
 </template>
@@ -21,8 +21,10 @@
 </style>
 
 <script>
+import Icon from "@/components/Icon/Icon";
+
 export default {
-  components: {},
+  components: { Icon },
   props: {
     hash: {
       type: String,

@@ -1,6 +1,6 @@
 <template>
   <div class="file-name">
-    <component :is="icon" class="file-name__icon"></component>
+    <component v-if="!nameOnly" :is="icon" class="file-name__icon"></component>
     <div
       class="file-name__title text_wrap_none"
       v-tooltip="{
@@ -30,6 +30,10 @@ export default {
     file: {
       type: Object,
       default: () => {},
+    },
+    nameOnly: {
+      type: Boolean,
+      default: false,
     },
   },
   computed: {

@@ -28,16 +28,16 @@
 
   &:hover & {
     &__icon {
-      color: $primary;
+      transform: translateX(5px);
     }
   }
 
   &__icon {
-    height: 14px;
-    width: 14px;
+    margin-right: $padding-xs;
+    height: 24px;
+    width: 24px;
     position: relative;
     transition: $transition-1;
-    margin-right: $padding-micro;
   }
 
   &__text {
