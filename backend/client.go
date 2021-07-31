@@ -220,29 +220,29 @@ func DownloadFileByHash(Hash string) bool {
 	mutateSeederLock := sync.Mutex{}
 
 	insertSession := func(addr string) {
-		if !sessionmanager.IsExistingSession(addr) {
-			_, err := sessionmanager.GetSession(addr, constants.GetSessionDialTimeout)
-			if err == nil {
-				mutateSeederLock.Lock()
-				activeSeeders = append(activeSeeders, addr)
-				mutateSeederLock.Unlock()
-				log.Println("New session created with", addr, "for file", file.FileName)
-				fmt.Println("New session created with", addr, "for file", file.FileName)
-			} else {
-				log.Println("Failed to create a session with", addr, "for file", file.FileName)
-				fmt.Println("Failed to create a session with", addr, "for file", file.FileName)
-			}
-		} else {
+		_, err := sessionmanager.GetSession(addr, constants.GetSessionDialTimeout)
+		if err == nil {
 			mutateSeederLock.Lock()
 			activeSeeders = append(activeSeeders, addr)
 			mutateSeederLock.Unlock()
-			log.Println("Existing session used with", addr, "for file", file.FileName)
-			fmt.Println("Existing session used with", addr, "for file", file.FileName)
+			log.Println("New session created with", addr, "for file", file.FileName)
+			fmt.Println("New session created with", addr, "for file", file.FileName)
+		} else {
+			log.Println("Failed to create a session with", addr, "for file", file.FileName)
+			fmt.Println("Failed to create a session with", addr, "for file", file.FileName)
 		}
 	}
 
 	for i := 0; i < len(file.Seeders); i++ {
-		go insertSession(file.Seeders[i])
+		if !sessionmanager.IsExistingSession(file.Seeders[i]) {
+			go insertSession(file.Seeders[i])
+		} else {
+			mutateSeederLock.Lock()
+			activeSeeders = append(activeSeeders, file.Seeders[i])
+			mutateSeederLock.Unlock()
+			log.Println("Existing session used with", file.Seeders[i], "for file", file.FileName)
+			fmt.Println("Existing session used with", file.Seeders[i], "for file", file.FileName)
+		}
 	}
 
 	downloadChunks(file, randomChunks, &mutateSeederLock, &activeSeeders)
@@ -252,7 +252,6 @@ func DownloadFileByHash(Hash string) bool {
 
 // Restarts a file download by providing a hash
 func restartDownload(Hash string) {
-
 	file, err := dbGetFile(Hash)
 	if err != nil {
 		pushError("Error on restart download", err.Error())
@@ -290,30 +289,33 @@ func restartDownload(Hash string) {
 	//A lock for mutating seeders
 	mutateSeederLock := sync.Mutex{}
 
+	//Dont start with unknown sessions
+	//activeSeeders = append(activeSeeders, file.Seeders...)
+
 	insertSession := func(addr string) {
-		if !sessionmanager.IsExistingSession(addr) {
-			_, err := sessionmanager.GetSession(addr, constants.GetSessionDialTimeout)
-			if err == nil {
-				mutateSeederLock.Lock()
-				activeSeeders = append(activeSeeders, addr)
-				mutateSeederLock.Unlock()
-				log.Println("New session created with", addr, "for file", file.FileName)
-				fmt.Println("New session created with", addr, "for file", file.FileName)
-			} else {
-				log.Println("Failed to create a session with", addr, "for file", file.FileName)
-				fmt.Println("Failed to create a session with", addr, "for file", file.FileName)
-			}
-		} else {
+		_, err := sessionmanager.GetSession(addr, constants.GetSessionDialTimeout)
+		if err == nil {
 			mutateSeederLock.Lock()
 			activeSeeders = append(activeSeeders, addr)
 			mutateSeederLock.Unlock()
-			log.Println("Existing session used with", addr, "for file", file.FileName)
-			fmt.Println("Existing session used with", addr, "for file", file.FileName)
+			log.Println("New session created with", addr, "for file", file.FileName)
+			fmt.Println("New session created with", addr, "for file", file.FileName)
+		} else {
+			log.Println("Failed to create a session with", addr, "for file", file.FileName)
+			fmt.Println("Failed to create a session with", addr, "for file", file.FileName)
 		}
 	}
 
 	for i := 0; i < len(file.Seeders); i++ {
-		go insertSession(file.Seeders[i])
+		if !sessionmanager.IsExistingSession(file.Seeders[i]) {
+			go insertSession(file.Seeders[i])
+		} else {
+			mutateSeederLock.Lock()
+			activeSeeders = append(activeSeeders, file.Seeders[i])
+			mutateSeederLock.Unlock()
+			log.Println("Existing session used with", file.Seeders[i], "for file", file.FileName)
+			fmt.Println("Existing session used with", file.Seeders[i], "for file", file.FileName)
+		}
 	}
 
 	downloadChunks(file, missingChunks, &mutateSeederLock, &activeSeeders)
