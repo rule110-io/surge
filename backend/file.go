@@ -17,15 +17,6 @@ import (
 	"github.com/rule110-io/surge/backend/mutexes"
 )
 
-func getFileSize(path string) (size int64) {
-	fi, err := os.Stat(path)
-	if err != nil {
-		return -1
-	}
-	// get the size
-	return fi.Size()
-}
-
 func getListedFileByHash(Hash string) *models.File {
 
 	var selectedFile *models.File = nil
@@ -102,7 +93,7 @@ func SetFilePause(Hash string, State bool) {
 	mutexes.FileWriteLock.Unlock()
 
 	msg := "Paused"
-	if State == false {
+	if !State {
 		msg = "Resumed"
 	}
 	pushNotification("Download "+msg, file.FileName)

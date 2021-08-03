@@ -25,7 +25,7 @@ import (
 func autoSubscribeWorker() {
 
 	//As long as the client is running subscribe
-	for true {
+	for {
 		resubscribeToTopics()
 		time.Sleep(time.Second * 20 * constants.SubscriptionDuration)
 	}
@@ -34,7 +34,7 @@ func autoSubscribeWorker() {
 // takes care that file data is regularly updated and stored in the database
 func updateFileDataWorker() {
 
-	for true {
+	for {
 		time.Sleep(time.Second)
 
 		mutexes.WorkerMapLock.Lock()
@@ -86,7 +86,7 @@ func updateFileDataWorker() {
 			totalDown += down
 			totalUp += up
 
-			if zeroBandwidthMap[key] == false || down+up != 0 {
+			if !zeroBandwidthMap[key] || down+up != 0 {
 				statusEvent := models.FileStatusEvent{
 					FileHash:          key,
 					Progress:          fileProgressMap[key],
@@ -110,7 +110,7 @@ func updateFileDataWorker() {
 		uploadBandwidthAccumulator["DISCOVERY"] = 0
 		mutexes.BandwidthAccumulatorMapLock.Unlock()
 
-		if zeroBandwidthMap["total"] == false || totalDown+totalUp != 0 {
+		if !zeroBandwidthMap["total"] || totalDown+totalUp != 0 {
 			wailsRuntime.Events.Emit("globalBandwidthUpdate", statusBundle, totalDown, totalUp)
 		}
 

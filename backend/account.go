@@ -35,7 +35,7 @@ func InitializeAccount() *nkn.Account {
 
 	// If the file doesn't exist, create it
 	if os.IsNotExist(err) {
-		account, err := nkn.NewAccount(nil)
+		account, _ := nkn.NewAccount(nil)
 		seed = account.Seed()
 
 		f, err := os.OpenFile(accountPathOS, os.O_WRONLY|os.O_CREATE, 0644)
@@ -55,7 +55,7 @@ func InitializeAccount() *nkn.Account {
 		}
 		defer file.Close()
 
-		seed, err = ioutil.ReadAll(file)
+		seed, _ = ioutil.ReadAll(file)
 	}
 
 	account, err := nkn.NewAccount(seed)

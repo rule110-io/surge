@@ -12,14 +12,14 @@ package constants
 import "time"
 
 const (
-	//ChunkSize is size of chunk in bytes (256 kB)
-	ChunkSize = 1024 * 256
+	//ChunkSize is size of chunk in bytes (1024 kB)
+	ChunkSize = 1024 * 1024
 
 	//NumClients is the number of NKN clients
 	NumClients = 8
 
 	//NumWorkers is the total number of concurrent chunk fetches allowed
-	NumWorkers = 32
+	NumWorkers = 8
 
 	//duration of a subscription blocktime is ~20sec
 	SubscriptionDuration = 180

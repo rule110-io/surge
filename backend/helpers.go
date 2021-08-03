@@ -144,7 +144,7 @@ func hashFile(randomHash string) {
 
 	//Add to payload
 	AddToSeedString(*dbFile)
-	AnnounceNewFile(*&dbFile)
+	AnnounceNewFile(dbFile)
 
 	pushNotification("Now seeding", dbFile.FileName)
 }
@@ -190,7 +190,7 @@ func ParsePayloadString(s string) []models.File {
 			}
 		}
 		//Unique listing so we add
-		if replace == false {
+		if !replace {
 			ListedFiles = append(ListedFiles, newListing)
 		}
 		mutexes.ListedFilesLock.Unlock()

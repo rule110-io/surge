@@ -84,6 +84,10 @@ func WriteChunk(FileID string, ChunkID int32, Chunk []byte) {
 	}
 	path := remoteFolder + string(os.PathSeparator) + fileInfo.FileName
 	osFile, err := os.OpenFile(path, os.O_RDWR, 0644)
+	if err != nil {
+		pushError("Error on write chunk (OpenFile)", err.Error())
+		return
+	}
 	defer osFile.Close()
 
 	if err != nil {

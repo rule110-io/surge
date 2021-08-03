@@ -47,8 +47,6 @@ var client *nkn.MultiClient
 
 var queryPayload = ""
 
-var clientOnlineMap map[string]bool
-
 //NumClientsStruct .
 
 var numClientsStore *wails.Store
@@ -134,14 +132,13 @@ func InitializeClient(args []string) bool {
 		}
 	}
 
-	InitializeTopicsManager()
 	messaging.Initialize(client, client.Account(), MessageReceived)
 	go autoSubscribeWorker()
 
 	go platform.WatchOSXHandler()
 
 	//Insert new file from arguments and start download
-	if args != nil && len(args) > 0 && len(args[0]) > 0 {
+	if len(args) > 0 && len(args[0]) > 0 {
 		platform.AskUser("startDownloadMagnetLinks", "{files : ["+args[0]+"]}")
 	}
 
@@ -152,7 +149,6 @@ func InitializeClient(args []string) bool {
 func StartClient(args []string) {
 
 	//Initialize all our global data maps
-	clientOnlineMap = make(map[string]bool)
 	workerMap = make(map[string]int)
 	downloadBandwidthAccumulator = make(map[string]int)
 	uploadBandwidthAccumulator = make(map[string]int)
@@ -161,7 +157,8 @@ func StartClient(args []string) {
 	chunksInTransit = make(map[string]bool)
 
 	//Initialize our surge nkn client
-	go InitializeClient(args)
+	InitializeTopicsManager()
+	InitializeClient(args)
 }
 
 //StopClient Stops the surge client and cleans up
@@ -261,7 +258,7 @@ func restartDownload(Hash string) {
 	//Get missing chunk indices
 	var missingChunks []int
 	for i := 0; i < file.NumChunks; i++ {
-		if bitmap.Get(file.ChunkMap, i) == false {
+		if !bitmap.Get(file.ChunkMap, i) {
 			missingChunks = append(missingChunks, i)
 		}
 	}
@@ -409,7 +406,6 @@ func listenToSession(Session *sessionmanager.Session) {
 		case constants.SurgeChunkID:
 			//Write add to download internally after parsing data
 			processChunk(Session, data)
-			break
 		}
 	}
 }

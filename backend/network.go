@@ -143,22 +143,6 @@ func downloadChunks(file *models.File, randomChunks []int, mutateSeederLock *syn
 					}
 					mutexes.WorkerMapLock.Unlock()
 
-					//TODO: Seeder not having a session is not dropped from here anymore
-					//but rather from the code that collects the session on download initiation
-					//TODO: Check if that works proper
-
-					//This file was not available at this time from this seeder, drop seeder for file.
-					/*mutateSeederLock.Lock()
-					for i := 0; i < len(ListedFiles); i++ {
-						if ListedFiles[i].FileHash == fileID {
-							ListedFiles[i].Seeders = removeStringFromSlice(ListedFiles[i].Seeders, downloadSeederAddr)
-							ListedFiles[i].SeederCount = len(ListedFiles[i].Seeders)
-							file = &ListedFiles[i]
-							break
-						}
-					}
-					mutateSeederLock.Unlock()*/
-
 					//return out of job
 					return
 				}
@@ -177,7 +161,6 @@ func downloadChunks(file *models.File, randomChunks []int, mutateSeederLock *syn
 
 				for sleepWorker {
 					time.Sleep(time.Second)
-					//fmt.Println(string("\033[36m"), "Worker Sleeping", string("\033[0m"))
 
 					//Check if connection is lost
 					_, sessionExists := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout)
@@ -185,8 +168,12 @@ func downloadChunks(file *models.File, randomChunks []int, mutateSeederLock *syn
 						//if session no longer exists
 						fmt.Println(string("\033[36m"), "session no longer exists while waiting for chunk to arrive for", downloadSeederAddr, string("\033[0m"))
 
+						fmt.Println(string("\033[36m"), "Attempting to reconnect with a new session", downloadSeederAddr, string("\033[0m"))
+						_, err := sessionmanager.GetSession(downloadSeederAddr, 10)
+						if err == nil {
+							sleepWorker = false
+						}
 						inTransit = true
-						sleepWorker = false
 						break
 					}
 
@@ -231,9 +218,6 @@ func downloadChunks(file *models.File, randomChunks []int, mutateSeederLock *syn
 					for i := 0; i < len(ListedFiles); i++ {
 						if ListedFiles[i].FileHash == fileID {
 							removeStringFromSlicePtr(activeSeeders, downloadSeederAddr)
-							ListedFiles[i].Seeders = removeStringFromSlice(ListedFiles[i].Seeders, downloadSeederAddr)
-							ListedFiles[i].SeederCount = len(ListedFiles[i].Seeders)
-							file = &ListedFiles[i]
 							break
 						}
 					}
@@ -322,7 +306,7 @@ func chunksDownloaded(s []byte, num int) int {
 
 	chunksLocalNum := 0
 	for i := 0; i < num; i++ {
-		if bitmap.Get(s, i) == true {
+		if bitmap.Get(s, i) {
 			chunksLocalNum++
 		}
 	}

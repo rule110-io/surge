@@ -26,15 +26,12 @@ func MessageReceived(msg *messaging.MessageReceivedObj) {
 	case MessageIDAnnounceFiles:
 		SendAnnounceFilesReply(msg)
 		processQueryResponse(msg.Sender, msg.Data)
-		break
 	case MessageIDAnnounceFilesReply:
 		//process file data
 		processQueryResponse(msg.Sender, msg.Data)
-		break
 	case MessageIDAnnounceNewFile:
 		//process file data
 		processQueryResponse(msg.Sender, msg.Data)
-		break
 	}
 
 }
@@ -126,7 +123,7 @@ func processQueryResponse(seeder string, Data []byte) {
 			}
 		}
 		//Unique listing so we add
-		if replace == false {
+		if !replace {
 			ListedFiles = append(ListedFiles, newListing)
 		}
 

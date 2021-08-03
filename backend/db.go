@@ -274,16 +274,12 @@ func SearchLocalFile(Query string, filterState FileFilterState, OrderBy string, 
 	break*/
 	case Downloading:
 		fileFilterFunc = func(f models.File) bool { return f.IsDownloading }
-		break
 	case Seeding:
 		fileFilterFunc = func(f models.File) bool { return f.IsUploading }
-		break
 	case Completed:
 		fileFilterFunc = func(f models.File) bool { return f.IsAvailable }
-		break
 	case Paused:
 		fileFilterFunc = func(f models.File) bool { return f.IsPaused }
-		break
 	}
 
 	resultFiles = filterFile(resultFiles, fileFilterFunc)
