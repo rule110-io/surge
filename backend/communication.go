@@ -127,6 +127,20 @@ func processQueryResponse(seeder string, Data []byte) {
 			ListedFiles = append(ListedFiles, newListing)
 		}
 
+		//Check if we have this file in the db already, if so add this new seeder
+		mutexes.FileWriteLock.Lock()
+		dbFile, err := dbGetFile(newListing.FileHash)
+		if err == nil {
+			log.Println("File in query was already known, seeder added!")
+
+			dbFile.Seeders = append(dbFile.Seeders, seeder)
+			dbFile.Seeders = distinctStringSlice(dbFile.Seeders)
+			dbFile.SeederCount = len(dbFile.Seeders)
+
+			dbInsertFile(*dbFile)
+		}
+		mutexes.FileWriteLock.Unlock()
+
 		fmt.Println(string("\033[33m"), "Filename", newListing.FileName, "FileHash", newListing.FileHash, string("\033[0m"))
 
 		log.Println("Query response new file: ", newListing.FileName, " seeder: ", seeder)
