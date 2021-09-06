@@ -39,7 +39,6 @@ export default {
       if (isNewFileHash) {
         this.shared = newFileHash.ChunksShared / newFileHash.NumChunks;
         this.progress = newFileHash.Progress * 100;
-        this.drawProgress(newFileHash.ChunkMap);
       }
     },
     progress(x) {
