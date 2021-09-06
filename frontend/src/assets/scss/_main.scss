@@ -123,11 +123,13 @@ a {
   }
 
   .tooltip-inner {
-    background: $dark;
+    background: $grey-dark;
     color: white;
-    border-radius: $br-md;
-    padding: 5px 10px 4px;
+    border-radius: $br-xs;
+    padding: $padding-xs;
     font-size: $fz-sm;
+    box-shadow: $shadow-4;
+    backdrop-filter: $blur;
   }
 
   .tooltip-arrow {
@@ -136,7 +138,7 @@ a {
     border-style: solid;
     position: absolute;
     margin: 5px;
-    border-color: $dark;
+    border-color: $grey-dark;
     z-index: 1;
   }
 
