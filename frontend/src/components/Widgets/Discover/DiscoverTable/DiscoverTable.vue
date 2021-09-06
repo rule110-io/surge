@@ -24,7 +24,9 @@
         <td class="text_align_right">
           {{ file.Seeders.length }}
         </td>
-        <td>PLACEHOLDER</td>
+        <td>
+          <FileSeeders :seeders="file.Seeders" />
+        </td>
         <td class="text_align_right"><FileDownload :hash="file.FileHash" /></td>
       </tr>
     </tbody>
@@ -42,9 +44,10 @@ import FileName from "@/components/File/FileName/FileName";
 import FileSize from "@/components/File/FileSize/FileSize";
 import FileHash from "@/components/File/FileHash/FileHash";
 import FileDownload from "@/components/File/FileDownload/FileDownload";
+import FileSeeders from "@/components/File/FileSeeders/FileSeeders";
 
 export default {
-  components: { FileName, FileSize, FileHash, FileDownload },
+  components: { FileName, FileSize, FileHash, FileDownload, FileSeeders },
   data: () => {
     return {};
   },
