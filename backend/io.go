@@ -25,6 +25,10 @@ import (
 	"github.com/skratchdot/open-golang/open"
 )
 
+func emitNotificationEvent(event string, title string, text string) {
+	wailsRuntime.Events.Emit("notificationEvent", title, text, time.Now().Unix())
+}
+
 func pushNotification(title string, text string) {
 	//If wails frontend is not yet bound, we wait in a task to not block main thread
 	if !FrontendReady {
@@ -32,11 +36,11 @@ func pushNotification(title string, text string) {
 			for !FrontendReady {
 				time.Sleep(time.Millisecond * 50)
 			}
-			wailsRuntime.Events.Emit("notificationEvent", title, text)
+			emitNotificationEvent("notificationEvent", title, text)
 		}
 		go waitAndPush()
 	} else {
-		wailsRuntime.Events.Emit("notificationEvent", title, text)
+		emitNotificationEvent("notificationEvent", title, text)
 	}
 }
 
@@ -47,11 +51,11 @@ func pushError(title string, text string) {
 			for !FrontendReady {
 				time.Sleep(time.Millisecond * 50)
 			}
-			wailsRuntime.Events.Emit("errorEvent", title, text)
+			emitNotificationEvent("errorEvent", title, text)
 		}
 		go waitAndPush()
 	} else {
-		wailsRuntime.Events.Emit("errorEvent", title, text)
+		emitNotificationEvent("errorEvent", title, text)
 	}
 }
 

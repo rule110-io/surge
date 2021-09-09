@@ -97,15 +97,15 @@ func ProcessStartupArgs(args []string, frontendReady *bool) bool {
 
 func mailSlotListen() {
 	ms, err := mailslot.New(mailSlotName, 0, mailslot.MAILSLOT_WAIT_FOREVER)
-	defer ms.Close()
-
 	if err != nil {
 		panic(err)
 	}
 
+	defer ms.Close()
+
 	reader := bufio.NewReader(ms)
 
-	for true {
+	for {
 		testData, err := reader.ReadString('\n')
 		if err != nil {
 			panic(err)
@@ -119,11 +119,11 @@ func mailSlotListen() {
 
 func mailSlotSend(message string) {
 	ms, err := mailslot.Open(mailSlotName)
-	defer ms.Close()
-
 	if err != nil {
 		panic(err)
 	}
+
+	defer ms.Close()
 
 	ms.Write([]byte(message + "\n"))
 }

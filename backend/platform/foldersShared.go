@@ -41,8 +41,7 @@ func InitializeFolders() (bool, error) {
 	newCreated := false
 
 	var dir = GetSurgeDir()
-	var dirFileMode os.FileMode
-	dirFileMode = os.ModeDir | (osUserRwx | osAllR)
+	var dirFileMode os.FileMode = os.ModeDir | (osUserRwx | osAllR)
 
 	if _, err := os.Stat(dir); os.IsNotExist(err) {
 		os.Mkdir(dir, dirFileMode)

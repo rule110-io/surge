@@ -22,6 +22,5 @@ func SetWailsRuntime(runtime *wails.Runtime, setVisualModeFunc setVisualMode) {
 
 //AskUser emit ask user event
 func AskUser(context string, payload string) {
-	//log.Println("Emitting Event: ", "notificationEvent", title, text)
 	wailsRuntime.Events.Emit("userEvent", context, payload)
 }
