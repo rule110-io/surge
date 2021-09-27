@@ -7,6 +7,7 @@ const getDefaultState = () => {
     localPages: 0,
     remotePages: 0,
     localFilesConfig: {
+      filter: 0,
       search: "",
       orderBy: "FileName",
       isDesc: true,
@@ -52,11 +53,18 @@ const mutations = {
 
 const actions = {
   fetchLocalFiles({ commit, state }) {
-    const { search, skip, get, orderBy, isDesc } = state.localFilesConfig;
+    const {
+      search,
+      skip,
+      get,
+      orderBy,
+      isDesc,
+      filter,
+    } = state.localFilesConfig;
 
     window.backend.MiddlewareFunctions.GetLocalFiles(
       search,
-      0,
+      filter,
       orderBy,
       isDesc,
       skip,
