@@ -25,7 +25,13 @@
         >Add file</Button
       >
       <Divider />
-      <Icon class="header__icon" icon="NotificationsIcon" />
+      <Icon
+        class="header__icon"
+        icon="NotificationsIcon"
+        @click.native.stop="toggleNotifications"
+      />
+      <div class="header__notifications-marker" v-show="counter"></div>
+      <Notifications />
       <Icon class="header__icon" icon="SettingsIcon" />
     </div>
   </header>
@@ -37,9 +43,9 @@
 
 <script>
 import { mapState } from "vuex";
-import { mixin as clickaway } from "vue-clickaway";
 
 import Navigation from "@/components/Navigation/Navigation";
+import Notifications from "@/components/Notifications/Notifications";
 import CustomInput from "@/components/Controls/Input/Input";
 import Button from "@/components/Button/Button";
 import Divider from "@/components/Divider/Divider";
@@ -48,8 +54,15 @@ import Icon from "@/components/Icon/Icon";
 import Logo from "@/assets/icons/Logo.svg";
 
 export default {
-  components: { Logo, Navigation, CustomInput, Button, Divider, Icon },
-  mixins: [clickaway],
+  components: {
+    Logo,
+    Navigation,
+    CustomInput,
+    Button,
+    Divider,
+    Icon,
+    Notifications,
+  },
   data: () => {
     return {
       topicName: "",
@@ -108,9 +121,6 @@ export default {
     },
     toggleNotifications() {
       this.$store.commit("notifications/toggleNotifications", !this.open);
-    },
-    closeNotifications() {
-      this.$store.commit("notifications/toggleNotifications", false);
     },
   },
 };

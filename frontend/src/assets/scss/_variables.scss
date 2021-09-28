@@ -8,6 +8,7 @@ $font-family: "Inter", sans-serif;
 // Colors
 $darkest: #0e0e10;
 $dark: #131416;
+$dark-semi-light: #141416;
 $dark-light: #2d2e30;
 $dark-gradient: linear-gradient(
   0deg,
@@ -18,11 +19,13 @@ $semi-dark: #212228;
 $white: #fff;
 $white-ghost: rgba(255, 255, 255, 0.05);
 $primary: #0a9795;
-$primary-gradient: linear-gradient(92.64deg, #0aa292 0.31%, #084b9c 129.25%);
+$jade: #0aa292;
+$primary-gradient: linear-gradient(92.64deg, $jade 0.31%, #084b9c 129.25%);
 $grey: #7b7d82;
 $grey-light: #7e8084;
 $grey-dark: #28282d;
 $red: #eb5757;
+$danger: #ff3d48;
 $black-light: rgba(255, 255, 255, 0.03);
 $text-white: rgba(255, 255, 255, 0.8);
 
@@ -88,5 +91,6 @@ $br-md: 9px;
 $br-lg: 22px;
 
 $border: 1px solid $semi-dark;
+$border-transparent: 1px solid rgba(225, 225, 225, 0.1);
 
 $sidebar-width: 224px;

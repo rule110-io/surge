@@ -90,8 +90,8 @@ export default {
       });
     },
     enableNotifications() {
-      window.wails.Events.On("notificationEvent", (title, text) => {
-        const notification = { title, text };
+      window.wails.Events.On("notificationEvent", (title, text, timestamp) => {
+        const notification = { title, text, timestamp };
         this.$store.commit("notifications/addNotification", notification);
       });
     },

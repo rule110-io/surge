@@ -9,6 +9,17 @@
   top: 0;
   justify-content: space-between;
   width: 100%;
+  z-index: 10;
+
+  &__notifications-marker {
+    width: 8px;
+    height: 8px;
+    border-radius: 100px;
+    background: $danger;
+    position: absolute;
+    right: 82px;
+    top: 32px;
+  }
 
   &__left {
     display: flex;
