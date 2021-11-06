@@ -194,13 +194,11 @@ func SearchRemoteFile(Topic string, Query string, OrderBy string, IsDesc bool, S
 			if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) && file.FileLocation == "remote" {
 
 				result := models.File{
-					FileName:    file.FileName,
-					FileHash:    file.FileHash,
-					FileSize:    file.FileSize,
-					Seeders:     file.Seeders,
-					NumChunks:   file.NumChunks,
-					SeederCount: len(file.Seeders),
-					Topic:       file.Topic,
+					FileName:  file.FileName,
+					FileHash:  file.FileHash,
+					FileSize:  file.FileSize,
+					NumChunks: file.NumChunks,
+					Topic:     file.Topic,
 				}
 
 				tracked, err := dbGetFile(result.FileHash)
@@ -327,19 +325,6 @@ func SearchLocalFile(Query string, filterState FileFilterState, OrderBy string, 
 			Topic:         resultFiles[i].Topic,
 		}
 
-		if listing.IsUploading {
-			listing.Seeders = []string{GetAccountAddress()}
-		} else {
-			listing.Seeders = []string{}
-		}
-
-		for _, file := range ListedFiles {
-			if file.FileHash == listing.FileHash {
-				listing.Seeders = append(listing.Seeders, file.Seeders...)
-				break
-			}
-		}
-		listing.SeederCount = len(listing.Seeders)
 		//If file is downloading set progress
 		if listing.IsDownloading || listing.IsPaused {
 			numChunksLocal := chunksDownloaded(resultFiles[i].ChunkMap, listing.NumChunks)

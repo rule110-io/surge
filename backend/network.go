@@ -55,12 +55,14 @@ func fileBandwidth(FileID string) (Download int, Upload int) {
 	return int(fileBandwidthMap[FileID].Download.Avg()), int(fileBandwidthMap[FileID].Upload.Avg())
 }
 
-func downloadChunks(file *models.File, randomChunks []int, mutateSeederLock *sync.Mutex, activeSeeders *[]string) {
+func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLock *sync.Mutex, activeSeeders *[]string) {
 	fileID := file.FileHash
 
 	//todo: lock seeders
-	for file == nil || len(*activeSeeders) == 0 {
+	for file == nil || !AnySeeders(fileID) {
 		time.Sleep(time.Second)
+
+		//TODO: this might not be needed anymore now we have the file seeder tracker.
 		file = getListedFileByHash(fileID)
 	}
 
@@ -72,7 +74,7 @@ func downloadChunks(file *models.File, randomChunks []int, mutateSeederLock *syn
 	//Give the seeder a fair start with timers when a download is initiated
 	//Potentionally this seeder was last queried 60 seconds ago for files and otherwise idle but online
 	//todo: Lock seeders
-	for _, seeder := range *activeSeeders {
+	for _, seeder := range GetSeeders(fileID) {
 		sessionmanager.UpdateActivity(seeder)
 	}
 
@@ -109,7 +111,7 @@ func downloadChunks(file *models.File, randomChunks []int, mutateSeederLock *syn
 					//Give the seeder a fair start with timers when a download is initiated
 					//Potentionally this seeder was last queried 60 seconds ago for files and otherwise idle but online
 					//todo: lockseeders?
-					for _, seeder := range *activeSeeders {
+					for _, seeder := range GetSeeders(fileID) {
 						sessionmanager.UpdateActivity(seeder)
 					}
 				}
@@ -214,14 +216,17 @@ func downloadChunks(file *models.File, randomChunks []int, mutateSeederLock *syn
 					mutexes.WorkerMapLock.Unlock()
 
 					//This file was not available at this time from this seeder, drop seeder for file.
-					mutateSeederLock.Lock()
+					/*mutateSeederLock.Lock()
 					for i := 0; i < len(ListedFiles); i++ {
 						if ListedFiles[i].FileHash == fileID {
 							removeStringFromSlicePtr(activeSeeders, downloadSeederAddr)
 							break
 						}
 					}
-					mutateSeederLock.Unlock()
+					mutateSeederLock.Unlock()*/
+
+					RemoveFileSeeder(fileID, downloadSeederAddr)
+
 					//return out of job
 					return
 				}
@@ -232,17 +237,12 @@ func downloadChunks(file *models.File, randomChunks []int, mutateSeederLock *syn
 			//spin to seeder with workers available
 			spinForSeeder := true
 			for spinForSeeder {
-
-				mutateSeederLock.Lock()
-				numSeeds := len(*activeSeeders)
-				mutateSeederLock.Unlock()
-
-				for numSeeds == 0 {
+				for !AnySeeders(fileID) {
 					time.Sleep(time.Second)
 
-					listingRefreshed := getListedFileByHash(fileID)
+					//listingRefreshed := getListedFileByHash(fileID)
 
-					if listingRefreshed != nil {
+					/*if listingRefreshed != nil {
 						newSeeders := getListedFileByHash(fileID).Seeders
 						for _, v := range newSeeders {
 							_, err := sessionmanager.GetSession(v, constants.GetSessionDialTimeout)
@@ -258,10 +258,10 @@ func downloadChunks(file *models.File, randomChunks []int, mutateSeederLock *syn
 						mutateSeederLock.Lock()
 						numSeeds = len(*activeSeeders)
 						mutateSeederLock.Unlock()
-					}
+					}*/
 				}
 
-				downloadSeederAddr = (*activeSeeders)[seederAlternator]
+				downloadSeederAddr = GetSeeders(fileID)[seederAlternator]
 
 				//If seeder selected exceeds worker limit skip
 				mutexes.WorkerMapLock.Lock()
@@ -270,7 +270,7 @@ func downloadChunks(file *models.File, randomChunks []int, mutateSeederLock *syn
 
 				if seedWorkerNum >= constants.NumWorkers {
 					seederAlternator++
-					if seederAlternator > len(*activeSeeders)-1 {
+					if seederAlternator > len(GetSeeders(fileID))-1 {
 						seederAlternator = 0
 
 						//When weve spun a complete seeder cycle we sleep

@@ -117,3 +117,15 @@ func (s *MiddlewareFunctions) GetTopicSubscriptions() []string {
 
 	return topicNames
 }
+
+type FileDetails struct {
+	FileID  string
+	Seeders []string
+}
+
+func (s *MiddlewareFunctions) GetFileDetails(FileHash string) FileDetails {
+	return FileDetails{
+		FileID:  FileHash,
+		Seeders: GetSeeders(FileHash),
+	}
+}

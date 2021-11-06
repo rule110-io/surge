@@ -14,7 +14,6 @@ type File struct {
 	FileName      string
 	FileSize      int64
 	FileHash      string
-	Seeders       []string
 	Path          string //only for local
 	NumChunks     int
 	IsDownloading bool
@@ -26,7 +25,6 @@ type File struct {
 	IsAvailable   bool //only for local
 	ChunkMap      []byte
 	ChunksShared  int
-	SeederCount   int
 	Progress      float32 //only for remote
 	Topic         string
 }

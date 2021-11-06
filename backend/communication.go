@@ -100,11 +100,9 @@ func processQueryResponse(seeder string, Data []byte) {
 			FileName:     data[2],
 			FileSize:     fileSize,
 			FileHash:     data[4],
-			Seeders:      []string{seeder},
 			Path:         "",
 			NumChunks:    numChunks,
 			ChunkMap:     nil,
-			SeederCount:  1,
 			Topic:        data[5],
 		}
 
@@ -112,12 +110,6 @@ func processQueryResponse(seeder string, Data []byte) {
 		var replace = false
 		for l := 0; l < len(ListedFiles); l++ {
 			if ListedFiles[l].FileHash == newListing.FileHash {
-
-				//if the seeder is unique add it as an additional seeder for the file
-				ListedFiles[l].Seeders = append(ListedFiles[l].Seeders, seeder)
-				ListedFiles[l].Seeders = distinctStringSlice(ListedFiles[l].Seeders)
-				ListedFiles[l].SeederCount = len(ListedFiles[l].Seeders)
-
 				replace = true
 				break
 			}
@@ -133,9 +125,7 @@ func processQueryResponse(seeder string, Data []byte) {
 		if err == nil {
 			log.Println("File in query was already known, seeder added!")
 
-			dbFile.Seeders = append(dbFile.Seeders, seeder)
-			dbFile.Seeders = distinctStringSlice(dbFile.Seeders)
-			dbFile.SeederCount = len(dbFile.Seeders)
+			AddFileSeeder(dbFile.FileHash, seeder)
 
 			dbInsertFile(*dbFile)
 		}

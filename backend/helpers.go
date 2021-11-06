@@ -47,15 +47,19 @@ func distinctStringSlice(stringSlice []string) []string {
 
 type sortBySeederCountAsc []models.File
 
-func (a sortBySeederCountAsc) Len() int           { return len(a) }
-func (a sortBySeederCountAsc) Less(i, j int) bool { return a[i].SeederCount < a[j].SeederCount }
-func (a sortBySeederCountAsc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a sortBySeederCountAsc) Len() int { return len(a) }
+func (a sortBySeederCountAsc) Less(i, j int) bool {
+	return len(GetSeeders(a[i].FileHash)) < len(GetSeeders(a[j].FileHash))
+}
+func (a sortBySeederCountAsc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 type sortBySeederCountDesc []models.File
 
-func (a sortBySeederCountDesc) Len() int           { return len(a) }
-func (a sortBySeederCountDesc) Less(i, j int) bool { return a[i].SeederCount > a[j].SeederCount }
-func (a sortBySeederCountDesc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
+func (a sortBySeederCountDesc) Len() int { return len(a) }
+func (a sortBySeederCountDesc) Less(i, j int) bool {
+	return len(GetSeeders(a[i].FileHash)) > len(GetSeeders(a[j].FileHash))
+}
+func (a sortBySeederCountDesc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
 
 type sortByFileNameAsc []models.File
 
@@ -164,14 +168,11 @@ func ParsePayloadString(s string) []models.File {
 		fileSize, _ := strconv.ParseInt(data[3], 10, 64)
 		numChunks := int((fileSize-1)/int64(constants.ChunkSize)) + 1
 
-		seeder := strings.Split(data[5], ",")
-
 		newListing := models.File{
 			FileLocation: "remote",
 			FileName:     data[2],
 			FileSize:     fileSize,
 			FileHash:     data[4],
-			Seeders:      seeder,
 			Path:         "",
 			NumChunks:    numChunks,
 			ChunkMap:     nil,
@@ -184,7 +185,6 @@ func ParsePayloadString(s string) []models.File {
 		for l := 0; l < len(ListedFiles); l++ {
 			if ListedFiles[l].FileHash == newListing.FileHash {
 				//if the seeder is unique add it as an additional seeder for the file
-				ListedFiles[l].Seeders = append(ListedFiles[l].Seeders, seeder...)
 				replace = true
 				break
 			}
@@ -195,7 +195,7 @@ func ParsePayloadString(s string) []models.File {
 		}
 		mutexes.ListedFilesLock.Unlock()
 
-		log.Println("Program paramater new file: ", newListing.FileName, " seeder: ", newListing.Seeders)
+		log.Println("Program parameter new file: ", newListing.FileName)
 		files = append(files, newListing)
 	}
 	return files
