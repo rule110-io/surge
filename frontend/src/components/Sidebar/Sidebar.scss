@@ -7,6 +7,35 @@
   border-right: $border;
   box-sizing: border-box;
 
+  &__control {
+    display: flex;
+    align-items: center;
+    gap: $padding-sm;
+    color: $text-white;
+    cursor: pointer;
+    font-size: $fz-md;
+    line-height: 16px;
+    font-feature-settings: "salt" on;
+    padding: $padding-sm 0;
+    transition: $transition-1;
+
+    &:hover {
+      color: $primary;
+
+      svg {
+        path {
+          stroke: $primary;
+        }
+      }
+    }
+  }
+
+  &__controls {
+    margin-bottom: $padding-md;
+    padding-bottom: $padding-md;
+    border-bottom: $border;
+  }
+
   &__title {
     font-weight: $fw-bold;
     font-size: $fz-xs;
@@ -31,17 +60,31 @@
     color: $text-white;
     font-size: 14px;
     line-height: 16px;
-    padding: 0 $padding-md;
     box-sizing: border-box;
     transition: $transition-1;
     cursor: pointer;
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      height: 40px;
+      width: 192px;
+      border-radius: $br-md;
+      transition: $transition-1;
+      left: -14px;
+    }
 
     &_active {
-      background: $white-ghost;
+      &::after {
+        background: $white-ghost;
+      }
     }
 
     &:hover {
-      background: $white-ghost;
+      &::after {
+        background: $white-ghost;
+      }
     }
 
     &:not(:last-child) {

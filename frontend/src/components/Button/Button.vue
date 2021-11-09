@@ -28,7 +28,7 @@ export default {
     },
     size: {
       type: String,
-      default: "md",
+      default: "lg",
     },
     disabled: {
       type: Boolean,

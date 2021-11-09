@@ -1,0 +1,36 @@
+.control-wrapper {
+  &__title {
+    font-weight: $fw-semi-bold;
+    font-size: $fz-md;
+    line-height: 24px;
+    color: $white;
+    opacity: 0.8;
+    margin-bottom: $padding-xs;
+    display: block;
+  }
+
+  &__row {
+    display: flex;
+    align-items: center;
+
+    .checkbox {
+      &:not(:last-child) {
+        margin-right: $padding-md;
+      }
+    }
+  }
+
+  &__error {
+    font-size: $fz-md;
+    line-height: 24px;
+    min-height: 24px;
+    transition: $transition-1;
+    opacity: 0;
+    margin-top: $padding-xs;
+    color: $danger;
+
+    &_visible {
+      opacity: 1;
+    }
+  }
+}

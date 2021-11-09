@@ -5,11 +5,31 @@
   transition: $transition-1;
   box-sizing: border-box;
   border: 2px solid transparent;
-  background: $dark;
   display: flex;
   align-items: center;
   padding: $padding-sm $padding-md;
-  height: 48px;
+
+  box-shadow: $shadow-5;
+
+  &_size {
+    &_lg {
+      height: 48px;
+    }
+
+    &_md {
+      height: 40px;
+    }
+  }
+
+  &_theme {
+    &_dark {
+      background: $dark;
+    }
+
+    &_light {
+      background: $dark-gradient;
+    }
+  }
 
   &_readonly {
     border-color: transparent !important;
@@ -17,7 +37,6 @@
 
   &_focus {
     border-color: $primary;
-    box-shadow: $shadow-3;
   }
 
   &__controller {
@@ -31,8 +50,17 @@
     font-family: $font-family;
     color: $white;
     border-radius: $br-md;
-    background: $dark;
     border: none;
+
+    &_theme {
+      &_dark {
+        background: transparent;
+      }
+
+      &_light {
+        background: transparent;
+      }
+    }
 
     &_left {
       padding-right: 58px;
