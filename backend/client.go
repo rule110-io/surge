@@ -1,6 +1,7 @@
 package surge
 
 import (
+	"context"
 	"fmt"
 	"math/rand"
 	"os"
@@ -51,9 +52,9 @@ var queryPayload = ""
 var numClientsStore *wails.Store
 
 // WailsBind is a binding function at startup
-func WailsBind(runtime *wails.Runtime) {
-	wailsRuntime = runtime
-	platform.SetWailsRuntime(wailsRuntime, SetVisualMode)
+func WailsBind(ctx context.Context) {
+
+	platform.SetWailsRuntime(&ctx, SetVisualMode)
 
 	//Mac specific functions
 	go platform.InitOSHandler()

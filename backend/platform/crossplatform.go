@@ -1,6 +1,10 @@
 package platform
 
-import "github.com/wailsapp/wails"
+import (
+	"context"
+
+	"github.com/wailsapp/wails/v2/pkg/runtime"
+)
 
 var labelText chan string
 var appearance chan string
@@ -8,19 +12,19 @@ var filestring = ""
 var magnetstring = ""
 var mode = ""
 
-var wailsRuntime *wails.Runtime
+var wailsRuntime *context.Context
 
 type setVisualMode func(int)
 
 var setVisualModeRef setVisualMode
 
 // SetWailsRuntime binds the runtime
-func SetWailsRuntime(runtime *wails.Runtime, setVisualModeFunc setVisualMode) {
-	wailsRuntime = runtime
+func SetWailsRuntime(ctx *context.Context, setVisualModeFunc setVisualMode) {
+	wailsRuntime = ctx
 	setVisualModeRef = setVisualModeFunc
 }
 
 //AskUser emit ask user event
 func AskUser(context string, payload string) {
-	wailsRuntime.Events.Emit("userEvent", context, payload)
+	runtime.EventsEmit(*wailsRuntime, "userEvent", context, payload)
 }

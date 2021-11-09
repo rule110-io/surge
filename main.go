@@ -1,36 +1,24 @@
 package main
 
 import (
+	"embed"
 	"os"
 
 	"log"
 
-	"github.com/leaanthony/mewn"
 	surge "github.com/rule110-io/surge/backend"
 	"github.com/rule110-io/surge/backend/platform"
-	"github.com/wailsapp/wails"
+	"github.com/wailsapp/wails/v2"
+	"github.com/wailsapp/wails/v2/pkg/logger"
+	"github.com/wailsapp/wails/v2/pkg/options"
+	"github.com/wailsapp/wails/v2/pkg/options/mac"
+	"github.com/wailsapp/wails/v2/pkg/options/windows"
 )
 
-var wailsRuntime *wails.Runtime
+//go:embed frontend/src
+var assets embed.FS
+
 var arguments []string
-
-// Stats
-type Stats struct {
-	log *wails.CustomLogger
-}
-
-//WailsRuntime
-type WailsRuntime struct {
-	runtime *wails.Runtime
-}
-
-// WailsInit
-func (s *Stats) WailsInit(runtime *wails.Runtime) error {
-	s.log = runtime.Log.New("Stats")
-	go surge.WailsBind(runtime)
-
-	return nil
-}
 
 //WailsShutdown (does not trigger in debug environment, found end of main to be more reliable)
 /*func (s *WailsRuntime) WailsShutdown() {
@@ -47,7 +35,7 @@ func main() {
 
 	//surge.HashFile("C:\\Users\\mitch\\Downloads\\surge_remote\\surge-0.2.0-beta.windows.zip")
 
-	stats := &Stats{}
+	//stats := &Stats{}
 
 	argsWithProg := os.Args
 	argsWithoutProg := os.Args[1:]
@@ -76,23 +64,45 @@ func main() {
 
 	surge.StartClient(arguments)
 
-	js := mewn.String("./frontend/dist/app.js")
-	css := mewn.String("./frontend/dist/app.css")
+	app := NewApp()
 
-	app := wails.CreateApp(&wails.AppConfig{
-		Width:     1144,
-		Height:    790,
-		Resizable: true,
-		Title:     "Surge",
-		JS:        js,
-		CSS:       css,
-		Colour:    "#131313",
+	wails.Run(&options.App{
+		Title:             "Surge",
+		Width:             720,
+		Height:            570,
+		MinWidth:          720,
+		MinHeight:         570,
+		MaxWidth:          1280,
+		MaxHeight:         740,
+		DisableResize:     false,
+		Fullscreen:        false,
+		Frameless:         false,
+		StartHidden:       false,
+		HideWindowOnClose: false,
+		RGBA:              &options.RGBA{R: 33, G: 37, B: 43, A: 255},
+		Assets:            assets,
+		LogLevel:          logger.DEBUG,
+		OnStartup:         app.startup,
+		OnDomReady:        app.domReady,
+		OnShutdown:        app.shutdown,
+		Bind: []interface{}{
+			&surge.MiddlewareFunctions{},
+		},
+		Windows: &windows.Options{
+			WebviewIsTransparent: false,
+			WindowIsTranslucent:  false,
+			DisableWindowIcon:    false,
+		},
+		Mac: &mac.Options{
+			TitleBar:             mac.TitleBarHiddenInset(),
+			WebviewIsTransparent: true,
+			WindowIsTranslucent:  true,
+			About: &mac.AboutInfo{
+				Title:   "Vanilla Template",
+				Message: "Part of the Wails projects",
+			},
+		},
 	})
-
-	app.Bind(stats)
-	app.Bind(&surge.MiddlewareFunctions{})
-
-	app.Run()
 
 	surge.StopClient()
 }

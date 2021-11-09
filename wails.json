@@ -1,0 +1,21 @@
+{
+  "name": "Surge",
+  "assetdir": "frontend/src",
+  "frontend:build": "",
+  "frontend:install": "",
+  "frontend:dev": "",
+  "wailsjsdir": "./frontend",
+  "version": "2",
+  "Path": "",
+  "BuildDir": "",
+  "outputfilename": "surge",
+  "OutputType": "",
+  "Platform": "",
+  "Author": {
+    "name": "Christian Busch",
+    "email": "kontakt@christian-busch.com"
+  },
+  "debounceMS": 100,
+  "devserverurl": "http://localhost:34115",
+  "appargs": ""
+}
