@@ -41,3 +41,13 @@
     gap: $padding-llg;
   }
 }
+
+.modal-enter-active,
+.modal-leave-active {
+  transition: $transition-2;
+}
+.modal-enter,
+.modal-leave-to {
+  transform: translate(-50%, -75%);
+  opacity: 0;
+}
