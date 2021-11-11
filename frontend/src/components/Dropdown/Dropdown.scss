@@ -1,0 +1,44 @@
+.dropdown {
+  position: absolute;
+  right: 0;
+  top: 46px;
+  width: 100%;
+  border-radius: 14px;
+  box-shadow: $shadow-1;
+  backdrop-filter: $blur;
+  border-radius: 14px;
+  transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out,
+    width 0.2s ease-in-out, height 0.2s ease-in-out;
+  pointer-events: none;
+  transform: translate3d(0, -8px, 0);
+  opacity: 0;
+  z-index: 3;
+  cursor: default;
+  box-sizing: border-box;
+  overflow: hidden;
+
+  &_theme {
+    &_dark {
+      background-color: $dark-semi-light;
+    }
+
+    &_light {
+      background: $dark-gradient-static;
+    }
+  }
+
+  &__wrapper {
+    overflow-x: hidden;
+    overflow-y: auto;
+    max-height: 186px;
+    padding: $padding-md $padding-llg;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  &_visible {
+    opacity: 1;
+    transform: translate3d(0, 8px, 0);
+    pointer-events: auto;
+  }
+}

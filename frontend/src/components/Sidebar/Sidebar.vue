@@ -47,14 +47,14 @@
         </ControlWrapper>
       </template>
       <template slot="footer">
+        <Button theme="text" size="md" @click="closeShowTopicModal"
+          >Close</Button
+        >
         <Button
-          theme="text"
+          theme="default"
           size="md"
           @click="subscribeAndActivateTopic(topicName)"
           >Add New</Button
-        >
-        <Button theme="default" size="md" @click="closeShowTopicModal"
-          >Close</Button
         >
       </template>
     </Modal>

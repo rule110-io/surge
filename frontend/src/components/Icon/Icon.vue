@@ -18,6 +18,7 @@ import CopyIcon from "@/assets/icons/CopyIcon.svg";
 import DownloadDefaultIcon from "@/assets/icons/DownloadDefaultIcon.svg";
 import PlusIcon from "@/assets/icons/PlusIcon.svg";
 import CloseIcon from "@/assets/icons/CloseIcon.svg";
+import SelectIcon from "@/assets/icons/SelectIcon.svg";
 
 export default {
   components: {
@@ -31,6 +32,7 @@ export default {
     DownloadDefaultIcon,
     PlusIcon,
     CloseIcon,
+    SelectIcon,
   },
   props: {
     icon: {

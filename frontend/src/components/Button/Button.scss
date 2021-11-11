@@ -42,11 +42,11 @@
 
     &_text {
       background: transparent;
-      color: $primary;
+      color: $white;
       padding: 0;
 
       &:hover {
-        color: $white;
+        color: $primary;
       }
     }
 
