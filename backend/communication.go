@@ -124,12 +124,12 @@ func processQueryResponse(seeder string, Data []byte) {
 		dbFile, err := dbGetFile(newListing.FileHash)
 		if err == nil {
 			log.Println("File in query was already known, seeder added!")
-
-			AddFileSeeder(dbFile.FileHash, seeder)
-
 			dbInsertFile(*dbFile)
 		}
 		mutexes.FileWriteLock.Unlock()
+
+		//We now add this seeder to our file seeders
+		AddFileSeeder(dbFile.FileHash, seeder)
 
 		fmt.Println(string("\033[33m"), "Filename", newListing.FileName, "FileHash", newListing.FileHash, string("\033[0m"))
 
