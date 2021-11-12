@@ -19,6 +19,7 @@ import (
 	"github.com/rule110-io/surge/backend/mutexes"
 	"github.com/rule110-io/surge/backend/platform"
 	"github.com/rule110-io/surge/backend/sessionmanager"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 // makes sure the client is regularly subscribed to the surge topic
@@ -110,7 +111,7 @@ func updateFileDataWorker() {
 		mutexes.BandwidthAccumulatorMapLock.Unlock()
 
 		if !zeroBandwidthMap["total"] || totalDown+totalUp != 0 {
-			wailsRuntime.Events.Emit("globalBandwidthUpdate", statusBundle, totalDown, totalUp)
+			runtime.EventsEmit(*wailsContext, "globalBandwidthUpdate", statusBundle, totalDown, totalUp)
 		}
 
 		zeroBandwidthMap["total"] = totalDown+totalUp == 0

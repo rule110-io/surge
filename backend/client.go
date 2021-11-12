@@ -20,7 +20,6 @@ import (
 	pb "github.com/rule110-io/surge/backend/payloads"
 	"github.com/rule110-io/surge/backend/platform"
 	"github.com/rule110-io/surge/backend/sessionmanager"
-	"github.com/wailsapp/wails"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -37,7 +36,7 @@ var workerMap map[string]int
 //ListedFiles are remote files that can be downloaded
 var ListedFiles []models.File
 
-var wailsRuntime *wails.Runtime
+var wailsContext *context.Context
 
 //whether the nkn client is initialized
 var clientInitialized = false
@@ -49,22 +48,24 @@ var queryPayload = ""
 
 //NumClientsStruct .
 
-var numClientsStore *wails.Store
+//var numClientsStore *wails.Store
 
 // WailsBind is a binding function at startup
-func WailsBind(ctx context.Context) {
+func WailsBind(ctx *context.Context) {
 
-	platform.SetWailsRuntime(&ctx, SetVisualMode)
+	wailsContext = ctx
+
+	platform.SetWailsContext(ctx, SetVisualMode)
 
 	//Mac specific functions
 	go platform.InitOSHandler()
 	platform.SetVisualModeLikeOS()
 
-	numClients := NumClientsStruct{
-		Online: 0,
-	}
+	// numClients := NumClientsStruct{
+	// 	Online: 0,
+	// }
 
-	numClientsStore = wailsRuntime.Store.New("numClients", numClients)
+	//numClientsStore = runtime.Store.New("numClients", numClients)
 
 	updateNumClientStore()
 
@@ -328,11 +329,11 @@ func updateNumClientStore() {
 	if clientInitialized {
 		numConnections++
 	}
-	numClientsStore.Update(func(data NumClientsStruct) NumClientsStruct {
-		return NumClientsStruct{
-			Online: numConnections,
-		}
-	})
+	// numClientsStore.Update(func(data NumClientsStruct) NumClientsStruct {
+	// 	return NumClientsStruct{
+	// 		Online: numConnections,
+	// 	}
+	// })
 }
 
 // listens for incoming sessions

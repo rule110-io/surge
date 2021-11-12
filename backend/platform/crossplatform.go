@@ -12,19 +12,19 @@ var filestring = ""
 var magnetstring = ""
 var mode = ""
 
-var wailsRuntime *context.Context
+var wailsContext *context.Context
 
 type setVisualMode func(int)
 
 var setVisualModeRef setVisualMode
 
-// SetWailsRuntime binds the runtime
-func SetWailsRuntime(ctx *context.Context, setVisualModeFunc setVisualMode) {
-	wailsRuntime = ctx
+// SetWailsContext binds the runtime
+func SetWailsContext(ctx *context.Context, setVisualModeFunc setVisualMode) {
+	wailsContext = ctx
 	setVisualModeRef = setVisualModeFunc
 }
 
 //AskUser emit ask user event
 func AskUser(context string, payload string) {
-	runtime.EventsEmit(*wailsRuntime, "userEvent", context, payload)
+	runtime.EventsEmit(*wailsContext, "userEvent", context, payload)
 }

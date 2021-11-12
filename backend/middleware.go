@@ -3,12 +3,10 @@ package surge
 import (
 	"github.com/rule110-io/surge/backend/mutexes"
 	"github.com/rule110-io/surge/backend/platform"
-	"github.com/wailsapp/wails"
 )
 
 //MiddlewareFunctions struct to hold wails runtime for all middleware implementations
 type MiddlewareFunctions struct {
-	r *wails.Runtime
 }
 
 func (s *MiddlewareFunctions) GetLocalFiles(Query string, filterState FileFilterState, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryResult {

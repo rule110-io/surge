@@ -23,10 +23,11 @@ import (
 	"github.com/rule110-io/surge/backend/mutexes"
 	"github.com/rule110-io/surge/backend/platform"
 	"github.com/skratchdot/open-golang/open"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 func emitNotificationEvent(event string, title string, text string) {
-	wailsRuntime.Events.Emit("notificationEvent", title, text, time.Now().Unix())
+	runtime.EventsEmit(*wailsContext, "notificationEvent", title, text, time.Now().Unix())
 }
 
 func pushNotification(title string, text string) {
@@ -64,11 +65,11 @@ func SetVisualMode(visualMode int) {
 	if visualMode == 0 {
 		//light mode
 		DbWriteSetting("DarkMode", "false")
-		wailsRuntime.Events.Emit("darkThemeEvent", "false")
+		runtime.EventsEmit(*wailsContext, "darkThemeEvent", "false")
 	} else if visualMode == 1 {
 		//dark mode
 		DbWriteSetting("DarkMode", "true")
-		wailsRuntime.Events.Emit("darkThemeEvent", "true")
+		runtime.EventsEmit(*wailsContext, "darkThemeEvent", "true")
 	}
 }
 

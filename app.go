@@ -21,7 +21,7 @@ func NewApp() *App {
 func (b *App) startup(ctx context.Context) {
 	// Perform your setup here
 	b.ctx = ctx
-	go surge.WailsBind(ctx)
+	go surge.WailsBind(&ctx)
 }
 
 // domReady is called after the front-end dom has been loaded
