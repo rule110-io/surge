@@ -58,7 +58,7 @@ func WailsBind(ctx *context.Context) {
 	platform.SetWailsContext(ctx, SetVisualMode)
 
 	//Mac specific functions
-	go platform.InitOSHandler()
+	//go platform.InitOSHandler()
 	platform.SetVisualModeLikeOS()
 
 	// numClients := NumClientsStruct{

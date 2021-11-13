@@ -84,7 +84,7 @@ export default {
   },
   methods: {
     getChunkMap() {
-      window.backend.MiddlewareFunctions.GetFileChunkMap(
+      window.go.surge.MiddlewareFunctions.GetFileChunkMap(
         this.file.FileHash,
         156
       ).then((bits) => {

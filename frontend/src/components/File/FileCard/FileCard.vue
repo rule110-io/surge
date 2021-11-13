@@ -58,7 +58,7 @@ export default {
   methods: {
     openFile(file) {
       const { FileHash } = file;
-      window.backend.MiddlewareFunctions.OpenFile(FileHash).then(() => {});
+      window.go.surge.MiddlewareFunctions.OpenFile(FileHash).then(() => {});
     },
     getRandomColor() {
       const colors = this.colors;

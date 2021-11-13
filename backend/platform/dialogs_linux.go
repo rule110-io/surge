@@ -8,7 +8,7 @@ import (
 
 //OpenFileDialog uses platform agnostic package for a file dialog
 func OpenFileDialog() string {
-	selectedFile := runtime.OpenFileDialog(*wailsContext, runtime.OpenDialogOptions{
+	selectedFile, err := runtime.OpenFileDialog(*wailsContext, runtime.OpenDialogOptions{
 		Title: "Select File",
 		Filters: []runtime.FileFilter{
 			{

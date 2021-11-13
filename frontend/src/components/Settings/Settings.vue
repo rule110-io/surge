@@ -115,10 +115,10 @@ export default {
       this.$tours["myTour"].start();
     },
     openLog() {
-      window.backend.MiddlewareFunctions.OpenLog().then(() => {});
+      window.go.surge.MiddlewareFunctions.OpenLog().then(() => {});
     },
     openLink(Link) {
-      window.backend.MiddlewareFunctions.OpenLink(Link).then(() => {});
+      window.go.surge.MiddlewareFunctions.OpenLink(Link).then(() => {});
     },
   },
 };

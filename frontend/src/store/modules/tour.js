@@ -14,7 +14,7 @@ const mutations = {
 
 const actions = {
   offTour({ commit }) {
-    window.backend.MiddlewareFunctions.WriteSetting("Tour", "false").then(() => {
+    window.go.surge.MiddlewareFunctions.WriteSetting("Tour", "false").then(() => {
       commit("setTour", "false");
     });
   },

@@ -64,7 +64,7 @@ export default {
       this.$emit("toggleRemoveFileModal", false);
     },
     removeFile() {
-      window.backend.MiddlewareFunctions.RemoveFile(
+      window.go.surge.MiddlewareFunctions.RemoveFile(
         this.file.FileHash,
         this.fromDisk
       ).then(() => {

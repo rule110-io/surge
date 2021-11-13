@@ -104,5 +104,4 @@ func main() {
 		},
 	})
 
-	surge.StopClient()
 }

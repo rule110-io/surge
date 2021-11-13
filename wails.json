@@ -1,6 +1,6 @@
 {
   "name": "Surge",
-  "assetdir": "frontend/src",
+  "assetdir": "frontend/dist",
   "frontend:build": "",
   "frontend:install": "",
   "frontend:dev": "",

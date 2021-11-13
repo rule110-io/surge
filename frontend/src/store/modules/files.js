@@ -62,7 +62,7 @@ const actions = {
       filter,
     } = state.localFilesConfig;
 
-    window.backend.MiddlewareFunctions.GetLocalFiles(
+    window.go.surge.MiddlewareFunctions.GetLocalFiles(
       search,
       filter,
       orderBy,
@@ -83,7 +83,7 @@ const actions = {
       isDesc,
     } = state.remoteFilesConfig;
 
-    window.backend.MiddlewareFunctions.GetRemoteFiles(
+    window.go.surge.MiddlewareFunctions.GetRemoteFiles(
       topicName,
       search,
       orderBy,

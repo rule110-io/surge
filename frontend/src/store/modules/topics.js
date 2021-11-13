@@ -20,14 +20,14 @@ const mutations = {
 
 const actions = {
   fetchTopics({ commit }) {
-    window.backend.MiddlewareFunctions.GetTopicSubscriptions().then(
+    window.go.surge.MiddlewareFunctions.GetTopicSubscriptions().then(
       (topics) => {
         commit("setTopics", topics);
       }
     );
   },
   subscribeToTopic({ dispatch }, topicName) {
-    window.backend.MiddlewareFunctions.SubscribeToTopic(topicName).then(() => {
+    window.go.surge.MiddlewareFunctions.SubscribeToTopic(topicName).then(() => {
       dispatch("fetchTopics");
     });
   },

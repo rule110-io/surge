@@ -40,7 +40,7 @@ export default {
     startDownloadMagnetLinks() {
       const links = this.links;
 
-      window.backend.MiddlewareFunctions.StartDownloadMagnetLinks(links).then(
+      window.go.surge.MiddlewareFunctions.StartDownloadMagnetLinks(links).then(
         () => {
           this.$store.dispatch("files/fetchLocalFiles");
           this.$store.dispatch("files/fetchRemoteFiles");
@@ -50,7 +50,7 @@ export default {
       );
     },
     initDownloadEvent() {
-      window.wails.Events.On("userEvent", (context, payload) => {
+      window.runtime.EventsOn("userEvent", (context, payload) => {
         this.open = true;
         this.links = payload;
       });

@@ -46,7 +46,7 @@ export default {
       this.toggleRemoveFileModal(true);
     },
     openFolder(FileHash) {
-      window.backend.MiddlewareFunctions.OpenFolder(FileHash).then(() => {});
+      window.go.surge.MiddlewareFunctions.OpenFolder(FileHash).then(() => {});
     },
   },
 };

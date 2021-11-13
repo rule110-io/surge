@@ -111,7 +111,7 @@ export default {
       }, 500);
     },
     seedFile(topicName) {
-      window.backend.MiddlewareFunctions.SeedFile(topicName).then(() => {
+      window.go.surge.MiddlewareFunctions.SeedFile(topicName).then(() => {
         this.$store.dispatch("files/fetchLocalFiles");
         this.$store.dispatch("files/fetchRemoteFiles");
       });
