@@ -14,6 +14,7 @@
   text-align: center;
   letter-spacing: 0.1px;
   font-feature-settings: "salt" on;
+  position: relative;
 
   &__icon {
     margin-right: 10px;
@@ -24,8 +25,12 @@
   }
 
   &_size {
-    &_md {
+    &_lg {
       padding: $padding-md $padding-xl;
+    }
+
+    &_md {
+      padding: $padding-sm $padding-llg;
     }
   }
 
@@ -33,6 +38,27 @@
     &_primary {
       background: $primary-gradient;
       color: $white;
+    }
+
+    &_text {
+      background: transparent;
+      color: $white;
+      padding: 0;
+
+      &:hover {
+        color: $primary;
+      }
+    }
+
+    &_default {
+      background: $white-ghost;
+      box-shadow: $shadow-2;
+      backdrop-filter: $blur-2;
+      color: $white;
+
+      &:hover {
+        color: $primary;
+      }
     }
   }
 }

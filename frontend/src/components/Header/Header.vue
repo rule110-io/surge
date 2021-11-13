@@ -6,7 +6,7 @@
     </div>
 
     <div class="header__right">
-      <CustomInput
+      <Input
         class="header__search"
         :value="searchQuery"
         icon="SearchIcon"
@@ -17,11 +17,7 @@
             : remoteSearch(searchQuery)
         "
       />
-      <input placeholder="topic name" type="text" v-model="topicName" />
-      <Button
-        theme="primary"
-        class="header__button"
-        @click="seedFile(topicName)"
+      <Button theme="primary" class="header__button" @click="openAddFileModal"
         >Add file</Button
       >
       <Divider />
@@ -34,6 +30,27 @@
       <Notifications />
       <Icon class="header__icon" icon="SettingsIcon" />
     </div>
+
+    <Modal :show.sync="showAddFileModal">
+      <template slot="title">
+        Add New File
+      </template>
+      <template slot="body">
+        <ControlWrapper title="Topic name">
+          <Select
+            v-model="topicName"
+            :items="topics"
+            placeholder="Select topic"
+          />
+        </ControlWrapper>
+      </template>
+      <template slot="footer">
+        <Button theme="text" size="md" @click="closeAddFileModal">Close</Button>
+        <Button theme="default" size="md" @click="addFile(topicName)"
+          >Upload File</Button
+        >
+      </template>
+    </Modal>
   </header>
 </template>
 
@@ -46,10 +63,13 @@ import { mapState } from "vuex";
 
 import Navigation from "@/components/Navigation/Navigation";
 import Notifications from "@/components/Notifications/Notifications";
-import CustomInput from "@/components/Controls/Input/Input";
+import Input from "@/components/Controls/Input/Input";
 import Button from "@/components/Button/Button";
 import Divider from "@/components/Divider/Divider";
 import Icon from "@/components/Icon/Icon";
+import Modal from "@/components/Modals/Modal/Modal";
+import Select from "@/components/Controls/Select/Select";
+import ControlWrapper from "@/components/Controls/ControlWrapper/ControlWrapper";
 
 import Logo from "@/assets/icons/Logo.svg";
 
@@ -57,15 +77,19 @@ export default {
   components: {
     Logo,
     Navigation,
-    CustomInput,
     Button,
     Divider,
     Icon,
     Notifications,
+    Modal,
+    Input,
+    ControlWrapper,
+    Select,
   },
   data: () => {
     return {
-      topicName: "",
+      topicName: null,
+      showAddFileModal: false,
       active: true,
       focus: false,
       searchQuery: "",
@@ -77,6 +101,7 @@ export default {
     ...mapState("notifications", ["counter", "open"]),
     ...mapState("files", ["remoteFilesConfig", "localFilesConfig"]),
     ...mapState("darkTheme", ["darkTheme"]),
+    ...mapState("topics", ["topics"]),
     currentRoute() {
       return this.$route.name;
     },
@@ -86,6 +111,20 @@ export default {
     this.initLocalSearch();
   },
   methods: {
+    addFile(topicName) {
+      this.seedFile(topicName);
+      this.closeAddFileModal();
+      this.clearAddFileModal();
+    },
+    openAddFileModal() {
+      this.showAddFileModal = true;
+    },
+    closeAddFileModal() {
+      this.showAddFileModal = false;
+    },
+    clearAddFileModal() {
+      this.topicName = "";
+    },
     initRemoteSearch() {
       this.remoteSearch = this._.debounce((search) => {
         if (this.currentRoute !== "search") {

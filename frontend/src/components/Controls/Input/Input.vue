@@ -1,11 +1,21 @@
 <template>
-  <div class="input" :class="focus ? 'input_focus' : null">
+  <div
+    class="input"
+    :class="[
+      focus ? 'input_focus' : null,
+      `input_theme_${theme}`,
+      `input_size_${size}`,
+    ]"
+  >
     <div v-if="icon" class="input__icon">
       <component :is="icon" />
     </div>
     <input
       class="input__controller"
-      :class="[icon ? 'input__controller_icon' : null]"
+      :class="[
+        icon ? 'input__controller_icon' : null,
+        `input__controller_theme_${theme}`,
+      ]"
       :type="type"
       :placeholder="placeholder"
       :value="value"
@@ -41,6 +51,14 @@ export default {
     icon: {
       type: String,
       default: "",
+    },
+    theme: {
+      type: String,
+      default: "dark",
+    },
+    size: {
+      type: String,
+      default: "lg",
     },
   },
   data: () => {
