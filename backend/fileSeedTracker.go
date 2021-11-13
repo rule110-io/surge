@@ -20,7 +20,9 @@ func AddFileSeeder(fileHash string, addr string) {
 		fileSeedMap[fileHash] = []string{}
 	}
 
+	//Append and distinct so we dont double up
 	fileSeedMap[fileHash] = append(fileSeedMap[fileHash], addr)
+	fileSeedMap[fileHash] = distinctStringSlice(fileSeedMap[fileHash])
 }
 
 func RemoveFileSeeder(fileHash string, addr string) {

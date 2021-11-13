@@ -80,3 +80,26 @@ func resubscribeToTopics() {
 		subscribeToSurgeTopic(topic.Name, false)
 	}
 }
+
+//GetTopicInfo returns info about the topic given
+func GetTopicInfo(topicName string) models.TopicInfo {
+
+	topicEncoded := TopicEncode(topicName)
+	subCount, _ := client.GetSubscribersCount(topicEncoded)
+
+	//count files with topic
+	fileCount := 0
+	for _, v := range ListedFiles {
+		bitSetVar := 0
+		if v.Topic == topicName {
+			bitSetVar = 1
+		}
+		fileCount += bitSetVar
+	}
+
+	return models.TopicInfo{
+		Name:        topicName,
+		Subscribers: subCount,
+		FileCount:   fileCount,
+	}
+}

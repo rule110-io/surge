@@ -95,6 +95,7 @@ func updateFileDataWorker() {
 					UploadBandwidth:   up,
 					NumChunks:         file.NumChunks,
 					ChunksShared:      file.ChunksShared,
+					Seeders:           len(GetSeeders(key)),
 				}
 				statusBundle = append(statusBundle, statusEvent)
 			}

@@ -1,6 +1,7 @@
 package surge
 
 import (
+	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
 	"github.com/rule110-io/surge/backend/platform"
 )
@@ -126,4 +127,9 @@ func (s *MiddlewareFunctions) GetFileDetails(FileHash string) FileDetails {
 		FileID:  FileHash,
 		Seeders: GetSeeders(FileHash),
 	}
+}
+
+func (s *MiddlewareFunctions) GetTopicDetails(Topic string) models.TopicInfo {
+
+	return GetTopicInfo(Topic)
 }
