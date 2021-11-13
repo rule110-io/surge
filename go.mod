@@ -13,7 +13,7 @@ require (
 	github.com/nu7hatch/gouuid v0.0.0-20131221200532-179d4d0c4d8d // indirect
 	github.com/skratchdot/open-golang v0.0.0-20200116055534-eef842397966
 	github.com/sqweek/dialog v0.0.0-20200601143742-43ea34326190
-	github.com/wailsapp/wails/v2 v2.0.0-beta.19
+	github.com/wailsapp/wails/v2 v2.0.0-beta.20
 	github.com/xujiajun/nutsdb v0.5.0
 	golang.org/x/sys v0.0.0-20211025201205-69cdffdb9359
 	google.golang.org/protobuf v1.26.0
