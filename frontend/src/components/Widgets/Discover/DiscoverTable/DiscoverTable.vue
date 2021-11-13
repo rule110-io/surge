@@ -21,9 +21,7 @@
         <td>
           <FileHash :hash="file.FileHash" />
         </td>
-        <td class="text_align_right">
-          {{ file.Seeders.length }}
-        </td>
+        <td class="text_align_right">0</td>
         <td>
           <FileSeeders :seeders="file.Seeders" />
         </td>

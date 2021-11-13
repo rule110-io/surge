@@ -46,10 +46,10 @@ export default {
   computed: {
     ...mapState("pubKey", ["pubKey"]),
     seedersSlice() {
-      return this.seeders ? this.seeders.slice(0, this.count) : [];
+      return 0; //this.seeders ? this.seeders.slice(0, this.count) : [];
     },
     seedsLeft() {
-      return this.seeders ? this.seeders.length - this.count : 0;
+      return 0; //this.seeders ? this.seeders.length - this.count : 0;
     },
   },
 };
