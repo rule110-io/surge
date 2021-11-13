@@ -122,7 +122,7 @@ func processQueryResponse(seeder string, Data []byte) {
 		//Check if we have this file in the db already, if so add this new seeder
 		mutexes.FileWriteLock.Lock()
 		dbFile, err := dbGetFile(newListing.FileHash)
-		if err == nil {
+		if dbFile == nil || err == nil {
 			log.Println("File in query was already known, seeder added!")
 			dbInsertFile(*dbFile)
 		}
