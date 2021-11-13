@@ -53,7 +53,7 @@ func listen() {
 		//Wait for a message
 		msg := <-nknClient.OnMessage.C
 
-		if msg.Data != nil {
+		if msg != nil && msg.Data != nil {
 			//try to unmarshal
 			msgObj := MessageReceivedObj{}
 			err := json.Unmarshal(msg.Data, &msgObj)
