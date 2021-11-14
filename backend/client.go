@@ -161,6 +161,11 @@ func StartClient(args []string) {
 	InitializeFileSeedTracker()
 	InitializeTopicsManager()
 	InitializeClient(args)
+
+	//If we have no subs, subscribe to official
+	if len(topicsMap) == 0 {
+		subscribeToSurgeTopic(constants.SurgeOfficialTopic, true)
+	}
 }
 
 //StopClient Stops the surge client and cleans up
