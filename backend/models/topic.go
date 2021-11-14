@@ -9,4 +9,5 @@ type TopicInfo struct {
 	Name        string
 	Subscribers int
 	FileCount   int
+	Permissions TopicPermissions
 }

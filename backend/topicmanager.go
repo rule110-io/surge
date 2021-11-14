@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 
+	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
 )
@@ -101,5 +102,28 @@ func GetTopicInfo(topicName string) models.TopicInfo {
 		Name:        topicName,
 		Subscribers: subCount,
 		FileCount:   fileCount,
+		Permissions: GetTopicPermissions(topicName, GetAccountAddress()),
+	}
+}
+func GetTopicPermissions(topicName string, clientAddr string) models.TopicPermissions {
+	if topicName != constants.SurgeOfficialTopic {
+		return models.TopicPermissions{
+			CanRead:  true,
+			CanWrite: true,
+		}
+	}
+
+	//Check if user is from team
+	//TODO: make this onchain somehow
+	if clientAddr == "7a48870a43d1512e467e8df103b1dee8d908f297ffe1fb45e81317965597bc7c" {
+		return models.TopicPermissions{
+			CanRead:  true,
+			CanWrite: true,
+		}
+	} else {
+		return models.TopicPermissions{
+			CanRead:  true,
+			CanWrite: false,
+		}
 	}
 }

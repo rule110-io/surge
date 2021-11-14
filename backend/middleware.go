@@ -1,6 +1,7 @@
 package surge
 
 import (
+	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
 	"github.com/rule110-io/surge/backend/platform"
@@ -128,8 +129,13 @@ func (s *MiddlewareFunctions) GetFileDetails(FileHash string) FileDetails {
 		Seeders: GetSeeders(FileHash),
 	}
 }
-
 func (s *MiddlewareFunctions) GetTopicDetails(Topic string) models.TopicInfo {
 
 	return GetTopicInfo(Topic)
 }
+
+func (s *MiddlewareFunctions) GetOfficialTopicName() string {
+	return constants.SurgeOfficialTopic
+}
+
+//

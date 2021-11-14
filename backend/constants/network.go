@@ -11,7 +11,7 @@ package constants
 
 const (
 	//PublicTopic the public topic for subscriptions
-	PublicTopic = "privateTest"
+	SurgeOfficialTopic = "Surge Official"
 
 	//SurgeChunkID .
 	SurgeChunkID byte = 0x001
@@ -24,9 +24,6 @@ const (
 
 	//WorkerGetSessionTimeout when the session activity is older than this value the worker considers the session lost and moves on
 	WorkerGetSessionTimeout = 10 //seconds
-
-	//SendQueryRequestSessionTimeout when the session activity is older than this value the send query request is not sent
-	SendQueryRequestSessionTimeout = 60 //seconds
 
 	//GetSessionDialTimeout time till dial timeout
 	GetSessionDialTimeout = 60
