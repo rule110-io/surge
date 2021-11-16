@@ -5,19 +5,7 @@
         <Icon class="sidebar__control-icon" icon="PlusIcon"></Icon>Add New Topic
       </div>
     </div>
-    <!-- <div style="display: flex;">
-      <input
-        style="width: 80px;"
-        type="text"
-        v-model.trim="topicName"
-        placeholder="topic name"
-      />
-      <button @click="subscribeToTopic(topicName)">subscribe</button>
-    </div> -->
-
-    <div class="sidebar__title">
-      Subsribed
-    </div>
+    <div class="sidebar__title">Subsribed</div>
 
     <div class="sidebar__items">
       <div
@@ -33,9 +21,7 @@
       </div>
     </div>
     <Modal :show.sync="showTopicModal">
-      <template slot="title">
-        Add New Topic
-      </template>
+      <template slot="title"> Add New Topic </template>
       <template slot="body">
         <ControlWrapper title="Topic name">
           <Input
@@ -83,7 +69,7 @@ export default {
     };
   },
   computed: {
-    ...mapState("topics", ["topics", "activeTopic"]),
+    ...mapState("topics", ["topics"]),
     ...mapState("files", ["remoteFilesConfig"]),
   },
   mounted() {},

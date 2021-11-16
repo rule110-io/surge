@@ -1,14 +1,14 @@
 {
   "name": "Surge",
-  "assetdir": "frontend/dist",
+  "assetdir": "./frontend/dist",
   "frontend:build": "",
   "frontend:install": "",
   "frontend:dev": "",
-  "wailsjsdir": "./frontend",
+  "wailsjsdir": "./frontend/src",
   "version": "2",
   "Path": "",
   "BuildDir": "",
-  "outputfilename": "surge",
+  "outputfilename": "surge.exe",
   "OutputType": "",
   "Platform": "",
   "Author": {

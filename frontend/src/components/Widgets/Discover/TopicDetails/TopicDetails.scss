@@ -1,0 +1,28 @@
+.topic-details {
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__bot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  &__title {
+    font-weight: $fw-semi-bold;
+    font-size: $fz-llg;
+    line-height: 32px;
+    color: $white;
+    display: flex;
+    align-items: center;
+
+    &-icon {
+      height: 32px;
+      width: 32px;
+      margin-right: $padding-md;
+    }
+  }
+}

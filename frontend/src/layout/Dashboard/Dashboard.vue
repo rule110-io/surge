@@ -7,7 +7,7 @@
 <script>
 // const runtime = require("@wailsapp/runtime");
 
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 import Dashboard from "@/components/Dashboard/Dashboard";
 
@@ -51,10 +51,15 @@ export default {
 
     this.getPublicKey();
 
+    this.getOfficialTopicName();
+
     this.remoteInterval = setInterval(this.fetchRemoteFiles, 10000);
     this.localInterval = setInterval(this.fetchLocalFiles, 10000);
   },
   methods: {
+    ...mapActions({
+      getOfficialTopicName: "topics/getOfficialTopicName",
+    }),
     getPublicKey() {
       window.go.surge.MiddlewareFunctions.GetPublicKey().then((address) => {
         this.$store.commit("pubKey/setPubKey", address);

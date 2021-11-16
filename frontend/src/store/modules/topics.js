@@ -1,6 +1,8 @@
 const getDefaultState = () => {
   return {
     topics: [],
+    topicDetails: null,
+    officialTopicName: null,
   };
 };
 
@@ -16,6 +18,12 @@ const mutations = {
   setTopics(state, topicsList) {
     state.topics = topicsList;
   },
+  setTopicDetails(state, topicDetails) {
+    state.topicDetails = topicDetails;
+  },
+  setOfficialTopicName(state, topicName) {
+    state.officialTopicName = topicName;
+  },
 };
 
 const actions = {
@@ -29,6 +37,18 @@ const actions = {
   subscribeToTopic({ dispatch }, topicName) {
     window.go.surge.MiddlewareFunctions.SubscribeToTopic(topicName).then(() => {
       dispatch("fetchTopics");
+    });
+  },
+  getTopicDetails({ commit }, topicName) {
+    window.go.surge.MiddlewareFunctions.GetTopicDetails(topicName).then(
+      (details) => {
+        commit("setTopicDetails", details);
+      }
+    );
+  },
+  getOfficialTopicName({ commit }) {
+    window.go.surge.MiddlewareFunctions.GetOfficialTopicName().then((name) => {
+      commit("setOfficialTopicName", name);
     });
   },
 };
