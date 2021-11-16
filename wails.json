@@ -1,10 +1,10 @@
 {
   "name": "Surge",
-  "assetdir": "./frontend/dist",
+  "assetdir": "frontend/dist",
   "frontend:build": "",
   "frontend:install": "",
   "frontend:dev": "",
-  "wailsjsdir": "./frontend/src",
+  "wailsjsdir": "./frontend",
   "version": "2",
   "Path": "",
   "BuildDir": "",
