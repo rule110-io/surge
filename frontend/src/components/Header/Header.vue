@@ -6,17 +6,6 @@
     </div>
 
     <div class="header__right">
-      <Input
-        class="header__search"
-        :value="searchQuery"
-        icon="SearchIcon"
-        placeholder="Search or enter file hash"
-        @update="
-          currentRoute === 'download'
-            ? localSearch(searchQuery)
-            : remoteSearch(searchQuery)
-        "
-      />
       <Button theme="primary" class="header__button" @click="openAddFileModal"
         >Add file</Button
       >
@@ -32,9 +21,7 @@
     </div>
 
     <Modal :show.sync="showAddFileModal">
-      <template slot="title">
-        Add New File
-      </template>
+      <template slot="title"> Add New File </template>
       <template slot="body">
         <ControlWrapper title="Topic name">
           <Select
@@ -63,7 +50,6 @@ import { mapState } from "vuex";
 
 import Navigation from "@/components/Navigation/Navigation";
 import Notifications from "@/components/Notifications/Notifications";
-import Input from "@/components/Controls/Input/Input";
 import Button from "@/components/Button/Button";
 import Divider from "@/components/Divider/Divider";
 import Icon from "@/components/Icon/Icon";
@@ -82,7 +68,6 @@ export default {
     Icon,
     Notifications,
     Modal,
-    Input,
     ControlWrapper,
     Select,
   },
@@ -92,9 +77,6 @@ export default {
       showAddFileModal: false,
       active: true,
       focus: false,
-      searchQuery: "",
-      remoteSearch: () => {},
-      localSearch: () => {},
     };
   },
   computed: {
@@ -105,10 +87,6 @@ export default {
     currentRoute() {
       return this.$route.name;
     },
-  },
-  created() {
-    this.initRemoteSearch();
-    this.initLocalSearch();
   },
   methods: {
     addFile(topicName) {
@@ -124,30 +102,6 @@ export default {
     },
     clearAddFileModal() {
       this.topicName = "";
-    },
-    initRemoteSearch() {
-      this.remoteSearch = this._.debounce((search) => {
-        if (this.currentRoute !== "search") {
-          this.$router.replace("/search");
-        }
-
-        let newConfig = Object.assign({}, this.remoteFilesConfig);
-        newConfig.skip = 0;
-        newConfig.search = search;
-
-        this.$store.commit("files/setRemoteFilesConfig", newConfig);
-        this.$store.dispatch("files/fetchRemoteFiles");
-      }, 500);
-    },
-    initLocalSearch() {
-      this.localSearch = this._.debounce((search) => {
-        let newConfig = Object.assign({}, this.localFilesConfig);
-        newConfig.skip = 0;
-        newConfig.search = search;
-
-        this.$store.commit("files/setLocalFilesConfig", newConfig);
-        this.$store.dispatch("files/fetchLocalFiles");
-      }, 500);
     },
     seedFile(topicName) {
       window.go.surge.MiddlewareFunctions.SeedFile(topicName).then(() => {

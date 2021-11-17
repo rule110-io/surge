@@ -55,9 +55,11 @@
       box-shadow: $shadow-2;
       backdrop-filter: $blur-2;
       color: $white;
+      border: 1px solid transparent;
 
       &:hover {
-        color: $primary;
+        background: $primary;
+        border: $border-primary;
       }
     }
   }

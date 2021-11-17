@@ -18,13 +18,27 @@
     font-feature-settings: "salt" on;
     padding: $padding-sm 0;
     transition: $transition-1;
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      height: 40px;
+      width: 192px;
+      border-radius: $br-md;
+      transition: $transition-1;
+      left: -14px;
+    }
 
     &:hover {
-      color: $primary;
+      &::after {
+        background: $white-ghost;
+        box-shadow: $shadow-2;
+      }
 
       svg {
         path {
-          stroke: $primary;
+          stroke: $white;
         }
       }
     }
@@ -78,12 +92,14 @@
     &_active {
       &::after {
         background: $white-ghost;
+        box-shadow: $shadow-2;
       }
     }
 
     &:hover {
       &::after {
         background: $white-ghost;
+        box-shadow: $shadow-2;
       }
     }
 

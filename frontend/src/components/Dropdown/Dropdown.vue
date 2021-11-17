@@ -17,8 +17,6 @@
 </style>
 
 <script>
-import { mixin as clickaway } from "vue-clickaway";
-
 export default {
   components: {},
   props: {
@@ -32,7 +30,6 @@ export default {
       default: "dark",
     },
   },
-  mixins: [clickaway],
   data: () => {
     return {};
   },

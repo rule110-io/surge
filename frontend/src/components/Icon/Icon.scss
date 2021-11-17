@@ -2,17 +2,20 @@
   height: initial;
   width: initial;
   transition: $transition-1;
-  cursor: pointer;
 
   path,
   circle {
     transition: $transition-1;
   }
 
-  &:hover {
-    & path,
-    circle {
-      stroke: $white;
+  &_active {
+    cursor: pointer;
+
+    &:hover {
+      & path,
+      circle {
+        stroke: $white;
+      }
     }
   }
 }

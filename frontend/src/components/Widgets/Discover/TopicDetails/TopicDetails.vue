@@ -1,5 +1,8 @@
 <template>
-  <div class="topic-details" v-if="topicDetails">
+  <div
+    class="topic-details"
+    v-if="remoteFilesConfig.topicName.length && topicDetails"
+  >
     <div class="topic-details__top">
       <div class="topic-details__title">
         <ShieldIcon
@@ -8,11 +11,47 @@
         />
         #{{ topicDetails.Name }}
       </div>
-      <div class="topic-details__controls"></div>
+      <div class="topic-details__stats">
+        <div class="topic-details__stats-item">
+          <Icon class="sidebar__stats-icon" :active="false" icon="UsersIcon" />
+          <span>{{ topicDetails.Subscribers }}</span>
+        </div>
+        <div class="topic-details__stats-item">
+          <Icon class="sidebar__stats-icon" :active="false" icon="FileIcon" />
+          <span>{{ topicDetails.FileCount }}</span>
+        </div>
+        <div
+          class="topic-details__stats-item"
+          v-if="!topicDetails.Permissions.CanWrite"
+        >
+          <Icon class="sidebar__stats-icon" :active="false" icon="LockIcon" />
+        </div>
+        <div class="topic-details__stats-more" v-on-clickaway="closeDropdown">
+          <div class="topic-details__stats-more-btn" @click="openDropdown">
+            <Icon class="topic-details__stats-more-icon" icon="MoreIcon" />
+          </div>
+
+          <Dropdown class="topic-details__dropdown" :open.sync="dropdownOpen">
+            <ul class="dropdown__list">
+              <li
+                class="dropdown__list-item"
+                @click="unsubscribe(topicDetails.Name)"
+              >
+                Unsubscribe
+              </li>
+            </ul>
+          </Dropdown>
+        </div>
+      </div>
     </div>
     <div class="topic-details__bot">
-      <div class="topic-details__descr">descr</div>
-      <div>search</div>
+      <Input
+        class="topic-details__search"
+        :value="searchQuery"
+        icon="SearchIcon"
+        placeholder="Search or enter file hash"
+        @update="remoteSearch(searchQuery)"
+      />
     </div>
   </div>
 </template>
@@ -22,14 +61,24 @@
 </style>
 
 <script>
-import { mapState, mapActions } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 
 import ShieldIcon from "@/assets/icons/ShieldIcon.svg";
+import Icon from "@/components/Icon/Icon";
+import Dropdown from "@/components/Dropdown/Dropdown";
+import Input from "@/components/Controls/Input/Input";
+
+import { mixin as clickaway } from "vue-clickaway";
 
 export default {
-  components: { ShieldIcon },
+  mixins: [clickaway],
+  components: { ShieldIcon, Icon, Dropdown, Input },
   data: () => {
-    return {};
+    return {
+      dropdownOpen: false,
+      searchQuery: "",
+      remoteSearch: () => {},
+    };
   },
   computed: {
     ...mapState("topics", ["topicDetails", "officialTopicName"]),
@@ -40,11 +89,40 @@ export default {
       this.getTopicDetails(newVal);
     },
   },
+  created() {
+    this.initRemoteSearch();
+  },
   mounted() {},
   methods: {
     ...mapActions({
       getTopicDetails: "topics/getTopicDetails",
+      unsubscribeFromTopic: "topics/unsubscribeFromTopic",
+      fetchRemoteFiles: "topics/fetchRemoteFiles",
     }),
+    ...mapMutations({
+      setRemoteFilesTopic: "files/setRemoteFilesTopic",
+      setRemoteFilesConfig: "files/setRemoteFilesConfig",
+    }),
+    unsubscribe(topicName) {
+      this.unsubscribeFromTopic(topicName);
+      this.setRemoteFilesTopic("");
+    },
+    openDropdown() {
+      this.dropdownOpen = true;
+    },
+    closeDropdown() {
+      this.dropdownOpen = false;
+    },
+    initRemoteSearch() {
+      this.remoteSearch = this._.debounce((search) => {
+        let newConfig = Object.assign({}, this.remoteFilesConfig);
+        newConfig.skip = 0;
+        newConfig.search = search;
+
+        this.setRemoteFilesConfig(newConfig);
+        this.fetchRemoteFiles();
+      }, 500);
+    },
   },
 };
 </script>

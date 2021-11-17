@@ -25,4 +25,50 @@
       margin-right: $padding-md;
     }
   }
+
+  &__dropdown {
+    width: 177px;
+    top: 30px;
+  }
+
+  &__search {
+    width: 408px;
+    margin: $padding-llg 0;
+  }
+
+  &__stats {
+    display: flex;
+    align-items: center;
+    gap: $padding-llg;
+
+    &-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: $fz-base;
+      line-height: 24px;
+    }
+
+    &-more {
+      border-left: $border;
+      position: relative;
+
+      &-btn {
+        margin-left: $padding-llg;
+        height: 32px;
+        width: 32px;
+        background: transparent;
+        transition: $transition-1;
+        border-radius: $br-xs;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+
+        &:hover {
+          background: $white-light;
+        }
+      }
+    }
+  }
 }
