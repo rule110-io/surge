@@ -1,6 +1,8 @@
 package surge
 
 import (
+	"sort"
+
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
@@ -98,8 +100,13 @@ func (s *MiddlewareFunctions) StartDownloadMagnetLinks(Magnetlinks string) bool 
 	return true
 }
 
+//SubscribeToTopic subscribes to given topic
 func (s *MiddlewareFunctions) SubscribeToTopic(Topic string) {
-	subscribeToSurgeTopic(Topic, true)
+	if len(Topic) == 0 {
+		pushError("Error on Subscribe", "topic name of length zero.")
+	} else {
+		subscribeToSurgeTopic(Topic, true)
+	}
 }
 
 func (s *MiddlewareFunctions) UnsubscribeFromTopic(Topic string) {
@@ -114,6 +121,7 @@ func (s *MiddlewareFunctions) GetTopicSubscriptions() []string {
 		topicNames = append(topicNames, v.Name)
 	}
 	mutexes.TopicsMapLock.Unlock()
+	sort.Strings(topicNames)
 
 	return topicNames
 }
