@@ -45,7 +45,13 @@
       </div>
     </div>
     <div class="topic-details__bot">
-      <div>search</div>
+      <Input
+        class="topic-details__search"
+        :value="searchQuery"
+        icon="SearchIcon"
+        placeholder="Search or enter file hash"
+        @update="remoteSearch(searchQuery)"
+      />
     </div>
   </div>
 </template>
@@ -60,15 +66,18 @@ import { mapState, mapActions, mapMutations } from "vuex";
 import ShieldIcon from "@/assets/icons/ShieldIcon.svg";
 import Icon from "@/components/Icon/Icon";
 import Dropdown from "@/components/Dropdown/Dropdown";
+import Input from "@/components/Controls/Input/Input";
 
 import { mixin as clickaway } from "vue-clickaway";
 
 export default {
   mixins: [clickaway],
-  components: { ShieldIcon, Icon, Dropdown },
+  components: { ShieldIcon, Icon, Dropdown, Input },
   data: () => {
     return {
       dropdownOpen: false,
+      searchQuery: "",
+      remoteSearch: () => {},
     };
   },
   computed: {
@@ -80,14 +89,19 @@ export default {
       this.getTopicDetails(newVal);
     },
   },
+  created() {
+    this.initRemoteSearch();
+  },
   mounted() {},
   methods: {
     ...mapActions({
       getTopicDetails: "topics/getTopicDetails",
       unsubscribeFromTopic: "topics/unsubscribeFromTopic",
+      fetchRemoteFiles: "topics/fetchRemoteFiles",
     }),
     ...mapMutations({
       setRemoteFilesTopic: "files/setRemoteFilesTopic",
+      setRemoteFilesConfig: "files/setRemoteFilesConfig",
     }),
     unsubscribe(topicName) {
       this.unsubscribeFromTopic(topicName);
@@ -98,6 +112,16 @@ export default {
     },
     closeDropdown() {
       this.dropdownOpen = false;
+    },
+    initRemoteSearch() {
+      this.remoteSearch = this._.debounce((search) => {
+        let newConfig = Object.assign({}, this.remoteFilesConfig);
+        newConfig.skip = 0;
+        newConfig.search = search;
+
+        this.setRemoteFilesConfig(newConfig);
+        this.fetchRemoteFiles();
+      }, 500);
     },
   },
 };
