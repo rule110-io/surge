@@ -19,6 +19,7 @@ $dark-gradient-static: #262629;
 $semi-dark: #212228;
 $white: #fff;
 $white-ghost: rgba(255, 255, 255, 0.05);
+$white-light: rgba(255, 255, 255, 0.15);
 $primary: #0a9795;
 $jade: #0aa292;
 $primary-gradient: linear-gradient(92.64deg, $jade 0.31%, #084b9c 129.25%);
@@ -30,6 +31,7 @@ $danger: #ff3d48;
 $black-light: rgba(255, 255, 255, 0.03);
 $text-white: rgba(255, 255, 255, 0.8);
 $modal-bg: rgba(33, 33, 35, 0.83);
+$dropdown-dark: rgba(21, 21, 23, 0.83);
 $themes: (
   dark: (
     base: $dark,

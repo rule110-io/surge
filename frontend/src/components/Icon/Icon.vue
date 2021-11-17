@@ -1,5 +1,10 @@
 <template>
-  <component v-if="icon" :is="icon" class="icon"></component>
+  <component
+    v-if="icon"
+    :is="icon"
+    class="icon"
+    :class="{ icon_active: active }"
+  ></component>
   <span v-else></span>
 </template>
 
@@ -19,6 +24,10 @@ import DownloadDefaultIcon from "@/assets/icons/DownloadDefaultIcon.svg";
 import PlusIcon from "@/assets/icons/PlusIcon.svg";
 import CloseIcon from "@/assets/icons/CloseIcon.svg";
 import SelectIcon from "@/assets/icons/SelectIcon.svg";
+import UsersIcon from "@/assets/icons/UsersIcon.svg";
+import FileIcon from "@/assets/icons/FileIcon.svg";
+import LockIcon from "@/assets/icons/LockIcon.svg";
+import MoreIcon from "@/assets/icons/MoreIcon.svg";
 
 export default {
   components: {
@@ -33,11 +42,19 @@ export default {
     PlusIcon,
     CloseIcon,
     SelectIcon,
+    UsersIcon,
+    FileIcon,
+    LockIcon,
+    MoreIcon,
   },
   props: {
     icon: {
       type: String,
       default: "",
+    },
+    active: {
+      type: Boolean,
+      default: true,
     },
   },
 };

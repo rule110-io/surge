@@ -39,6 +39,13 @@ const actions = {
       dispatch("fetchTopics");
     });
   },
+  unsubscribeFromTopic({ dispatch }, topicName) {
+    window.go.surge.MiddlewareFunctions.UnsubscribeFromTopic(topicName).then(
+      () => {
+        dispatch("fetchTopics");
+      }
+    );
+  },
   getTopicDetails({ commit }, topicName) {
     window.go.surge.MiddlewareFunctions.GetTopicDetails(topicName).then(
       (details) => {

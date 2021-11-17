@@ -18,7 +18,7 @@
 
   &_theme {
     &_dark {
-      background-color: $dark-semi-light;
+      background-color: $dropdown-dark;
     }
 
     &_light {
@@ -40,5 +40,23 @@
     opacity: 1;
     transform: translate3d(0, 8px, 0);
     pointer-events: auto;
+  }
+
+  &__list {
+    &-item {
+      color: $white;
+      transition: $transition-1;
+      font-size: $fz-md;
+      line-height: 16px;
+      cursor: pointer;
+
+      &:hover {
+        color: $primary;
+      }
+
+      &:not(:last-child) {
+        margin-bottom: $padding-md;
+      }
+    }
   }
 }
