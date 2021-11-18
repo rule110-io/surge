@@ -6,7 +6,6 @@
         <th class="text_align_right">size</th>
         <th class="text_align_left">file hash</th>
         <th class="text_align_right">seeds</th>
-        <th class="text_align_left">source</th>
         <th class="text_align_right"></th>
       </tr>
     </thead>
@@ -22,9 +21,6 @@
           <FileHash :hash="file.FileHash" />
         </td>
         <td class="text_align_right">0</td>
-        <td>
-          <FileSeeders :seeders="file.Seeders" />
-        </td>
         <td class="text_align_right"><FileDownload :hash="file.FileHash" /></td>
       </tr>
     </tbody>
@@ -42,10 +38,9 @@ import FileName from "@/components/File/FileName/FileName";
 import FileSize from "@/components/File/FileSize/FileSize";
 import FileHash from "@/components/File/FileHash/FileHash";
 import FileDownload from "@/components/File/FileDownload/FileDownload";
-import FileSeeders from "@/components/File/FileSeeders/FileSeeders";
 
 export default {
-  components: { FileName, FileSize, FileHash, FileDownload, FileSeeders },
+  components: { FileName, FileSize, FileHash, FileDownload },
   data: () => {
     return {};
   },

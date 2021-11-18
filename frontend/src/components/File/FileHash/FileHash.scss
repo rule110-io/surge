@@ -29,6 +29,11 @@
   &:hover & {
     &__icon {
       transform: translateX(5px);
+
+      path,
+      circle {
+        stroke: $white;
+      }
     }
   }
 

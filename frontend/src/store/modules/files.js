@@ -53,14 +53,8 @@ const mutations = {
 
 const actions = {
   fetchLocalFiles({ commit, state }) {
-    const {
-      search,
-      skip,
-      get,
-      orderBy,
-      isDesc,
-      filter,
-    } = state.localFilesConfig;
+    const { search, skip, get, orderBy, isDesc, filter } =
+      state.localFilesConfig;
 
     window.go.surge.MiddlewareFunctions.GetLocalFiles(
       search,
@@ -74,14 +68,8 @@ const actions = {
     });
   },
   fetchRemoteFiles({ commit, state }) {
-    const {
-      topicName,
-      search,
-      skip,
-      get,
-      orderBy,
-      isDesc,
-    } = state.remoteFilesConfig;
+    const { topicName, search, skip, get, orderBy, isDesc } =
+      state.remoteFilesConfig;
 
     window.go.surge.MiddlewareFunctions.GetRemoteFiles(
       topicName,

@@ -2,10 +2,11 @@
   width: $sidebar-width;
   position: fixed;
   left: 0;
-  height: calc(100% - 48px);
-  padding: $padding-llg;
+  height: calc(100% - 48px - 88px);
+  padding: $padding-llg 0;
   border-right: $border;
   box-sizing: border-box;
+  z-index: 1;
 
   &__control {
     display: flex;
@@ -46,8 +47,9 @@
 
   &__controls {
     margin-bottom: $padding-md;
-    padding-bottom: $padding-md;
     border-bottom: $border;
+    padding: 0 $padding-llg;
+    padding-bottom: $padding-md;
   }
 
   &__title {
@@ -58,10 +60,15 @@
     text-transform: uppercase;
     font-feature-settings: "salt" on;
     color: $grey-light;
+    padding: 0 $padding-llg;
   }
 
   &__items {
     margin-top: $padding-sm;
+    overflow-y: scroll;
+    overflow-x: visible;
+    max-height: calc(100% - 104px);
+    padding: 0 $padding-llg;
   }
 
   &__item {
