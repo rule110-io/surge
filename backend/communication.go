@@ -96,14 +96,13 @@ func processQueryResponse(seeder string, Data []byte) {
 		numChunks := int((fileSize-1)/int64(constants.ChunkSize)) + 1
 
 		newListing := models.File{
-			FileLocation: "remote",
-			FileName:     data[2],
-			FileSize:     fileSize,
-			FileHash:     data[4],
-			Path:         "",
-			NumChunks:    numChunks,
-			ChunkMap:     nil,
-			Topic:        data[5],
+			FileName:  data[2],
+			FileSize:  fileSize,
+			FileHash:  data[4],
+			Path:      "",
+			NumChunks: numChunks,
+			ChunkMap:  nil,
+			Topic:     data[5],
 		}
 
 		//Replace existing, or remove.

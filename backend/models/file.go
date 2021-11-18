@@ -10,7 +10,6 @@
 package models
 
 type File struct {
-	FileLocation  string //Enum: "remote" or "local"
 	FileName      string
 	FileSize      int64
 	FileHash      string

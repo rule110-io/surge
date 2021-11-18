@@ -45,50 +45,6 @@ func distinctStringSlice(stringSlice []string) []string {
 	return list
 }
 
-type sortBySeederCountAsc []models.File
-
-func (a sortBySeederCountAsc) Len() int { return len(a) }
-func (a sortBySeederCountAsc) Less(i, j int) bool {
-	return len(GetSeeders(a[i].FileHash)) < len(GetSeeders(a[j].FileHash))
-}
-func (a sortBySeederCountAsc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-
-type sortBySeederCountDesc []models.File
-
-func (a sortBySeederCountDesc) Len() int { return len(a) }
-func (a sortBySeederCountDesc) Less(i, j int) bool {
-	return len(GetSeeders(a[i].FileHash)) > len(GetSeeders(a[j].FileHash))
-}
-func (a sortBySeederCountDesc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-
-type sortByFileNameAsc []models.File
-
-func (a sortByFileNameAsc) Len() int { return len(a) }
-func (a sortByFileNameAsc) Less(i, j int) bool {
-	return strings.ToLower(a[i].FileName) < strings.ToLower(a[j].FileName)
-}
-func (a sortByFileNameAsc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-
-type sortByFileNameDesc []models.File
-
-func (a sortByFileNameDesc) Len() int { return len(a) }
-func (a sortByFileNameDesc) Less(i, j int) bool {
-	return strings.ToLower(a[i].FileName) > strings.ToLower(a[j].FileName)
-}
-func (a sortByFileNameDesc) Swap(i, j int) { a[i], a[j] = a[j], a[i] }
-
-type sortByFileSizeAsc []models.File
-
-func (a sortByFileSizeAsc) Len() int           { return len(a) }
-func (a sortByFileSizeAsc) Less(i, j int) bool { return a[i].FileSize < a[j].FileSize }
-func (a sortByFileSizeAsc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-
-type sortByFileSizeDesc []models.File
-
-func (a sortByFileSizeDesc) Len() int           { return len(a) }
-func (a sortByFileSizeDesc) Less(i, j int) bool { return a[i].FileSize > a[j].FileSize }
-func (a sortByFileSizeDesc) Swap(i, j int)      { a[i], a[j] = a[j], a[i] }
-
 //ByteCountSI converts filesize in bytes to human readable text
 func ByteCountSI(b int64) string {
 	const unit = 1000
@@ -120,7 +76,7 @@ func surgeGenerateMagnetLink(fileName string, sizeInBytes int64, hash string, se
 	//Example payload
 	//surge://|file|The_Two_Towers-The_Purist_Edit-Trailer.avi|14997504|965c013e991ee246d63d45ea71954c4d|/
 	if seeder == "" {
-		seeder = client.Addr().String()
+		seeder = GetAccountAddress()
 	}
 
 	return "surge://|file|" + fileName + "|" + strconv.FormatInt(sizeInBytes, 10) + "|" + hash + "|" + seeder + "|" + topic + "|/"
@@ -169,14 +125,13 @@ func ParsePayloadString(s string) []models.File {
 		numChunks := int((fileSize-1)/int64(constants.ChunkSize)) + 1
 
 		newListing := models.File{
-			FileLocation: "remote",
-			FileName:     data[2],
-			FileSize:     fileSize,
-			FileHash:     data[4],
-			Path:         "",
-			NumChunks:    numChunks,
-			ChunkMap:     nil,
-			Topic:        data[5],
+			FileName:  data[2],
+			FileSize:  fileSize,
+			FileHash:  data[4],
+			Path:      "",
+			NumChunks: numChunks,
+			ChunkMap:  nil,
+			Topic:     data[5],
 		}
 
 		mutexes.ListedFilesLock.Lock()

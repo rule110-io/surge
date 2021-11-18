@@ -181,30 +181,51 @@ type PagedQueryResult struct {
 	Count  int
 }
 
-//SearchRemoteFile runs a paged query
-func SearchRemoteFile(Topic string, Query string, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryResult {
+//PagedQueryResult is a paging query result for file searches
+type PagedQueryRemoteResult struct {
+	Result []models.FileListing
+	Count  int
+}
 
-	var results []models.File
+//SearchRemoteFile runs a paged query
+func SearchRemoteFile(Topic string, Query string, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryRemoteResult {
+
+	var results []models.FileListing
 
 	mutexes.ListedFilesLock.Lock()
 	for _, file := range ListedFiles {
 
 		if file.Topic == Topic {
 
-			if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) && file.FileLocation == "remote" {
+			if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) {
 
-				result := models.File{
-					FileName:  file.FileName,
-					FileHash:  file.FileHash,
-					FileSize:  file.FileSize,
-					NumChunks: file.NumChunks,
-					Topic:     file.Topic,
-				}
+				localFile, _ := dbGetFile(file.FileHash)
 
-				tracked, err := dbGetFile(result.FileHash)
-
-				//only add non-local files to the result
-				if err != nil && tracked == nil {
+				if localFile != nil {
+					result := models.FileListing{
+						FileName:      file.FileName,
+						FileHash:      file.FileHash,
+						FileSize:      file.FileSize,
+						NumChunks:     file.NumChunks,
+						Topic:         file.Topic,
+						NumSeeders:    len(GetSeeders(file.FileHash)),
+						IsTracked:     true,
+						IsDownloading: file.IsDownloading,
+						IsUploading:   file.IsUploading,
+					}
+					results = append(results, result)
+				} else {
+					result := models.FileListing{
+						FileName:      file.FileName,
+						FileHash:      file.FileHash,
+						FileSize:      file.FileSize,
+						NumChunks:     file.NumChunks,
+						Topic:         file.Topic,
+						NumSeeders:    len(GetSeeders(file.FileHash)),
+						IsTracked:     false,
+						IsDownloading: file.IsDownloading,
+						IsUploading:   file.IsUploading,
+					}
 					results = append(results, result)
 				}
 
@@ -216,21 +237,21 @@ func SearchRemoteFile(Topic string, Query string, OrderBy string, IsDesc bool, S
 	switch OrderBy {
 	case "FileName":
 		if !IsDesc {
-			sort.Sort(sortByFileNameAsc(results))
+			sort.Sort(sortByListingFileNameAsc(results))
 		} else {
-			sort.Sort(sortByFileNameDesc(results))
+			sort.Sort(sortByListingFileNameDesc(results))
 		}
 	case "FileSize":
 		if !IsDesc {
-			sort.Sort(sortByFileSizeAsc(results))
+			sort.Sort(sortByListingFileSizeAsc(results))
 		} else {
-			sort.Sort(sortByFileSizeDesc(results))
+			sort.Sort(sortByListingFileSizeDesc(results))
 		}
 	default:
 		if !IsDesc {
-			sort.Sort(sortBySeederCountAsc(results))
+			sort.Sort(sortByListingSeederCountAsc(results))
 		} else {
-			sort.Sort(sortBySeederCountDesc(results))
+			sort.Sort(sortByListingSeederCountDesc(results))
 		}
 	}
 
@@ -245,7 +266,7 @@ func SearchRemoteFile(Topic string, Query string, OrderBy string, IsDesc bool, S
 		right = len(results)
 	}
 
-	return PagedQueryResult{
+	return PagedQueryRemoteResult{
 		Result: results[left:right],
 		Count:  len(results),
 	}
@@ -258,7 +279,7 @@ func SearchLocalFile(Query string, filterState FileFilterState, OrderBy string, 
 
 	allFiles := dbGetAllFiles()
 	for _, file := range allFiles {
-		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) && file.FileLocation == "local" {
+		if strings.Contains(strings.ToLower(file.FileName), strings.ToLower(Query)) || strings.Contains(strings.ToLower(file.FileHash), strings.ToLower(Query)) {
 			resultFiles = append(resultFiles, file)
 		}
 	}

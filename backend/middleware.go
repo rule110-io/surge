@@ -18,7 +18,7 @@ func (s *MiddlewareFunctions) GetLocalFiles(Query string, filterState FileFilter
 }
 
 //GetRemoteFiles gets remote files
-func (s *MiddlewareFunctions) GetRemoteFiles(Topic string, Query string, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryResult {
+func (s *MiddlewareFunctions) GetRemoteFiles(Topic string, Query string, OrderBy string, IsDesc bool, Skip int, Take int) PagedQueryRemoteResult {
 	return SearchRemoteFile(Topic, Query, OrderBy, IsDesc, Skip, Take)
 }
 

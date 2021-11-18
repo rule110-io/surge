@@ -64,7 +64,7 @@ const go = {
        * @param {boolean} arg4 - Go Type: bool
        * @param {number} arg5 - Go Type: int
        * @param {number} arg6 - Go Type: int
-       * @returns {Promise<PagedQueryResult>}  - Go Type: surge.PagedQueryResult
+       * @returns {Promise<PagedQueryRemoteResult>}  - Go Type: surge.PagedQueryRemoteResult
        */
       "GetRemoteFiles": (arg1, arg2, arg3, arg4, arg5, arg6) => {
         return window.go.surge.MiddlewareFunctions.GetRemoteFiles(arg1, arg2, arg3, arg4, arg5, arg6);

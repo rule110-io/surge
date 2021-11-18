@@ -203,7 +203,6 @@ func DownloadFileByHash(Hash string) bool {
 	dbFile, err := dbGetFile(Hash)
 	log.Println(dbFile)
 	if err != nil {
-		file.FileLocation = "local"
 		file.Path = path
 		file.NumChunks = numChunks
 		file.ChunkMap = bitmap.NewSlice(numChunks)
@@ -482,7 +481,6 @@ func SeedFilepath(Path string, Topic string) bool {
 
 	//Append to local files
 	localFile := models.File{
-		FileLocation:  "local",
 		FileName:      fileName,
 		FileSize:      fileSize,
 		FileHash:      randomHash,
@@ -516,7 +514,7 @@ func BuildSeedString(dbFiles []models.File) {
 
 	newQueryPayload := ""
 	for _, dbFile := range dbFiles {
-		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, client.Addr().String(), dbFile.Topic)
+		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, GetAccountAddress(), dbFile.Topic)
 		log.Println("Magnet:", magnet)
 
 		if dbFile.IsUploading {

@@ -42,7 +42,7 @@ func RemoveSeeder(addr string) {
 	fileSeedLock.Lock()
 	defer fileSeedLock.Unlock()
 
-	for k, _ := range fileSeedMap {
+	for k := range fileSeedMap {
 		removeFileSeeder(k, addr)
 	}
 }
