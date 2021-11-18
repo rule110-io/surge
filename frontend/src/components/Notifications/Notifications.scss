@@ -25,12 +25,13 @@
       font-weight: $fw-semi-bold;
       font-size: $fz-lg;
       line-height: 24px;
+      color: $white;
     }
 
     &-clear {
       font-size: $fz-sm;
       line-height: 16px;
-      color: $jade;
+      color: $white;
       transition: $transition-1;
       cursor: pointer;
 
