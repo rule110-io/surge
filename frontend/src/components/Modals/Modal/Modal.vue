@@ -6,7 +6,7 @@
         <div class="modal__header-close">
           <Icon
             class="modal__header-close-icon"
-            @click.native="close"
+            @click.native="$listeners.closeAndClear"
             icon="CloseIcon"
           ></Icon>
         </div>
@@ -36,10 +36,6 @@ export default {
     return {};
   },
   computed: {},
-  methods: {
-    close() {
-      this.$emit("update:show", false);
-    },
-  },
+  methods: {},
 };
 </script>

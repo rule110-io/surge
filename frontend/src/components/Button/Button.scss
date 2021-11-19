@@ -21,7 +21,10 @@
     height: 18px;
   }
 
-  &_disabled {
+  &:disabled {
+    color: rgba($white, 0.2) !important;
+    cursor: not-allowed !important;
+    pointer-events: none;
   }
 
   &_size {

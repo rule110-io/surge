@@ -22,6 +22,7 @@
     "regenerator-runtime": "^0.13.3",
     "v-tooltip": "^2.0.3",
     "vue": "^2.6.11",
+    "vue-bus": "^1.2.1",
     "vue-chartjs": "^3.5.0",
     "vue-clamp": "^0.3.1",
     "vue-clickaway": "^2.2.2",

@@ -20,8 +20,11 @@
         <td>
           <FileHash :hash="file.FileHash" />
         </td>
-        <td class="text_align_right">0</td>
-        <td class="text_align_right"><FileDownload :hash="file.FileHash" /></td>
+        <td class="text_align_right">{{ file.NumSeeders }}</td>
+        <td class="text_align_right">
+          <FileDownload v-if="!file.IsTracked" :hash="file.FileHash" />
+          <component v-else :is="getFileIcon(file)"></component>
+        </td>
       </tr>
     </tbody>
   </table>
@@ -39,8 +42,20 @@ import FileSize from "@/components/File/FileSize/FileSize";
 import FileHash from "@/components/File/FileHash/FileHash";
 import FileDownload from "@/components/File/FileDownload/FileDownload";
 
+import DownloadIcon from "@/assets/icons/DownloadIcon.svg";
+import UploadIcon from "@/assets/icons/UploadIcon.svg";
+import CheckIcon from "@/assets/icons/CheckIcon.svg";
+
 export default {
-  components: { FileName, FileSize, FileHash, FileDownload },
+  components: {
+    FileName,
+    FileSize,
+    FileHash,
+    FileDownload,
+    DownloadIcon,
+    UploadIcon,
+    CheckIcon,
+  },
   data: () => {
     return {};
   },
@@ -59,6 +74,15 @@ export default {
       newConfig.orderBy = orderBy;
       this.$store.commit("files/setRemoteFilesConfig", newConfig);
       this.$store.dispatch("files/fetchRemoteFiles");
+    },
+    getFileIcon(file) {
+      if (file.IsDownloading) {
+        return "DownloadIcon";
+      } else if (file.IsUploading) {
+        return "UploadIcon";
+      } else {
+        return "CheckIcon";
+      }
     },
   },
 };

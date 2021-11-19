@@ -11,6 +11,7 @@ import lodash from "lodash";
 import VueTour from "vue-tour";
 import VTooltip from "v-tooltip";
 import VueClipboard from "vue-clipboard2";
+import VueBus from "vue-bus";
 
 import { store } from "./store/store.js";
 
@@ -24,13 +25,13 @@ Vue.use(VueLodash, { lodash: lodash });
 Vue.use(VueTour);
 Vue.use(VTooltip);
 Vue.use(VueClipboard);
+Vue.use(VueBus);
 
 new Vue({
   router,
   store,
   render: (h) => h(App),
   mounted() {
-    this.$router.replace("/").catch(() => { });
+    this.$router.replace("/").catch(() => {});
   },
 }).$mount("#app");
-

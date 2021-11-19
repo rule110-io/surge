@@ -11,6 +11,7 @@
   left: 50%;
   transform: translate(-50%, -50%);
   background: $modal-bg;
+  z-index: 100;
 
   &__header {
     display: flex;

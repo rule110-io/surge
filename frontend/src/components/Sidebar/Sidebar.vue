@@ -1,7 +1,7 @@
 <template>
   <div class="sidebar">
     <div class="sidebar__controls">
-      <div class="sidebar__control" @click="openShowTopicModal">
+      <div class="sidebar__control" @click="openAddTopicModal">
         <Icon class="sidebar__control-icon" icon="PlusIcon"></Icon>Add New Topic
       </div>
     </div>
@@ -20,30 +20,6 @@
         {{ topic }}
       </div>
     </div>
-    <Modal :show.sync="showTopicModal">
-      <template slot="title"> Add New Topic </template>
-      <template slot="body">
-        <ControlWrapper title="Topic name">
-          <Input
-            v-model="topicName"
-            theme="light"
-            size="md"
-            placeholder="Enter topic name here"
-          />
-        </ControlWrapper>
-      </template>
-      <template slot="footer">
-        <Button theme="text" size="md" @click="closeShowTopicModal"
-          >Close</Button
-        >
-        <Button
-          theme="default"
-          size="md"
-          @click="subscribeAndActivateTopic(topicName)"
-          >Add New</Button
-        >
-      </template>
-    </Modal>
   </div>
 </template>
 
@@ -53,19 +29,14 @@
 
 <script>
 import Icon from "@/components/Icon/Icon";
-import Modal from "@/components/Modals/Modal/Modal";
-import ControlWrapper from "@/components/Controls/ControlWrapper/ControlWrapper";
-import Input from "@/components/Controls/Input/Input";
-import Button from "@/components/Button/Button";
 
-import { mapState, mapActions, mapMutations } from "vuex";
+import { mapState, mapMutations } from "vuex";
 
 export default {
-  components: { Icon, Modal, ControlWrapper, Input, Button },
+  components: { Icon },
   data: () => {
     return {
       topicName: "",
-      showTopicModal: false,
     };
   },
   computed: {
@@ -74,26 +45,11 @@ export default {
   },
   mounted() {},
   methods: {
-    ...mapActions({
-      subscribeToTopic: "topics/subscribeToTopic",
-    }),
     ...mapMutations({
       setRemoteFilesTopic: "files/setRemoteFilesTopic",
     }),
-    subscribeAndActivateTopic(topic) {
-      this.subscribeToTopic(topic);
-      this.setRemoteFilesTopic(topic);
-      this.closeShowTopicModal();
-      this.clearTopicModal();
-    },
-    openShowTopicModal() {
-      this.showTopicModal = true;
-    },
-    closeShowTopicModal() {
-      this.showTopicModal = false;
-    },
-    clearTopicModal() {
-      this.topicName = "";
+    openAddTopicModal() {
+      this.$bus.$emit("openAddTopicModal");
     },
   },
 };

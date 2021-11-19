@@ -1,5 +1,5 @@
 <template>
-  <div :class="`select__wrapper`">
+  <div class="select__wrapper" v-on-clickaway="closeSelect">
     <div
       :class="['select__button', open ? 'select__button_active' : null]"
       @click="toggleSelect()"
@@ -36,6 +36,8 @@
 </style>
 
 <script>
+import { mixin as clickaway } from "vue-clickaway";
+
 import Icon from "@/components/Icon/Icon";
 import Dropdown from "@/components/Dropdown/Dropdown";
 
@@ -59,6 +61,7 @@ export default {
     },
   },
   components: { Icon, Dropdown },
+  mixins: [clickaway],
   data: () => {
     return {
       open: false,
@@ -84,6 +87,11 @@ export default {
     },
     setSelect(item) {
       this.$emit("input", item);
+    },
+    closeSelect() {
+      if (!this.open) return;
+
+      this.open = false;
     },
   },
 };

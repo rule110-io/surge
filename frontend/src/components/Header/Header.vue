@@ -19,25 +19,6 @@
       <Notifications />
       <Icon class="header__icon" icon="SettingsIcon" />
     </div>
-
-    <Modal :show.sync="showAddFileModal">
-      <template slot="title"> Add New File </template>
-      <template slot="body">
-        <ControlWrapper title="Topic name">
-          <Select
-            v-model="topicName"
-            :items="topics"
-            placeholder="Select topic"
-          />
-        </ControlWrapper>
-      </template>
-      <template slot="footer">
-        <Button theme="text" size="md" @click="closeAddFileModal">Close</Button>
-        <Button theme="default" size="md" @click="addFile(topicName)"
-          >Upload File</Button
-        >
-      </template>
-    </Modal>
   </header>
 </template>
 
@@ -53,9 +34,6 @@ import Notifications from "@/components/Notifications/Notifications";
 import Button from "@/components/Button/Button";
 import Divider from "@/components/Divider/Divider";
 import Icon from "@/components/Icon/Icon";
-import Modal from "@/components/Modals/Modal/Modal";
-import Select from "@/components/Controls/Select/Select";
-import ControlWrapper from "@/components/Controls/ControlWrapper/ControlWrapper";
 
 import Logo from "@/assets/icons/Logo.svg";
 
@@ -67,9 +45,6 @@ export default {
     Divider,
     Icon,
     Notifications,
-    Modal,
-    ControlWrapper,
-    Select,
   },
   data: () => {
     return {
@@ -82,35 +57,13 @@ export default {
   computed: {
     ...mapState("notifications", ["counter", "open"]),
     ...mapState("files", ["remoteFilesConfig", "localFilesConfig"]),
-    ...mapState("darkTheme", ["darkTheme"]),
-    ...mapState("topics", ["topics"]),
     currentRoute() {
       return this.$route.name;
     },
   },
   methods: {
-    addFile(topicName) {
-      this.seedFile(topicName);
-      this.closeAddFileModal();
-      this.clearAddFileModal();
-    },
     openAddFileModal() {
-      this.showAddFileModal = true;
-    },
-    closeAddFileModal() {
-      this.showAddFileModal = false;
-    },
-    clearAddFileModal() {
-      this.topicName = "";
-    },
-    seedFile(topicName) {
-      window.go.surge.MiddlewareFunctions.SeedFile(topicName).then(() => {
-        this.$store.dispatch("files/fetchLocalFiles");
-        this.$store.dispatch("files/fetchRemoteFiles");
-      });
-    },
-    toggleTheme() {
-      this.$store.dispatch("darkTheme/toggleDarkTheme");
+      this.$bus.$emit("openAddFileModal");
     },
     toggleNotifications() {
       this.$store.commit("notifications/toggleNotifications", !this.open);
