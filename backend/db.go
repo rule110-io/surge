@@ -352,10 +352,6 @@ func SearchLocalFile(Query string, filterState FileFilterState, OrderBy string, 
 			listing.Progress = 1.0
 		}
 
-		if listing.Progress >= 1 {
-			listing.IsAvailable = true
-		}
-
 		resultListings = append(resultListings, listing)
 
 	}
