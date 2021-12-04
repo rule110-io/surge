@@ -78,6 +78,7 @@ func updateFileDataWorker() {
 					pushNotification("Download Finished", file.FileName)
 					file.IsDownloading = false
 					file.IsUploading = true
+					file.IsAvailable = true
 					dbInsertFile(file)
 					go AddToSeedString(file)
 				}

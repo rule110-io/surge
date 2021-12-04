@@ -370,6 +370,7 @@ func TransmitChunk(Session *sessionmanager.Session, FileID string, ChunkID int32
 		fileInfo.IsMissing = true
 		fileInfo.IsDownloading = false
 		fileInfo.IsUploading = false
+		fileInfo.IsAvailable = false
 		dbInsertFile(*fileInfo)
 		mutexes.FileWriteLock.Unlock()
 

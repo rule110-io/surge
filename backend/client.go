@@ -279,6 +279,7 @@ func restartDownload(Hash string) {
 		pushNotification("Download Finished", file.FileName)
 		file.IsDownloading = false
 		file.IsUploading = true
+		file.IsAvailable = true
 		dbInsertFile(*file)
 		go AddToSeedString(*file)
 		return

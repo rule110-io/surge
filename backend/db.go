@@ -177,7 +177,7 @@ func DbReadSetting(Name string) (string, error) {
 
 //PagedQueryResult is a paging query result for file searches
 type PagedQueryResult struct {
-	Result []models.File
+	Result []models.FileTransfer
 	Count  int
 }
 
@@ -289,7 +289,7 @@ func SearchLocalFile(Query string, filterState FileFilterState, OrderBy string, 
 	//Filter files on filter state
 	switch filterState {
 	/*case All: //added for clarity
-	fileFilterFunc = func(f models.File) bool { return true }
+	fileFilterFunc = func(f models.File) bool { return true }ec
 	break*/
 	case Downloading:
 		fileFilterFunc = func(f models.File) bool { return f.IsDownloading }
@@ -327,12 +327,11 @@ func SearchLocalFile(Query string, filterState FileFilterState, OrderBy string, 
 
 	//Subset
 	resultFiles = resultFiles[left:right]
-	resultListings := []models.File{}
+	resultListings := []models.FileTransfer{}
 
 	mutexes.ListedFilesLock.Lock()
 	for i := 0; i < len(resultFiles); i++ {
-		listing := models.File{
-			ChunksShared:  resultFiles[i].ChunksShared,
+		listing := models.FileTransfer{
 			FileHash:      resultFiles[i].FileHash,
 			FileName:      resultFiles[i].FileName,
 			FileSize:      resultFiles[i].FileSize,
@@ -341,15 +340,20 @@ func SearchLocalFile(Query string, filterState FileFilterState, OrderBy string, 
 			IsMissing:     resultFiles[i].IsMissing,
 			IsPaused:      resultFiles[i].IsPaused,
 			IsUploading:   resultFiles[i].IsUploading,
-			NumChunks:     resultFiles[i].NumChunks,
-			Path:          resultFiles[i].Path,
 			Topic:         resultFiles[i].Topic,
+			NumSeeders:    len(GetSeeders(resultFiles[i].FileHash)),
 		}
 
 		//If file is downloading set progress
 		if listing.IsDownloading || listing.IsPaused {
-			numChunksLocal := chunksDownloaded(resultFiles[i].ChunkMap, listing.NumChunks)
-			listing.Progress = float32(float64(numChunksLocal) / float64(listing.NumChunks))
+			numChunksLocal := chunksDownloaded(resultFiles[i].ChunkMap, resultFiles[i].NumChunks)
+			listing.Progress = float32(float64(numChunksLocal) / float64(resultFiles[i].NumChunks))
+		} else {
+			listing.Progress = 1.0
+		}
+
+		if listing.Progress >= 1 {
+			listing.IsAvailable = true
 		}
 
 		resultListings = append(resultListings, listing)
