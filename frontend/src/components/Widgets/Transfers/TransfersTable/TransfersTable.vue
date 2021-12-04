@@ -26,7 +26,7 @@
           <FileProgress :file="file" />
         </td>
         <td></td>
-        <td class="text_align_right"></td>
+        <td class="text_align_right">{{file}}</td>
         <td class="text_align_right"></td>
         <td class="text_align_right"></td>
         <td class="text_align_right"></td>
