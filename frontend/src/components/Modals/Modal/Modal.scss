@@ -35,6 +35,16 @@
     margin: $padding-llg 0;
   }
 
+  &__descr {
+    font-size: $fz-sm;
+    line-height: 16px;
+    color: $grey;
+  }
+
+  &__item {
+    margin-bottom: $padding-llg;
+  }
+
   &__footer {
     display: flex;
     align-items: center;

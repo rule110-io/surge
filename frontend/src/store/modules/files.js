@@ -22,6 +22,7 @@ const getDefaultState = () => {
       skip: 0,
       get: 8,
     },
+    activeFile: {},
   };
 };
 
@@ -48,6 +49,9 @@ const mutations = {
   },
   setLocalFilesConfig(state, payload) {
     state.localFilesConfig = payload;
+  },
+  setActiveFile(state, payload) {
+    state.activeFile = payload;
   },
 };
 

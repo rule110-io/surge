@@ -28,6 +28,7 @@ import UsersIcon from "@/assets/icons/UsersIcon.svg";
 import FileIcon from "@/assets/icons/FileIcon.svg";
 import LockIcon from "@/assets/icons/LockIcon.svg";
 import MoreIcon from "@/assets/icons/MoreIcon.svg";
+import FolderIcon from "@/assets/icons/FolderIcon.svg";
 
 export default {
   components: {
@@ -46,6 +47,7 @@ export default {
     FileIcon,
     LockIcon,
     MoreIcon,
+    FolderIcon,
   },
   props: {
     icon: {

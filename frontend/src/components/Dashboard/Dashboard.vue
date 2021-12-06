@@ -10,6 +10,7 @@
     <NetworkStats />
     <AddTopicModal openModalEvent="openAddTopicModal" />
     <AddFileModal openModalEvent="openAddFileModal" />
+    <RemoveFileModal openModalEvent="openRemoveFileModal" />
   </div>
 </template>
 
@@ -24,9 +25,16 @@ import Header from "@/components/Header/Header";
 import NetworkStats from "@/components/NetworkStats/NetworkStats";
 import AddTopicModal from "@/components/Modals/AddTopicModal/AddTopicModal";
 import AddFileModal from "@/components/Modals/AddFileModal/AddFileModal";
+import RemoveFileModal from "@/components/Modals/RemoveFileModal/RemoveFileModal";
 
 export default {
-  components: { Header, NetworkStats, AddTopicModal, AddFileModal },
+  components: {
+    Header,
+    NetworkStats,
+    AddTopicModal,
+    AddFileModal,
+    RemoveFileModal,
+  },
   data: () => {
     return {};
   },

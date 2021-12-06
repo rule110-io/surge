@@ -10,7 +10,6 @@
         <th class="text_align_right">down</th>
         <th class="text_align_right">UP</th>
         <th class="text_align_right">ETA</th>
-        <th class="text_align_right">RATIO</th>
         <th></th>
       </tr>
     </thead>
@@ -26,12 +25,16 @@
           <FileProgress :file="file" />
         </td>
         <td></td>
-        <td class="text_align_right">{{file}}</td>
         <td class="text_align_right"></td>
         <td class="text_align_right"></td>
         <td class="text_align_right"></td>
         <td class="text_align_right"></td>
-        <td></td>
+        <td class="text_align_right" style="width: 1px">
+          <div style="display: flex; align-items: center">
+            <Icon icon="FolderIcon" @click.native="openFolder(file.FileHash)" />
+            <FileActions :file="file" />
+          </div>
+        </td>
       </tr>
     </tbody>
   </table>
@@ -47,9 +50,12 @@ import { mapState } from "vuex";
 import FileName from "@/components/File/FileName/FileName";
 import FileSize from "@/components/File/FileSize/FileSize";
 import FileProgress from "@/components/File/FileProgress/FileProgress";
+import FileActions from "@/components/File/FileActions/FileActions";
+
+import Icon from "@/components/Icon/Icon";
 
 export default {
-  components: { FileName, FileSize, FileProgress },
+  components: { FileName, FileSize, FileProgress, Icon, FileActions },
   data: () => {
     return {};
   },
@@ -68,6 +74,9 @@ export default {
       newConfig.orderBy = orderBy;
       this.$store.commit("files/setLocalFilesConfig", newConfig);
       this.$store.dispatch("files/fetchLocalFiles");
+    },
+    openFolder(FileHash) {
+      window.go.surge.MiddlewareFunctions.OpenFolder(FileHash).then(() => {});
     },
   },
 };

@@ -1,61 +1,66 @@
 .checkbox {
   position: relative;
-  height: 20px;
+  height: 16px;
   display: flex;
   align-items: center;
+  width: unset;
+  flex-shrink: 0;
+  margin-bottom: $padding-md;
 
-  &:not(:last-child) {
-    margin-bottom: $padding-micro;
+  &__title {
+    margin-left: calc(16px + #{$padding-sm});
+    font-size: $fz-sm;
+    line-height: 16px;
+    color: $white;
   }
 
   &__control {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     opacity: 0;
     z-index: 1;
+    left: 0;
     cursor: pointer;
     box-sizing: border-box;
     position: absolute;
     top: 0;
+    margin: 0;
 
     &:checked + label {
-      background-color: $primary;
-      border-color: $primary;
-
-      &:after {
+      &::after {
         opacity: 1;
       }
+    }
+    &:disabled + label {
+      background: rgba(117, 121, 129, 0.2);
     }
   }
 
   &__label {
-    background-color: white;
-    border: 1px solid $grey-light;
+    background-color: transparent;
+    box-sizing: border-box;
+    border: 1.5px solid $white-light;
     cursor: pointer;
     left: 0;
     position: absolute;
-    top: 2px;
+    top: 0;
     width: 16px;
     height: 16px;
     transition: $transition-1;
-    border-radius: 2px;
+    border-radius: 5px;
 
-    &:after {
-      border: 2px solid white;
-      border-top: none;
-      border-right: none;
+    &::after {
+      transition: $transition-1;
       content: "";
-      height: 4px;
-      left: 3px;
+      height: 8px;
+      display: block;
+      background: $white;
+      left: 2px;
       opacity: 0;
       position: absolute;
-      top: 4px;
-      transform: rotate(-45deg);
+      top: 2px;
       width: 8px;
+      border-radius: 2px;
     }
-  }
-
-  &__text {
-    margin-left: calc(16px + #{$padding-micro});
   }
 }
