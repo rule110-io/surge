@@ -35,6 +35,13 @@ a {
   height: 100vh;
 }
 
+.background {
+  &_error {
+    background: $error-gradient;
+    background-blend-mode: overlay, normal;
+  }
+}
+
 .text {
   &_wrap {
     &_none {

@@ -19,14 +19,16 @@ export default {
   },
   computed: {
     status() {
-      if (this.file.IsDownloading) {
+      if (this.file.IsMissing) {
+        return "Missing";
+      } else if (this.file.IsPaused) {
+        return "Paused";
+      } else if (this.file.IsDownloading) {
         return "Downloading";
       } else if (this.file.IsUploading) {
         return "Seeding";
       } else if (this.file.IsAvailable) {
         return "Completed";
-      } else if (this.file.IsPaused) {
-        return "Paused";
       } else {
         return "All";
       }

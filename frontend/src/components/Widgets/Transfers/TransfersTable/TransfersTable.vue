@@ -14,7 +14,11 @@
       </tr>
     </thead>
     <tbody>
-      <tr v-for="file in localFiles" :key="file.FileHash">
+      <tr
+        v-for="file in localFiles"
+        :key="file.FileHash"
+        :class="{ background_error: file.IsMissing }"
+      >
         <td>
           <FileName :file="file" />
         </td>

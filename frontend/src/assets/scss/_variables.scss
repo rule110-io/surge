@@ -32,6 +32,7 @@ $black-light: rgba(255, 255, 255, 0.03);
 $text-white: rgba(255, 255, 255, 0.8);
 $modal-bg: rgba(33, 33, 35, 0.83);
 $dropdown-dark: rgba(21, 21, 23, 0.83);
+$error-gradient: linear-gradient(0deg, #ff6d6d, #ff6d6d), #131416;
 $themes: (
   dark: (
     base: $dark,

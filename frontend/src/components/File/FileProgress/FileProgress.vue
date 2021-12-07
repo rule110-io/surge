@@ -2,6 +2,7 @@
   <div class="progress-bar">
     <div
       class="progress-bar__value"
+      :class="{ 'progress-bar__value_error': file.IsMissing }"
       :style="{ width: progressFormatted }"
     ></div>
     <div class="progress-bar__text">

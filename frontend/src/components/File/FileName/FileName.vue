@@ -23,9 +23,10 @@
 import DownloadIcon from "@/assets/icons/DownloadIcon.svg";
 import UploadIcon from "@/assets/icons/UploadIcon.svg";
 import CheckIcon from "@/assets/icons/CheckIcon.svg";
+import MissingIcon from "@/assets/icons/MissingIcon.svg";
 
 export default {
-  components: { DownloadIcon, UploadIcon, CheckIcon },
+  components: { DownloadIcon, UploadIcon, CheckIcon, MissingIcon },
   props: {
     file: {
       type: Object,
@@ -38,7 +39,9 @@ export default {
   },
   computed: {
     icon() {
-      if (this.file.IsDownloading) {
+      if (this.file.IsMissing) {
+        return "MissingIcon";
+      } else if (this.file.IsDownloading) {
         return "DownloadIcon";
       } else if (this.file.IsUploading) {
         return "UploadIcon";

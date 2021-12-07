@@ -15,6 +15,10 @@
     left: 0;
     top: 0;
     transition: $transition-1;
+
+    &_error {
+      background: rgba(255, 255, 255, 0.03);
+    }
   }
 
   &__text {
