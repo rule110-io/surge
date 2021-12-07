@@ -2,7 +2,6 @@ import Vue from "vue";
 import Vuex from "vuex";
 
 import Notifications from "./modules/notifications";
-import ClientStatus from "./modules/clientStatus";
 import GlobalBandwidth from "./modules/globalBandwidth";
 import Snackbar from "./modules/snackbar";
 import DarkTheme from "./modules/darkTheme";
@@ -19,7 +18,6 @@ export const store = new Vuex.Store({
   strict: false,
   modules: {
     notifications: Notifications,
-    clientStatus: ClientStatus,
     globalBandwidth: GlobalBandwidth,
     files: Files,
     snackbar: Snackbar,

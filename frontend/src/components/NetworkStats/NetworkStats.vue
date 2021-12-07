@@ -1,12 +1,5 @@
 <template>
   <div class="network-stats">
-    <div class="network-stats__left text_wrap_none">
-      <template v-if="online === 0">
-        Discovering network...
-      </template>
-      <template v-else>Total Clients Connected: {{ online }} </template>
-    </div>
-
     <div class="network-stats__right">
       <div class="network-stats__item text_wrap_none">
         Download: {{ totalDown | prettyBytes(1) }}/s
@@ -31,7 +24,6 @@ export default {
     return {};
   },
   computed: {
-    ...mapState("clientStatus", ["online"]),
     ...mapState("globalBandwidth", ["statusBundle", "totalDown", "totalUp"]),
   },
   methods: {},

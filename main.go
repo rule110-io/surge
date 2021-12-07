@@ -68,11 +68,11 @@ func main() {
 
 	wails.Run(&options.App{
 		Title:             "Surge",
-		Width:             720,
+		Width:             1320,
 		Height:            570,
-		MinWidth:          720,
+		MinWidth:          1320,
 		MinHeight:         570,
-		MaxWidth:          1280,
+		MaxWidth:          1920,
 		MaxHeight:         740,
 		DisableResize:     false,
 		Fullscreen:        false,
