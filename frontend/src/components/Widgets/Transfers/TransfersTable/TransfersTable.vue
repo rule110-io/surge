@@ -22,7 +22,7 @@
           background_error: file.IsMissing,
           table__row_active: isSelectedFile(file.FileHash),
         }"
-        @click="setSelectedFiles(file)"
+        @click="updateSelectedFiles(file)"
       >
         <td>
           <FileName :file="file" />
@@ -57,7 +57,7 @@
 </style>
 
 <script>
-import { mapState, mapMutations } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 import FileName from "@/components/File/FileName/FileName";
 import FileSize from "@/components/File/FileSize/FileSize";
@@ -98,8 +98,8 @@ export default {
     window.addEventListener("mouseup", this.stopDrag);
   },
   methods: {
-    ...mapMutations({
-      setSelectedFiles: "files/setSelectedFiles",
+    ...mapActions({
+      updateSelectedFiles: "files/updateSelectedFiles",
     }),
     setSorting(orderBy) {
       let newConfig = Object.assign({}, this.localFilesConfig);

@@ -2,6 +2,7 @@
   <ContentWrapper>
     <TransfersHeader />
     <TransfersTable />
+    <TransferControls />
   </ContentWrapper>
 </template>
 <script>
@@ -10,10 +11,16 @@ import { mapState } from "vuex";
 import ContentWrapper from "@/components/ContentWrapper/ContentWrapper";
 import TransfersHeader from "@/components/Widgets/Transfers/TransfersHeader/TransfersHeader";
 import TransfersTable from "@/components/Widgets/Transfers/TransfersTable/TransfersTable";
+import TransferControls from "@/components/Widgets/Transfers/TransferControls/TransferControls";
 
 export default {
   name: "download",
-  components: { ContentWrapper, TransfersHeader, TransfersTable },
+  components: {
+    ContentWrapper,
+    TransfersHeader,
+    TransfersTable,
+    TransferControls,
+  },
   data: () => {
     return {
       isRemoveFileModal: false,

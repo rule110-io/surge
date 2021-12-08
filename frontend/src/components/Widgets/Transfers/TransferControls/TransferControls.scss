@@ -1,0 +1,52 @@
+.transfer-controls {
+  position: fixed;
+  bottom: 64px;
+
+  &__left {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+  }
+
+  &__selected {
+    padding: $padding-xs $padding-md;
+    color: $white;
+    background: $white-light;
+    box-shadow: $shadow-5;
+    backdrop-filter: $blur-2;
+    border-radius: 100px;
+    display: flex;
+    align-items: center;
+
+    &-close {
+      margin-left: $padding-xs;
+
+      &:hover {
+        path {
+          stroke: $red;
+        }
+      }
+    }
+
+    &_text {
+      font-weight: $fw-semi-bold;
+      font-size: $fz-sm;
+      line-height: 16px;
+      font-feature-settings: "salt" on;
+    }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: $padding-llg;
+
+    &-icon {
+      &:hover {
+        path {
+          stroke: $primary;
+        }
+      }
+    }
+  }
+}

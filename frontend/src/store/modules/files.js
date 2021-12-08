@@ -57,11 +57,20 @@ const mutations = {
     state.activeFile = payload;
   },
   setSelectedFiles(state, payload) {
-    state.selectedFiles = xorBy(state.selectedFiles, [payload], "FileHash");
+    state.selectedFiles = payload;
   },
 };
 
 const actions = {
+  clearSelectedFiles({ commit }) {
+    commit("setSelectedFiles", []);
+  },
+  updateSelectedFiles({ commit, state }, payload) {
+    commit(
+      "setSelectedFiles",
+      xorBy(state.selectedFiles, [payload], "FileHash")
+    );
+  },
   fetchLocalFiles({ commit, state }) {
     const { search, skip, get, orderBy, isDesc, filter } =
       state.localFilesConfig;
