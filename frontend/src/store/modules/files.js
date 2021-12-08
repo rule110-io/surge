@@ -1,3 +1,5 @@
+import { xorBy } from "lodash";
+
 const getDefaultState = () => {
   return {
     localFiles: [],
@@ -23,6 +25,7 @@ const getDefaultState = () => {
       get: 8,
     },
     activeFile: {},
+    selectedFiles: [],
   };
 };
 
@@ -52,6 +55,9 @@ const mutations = {
   },
   setActiveFile(state, payload) {
     state.activeFile = payload;
+  },
+  setSelectedFiles(state, payload) {
+    state.selectedFiles = xorBy(state.selectedFiles, [payload], "FileHash");
   },
 };
 

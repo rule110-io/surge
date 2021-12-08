@@ -1,5 +1,5 @@
 <template>
-  <table>
+  <table class="table">
     <thead>
       <tr>
         <th class="text_align_left">name</th>
@@ -17,7 +17,12 @@
       <tr
         v-for="file in localFiles"
         :key="file.FileHash"
-        :class="{ background_error: file.IsMissing }"
+        class="table__row"
+        :class="{
+          background_error: file.IsMissing,
+          table__row_active: isSelectedFile(file.FileHash),
+        }"
+        @click="setSelectedFiles(file)"
       >
         <td>
           <FileName :file="file" />
@@ -35,8 +40,11 @@
         <td class="text_align_right"><FileTime :file="file" /></td>
         <td class="text_align_right" style="width: 1px">
           <div style="display: flex; align-items: center">
-            <Icon icon="FolderIcon" @click.native="openFolder(file.FileHash)" />
-            <FileActions :file="file" />
+            <Icon
+              icon="FolderIcon"
+              @click.native.stop="openFolder(file.FileHash)"
+            />
+            <FileActions @click.native.stop :file="file" />
           </div>
         </td>
       </tr>
@@ -49,7 +57,7 @@
 </style>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 
 import FileName from "@/components/File/FileName/FileName";
 import FileSize from "@/components/File/FileSize/FileSize";
@@ -78,12 +86,21 @@ export default {
     return {};
   },
   computed: {
-    ...mapState("files", ["localFiles", "localCount", "localFilesConfig"]),
+    ...mapState("files", [
+      "localFiles",
+      "localCount",
+      "localFilesConfig",
+      "selectedFiles",
+    ]),
   },
   mounted() {
     this.$store.dispatch("files/fetchLocalFiles");
+    window.addEventListener("mouseup", this.stopDrag);
   },
   methods: {
+    ...mapMutations({
+      setSelectedFiles: "files/setSelectedFiles",
+    }),
     setSorting(orderBy) {
       let newConfig = Object.assign({}, this.localFilesConfig);
       const currentOrder = newConfig.orderBy;
@@ -95,6 +112,9 @@ export default {
     },
     openFolder(FileHash) {
       window.go.surge.MiddlewareFunctions.OpenFolder(FileHash).then(() => {});
+    },
+    isSelectedFile(FileHash) {
+      return this._.findIndex(this.selectedFiles, ["FileHash", FileHash]) > -1;
     },
   },
 };

@@ -239,6 +239,17 @@ tbody {
   td {
     font-feature-settings: "salt" on;
     color: $white;
+
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid transparent;
+
+    &:first-child {
+      border-left: 1px solid transparent;
+    }
+
+    &:last-child {
+      border-right: 1px solid transparent;
+    }
   }
 }
 
@@ -258,4 +269,22 @@ th {
   text-transform: uppercase;
   font-feature-settings: "salt" on;
   color: $grey;
+}
+
+.table {
+  &__row {
+    &_active {
+      background: linear-gradient(
+          0deg,
+          rgba(10, 151, 149, 0.2),
+          rgba(10, 151, 149, 0.2)
+        ),
+        #131416;
+      background-blend-mode: normal;
+
+      td {
+        border-color: $primary !important;
+      }
+    }
+  }
 }
