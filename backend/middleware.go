@@ -28,8 +28,8 @@ func (s *MiddlewareFunctions) DownloadFile(Hash string) bool {
 }
 
 //SetDownloadPause set pause state by hash (bool)
-func (s *MiddlewareFunctions) SetDownloadPause(Hash string, State bool) {
-	SetFilePause(Hash, State)
+func (s *MiddlewareFunctions) SetDownloadPause(Hashes []string, State bool) {
+	SetFilePause(Hashes, State)
 }
 
 //GetPublicKey retrieves account pubkey

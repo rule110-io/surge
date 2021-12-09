@@ -80,23 +80,25 @@ func GetFileChunkMapString(file *models.File, Size int) string {
 }
 
 //SetFilePause sets a file IsPaused state for by file hash
-func SetFilePause(Hash string, State bool) {
+func SetFilePause(Hashes []string, State bool) {
 
 	mutexes.FileWriteLock.Lock()
-	file, err := dbGetFile(Hash)
-	if err != nil {
-		pushNotification("Failed To Pause", "Could not find the file to pause.")
-		return
-	}
-	file.IsPaused = State
-	dbInsertFile(*file)
-	mutexes.FileWriteLock.Unlock()
+	defer mutexes.FileWriteLock.Unlock()
 
-	msg := "Paused"
-	if !State {
-		msg = "Resumed"
+	for _, hash := range Hashes {
+		file, err := dbGetFile(hash)
+		if err != nil {
+			pushNotification("Failed To Pause", "Could not find the file to pause.")
+		}
+		file.IsPaused = State
+		dbInsertFile(*file)
+
+		msg := "Paused"
+		if !State {
+			msg = "Resumed"
+		}
+		pushNotification("Download "+msg, file.FileName)
 	}
-	pushNotification("Download "+msg, file.FileName)
 }
 
 //RemoveFileByHash removes file from surge db and optionally from disk
