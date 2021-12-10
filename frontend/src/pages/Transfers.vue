@@ -2,7 +2,7 @@
   <ContentWrapper>
     <TransfersHeader />
     <TransfersTable />
-    <TransferControls />
+    <TransferControls v-show="selectedFiles.length" />
   </ContentWrapper>
 </template>
 <script>
@@ -28,7 +28,12 @@ export default {
     };
   },
   computed: {
-    ...mapState("files", ["localFiles", "localCount", "localFilesConfig"]),
+    ...mapState("files", [
+      "localFiles",
+      "localCount",
+      "localFilesConfig",
+      "selectedFiles",
+    ]),
   },
   mounted() {
     this.$store.dispatch("files/fetchLocalFiles");

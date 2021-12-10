@@ -15,10 +15,19 @@
   letter-spacing: 0.1px;
   font-feature-settings: "salt" on;
   position: relative;
+  display: flex;
+  align-items: center;
 
   &__icon {
-    margin-right: 10px;
-    height: 18px;
+    margin-right: $padding-xs;
+  }
+
+  &:hover {
+    svg {
+      path {
+        stroke: $white;
+      }
+    }
   }
 
   &:disabled {
@@ -34,6 +43,7 @@
 
     &_md {
       padding: $padding-sm $padding-llg;
+      height: 40px;
     }
   }
 
@@ -60,7 +70,25 @@
       color: $white;
       border: 1px solid transparent;
 
+      &_icon {
+        color: $grey;
+      }
+
       &:hover {
+        background: $primary;
+        border: $border-primary;
+      }
+    }
+
+    &_icon {
+      background: $white-ghost;
+      box-shadow: $shadow-2;
+      backdrop-filter: $blur-2;
+      color: $grey;
+      border: 1px solid transparent;
+
+      &:hover {
+        color: $white;
         background: $primary;
         border: $border-primary;
       }

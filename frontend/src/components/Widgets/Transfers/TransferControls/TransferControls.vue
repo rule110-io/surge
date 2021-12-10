@@ -24,7 +24,14 @@
         />
       </div>
     </div>
-    <div class="transfer-controls__right"></div>
+    <div class="transfer-controls__right">
+      <Button theme="icon" size="md" icon="InfoIcon" @click="false"
+        >Details</Button
+      >
+      <Button theme="icon" size="md" icon="ChartIcon" @click="false"
+        >Speed</Button
+      >
+    </div>
   </div>
 </template>
 
@@ -36,9 +43,10 @@
 import { mapState, mapActions } from "vuex";
 
 import Icon from "@/components/Icon/Icon";
+import Button from "@/components/Button/Button";
 
 export default {
-  components: { Icon },
+  components: { Icon, Button },
   data: () => {
     return {};
   },

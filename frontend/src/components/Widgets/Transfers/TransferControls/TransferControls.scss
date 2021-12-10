@@ -1,10 +1,20 @@
 .transfer-controls {
   position: fixed;
   bottom: 64px;
+  display: flex;
+  justify-content: space-between;
+  width: calc(100% - 48px);
+  left: 24px;
 
   &__left {
     display: flex;
     gap: 28px;
+    align-items: center;
+  }
+
+  &__right {
+    display: flex;
+    gap: $padding-md;
     align-items: center;
   }
 
