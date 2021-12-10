@@ -5,7 +5,7 @@
         <th class="text_align_left">name</th>
         <th class="text_align_right">size</th>
         <th class="text_align_left" style="width: 134px">progress</th>
-        <th class="text_align_left">status</th>
+        <th class="text_align_left" style="width: 120px">status</th>
         <th class="text_align_center">seeds</th>
         <th class="text_align_right">down</th>
         <th class="text_align_right">UP</th>

@@ -12,8 +12,16 @@
         />
       </div>
       <div class="transfer-controls__actions">
-        <Icon icon="ControlPlayIcon" class="transfer-controls__actions-icon" />
-        <Icon icon="ControlPauseIcon" class="transfer-controls__actions-icon" />
+        <Icon
+          @click.native="setPause(false)"
+          icon="ControlPlayIcon"
+          class="transfer-controls__actions-icon"
+        />
+        <Icon
+          @click.native="setPause(true)"
+          icon="ControlPauseIcon"
+          class="transfer-controls__actions-icon"
+        />
       </div>
     </div>
     <div class="transfer-controls__right"></div>
@@ -43,6 +51,15 @@ export default {
     ...mapActions({
       clearSelectedFiles: "files/clearSelectedFiles",
     }),
+    setPause(bool) {
+      const hashes = this._.map(this.selectedFiles, "FileHash");
+
+      window.go.surge.MiddlewareFunctions.SetDownloadPause(hashes, bool).then(
+        () => {
+          this.$store.dispatch("files/fetchLocalFiles");
+        }
+      );
+    },
   },
 };
 </script>
