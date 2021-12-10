@@ -94,6 +94,7 @@ func main() {
 			DisableWindowIcon:    false,
 		},
 		Mac: &mac.Options{
+			Appearance: mac.NSAppearanceNameDarkAqua,
 			TitleBar: &mac.TitleBar{
 				TitlebarAppearsTransparent: false,
 				HideTitle:                  false,
