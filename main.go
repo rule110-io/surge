@@ -94,12 +94,19 @@ func main() {
 			DisableWindowIcon:    false,
 		},
 		Mac: &mac.Options{
-			TitleBar:             mac.TitleBarHiddenInset(),
+			TitleBar: &mac.TitleBar{
+				TitlebarAppearsTransparent: false,
+				HideTitle:                  false,
+				HideTitleBar:               false,
+				FullSizeContent:            false,
+				UseToolbar:                 false,
+				HideToolbarSeparator:       true,
+			},
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
 			About: &mac.AboutInfo{
-				Title:   "Vanilla Template",
-				Message: "Part of the Wails projects",
+				Title:   "Surge v0.5 - P2P on steroids",
+				Message: "© 2020-2022 rule110",
 			},
 		},
 	})

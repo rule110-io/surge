@@ -79,7 +79,7 @@ const go = {
       },
       /**
        * GetTopicSubscriptions
-       * @returns {Promise<Array.<string>>}  - Go Type: []string
+       * @returns {Promise<Array<string>>}  - Go Type: []string
        */
       "GetTopicSubscriptions": () => {
         return window.go.surge.MiddlewareFunctions.GetTopicSubscriptions();
@@ -142,7 +142,7 @@ const go = {
       },
       /**
        * SetDownloadPause
-       * @param {string} arg1 - Go Type: string
+       * @param {Array<string>} arg1 - Go Type: []string
        * @param {boolean} arg2 - Go Type: bool
        * @returns {Promise<void>} 
        */

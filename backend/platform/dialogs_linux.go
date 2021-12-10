@@ -10,15 +10,6 @@ import (
 func OpenFileDialog() string {
 	selectedFile, err := runtime.OpenFileDialog(*wailsContext, runtime.OpenDialogOptions{
 		Title: "Select File",
-		Filters: []runtime.FileFilter{
-			{
-				DisplayName: "Images (*.png;*.jpg)",
-				Pattern:     "*.png;*.jpg",
-			}, {
-				DisplayName: "Videos (*.mov;*.mp4)",
-				Pattern:     "*.mov;*.mp4",
-			},
-		},
 	})
 	if err != nil {
 		log.Panic("Error on file opening", err.Error())

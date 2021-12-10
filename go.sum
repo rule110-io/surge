@@ -132,8 +132,8 @@ github.com/go-kit/kit v0.8.0/go.mod h1:xBxKIO96dXMWWy0MnWVtmwkA9/13aqxPnvrjFYMA2
 github.com/go-logfmt/logfmt v0.3.0/go.mod h1:Qt1PoO58o5twSAckw1HlFXLmHsOX5/0LbT9GBnD5lWE=
 github.com/go-logfmt/logfmt v0.4.0/go.mod h1:3RMwSq7FuexP4Kalkev3ejPJsZTpXXBr9+V4qmtdjCk=
 github.com/go-ole/go-ole v1.2.4/go.mod h1:XCwSNxSkXRo4vlyPy93sltvi/qJq0jqQhjqQNIwKuxM=
-github.com/go-ole/go-ole v1.2.5 h1:t4MGB5xEDZvXI+0rMjjsfBsD7yAgp/s9ZDkL1JndXwY=
-github.com/go-ole/go-ole v1.2.5/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
+github.com/go-ole/go-ole v1.2.6 h1:/Fpf6oFPoeFik9ty7siob0G6Ke8QvQEuVcuChpwXzpY=
+github.com/go-ole/go-ole v1.2.6/go.mod h1:pprOEPIfldk/42T2oK7lQ4v4JSDwmV0As9GaiUsvbm0=
 github.com/go-playground/assert/v2 v2.0.1/go.mod h1:VDjEfimB/XKnb+ZQfWdccd7VUvScMdVu0Titje2rxJ4=
 github.com/go-playground/locales v0.13.0/go.mod h1:taPMhCMXrRLJO55olJkUXHZBHCxTMfnGwq/HNwmWNS8=
 github.com/go-playground/universal-translator v0.17.0/go.mod h1:UkSxE5sNxxRwHyU+Scu5vgOQjsIJAF8j9muTVoKLVtA=
@@ -291,8 +291,8 @@ github.com/leaanthony/go-ansi-parser v1.0.1 h1:97v6c5kYppVsbScf4r/VZdXyQ21KQIfeQ
 github.com/leaanthony/go-ansi-parser v1.0.1/go.mod h1:7arTzgVI47srICYhvgUV4CGd063sGEeoSlych5yeSPM=
 github.com/leaanthony/go-common-file-dialog v1.0.3 h1:O0uGjKnWtdEADGrkg+TyAAbZylykMwwx/MNEXn9fp+Y=
 github.com/leaanthony/go-common-file-dialog v1.0.3/go.mod h1:TGhEc9eSJgRsupZ+iH1ZgAOnEo9zp05cRH2j08RPrF0=
-github.com/leaanthony/go-webview2 v0.0.0-20211022194343-1e4c8d4226f3 h1:qhgrg3MhFRAIvtaqoqI+SrT+0wDYpxDMp9e3cvcxMpI=
-github.com/leaanthony/go-webview2 v0.0.0-20211022194343-1e4c8d4226f3/go.mod h1:lS5ds4bruPk9d7lzdF/OH31Z0YCerI6MmHNFGsWoUnM=
+github.com/leaanthony/go-webview2 v0.0.0-20211202091502-64deee9a37e3 h1:vKdQzUWiq5wtVBLTTeYuikcgQbF/HtYaOmxGzbfkcT0=
+github.com/leaanthony/go-webview2 v0.0.0-20211202091502-64deee9a37e3/go.mod h1:iX54IaVk1FnDqMuHJ47VYLPQOcVqQiOe9SJACt9CAbU=
 github.com/leaanthony/gosod v1.0.3 h1:Fnt+/B6NjQOVuCWOKYRREZnjGyvg+mEhd1nkkA04aTQ=
 github.com/leaanthony/gosod v1.0.3/go.mod h1:BJ2J+oHsQIyIQpnLPjnqFGTMnOZXDbvWtRCSG7jGxs4=
 github.com/leaanthony/idgen v1.0.0/go.mod h1:4nBZnt8ml/f/ic/EVQuLxuj817RccT2fyrUaZFxrcVA=
@@ -302,8 +302,8 @@ github.com/leaanthony/typescriptify-golang-structs v0.1.7 h1:yoznzWzyxkO/iWdlpq+
 github.com/leaanthony/typescriptify-golang-structs v0.1.7/go.mod h1:cWtOkiVhMF77e6phAXUcfNwYmMwCJ67Sij24lfvi9Js=
 github.com/leaanthony/webview2runtime v1.1.0 h1:N0pv55ift8XtqozIp4PNOtRCJ/Qdd/qzx80lUpalS4c=
 github.com/leaanthony/webview2runtime v1.1.0/go.mod h1:hH9GnWCve3DYzNaPOcPbhHQ7fodXR1QJNsnwixid4Tk=
-github.com/leaanthony/winc v0.0.0-20210921073452-54963136bf18 h1:5iOd93PZbpH4Iir8QkC4coFD+zEQEZSIRcjwjTFZkr0=
-github.com/leaanthony/winc v0.0.0-20210921073452-54963136bf18/go.mod h1:KEbMsKoznsebyGHwLk5LqkFOxL5uXSRdvpP4+avmAMs=
+github.com/leaanthony/winc v0.0.0-20211202091710-9931d43181ff h1:FwGObElCr/T/xy8S9IKDjWsNcfJHGxgjRl/GIbcseoQ=
+github.com/leaanthony/winc v0.0.0-20211202091710-9931d43181ff/go.mod h1:KEbMsKoznsebyGHwLk5LqkFOxL5uXSRdvpP4+avmAMs=
 github.com/leaanthony/winicon v1.0.0/go.mod h1:en5xhijl92aphrJdmRPlh4NI1L6wq3gEm0LpXAPghjU=
 github.com/leodido/go-urn v1.2.0/go.mod h1:+8+nEpDfqqsY+g338gtMEUOtuK+4dEMhiQEgxpxOKII=
 github.com/linode/linodego v0.10.0/go.mod h1:cziNP7pbvE3mXIPneHj0oRY8L1WtGEIKlZ8LANE4eXA=
@@ -459,8 +459,6 @@ github.com/valyala/tcplisten v0.0.0-20161114210144-ceec8f93295a/go.mod h1:v3UYOV
 github.com/valyala/tcplisten v1.0.0 h1:rBHj/Xf+E1tRGZyWIWwJDiRY0zc1Js+CV5DqwacVSA8=
 github.com/valyala/tcplisten v1.0.0/go.mod h1:T0xQ8SeCZGxckz9qRXTfG43PvQ/mcWh7FwZEA7Ioqkc=
 github.com/vultr/govultr v0.4.2/go.mod h1:TUuUizMOFc7z+PNMssb6iGjKjQfpw5arIaOLfocVudQ=
-github.com/wailsapp/wails/v2 v2.0.0-beta.20 h1:oEHdd/jGNN7Mg0ZctQlsQt9Mwfxbs1hkS7U1knxsbAc=
-github.com/wailsapp/wails/v2 v2.0.0-beta.20/go.mod h1:o7aGn4xMSLMKbULJr+IIFiosWA2oUJkefF8yftWzj5w=
 github.com/wzshiming/ctc v1.2.3/go.mod h1:2tVAtIY7SUyraSk0JxvwmONNPFL4ARavPuEsg5+KA28=
 github.com/wzshiming/winseq v0.0.0-20200112104235-db357dc107ae/go.mod h1:VTAq37rkGeV+WOybvZwjXiJOicICdpLCN8ifpISjK20=
 github.com/xanzy/ssh-agent v0.3.0/go.mod h1:3s9xbODqPuuhK9JV1R321M/FlMZSBvE5aY6eAcqrDh0=
@@ -476,7 +474,6 @@ github.com/xujiajun/nutsdb v0.5.0 h1:j/jM3Zw7Chg8WK7bAcKR0Xr7Mal47U1oJAMgySfDn9E
 github.com/xujiajun/nutsdb v0.5.0/go.mod h1:owdwN0tW084RxEodABLbO7h4Z2s9WiAjZGZFhRh0/1Q=
 github.com/xujiajun/utils v0.0.0-20190123093513-8bf096c4f53b h1:jKG9OiL4T4xQN3IUrhUpc1tG+HfDXppkgVcrAiiaI/0=
 github.com/xujiajun/utils v0.0.0-20190123093513-8bf096c4f53b/go.mod h1:AZd87GYJlUzl82Yab2kTjx1EyXSQCAfZDhpTo1SQC4k=
-github.com/xyproto/xpm v1.2.1/go.mod h1:cMnesLsD0PBXLgjDfTDEaKr8XyTFsnP1QycSqRw7BiY=
 github.com/yuin/goldmark v1.2.1/go.mod h1:3hX8gzYuyVAZsxl0MRgGTJEmQBFcNTphYh9decYSb74=
 github.com/ztrue/tracerr v0.3.0/go.mod h1:qEalzze4VN9O8tnhBXScfCrmoJo10o8TN5ciKjm6Mww=
 gitlab.com/NebulousLabs/fastrand v0.0.0-20181126182046-603482d69e40/go.mod h1:rOnSnoRyxMI3fe/7KIbVcsHRGxe30OONv8dEgo+vCfA=
@@ -622,10 +619,10 @@ golang.org/x/sys v0.0.0-20200212091648-12a6c2dcc1e4/go.mod h1:h1NjWce9XRLGQEsW7w
 golang.org/x/sys v0.0.0-20200223170610-d5e6a3e2c0ae/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200302150141-5c8b2ff67527/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200810151505-1b9f1253b3ed/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
-golang.org/x/sys v0.0.0-20200814200057-3d37ad5750ed/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20200930185726-fdedc70b468f/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20201119102817-f84b799fce68/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20210119212857-b64e53b001e4/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
+golang.org/x/sys v0.0.0-20210218145245-beda7e5e158e/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20210320140829-1e4c9ba3b0c4/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20210324051608-47abb6519492/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=
 golang.org/x/sys v0.0.0-20210423082822-04245dca01da/go.mod h1:h1NjWce9XRLGQEsW7wpKNCjG9DtNlClVuFLEZdDNbEs=

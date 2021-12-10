@@ -22,4 +22,4 @@ require (
 	gopkg.in/yaml.v3 v3.0.0-20200615113413-eeeca48fe776 // indirect
 )
 
-//replace github.com/wailsapp/wails v1.11.0 => ../wails
+//replace github.com/wailsapp/wails/v2 v2.0.0-beta.20 => ../../wailsapp/wails/v2
