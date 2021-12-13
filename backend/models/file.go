@@ -26,4 +26,5 @@ type File struct {
 	ChunksShared  int
 	Progress      float32 //only for remote
 	Topic         string
+	DateTimeAdded int64
 }
