@@ -1,16 +1,16 @@
 package messaging
 
 type MessageObj struct {
-	Type  int
-	Topic string
-	Data  []byte
+	Type         int
+	TopicEncoded string
+	Data         []byte
 }
 
 type MessageReceivedObj struct {
-	Type   int
-	Topic  string
-	Data   []byte
-	Sender string
+	Type         int
+	TopicEncoded string
+	Data         []byte
+	Sender       string
 }
 
 //Message Types

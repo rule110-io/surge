@@ -16,6 +16,7 @@ const (
 	MessageIDAnnounceFiles = iota
 	MessageIDAnnounceFilesReply
 	MessageIDAnnounceNewFile
+	MessageIDAnnounceRemoveFile
 )
 
 func MessageReceived(msg *messaging.MessageReceivedObj) {
@@ -32,29 +33,31 @@ func MessageReceived(msg *messaging.MessageReceivedObj) {
 	case MessageIDAnnounceNewFile:
 		//process file data
 		processQueryResponse(msg.Sender, msg.Data)
+	case MessageIDAnnounceRemoveFile:
+		processRemoveFile(string(msg.Data), msg.Sender)
 	}
 
 }
 
-func AnnounceFiles(topic string) {
-	fmt.Println(string("\033[36m"), "REQUESTING FILES FOR TOPIC", topic)
+func AnnounceFiles(topicEncoded string) {
+	fmt.Println(string("\033[36m"), "ANNOUNCING FILES FOR TOPIC", topicEncoded)
 	//Create the data object
 	dataObj := messaging.MessageObj{
-		Type:  MessageIDAnnounceFiles,
-		Topic: topic,
-		Data:  []byte(queryPayload),
+		Type:         MessageIDAnnounceFiles,
+		TopicEncoded: topicEncoded,
+		Data:         []byte(queryPayload),
 	}
 
 	messaging.Broadcast(&dataObj)
 }
 
 func SendAnnounceFilesReply(msg *messaging.MessageReceivedObj) {
-	fmt.Println(string("\033[36m"), "SENDING FILE REQUEST REPLY", msg.Topic, msg.Sender)
+	fmt.Println(string("\033[36m"), "SENDING FILE REQUEST REPLY", msg.TopicEncoded, msg.Sender)
 	//Create the data object
 	dataObj := messaging.MessageObj{
-		Type:  MessageIDAnnounceFilesReply,
-		Topic: msg.Topic,
-		Data:  []byte(queryPayload),
+		Type:         MessageIDAnnounceFilesReply,
+		TopicEncoded: msg.TopicEncoded,
+		Data:         []byte(queryPayload),
 	}
 	msg.Reply(&dataObj)
 }
@@ -67,12 +70,45 @@ func AnnounceNewFile(file *models.File) {
 
 	//Create the data object
 	dataObj := messaging.MessageObj{
-		Type:  MessageIDAnnounceNewFile,
-		Topic: file.Topic,
-		Data:  []byte(payload),
+		Type:         MessageIDAnnounceNewFile,
+		TopicEncoded: TopicEncode(file.Topic),
+		Data:         []byte(payload),
 	}
 
 	messaging.Broadcast(&dataObj)
+}
+
+func AnnounceRemoveFile(topic string, fileHash string) {
+	fmt.Println(string("\033[36m"), "ANNOUNCE REMOVE FILE FOR TOPIC ", topic, " hash: ", fileHash)
+
+	//Create the data object
+	dataObj := messaging.MessageObj{
+		Type:         MessageIDAnnounceRemoveFile,
+		TopicEncoded: TopicEncode(topic),
+		Data:         []byte(fileHash),
+	}
+
+	messaging.Broadcast(&dataObj)
+}
+
+func processRemoveFile(hash string, seeder string) {
+	fmt.Println(string("\033[36m"), "PROCESS REMOVE FILE FOR TOPIC, hash:", hash, " seeder: ", seeder)
+
+	RemoveFileSeeder(hash, seeder)
+
+	mutexes.ListedFilesLock.Lock()
+	defer mutexes.ListedFilesLock.Unlock()
+
+	//Remove empty seeders listings
+	for i := 0; i < len(ListedFiles); i++ {
+		if !AnySeeders(ListedFiles[i].FileHash) {
+			// Remove the element at index i from a.
+			ListedFiles[i] = ListedFiles[len(ListedFiles)-1] // Copy last element to index i.
+			ListedFiles[len(ListedFiles)-1] = models.File{}  // Erase last element (write zero value).
+			ListedFiles = ListedFiles[:len(ListedFiles)-1]   // Truncate slice.
+			i--
+		}
+	}
 }
 
 func processQueryResponse(seeder string, Data []byte) {
