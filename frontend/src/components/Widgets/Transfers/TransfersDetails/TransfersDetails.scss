@@ -1,0 +1,44 @@
+.transfers-details {
+  &__tabs {
+    display: flex;
+    align-items: center;
+    gap: $padding-md;
+    position: relative;
+    top: 8px;
+    padding: 8px 0;
+  }
+
+  &__item {
+    align-items: center;
+    padding: 0 $padding-md $padding-md $padding-md;
+    cursor: pointer;
+    font-size: $fz-md;
+    position: relative;
+    transition: $transition-1;
+
+    &:after {
+      content: "";
+      display: block;
+      position: absolute;
+      bottom: 0;
+      height: 3px;
+      width: 100%;
+      background: transparent;
+      left: 0;
+      transition: $transition-1;
+      border-radius: $br-xs;
+    }
+
+    &:hover {
+      color: $white;
+    }
+
+    &_active {
+      color: $white;
+
+      &:after {
+        background: $primary-gradient;
+      }
+    }
+  }
+}
