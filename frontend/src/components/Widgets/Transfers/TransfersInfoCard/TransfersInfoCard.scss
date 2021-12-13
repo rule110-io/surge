@@ -7,6 +7,8 @@
   left: 0;
   bottom: 0;
   transform: translateY(410px);
+  box-shadow: $shadow-5;
+  backdrop-filter: $blur-2;
 
   &__title {
     font-weight: $fw-bold;
