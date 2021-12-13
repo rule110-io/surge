@@ -87,6 +87,18 @@
       color: $grey;
       border: 1px solid transparent;
 
+      &_active {
+        background: $primary;
+        border: $border-primary;
+        color: $white;
+
+        svg {
+          path {
+            stroke: $white;
+          }
+        }
+      }
+
       &:hover {
         color: $white;
         background: $primary;

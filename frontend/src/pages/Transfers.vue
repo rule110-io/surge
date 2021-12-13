@@ -3,6 +3,7 @@
     <TransfersHeader />
     <TransfersTable />
     <TransferControls v-show="selectedFiles.length" />
+    <TransfersDetails />
   </ContentWrapper>
 </template>
 <script>
@@ -12,6 +13,7 @@ import ContentWrapper from "@/components/ContentWrapper/ContentWrapper";
 import TransfersHeader from "@/components/Widgets/Transfers/TransfersHeader/TransfersHeader";
 import TransfersTable from "@/components/Widgets/Transfers/TransfersTable/TransfersTable";
 import TransferControls from "@/components/Widgets/Transfers/TransferControls/TransferControls";
+import TransfersDetails from "@/components/Widgets/Transfers/TransfersDetails/TransfersDetails";
 
 export default {
   name: "download",
@@ -20,6 +22,7 @@ export default {
     TransfersHeader,
     TransfersTable,
     TransferControls,
+    TransfersDetails,
   },
   data: () => {
     return {

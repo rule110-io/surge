@@ -25,10 +25,20 @@
       </div>
     </div>
     <div class="transfer-controls__right">
-      <Button theme="icon" size="md" icon="InfoIcon" @click="false"
+      <Button
+        @click="toggleFileDetails"
+        theme="icon"
+        size="md"
+        icon="InfoIcon"
+        :active="fileDetails"
         >Details</Button
       >
-      <Button theme="icon" size="md" icon="ChartIcon" @click="false"
+      <Button
+        @click="toggleFileSpeed"
+        theme="icon"
+        size="md"
+        icon="ChartIcon"
+        :active="fileSpeed"
         >Speed</Button
       >
     </div>
@@ -51,13 +61,15 @@ export default {
     return {};
   },
   computed: {
-    ...mapState("files", ["selectedFiles"]),
+    ...mapState("files", ["selectedFiles", "fileSpeed", "fileDetails"]),
   },
   watch: {},
   mounted() {},
   methods: {
     ...mapActions({
       clearSelectedFiles: "files/clearSelectedFiles",
+      toggleFileSpeed: "files/toggleFileSpeed",
+      toggleFileDetails: "files/toggleFileDetails",
     }),
     setPause(bool) {
       const hashes = this._.map(this.selectedFiles, "FileHash");

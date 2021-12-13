@@ -2,7 +2,11 @@
   <component
     :is="type"
     class="button"
-    :class="[`button_theme_${theme}`, `button_size_${size}`]"
+    :class="[
+      `button_theme_${theme}`,
+      active ? `button_theme_${theme}_active` : null,
+      `button_size_${size}`,
+    ]"
     :to="to"
     :disabled="disabled"
     v-on="!disabled ? $listeners : false"
@@ -45,6 +49,10 @@ export default {
     icon: {
       type: String,
       default: "",
+    },
+    active: {
+      type: Boolean,
+      default: false,
     },
   },
   data: () => {

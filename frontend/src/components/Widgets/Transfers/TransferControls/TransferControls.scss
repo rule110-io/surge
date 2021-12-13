@@ -5,6 +5,7 @@
   justify-content: space-between;
   width: calc(100% - 48px);
   left: 24px;
+  z-index: 1;
 
   &__left {
     display: flex;

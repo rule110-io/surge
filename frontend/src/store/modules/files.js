@@ -26,6 +26,8 @@ const getDefaultState = () => {
     },
     activeFile: {},
     selectedFiles: [],
+    fileSpeed: false,
+    fileDetails: false,
   };
 };
 
@@ -59,6 +61,12 @@ const mutations = {
   setSelectedFiles(state, payload) {
     state.selectedFiles = payload;
   },
+  setFileSpeed(state, payload) {
+    state.fileSpeed = payload;
+  },
+  setFileDetails(state, payload) {
+    state.fileDetails = payload;
+  },
 };
 
 const actions = {
@@ -70,6 +78,14 @@ const actions = {
       "setSelectedFiles",
       xorBy(state.selectedFiles, [payload], "FileHash")
     );
+  },
+  toggleFileSpeed({ commit, state }) {
+    commit("setFileSpeed", !state.fileSpeed);
+    commit("setFileDetails", false);
+  },
+  toggleFileDetails({ commit, state }) {
+    commit("setFileDetails", !state.fileDetails);
+    commit("setFileSpeed", false);
   },
   fetchLocalFiles({ commit, state }) {
     const { search, skip, get, orderBy, isDesc, filter } =
