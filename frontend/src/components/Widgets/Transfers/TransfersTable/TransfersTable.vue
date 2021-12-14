@@ -22,7 +22,8 @@
           background_error: file.IsMissing,
           table__row_active: isSelectedFile(file.FileHash),
         }"
-        @click="updateSelectedFiles(file)"
+        @click.ctrl="updateSelectedFiles(file)"
+        @click.exact="addSingleSelectedFile(file)"
       >
         <td>
           <FileName :file="file" />
@@ -100,6 +101,7 @@ export default {
   methods: {
     ...mapActions({
       updateSelectedFiles: "files/updateSelectedFiles",
+      addSingleSelectedFile: "files/addSingleSelectedFile",
     }),
     setSorting(orderBy) {
       let newConfig = Object.assign({}, this.localFilesConfig);

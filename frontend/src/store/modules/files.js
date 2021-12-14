@@ -79,6 +79,9 @@ const actions = {
       xorBy(state.selectedFiles, [payload], "FileHash")
     );
   },
+  addSingleSelectedFile({ commit }, payload) {
+    commit("setSelectedFiles", [payload]);
+  },
   toggleFileSpeed({ commit, state }) {
     commit("setFileSpeed", !state.fileSpeed);
     commit("setFileDetails", false);
