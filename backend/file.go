@@ -106,13 +106,14 @@ func RemoveFileByHash(Hash string, FromDisk bool) bool {
 
 	mutexes.FileWriteLock.Lock()
 
+	file, err := dbGetFile(Hash)
+	if !FromDisk && err != nil {
+		log.Println("Error on remove file (read db)", err.Error())
+		pushError("Error on remove file (read db)", err.Error())
+		return false
+	}
+
 	if FromDisk {
-		file, err := dbGetFile(Hash)
-		if err != nil {
-			log.Println("Error on remove file (read db)", err.Error())
-			pushError("Error on remove file (read db)", err.Error())
-			return false
-		}
 		err = os.Remove(file.Path)
 		if err != nil {
 			log.Println("Error on remove file from disk", err.Error())
@@ -120,13 +121,15 @@ func RemoveFileByHash(Hash string, FromDisk bool) bool {
 		}
 	}
 
-	err := dbDeleteFile(Hash)
+	err = dbDeleteFile(Hash)
 	if err != nil {
 		log.Println("Error on remove file (read db)", err.Error())
 		pushError("Error on remove file (read db)", err.Error())
 		return false
 	}
 	mutexes.FileWriteLock.Unlock()
+
+	AnnounceRemoveFile(file.Topic, file.FileHash)
 
 	//Rebuild entirely
 	dbFiles := dbGetAllFiles()

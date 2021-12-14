@@ -129,14 +129,37 @@ func (s *MiddlewareFunctions) GetTopicSubscriptions() []string {
 }
 
 type FileDetails struct {
-	FileID  string
-	Seeders []string
+	FileID           string
+	Seeders          []string
+	NumChunks        int
+	ChunksDownloaded int
+	ChunksShared     int
+	BytesDownloaded  int64
+	BytesUploaded    int64
+	DateTimeAdded    int64
 }
 
 func (s *MiddlewareFunctions) GetFileDetails(FileHash string) FileDetails {
+
+	file, err := dbGetFile(FileHash)
+	if err != nil {
+		pushError("Error on getting file details", err.Error())
+		return FileDetails{}
+	}
+
+	chunksDownloaded := chunksDownloaded(file.ChunkMap, file.NumChunks)
+	byteDown := int64(chunksDownloaded) * int64(constants.ChunkSize)
+	byteUp := int64(file.ChunksShared) * int64(constants.ChunkSize)
+
 	return FileDetails{
-		FileID:  FileHash,
-		Seeders: GetSeeders(FileHash),
+		FileID:           file.FileHash,
+		Seeders:          GetSeeders(FileHash),
+		NumChunks:        file.NumChunks,
+		ChunksDownloaded: chunksDownloaded,
+		ChunksShared:     file.ChunksShared,
+		BytesDownloaded:  byteDown,
+		BytesUploaded:    byteUp,
+		DateTimeAdded:    file.DateTimeAdded,
 	}
 }
 func (s *MiddlewareFunctions) GetTopicDetails(Topic string) models.TopicInfo {

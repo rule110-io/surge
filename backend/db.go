@@ -14,6 +14,7 @@ import (
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"log"
 
@@ -106,6 +107,11 @@ func dbGetFile(Hash string) (*models.File, error) {
 
 // Inserts a File to the DB
 func dbInsertFile(File models.File) {
+
+	if File.DateTimeAdded == 0 {
+		File.DateTimeAdded = time.Now().Unix()
+	}
+
 	if err := db.Update(
 		func(tx *nutsdb.Tx) error {
 

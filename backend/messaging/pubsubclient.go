@@ -23,9 +23,13 @@ func Initialize(client *nkn.MultiClient, account *nkn.Account, onMsgHandler func
 //Broadcast sends a message to all subscribers
 func Broadcast(msg *MessageObj) {
 	jsonObj, err := json.Marshal(msg)
+	if err != nil {
+		fmt.Println(err)
+	}
+
 	fmt.Println("Marshalled Bytes:", jsonObj)
 
-	err = nknClient.PublishBinary(msg.Topic, jsonObj, &nkn.MessageConfig{
+	err = nknClient.PublishBinary(msg.TopicEncoded, jsonObj, &nkn.MessageConfig{
 		TxPool: true,
 	})
 	if err != nil {

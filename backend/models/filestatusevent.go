@@ -15,7 +15,5 @@ type FileStatusEvent struct {
 	Status            string
 	DownloadBandwidth int
 	UploadBandwidth   int
-	NumChunks         int
-	ChunksShared      int
 	Seeders           int
 }
