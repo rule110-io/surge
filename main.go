@@ -53,7 +53,7 @@ func main() {
 		log.Panic("Error on startup", err.Error())
 	}
 	surge.InitializeDb()
-	surge.InitializeLog()
+	//surge.InitializeLog()
 	defer surge.CloseDb()
 	if newlyCreated {
 		// seems like this is the first time starting the app

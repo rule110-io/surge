@@ -6,7 +6,7 @@ import (
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
-	"github.com/rule110-io/surge/backend/platform"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 //MiddlewareFunctions struct to hold wails runtime for all middleware implementations
@@ -66,7 +66,9 @@ func (s *MiddlewareFunctions) OpenFolder(Hash string) {
 }
 
 func (s *MiddlewareFunctions) SeedFile(Topic string) bool {
-	path := platform.OpenFileDialog()
+	path, _ := runtime.OpenFileDialog(*wailsContext, runtime.OpenDialogOptions{
+		Title: "Select File",
+	})
 	if path == "" {
 		return false
 	}
