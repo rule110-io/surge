@@ -130,11 +130,6 @@ func RemoveFileByHash(Hash string, FromDisk bool) bool {
 	mutexes.FileWriteLock.Unlock()
 
 	AnnounceRemoveFile(file.Topic, file.FileHash)
-
-	//Rebuild entirely
-	dbFiles := dbGetAllFiles()
-	go BuildSeedString(dbFiles)
-
 	return true
 }
 

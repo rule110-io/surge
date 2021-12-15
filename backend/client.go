@@ -44,8 +44,6 @@ var clientInitialized = false
 //The nkn client
 var client *nkn.MultiClient
 
-var queryPayload = ""
-
 //NumClientsStruct .
 
 //var numClientsStore *wails.Store
@@ -124,8 +122,6 @@ func InitializeClient(args []string) bool {
 			dbInsertFile(dbFiles[i])
 		}
 	}
-
-	BuildSeedString(filesOnDisk)
 
 	for i := 0; i < len(filesOnDisk); i++ {
 		if filesOnDisk[i].IsDownloading {
@@ -249,7 +245,6 @@ func restartDownload(Hash string) {
 		file.IsUploading = true
 		file.IsAvailable = true
 		dbInsertFile(*file)
-		go AddToSeedString(*file)
 		return
 	}
 
@@ -436,34 +431,4 @@ func SeedFilepath(Path string, Topic string) bool {
 	go hashFile(randomHash)
 
 	return true
-}
-
-//BuildSeedString builds a string of seeded files to share with clients
-func BuildSeedString(dbFiles []models.File) {
-
-	newQueryPayload := ""
-	for _, dbFile := range dbFiles {
-		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, GetAccountAddress(), dbFile.Topic)
-		log.Println("Magnet:", magnet)
-
-		if dbFile.IsUploading {
-			//Add to payload
-			payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Topic)
-			//log.Println(payload)
-			newQueryPayload += payload
-		}
-	}
-	queryPayload = newQueryPayload
-}
-
-//AddToSeedString adds to existing seed string
-func AddToSeedString(dbFile models.File) {
-
-	//Add to payload
-	payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Topic)
-	//log.Println(payload)
-	queryPayload += payload
-
-	//Make sure you're subscribed when seeding a file
-	go subscribeToSurgeTopic(dbFile.Topic, true)
 }

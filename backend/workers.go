@@ -80,7 +80,11 @@ func updateFileDataWorker() {
 					file.IsUploading = true
 					file.IsAvailable = true
 					dbInsertFile(file)
-					go AddToSeedString(file)
+
+					dbFile, err := dbGetFile(file.FileHash)
+					if err == nil {
+						AnnounceNewFile(dbFile)
+					}
 				}
 			}
 

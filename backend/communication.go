@@ -44,16 +44,13 @@ func AnnounceFiles(topicEncoded string) {
 
 	payload := getTopicPayload(topicEncoded)
 
-	if len(payload) > 0 {
-		//Create the data object
-		dataObj := messaging.MessageObj{
-			Type:         MessageIDAnnounceFiles,
-			TopicEncoded: topicEncoded,
-			Data:         []byte(queryPayload),
-		}
-
-		messaging.Broadcast(&dataObj)
+	dataObj := messaging.MessageObj{
+		Type:         MessageIDAnnounceFiles,
+		TopicEncoded: topicEncoded,
+		Data:         []byte(payload),
 	}
+
+	messaging.Broadcast(&dataObj)
 }
 
 func SendAnnounceFilesReply(msg *messaging.MessageReceivedObj) {
@@ -66,7 +63,7 @@ func SendAnnounceFilesReply(msg *messaging.MessageReceivedObj) {
 		dataObj := messaging.MessageObj{
 			Type:         MessageIDAnnounceFilesReply,
 			TopicEncoded: msg.TopicEncoded,
-			Data:         []byte(queryPayload),
+			Data:         []byte(payload),
 		}
 		msg.Reply(&dataObj)
 	}
@@ -174,9 +171,10 @@ func processQueryResponse(seeder string, Data []byte) {
 	mutexes.ListedFilesLock.Unlock()
 }
 
-func getTopicPayload(topicEncoded string) (payload string) {
+func getTopicPayload(topicEncoded string) string {
 	dbFiles := dbGetAllFiles()
 
+	payload := ""
 	for _, dbFile := range dbFiles {
 
 		if TopicEncode(dbFile.Topic) != topicEncoded {
@@ -188,9 +186,7 @@ func getTopicPayload(topicEncoded string) (payload string) {
 
 		if dbFile.IsUploading {
 			//Add to payload
-			payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Topic)
-			//log.Println(payload)
-			payload += payload
+			payload += surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Topic)
 		}
 	}
 	return payload

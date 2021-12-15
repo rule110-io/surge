@@ -90,8 +90,6 @@ func hashFile(randomHash string) {
 	dbFile.FileHash = hashString
 	dbInsertFile(*dbFile)
 
-	//Add to payload
-	AddToSeedString(*dbFile)
 	AnnounceNewFile(dbFile)
 
 	pushNotification("Now seeding", dbFile.FileName)
