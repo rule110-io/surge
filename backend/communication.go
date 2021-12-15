@@ -41,25 +41,35 @@ func MessageReceived(msg *messaging.MessageReceivedObj) {
 
 func AnnounceFiles(topicEncoded string) {
 	fmt.Println(string("\033[36m"), "ANNOUNCING FILES FOR TOPIC", topicEncoded)
-	//Create the data object
-	dataObj := messaging.MessageObj{
-		Type:         MessageIDAnnounceFiles,
-		TopicEncoded: topicEncoded,
-		Data:         []byte(queryPayload),
-	}
 
-	messaging.Broadcast(&dataObj)
+	payload := getTopicPayload(topicEncoded)
+
+	if len(payload) > 0 {
+		//Create the data object
+		dataObj := messaging.MessageObj{
+			Type:         MessageIDAnnounceFiles,
+			TopicEncoded: topicEncoded,
+			Data:         []byte(queryPayload),
+		}
+
+		messaging.Broadcast(&dataObj)
+	}
 }
 
 func SendAnnounceFilesReply(msg *messaging.MessageReceivedObj) {
 	fmt.Println(string("\033[36m"), "SENDING FILE REQUEST REPLY", msg.TopicEncoded, msg.Sender)
-	//Create the data object
-	dataObj := messaging.MessageObj{
-		Type:         MessageIDAnnounceFilesReply,
-		TopicEncoded: msg.TopicEncoded,
-		Data:         []byte(queryPayload),
+
+	payload := getTopicPayload(msg.TopicEncoded)
+
+	if len(payload) > 0 {
+		//Create the data object
+		dataObj := messaging.MessageObj{
+			Type:         MessageIDAnnounceFilesReply,
+			TopicEncoded: msg.TopicEncoded,
+			Data:         []byte(queryPayload),
+		}
+		msg.Reply(&dataObj)
 	}
-	msg.Reply(&dataObj)
 }
 
 func AnnounceNewFile(file *models.File) {
@@ -162,4 +172,26 @@ func processQueryResponse(seeder string, Data []byte) {
 		log.Println("Query response new file: ", newListing.FileName, " seeder: ", seeder)
 	}
 	mutexes.ListedFilesLock.Unlock()
+}
+
+func getTopicPayload(topicEncoded string) (payload string) {
+	dbFiles := dbGetAllFiles()
+
+	for _, dbFile := range dbFiles {
+
+		if TopicEncode(dbFile.Topic) != topicEncoded {
+			continue
+		}
+
+		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, GetAccountAddress(), dbFile.Topic)
+		log.Println("Magnet:", magnet)
+
+		if dbFile.IsUploading {
+			//Add to payload
+			payload := surgeGenerateTopicPayload(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, dbFile.Topic)
+			//log.Println(payload)
+			payload += payload
+		}
+	}
+	return payload
 }

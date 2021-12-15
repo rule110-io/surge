@@ -3,6 +3,7 @@ package messaging
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 
 	nkn "github.com/nknorg/nkn-sdk-go"
 )
@@ -62,7 +63,11 @@ func listen() {
 			msgObj := MessageReceivedObj{}
 			err := json.Unmarshal(msg.Data, &msgObj)
 			if err != nil {
+				log.Println("Received invalid message:", string(msg.Data), "from:", msg.Src, "error:", err)
 				fmt.Println("Received invalid message:", string(msg.Data), "from:", msg.Src, "error:", err)
+			} else if msg.Src == nknClient.Address() {
+				log.Println("Discard message received from self:", string(msg.Data), "from:", msg.Src, "error:", err)
+				fmt.Println("Discard message received from self:", string(msg.Data), "from:", msg.Src, "error:", err)
 			} else {
 				msgObj.Sender = msg.Src
 				onMessageHandler(&msgObj)
