@@ -28,7 +28,7 @@ var onDisconnect func(addr string)
 type Session struct {
 	Session          net.Conn
 	Reader           *bufio.Reader
-	lastActivityUnix int64
+	LastActivityUnix int64
 }
 
 //A map to hold nkn sessions
@@ -89,7 +89,7 @@ func GetSession(Address string, timeoutInSeconds int) (*Session, error) {
 	/*
 		if exists {
 			//If the sessions exists, check if its still active, if not dump it and try to create a new one.
-			elapsedSinceLastActivity := time.Now().Unix() - session.lastActivityUnix
+			elapsedSinceLastActivity := time.Now().Unix() - session.LastActivityUnix
 			if elapsedSinceLastActivity > int64(timeoutInSeconds) {
 				closeSession(Address)
 
@@ -111,7 +111,7 @@ func GetExistingSession(Address string, timeoutInSeconds int) (*Session, bool) {
 
 	if exists {
 		//If the sessions exists, check if its still active, if not dump it and try to create a new one.
-		elapsedSinceLastActivity := time.Now().Unix() - session.lastActivityUnix
+		elapsedSinceLastActivity := time.Now().Unix() - session.LastActivityUnix
 		if elapsedSinceLastActivity > int64(timeoutInSeconds) {
 			closeSession(Address)
 
@@ -128,7 +128,7 @@ func GetExistingSessionWithoutClosing(Address string, timeoutInSeconds int) (*Se
 
 	if exists {
 		//If the sessions exists, check if its still active, if not dump it and try to create a new one.
-		elapsedSinceLastActivity := time.Now().Unix() - session.lastActivityUnix
+		elapsedSinceLastActivity := time.Now().Unix() - session.LastActivityUnix
 		if elapsedSinceLastActivity > int64(timeoutInSeconds) {
 			return nil, false
 		}
@@ -153,11 +153,11 @@ func AcceptSession(acceptedConnection net.Conn) *Session {
 	session := &Session{
 		Reader:           listenReader,
 		Session:          acceptedConnection,
-		lastActivityUnix: time.Now().Unix(),
+		LastActivityUnix: time.Now().Unix(),
 	}
 
 	//Give it a 10 sec headstart, old session workers take up to 10 sec to timeout, then to fetch the new session this would then already be timedout.
-	session.lastActivityUnix = time.Now().Unix() + constants.WorkerGetSessionTimeout
+	session.LastActivityUnix = time.Now().Unix() + constants.WorkerGetSessionTimeout
 	sessionMap[addr] = session
 
 	go onConnect(session, true)
@@ -172,7 +172,7 @@ func UpdateActivity(Address string) {
 	session, exists := sessionMap[Address]
 
 	if exists {
-		session.lastActivityUnix = time.Now().Unix()
+		session.LastActivityUnix = time.Now().Unix()
 	}
 }
 
@@ -208,7 +208,7 @@ func createSession(Address string) (*Session, error) {
 	session := &Session{
 		Reader:           reader,
 		Session:          nknSession,
-		lastActivityUnix: time.Now().Unix(),
+		LastActivityUnix: time.Now().Unix(),
 	}
 
 	go onConnect(session, false)

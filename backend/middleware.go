@@ -6,6 +6,7 @@ import (
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
+	"github.com/rule110-io/surge/backend/sessionmanager"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -130,13 +131,20 @@ func (s *MiddlewareFunctions) GetTopicSubscriptions() []string {
 
 type FileDetails struct {
 	FileID           string
-	Seeders          []string
+	Seeders          []SeederDetails
 	NumChunks        int
 	ChunksDownloaded int
 	ChunksShared     int
 	BytesDownloaded  int64
 	BytesUploaded    int64
 	DateTimeAdded    int64
+}
+
+type SeederDetails struct {
+	PublicKey     string
+	Workers       int
+	ActiveSession bool
+	LastActivity  int64
 }
 
 func (s *MiddlewareFunctions) GetFileDetails(FileHash string) FileDetails {
@@ -151,9 +159,36 @@ func (s *MiddlewareFunctions) GetFileDetails(FileHash string) FileDetails {
 	byteDown := int64(chunksDownloaded) * int64(constants.ChunkSize)
 	byteUp := int64(file.ChunksShared) * int64(constants.ChunkSize)
 
+	seederDetails := []SeederDetails{}
+	seeders := GetSeeders(FileHash)
+
+	for _, v := range seeders {
+
+		mutexes.WorkerMapLock.Lock()
+		workerCount := workerMap[v]
+		mutexes.WorkerMapLock.Unlock()
+
+		session, exists := sessionmanager.GetExistingSessionWithoutClosing(v, constants.GetSessionDialTimeout)
+
+		sessionActive := false
+		lastActivity := int64(-1)
+
+		if exists {
+			sessionActive = true
+			lastActivity = session.LastActivityUnix
+		}
+
+		seederDetails = append(seederDetails, SeederDetails{
+			PublicKey:     v,
+			Workers:       workerCount,
+			ActiveSession: sessionActive,
+			LastActivity:  lastActivity,
+		})
+	}
+
 	return FileDetails{
 		FileID:           file.FileHash,
-		Seeders:          GetSeeders(FileHash),
+		Seeders:          seederDetails,
 		NumChunks:        file.NumChunks,
 		ChunksDownloaded: chunksDownloaded,
 		ChunksShared:     file.ChunksShared,
