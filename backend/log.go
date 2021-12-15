@@ -75,8 +75,6 @@ func RecoverAndLog() {
 		w.WriteString(string(buf[0:stackSize]))
 		w.Flush()
 
-		pushError("Panic", "Please check your log file and paniclog for more info")
-
-		panic("Panic dumped but not digested, please check your log")
+		pushError("Panic", "Please check your paniclog for more info, you might have to restart the client.")
 	}
 }
