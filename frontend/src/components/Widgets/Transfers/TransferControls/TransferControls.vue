@@ -24,7 +24,7 @@
         />
       </div>
     </div>
-    <div class="transfer-controls__right">
+    <div class="transfer-controls__right" v-show="selectedFiles.length === 1">
       <Button
         @click="toggleFileDetails"
         theme="icon"

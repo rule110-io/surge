@@ -23,6 +23,7 @@
           table__row_active: isSelectedFile(file.FileHash),
         }"
         @click.ctrl="updateSelectedFiles(file)"
+        @click.meta="updateSelectedFiles(file)"
         @click.exact="addSingleSelectedFile(file)"
       >
         <td>

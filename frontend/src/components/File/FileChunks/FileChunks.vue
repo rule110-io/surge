@@ -41,13 +41,16 @@ export default {
     },
     "file.FileHash": {
       handler(newHash) {
+        console.log(newHash);
         if (!newHash) return;
 
         this.getChunkMap();
       },
     },
   },
-  mounted() {},
+  mounted() {
+    this.getChunkMap();
+  },
   methods: {
     getChunkMap() {
       const canvasWidth = this.$refs.canvas.clientWidth;

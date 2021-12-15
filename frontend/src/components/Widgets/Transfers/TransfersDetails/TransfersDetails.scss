@@ -41,4 +41,62 @@
       }
     }
   }
+
+  &__chunks {
+    padding-bottom: $padding-llg;
+    border-bottom: $border;
+    margin-bottom: $padding-llg;
+  }
+
+  &__info {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: $padding-md;
+
+    &-item {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      font-size: $fz-md;
+      line-height: 16px;
+      gap: $padding-md;
+    }
+
+    &-left {
+      color: $text-white;
+    }
+
+    &-right {
+      color: $white;
+      font-weight: $fw-semi-bold;
+    }
+  }
+
+  &__seeders {
+    display: grid;
+    gap: 10px;
+
+    &-row {
+      display: grid;
+      grid-template-columns: max-content max-content;
+      gap: $padding-llg;
+    }
+
+    &-value {
+      font-size: $fz-md;
+      line-height: 16px;
+      color: $white;
+      opacity: 0.8;
+    }
+
+    &-heading {
+      font-weight: $fw-bold;
+      font-size: $fz-xs;
+      line-height: 16px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      font-feature-settings: "salt" on;
+      color: $grey;
+      margin-bottom: 6px;
+    }
+  }
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="file-time text_wrap_none">
-    <template v-if="file.IsDownloading">
+    <template v-if="file.IsDownloading && !file.IsPaused">
       {{ [seconds, "seconds"] | duration("humanize") }}
     </template>
     <template v-else> ∞ </template>
