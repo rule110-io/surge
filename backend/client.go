@@ -192,7 +192,12 @@ func DownloadFileByHash(Hash string) bool {
 
 	// If the file doesn't exist allocate it
 	var path = remoteFolder + string(os.PathSeparator) + file.FileName
-	AllocateFile(path, file.FileSize)
+
+	isAllocated := AllocateFile(path, file.FileSize)
+	if !isAllocated {
+		return false
+	}
+
 	numChunks := int((file.FileSize-1)/int64(constants.ChunkSize)) + 1
 
 	//When downloading from remote enter file into db

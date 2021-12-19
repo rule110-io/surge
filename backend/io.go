@@ -155,24 +155,30 @@ func OpenFolderByHash(Hash string) {
 }
 
 // AllocateFile Allocates a file on disk at path with size in bytes
-func AllocateFile(path string, size int64) {
+func AllocateFile(path string, size int64) bool {
 
 	fd, err := os.Create(path)
 	if err != nil {
-		log.Panic("Failed to create output")
+		pushError("File disk allocation error", "file could not be created at "+path)
+		return false
 	}
 	_, err = fd.Seek(size-1, 0)
 	if err != nil {
-		log.Panic("Failed to seek")
+		pushError("File disk allocation error", "file was created but could not be read at "+path)
+		return false
 	}
 	_, err = fd.Write([]byte{0})
 	if err != nil {
-		log.Panic("Write failed")
+		pushError("File disk allocation error", "file was read but could not be written at "+path)
+		return false
 	}
 	err = fd.Close()
 	if err != nil {
-		log.Panic("Failed to close file")
+		pushError("File disk allocation error", "file was written but could not be released at "+path)
+		return false
 	}
+
+	return true
 }
 
 // HashFile generates hash for file given filepath
