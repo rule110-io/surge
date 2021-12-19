@@ -206,4 +206,13 @@ func (s *MiddlewareFunctions) GetOfficialTopicName() string {
 	return constants.SurgeOfficialTopic
 }
 
-//
+func (s *MiddlewareFunctions) SetDownloadFolder() bool {
+	path, _ := runtime.OpenDirectoryDialog(*wailsContext, runtime.OpenDialogOptions{
+		Title: "Select Download Folder",
+	})
+	if path == "" {
+		return false
+	}
+	DbWriteSetting("downloadFolder", path)
+	return true
+}
