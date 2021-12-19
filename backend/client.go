@@ -185,9 +185,10 @@ func DownloadFileByHash(Hash string) bool {
 
 	pushNotification("Download Started", file.FileName)
 
-	remoteFolder, err := platform.GetRemoteFolder()
+	remoteFolder, err := getDownloadFolderPath()
 	if err != nil {
 		log.Println("Remote folder does not exist")
+		pushError("Error on download file", "Could not access download folder at path: "+remoteFolder)
 	}
 
 	// If the file doesn't exist allocate it
@@ -436,4 +437,17 @@ func SeedFilepath(Path string, Topic string) bool {
 	go hashFile(randomHash)
 
 	return true
+}
+
+func getDownloadFolderPath() (string, error) {
+	folder, err := DbReadSetting("downloadFolder")
+	if err == nil && len(folder) > 0 {
+		return folder, nil
+	} else {
+		folder, err = platform.GetRemoteFolder()
+		if err == nil {
+			return folder, nil
+		}
+	}
+	return "", err
 }

@@ -21,7 +21,6 @@ import (
 	bitmap "github.com/boljen/go-bitmap"
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/mutexes"
-	"github.com/rule110-io/surge/backend/platform"
 	"github.com/skratchdot/open-golang/open"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
@@ -82,13 +81,8 @@ func WriteChunk(FileID string, ChunkID int32, Chunk []byte) {
 		log.Println("Error on write chunk (db get)", err.Error())
 		return
 	}
-	remoteFolder, err := platform.GetRemoteFolder()
-	if err != nil {
-		pushError("Error on write chunk (GetRemoteFolder)", err.Error())
-		return
-	}
-	path := remoteFolder + string(os.PathSeparator) + fileInfo.FileName
-	osFile, err := os.OpenFile(path, os.O_RDWR, 0644)
+
+	osFile, err := os.OpenFile(fileInfo.Path, os.O_RDWR, 0644)
 	if err != nil {
 		pushError("Error on write chunk (OpenFile)", err.Error())
 		return
