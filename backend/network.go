@@ -98,23 +98,8 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 			}
 
 			//Pause if file is paused
-			for err == nil && dbFile.IsPaused {
-				time.Sleep(time.Second * 5)
-				dbFile, err = dbGetFile(fileID)
-				if err != nil {
-					log.Println("Download Job Terminated", "File no longer in DB")
-					return
-				}
-
-				//Coming out of a pause situation we reset our received timer
-				if !dbFile.IsPaused {
-					//Give the seeder a fair start with timers when a download is initiated
-					//Potentionally this seeder was last queried 60 seconds ago for files and otherwise idle but online
-					//todo: lockseeders?
-					for _, seeder := range GetSeeders(fileID) {
-						sessionmanager.UpdateActivity(seeder)
-					}
-				}
+			for dbFile.IsPaused {
+				return
 			}
 
 			//Create a async job to download a chunk

@@ -90,14 +90,15 @@ func SetFilePause(Hashes []string, State bool) {
 		if err != nil {
 			pushNotification("Failed To Pause", "Could not find the file to pause.")
 		}
-		file.IsPaused = State
-		dbInsertFile(*file)
 
-		msg := "Paused"
-		if !State {
-			msg = "Resumed"
+		if file.IsPaused != State {
+			file.IsPaused = State
+			dbInsertFile(*file)
+
+			if !file.IsPaused && file.IsDownloading {
+				go restartDownload(file.FileHash)
+			}
 		}
-		pushNotification("Download "+msg, file.FileName)
 	}
 }
 

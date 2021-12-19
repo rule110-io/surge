@@ -251,7 +251,7 @@ func restartDownload(Hash string) {
 	rand.Seed(time.Now().UnixNano())
 	rand.Shuffle(numChunks, func(i, j int) { missingChunks[i], missingChunks[j] = missingChunks[j], missingChunks[i] })
 
-	log.Println("Restarting Download Creation Session for", file.FileName)
+	log.Println("Restarting Download for", file.FileName)
 
 	downloadChunks(file, missingChunks)
 }
