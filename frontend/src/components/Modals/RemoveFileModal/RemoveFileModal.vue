@@ -21,7 +21,7 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 import FormMixin from "@/mixins/FormMixin.js";
 
@@ -48,6 +48,9 @@ export default {
   },
   mounted() {},
   methods: {
+    ...mapActions({
+      clearSelectedFiles: "files/clearSelectedFiles",
+    }),
     clearModal() {
       this.fromDisk = false;
     },
@@ -56,6 +59,7 @@ export default {
         this.activeFile.FileHash,
         this.fromDisk
       ).then(() => {
+        this.clearSelectedFiles();
         let newConfig = Object.assign({}, this.localFilesConfig);
         newConfig.skip = 0;
         this.$store.commit("files/setLocalFilesConfig", newConfig);
