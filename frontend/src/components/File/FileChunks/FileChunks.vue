@@ -36,7 +36,7 @@ export default {
       const isNewFileHash = !this._.isEmpty(newFileHash);
 
       if (isNewFileHash) {
-        this.drawProgress(newFileHash.ChunkMap);
+        this.getChunkMap();
       }
     },
     "file.FileHash": {
