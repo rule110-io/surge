@@ -19,7 +19,7 @@
 </style>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations, mapActions } from "vuex";
 
 import Header from "@/components/Header/Header";
 import NetworkStats from "@/components/NetworkStats/NetworkStats";
@@ -39,8 +39,30 @@ export default {
     return {};
   },
   computed: {
-    ...mapState("files", ["remoteFiles", "localFiles"]),
+    ...mapState("files", ["remoteFiles", "localFiles", "selectedFiles"]),
   },
-  methods: {},
+  watch: {
+    selectedFiles(newFiles) {
+      if (!newFiles.length) {
+        this.closeDetails();
+      }
+    },
+    $route() {
+      this.clearSelectedFiles();
+    },
+  },
+  methods: {
+    ...mapMutations({
+      setFileDetails: "files/setFileDetails",
+      setFileSpeed: "files/setFileSpeed",
+    }),
+    ...mapActions({
+      clearSelectedFiles: "files/clearSelectedFiles",
+    }),
+    closeDetails() {
+      this.setFileDetails(false);
+      this.setFileSpeed(false);
+    },
+  },
 };
 </script>

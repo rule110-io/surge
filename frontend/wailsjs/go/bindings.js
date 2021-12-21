@@ -141,6 +141,13 @@ const go = {
         return window.go.surge.MiddlewareFunctions.SeedFile(arg1);
       },
       /**
+       * SetDownloadFolder
+       * @returns {Promise<boolean>}  - Go Type: bool
+       */
+      "SetDownloadFolder": () => {
+        return window.go.surge.MiddlewareFunctions.SetDownloadFolder();
+      },
+      /**
        * SetDownloadPause
        * @param {Array<string>} arg1 - Go Type: []string
        * @param {boolean} arg2 - Go Type: bool

@@ -73,13 +73,8 @@
 
   &__seeders {
     display: grid;
-    gap: 10px;
-
-    &-row {
-      display: grid;
-      grid-template-columns: max-content max-content;
-      gap: $padding-llg;
-    }
+    gap: 10px $padding-llg;
+    grid-template-columns: repeat(4, max-content);
 
     &-value {
       font-size: $fz-md;

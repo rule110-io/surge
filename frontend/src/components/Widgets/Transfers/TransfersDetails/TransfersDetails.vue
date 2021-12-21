@@ -85,22 +85,35 @@
         </div>
       </div>
       <div class="transfers-details__seeders" v-show="activeTab === 'Seeders'">
-        <div class="transfers-details__seeders-row">
-          <div class="transfers-details__seeders-heading">#</div>
-          <div class="transfers-details__seeders-heading">Pubkey</div>
-        </div>
-        <div
+        <div class="transfers-details__seeders-heading">#</div>
+        <div class="transfers-details__seeders-heading">Pubkey</div>
+        <div class="transfers-details__seeders-heading">Last Activity</div>
+        <div class="transfers-details__seeders-heading">Workers</div>
+
+        <template
           class="transfers-details__seeders-row"
           v-for="(item, i) in activeFileDetails.Seeders"
-          :key="i"
         >
-          <div class="transfers-details__seeders-value">
+          <div class="transfers-details__seeders-value" :key="i">
             {{ i + 1 }}
           </div>
-          <div class="transfers-details__seeders-value">
-            {{ item }}
+          <div class="transfers-details__seeders-value" :key="i">
+            {{ item.PublicKey }}
           </div>
-        </div>
+
+          <div class="transfers-details__seeders-value" :key="i">
+            <template v-if="item.LastActivity === -1"> -</template>
+            <template v-else>
+              {{ $moment(item.LastActivity * 1000).fromNow() }}
+            </template>
+          </div>
+          <div
+            class="transfers-details__seeders-value text_align_center"
+            :key="i"
+          >
+            {{ item.Workers }}
+          </div>
+        </template>
       </div>
     </template>
   </TransfersInfoCard>
