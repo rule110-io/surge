@@ -62,7 +62,7 @@ func GetSessionsString() string {
 }
 
 //GetSession returns a session for given address
-func GetSession(Address string, timeoutInSeconds int) (*Session, error) {
+func GetSession(Address string) (*Session, error) {
 	defer func() {
 		if r := recover(); r != nil {
 			fmt.Printf("Panic: %+v\n", r)
@@ -86,21 +86,26 @@ func GetSession(Address string, timeoutInSeconds int) (*Session, error) {
 			return nil, err
 		}
 	}
-	/*
-		if exists {
-			//If the sessions exists, check if its still active, if not dump it and try to create a new one.
-			elapsedSinceLastActivity := time.Now().Unix() - session.LastActivityUnix
-			if elapsedSinceLastActivity > int64(timeoutInSeconds) {
-				closeSession(Address)
 
-				session, err = createSession(Address)
-				if err == nil {
-					sessionLockMapLock.Lock()
-					sessionMap[Address] = session
-					sessionLockMapLock.Unlock()
-				}
-			}
-		}*/
+	return session, nil
+}
+
+func ReplaceSession(Address string) (*Session, error) {
+	defer func() {
+		if r := recover(); r != nil {
+			fmt.Printf("Panic: %+v\n", r)
+		}
+	}()
+
+	session, err := createSession(Address)
+
+	if err == nil {
+		sessionLockMapLock.Lock()
+		sessionMap[Address] = session
+		sessionLockMapLock.Unlock()
+	} else {
+		return nil, err
+	}
 
 	return session, nil
 }
@@ -137,13 +142,19 @@ func GetExistingSessionWithoutClosing(Address string, timeoutInSeconds int) (*Se
 	return session, exists
 }
 
+//GetExistingSessionWithoutClosing does not attempt to create a connection only returns existing
+func FetchSession(Address string) *Session {
+	session := sessionMap[Address]
+	return session
+}
+
 //CloseSession handles session termination and removes from map
-/*func CloseSession(address string) {
-	lockSession(Address)
-	defer unlockSession(Address)
+func CloseSession(address string) {
+	lockSession(address)
+	defer unlockSession(address)
 
 	closeSession(address)
-}*/
+}
 
 //AcceptSession accepts a incoming session connection
 func AcceptSession(acceptedConnection net.Conn) *Session {

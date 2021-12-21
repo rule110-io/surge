@@ -20,10 +20,10 @@ const (
 	NknClientDialTimeout = 10000
 
 	//WorkerChunkReceiveTimeout is the time till a chunk request is considered a timeout and the chunk is requeued
-	WorkerChunkReceiveTimeout = 60 //seconds
+	WorkerChunkReceiveTimeout = 30 //seconds
 
 	//WorkerGetSessionTimeout when the session activity is older than this value the worker considers the session lost and moves on
-	WorkerGetSessionTimeout = 10 //seconds
+	WorkerGetSessionTimeout = 30 //seconds
 
 	//GetSessionDialTimeout time till dial timeout
 	GetSessionDialTimeout = 60

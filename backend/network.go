@@ -70,6 +70,8 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 
 	seederAlternator := 0
 	appendChunkLock := sync.Mutex{}
+	recreateSessionLock := sync.Mutex{}
+	lastRecreateTime := int64(0)
 
 	//Give the seeder a fair start with timers when a download is initiated
 	//Potentionally this seeder was last queried 60 seconds ago for files and otherwise idle but online
@@ -87,9 +89,19 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 		defer terminate(terminateFlag)
 
 		for i := 0; i < numChunks; i++ {
+			fmt.Println(numChunks)
 			fmt.Println(string("\033[36m"), "Preparing Chunk Fetch", string("\033[0m"))
 
 			dbFile, err := dbGetFile(fileID)
+
+			//DEBUG CODE REMOVE THIS SUPER INEFFICIENT:
+			/*var missingChunks []int
+			for i := 0; i < dbFile.NumChunks; i++ {
+				if !bitmap.Get(dbFile.ChunkMap, i) {
+					missingChunks = append(missingChunks, i)
+				}
+			}
+			fmt.Println(missingChunks)*/
 
 			//Check if file is still tracked in surge
 			if err != nil {
@@ -104,19 +116,8 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 
 			//Create a async job to download a chunk
 			requestChunkJob := func(chunkID int, downloadSeederAddr string) {
-
-				success := false
-
-				session, err := sessionmanager.GetSession(downloadSeederAddr, constants.WorkerGetSessionTimeout)
-
-				if err == nil {
-					success = RequestChunk(session, fileID, int32(chunkID))
-				} else {
-					success = false
-				}
-
-				//if download fails append the chunk to remaining to retry later
-				if !success {
+				requeue := func() {
+					fmt.Println("Chunk ID", chunkID, " failed, and is being listed to be fetched again.")
 					appendChunkLock.Lock()
 					randomChunks = append(randomChunks, chunkID)
 					numChunks++
@@ -129,8 +130,23 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 						workerMap[downloadSeederAddr] = 0
 					}
 					mutexes.WorkerMapLock.Unlock()
+				}
 
-					//return out of job
+				recreateSessionLock.Lock()
+				session, err := sessionmanager.GetSession(downloadSeederAddr)
+				recreateSessionLock.Unlock()
+
+				successRequest := false
+				if err == nil {
+					successRequest = RequestChunk(session, fileID, int32(chunkID))
+				} else {
+					//No session could be made, drop the file seeder.
+					RemoveFileSeeder(fileID, downloadSeederAddr)
+				}
+
+				//if download fails return
+				if !successRequest {
+					requeue()
 					return
 				}
 
@@ -150,19 +166,13 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 					time.Sleep(time.Second)
 
 					//Check if connection is lost
-					_, sessionExists := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout)
-					if !sessionExists {
-						//if session no longer exists
-						fmt.Println(string("\033[36m"), "session no longer exists while waiting for chunk to arrive for", downloadSeederAddr, string("\033[0m"))
-
-						fmt.Println(string("\033[36m"), "Attempting to reconnect with a new session", downloadSeederAddr, string("\033[0m"))
-						_, err := sessionmanager.GetSession(downloadSeederAddr, 10)
-						if err == nil {
-							sleepWorker = false
-						}
+					/*existingSession, any := sessionmanager.GetExistingSession(downloadSeederAddr, constants.WorkerGetSessionTimeout)
+					if existingSession == nil || !any {
+						fmt.Println(string("\033[36m"), "No session with remote client available while waiting for requested chunk to arrive.", downloadSeederAddr, string("\033[0m"))
 						inTransit = true
+						sleepWorker = false
 						break
-					}
+					}*/
 
 					//Check if received
 					mutexes.ChunkInTransitLock.Lock()
@@ -170,7 +180,7 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 					mutexes.ChunkInTransitLock.Unlock()
 
 					if !isInTransit {
-						//if no longer in transit, continue workers
+						//chunk received! if no longer in transit, continue workers
 						inTransit = false
 						sleepWorker = false
 						break
@@ -180,6 +190,33 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 						fmt.Println(string("\033[36m"), "timeout is triggered, leave in transit.", string("\033[0m"))
 						inTransit = true
 						sleepWorker = false
+
+						//Try replacing the session with a new one.
+						lockTime := time.Now().Unix()
+
+						recreateSessionLock.Lock()
+						if lastRecreateTime > lockTime {
+							//a new session was created.
+							requeue()
+							fmt.Println(string("\033[36m"), "using newly replaced session.", string("\033[0m"))
+							recreateSessionLock.Unlock()
+							return
+						}
+
+						_, err := sessionmanager.ReplaceSession(downloadSeederAddr)
+						lastRecreateTime = time.Now().Unix()
+						recreateSessionLock.Unlock()
+
+						if err == nil {
+							fmt.Println(string("\033[36m"), "session was replaced, continue downloading.", string("\033[0m"))
+						} else {
+							fmt.Println(string("\033[36m"), "a new session could not be created, stop downloading.", string("\033[0m"))
+							//RemoveSeeder(downloadSeederAddr)
+							sessionmanager.CloseSession(downloadSeederAddr)
+							requeue()
+							return
+						}
+
 						break
 					}
 					receiveTimeoutCounter++
@@ -187,32 +224,7 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 
 				//If its still in transit abort
 				if inTransit {
-					appendChunkLock.Lock()
-					randomChunks = append(randomChunks, chunkID)
-					numChunks++
-					appendChunkLock.Unlock()
-
-					//TODO: Remove this clamp, dont double count timeouted arrivals
-					mutexes.WorkerMapLock.Lock()
-					workerMap[downloadSeederAddr]--
-					if workerMap[downloadSeederAddr] < 0 {
-						workerMap[downloadSeederAddr] = 0
-					}
-					mutexes.WorkerMapLock.Unlock()
-
-					//This file was not available at this time from this seeder, drop seeder for file.
-					/*mutateSeederLock.Lock()
-					for i := 0; i < len(ListedFiles); i++ {
-						if ListedFiles[i].FileHash == fileID {
-							removeStringFromSlicePtr(activeSeeders, downloadSeederAddr)
-							break
-						}
-					}
-					mutateSeederLock.Unlock()*/
-
-					RemoveFileSeeder(fileID, downloadSeederAddr)
-
-					//return out of job
+					requeue()
 					return
 				}
 			}
@@ -223,27 +235,8 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 			spinForSeeder := true
 			for spinForSeeder {
 				for !AnySeeders(fileID) {
+					fmt.Println(string("\033[36m"), "sleeping for seeders.", string("\033[0m"))
 					time.Sleep(time.Second)
-
-					//listingRefreshed := getListedFileByHash(fileID)
-
-					/*if listingRefreshed != nil {
-						newSeeders := getListedFileByHash(fileID).Seeders
-						for _, v := range newSeeders {
-							_, err := sessionmanager.GetSession(v, constants.GetSessionDialTimeout)
-							if err != nil {
-								log.Println(err)
-							} else {
-								mutateSeederLock.Lock()
-								*activeSeeders = append(*activeSeeders, v)
-								mutateSeederLock.Unlock()
-								sessionmanager.UpdateActivity(v)
-							}
-						}
-						mutateSeederLock.Lock()
-						numSeeds = len(*activeSeeders)
-						mutateSeederLock.Unlock()
-					}*/
 				}
 
 				downloadSeederAddr = GetSeeders(fileID)[seederAlternator]
