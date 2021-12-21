@@ -1,6 +1,6 @@
 <template>
   <div class="file-actions" v-on-clickaway="closeDropdown">
-    <div class="file-actions__btn" @click="openDropdown">
+    <div class="file-actions__btn" @click="toggleDropdown">
       <Icon class="file-actions__icon" icon="MoreIcon" />
     </div>
 
@@ -48,6 +48,13 @@ export default {
     },
     closeDropdown() {
       this.dropdownOpen = false;
+    },
+    toggleDropdown() {
+      if (this.dropdownOpen) {
+        this.closeDropdown();
+      } else {
+        this.openDropdown();
+      }
     },
     openRemoveFileModal() {
       this.initActiveFile();

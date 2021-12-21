@@ -27,7 +27,7 @@
           <Icon class="sidebar__stats-icon" :active="false" icon="LockIcon" />
         </div>
         <div class="topic-details__stats-more" v-on-clickaway="closeDropdown">
-          <div class="topic-details__stats-more-btn" @click="openDropdown">
+          <div class="topic-details__stats-more-btn" @click="toggleDropdown">
             <Icon class="topic-details__stats-more-icon" icon="MoreIcon" />
           </div>
 
@@ -112,6 +112,13 @@ export default {
     },
     closeDropdown() {
       this.dropdownOpen = false;
+    },
+    toggleDropdown() {
+      if (this.dropdownOpen) {
+        this.closeDropdown();
+      } else {
+        this.openDropdown();
+      }
     },
     initRemoteSearch() {
       this.remoteSearch = this._.debounce((search) => {
