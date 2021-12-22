@@ -335,7 +335,6 @@ func SearchLocalFile(Query string, filterState FileFilterState, OrderBy string, 
 	resultFiles = resultFiles[left:right]
 	resultListings := []models.FileTransfer{}
 
-	mutexes.ListedFilesLock.Lock()
 	for i := 0; i < len(resultFiles); i++ {
 		listing := models.FileTransfer{
 			FileHash:      resultFiles[i].FileHash,
@@ -361,7 +360,6 @@ func SearchLocalFile(Query string, filterState FileFilterState, OrderBy string, 
 		resultListings = append(resultListings, listing)
 
 	}
-	mutexes.ListedFilesLock.Unlock()
 
 	return PagedQueryResult{
 		Result: resultListings,
