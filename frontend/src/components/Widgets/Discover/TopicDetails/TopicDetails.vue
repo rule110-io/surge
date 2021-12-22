@@ -47,10 +47,10 @@
     <div class="topic-details__bot">
       <Input
         class="topic-details__search"
-        :value="searchQuery"
+        v-model="searchQuery"
         icon="SearchIcon"
-        placeholder="Search or enter file hash"
-        @update="remoteSearch(searchQuery)"
+        placeholder="Filter files..."
+        @update="remoteSearch"
       />
     </div>
   </div>
@@ -87,6 +87,8 @@ export default {
   watch: {
     "remoteFilesConfig.topicName"(newVal) {
       this.getTopicDetails(newVal);
+      this.searchQuery = "";
+      this.remoteSearch();
     },
   },
   created() {
@@ -121,11 +123,10 @@ export default {
       }
     },
     initRemoteSearch() {
-      this.remoteSearch = this._.debounce((search) => {
+      this.remoteSearch = this._.debounce(() => {
         let newConfig = Object.assign({}, this.remoteFilesConfig);
         newConfig.skip = 0;
-        newConfig.search = search;
-
+        newConfig.search = this.searchQuery;
         this.setRemoteFilesConfig(newConfig);
         this.fetchRemoteFiles();
       }, 500);

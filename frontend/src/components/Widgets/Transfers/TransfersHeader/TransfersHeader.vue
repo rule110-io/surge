@@ -3,9 +3,10 @@
     <Tabs title="Status" :tabs="filters" :active-tab.sync="activeFilter" />
     <Input
       class="transfers-header__search"
-      :value="searchQuery"
+      v-model="searchQuery"
       icon="SearchIcon"
       placeholder="Filter files..."
+      @update="localSearch"
     />
   </div>
 </template>
@@ -15,7 +16,7 @@
 </style>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapActions, mapMutations } from "vuex";
 
 import Input from "@/components/Controls/Input/Input";
 import Tabs from "@/components/Tabs/Tabs";
@@ -27,6 +28,7 @@ export default {
       searchQuery: "",
       filters: ["All", "Downloading", "Seeding", "Completed", "Paused"],
       activeFilter: "",
+      localSearch: () => {},
     };
   },
   computed: {
@@ -45,8 +47,29 @@ export default {
       this.$store.dispatch("files/fetchLocalFiles");
     },
   },
+  created() {
+    this.initLocalSearch();
+  },
   mounted() {
     this.activeFilter = "All";
+    this.localSearch();
+  },
+  methods: {
+    ...mapActions({
+      fetchLocalFiles: "topics/fetchLocalFiles",
+    }),
+    ...mapMutations({
+      setLocalFilesConfig: "files/setLocalFilesConfig",
+    }),
+    initLocalSearch() {
+      this.localSearch = this._.debounce(() => {
+        let newConfig = Object.assign({}, this.localFilesConfig);
+        newConfig.skip = 0;
+        newConfig.search = this.searchQuery;
+        this.setLocalFilesConfig(newConfig);
+        this.fetchLocalFiles();
+      }, 500);
+    },
   },
 };
 </script>
