@@ -180,8 +180,6 @@ export default {
       window.go.surge.MiddlewareFunctions.GetFileDetails(file.FileHash).then(
         (resp) => {
           this.activeFileDetails = { ...file, ...resp };
-
-          console.log(this.activeFileDetails);
         }
       );
     },

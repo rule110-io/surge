@@ -41,7 +41,6 @@ export default {
     },
     "file.FileHash": {
       handler(newHash) {
-        console.log(newHash);
         if (!newHash) return;
 
         this.getChunkMap();

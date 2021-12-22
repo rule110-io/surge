@@ -38,8 +38,6 @@ export default {
     activeFilter(newStatus) {
       const filterCode = this._.indexOf(this.filters, newStatus);
 
-      console.log(filterCode);
-
       let newConfig = Object.assign({}, this.localFilesConfig);
       newConfig.filter = filterCode;
       this.$store.commit("files/setLocalFilesConfig", newConfig);

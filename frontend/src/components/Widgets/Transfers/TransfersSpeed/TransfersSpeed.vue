@@ -2,7 +2,9 @@
   <TransfersInfoCard class="transfers-spped" :active="fileSpeed" title="Speed">
     <template slot="info"> </template>
 
-    <template slot="body"> </template>
+    <template slot="body">
+      <BandwidthChart :file="lastSelected" />
+    </template>
   </TransfersInfoCard>
 </template>
 
@@ -14,9 +16,10 @@
 import { mapState } from "vuex";
 
 import TransfersInfoCard from "@/components/Widgets/Transfers/TransfersInfoCard/TransfersInfoCard";
+import BandwidthChart from "@/components/BandwidthChart/BandwidthChart";
 
 export default {
-  components: { TransfersInfoCard },
+  components: { TransfersInfoCard, BandwidthChart },
   computed: {
     ...mapState("files", ["fileSpeed", "selectedFiles"]),
   },
