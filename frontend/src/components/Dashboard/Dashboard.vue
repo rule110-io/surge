@@ -48,7 +48,7 @@ export default {
       }
     },
     $route() {
-      this.clearSelectedFiles();
+      this.closeDetails();
     },
   },
   methods: {

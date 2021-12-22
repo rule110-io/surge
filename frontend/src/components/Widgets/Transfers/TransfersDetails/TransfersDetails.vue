@@ -30,6 +30,12 @@
           :file="activeFileDetails"
         />
         <div class="transfers-details__info">
+          <div class="transfers-details__info-item" style="grid-column: span 4">
+            <div class="transfers-details__info-left">File Hash</div>
+            <div class="transfers-details__info-right">
+              {{ activeFileDetails.FileHash }}
+            </div>
+          </div>
           <div class="transfers-details__info-item">
             <div class="transfers-details__info-left">Downloaded</div>
             <div class="transfers-details__info-right">
