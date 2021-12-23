@@ -54,7 +54,7 @@ export default {
   },
   methods: {
     ...mapActions({
-      fetchLocalFiles: "topics/fetchLocalFiles",
+      fetchLocalFiles: "files/fetchLocalFiles",
     }),
     ...mapMutations({
       setLocalFilesConfig: "files/setLocalFilesConfig",
