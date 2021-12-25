@@ -29,8 +29,10 @@ export default {
         return "Seeding";
       } else if (this.file.IsAvailable) {
         return "Completed";
+      } else if (this.file.IsHashing) {
+        return "Hashing";
       } else {
-        return "All";
+        return "-";
       }
     },
   },

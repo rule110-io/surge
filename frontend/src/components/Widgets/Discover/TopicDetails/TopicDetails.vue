@@ -4,7 +4,7 @@
     v-if="remoteFilesConfig.topicName.length && topicDetails"
   >
     <div class="topic-details__top">
-      <div class="topic-details__title">
+      <div class="topic-details__title selectable">
         <ShieldIcon
           v-if="topicDetails.Name === officialTopicName"
           class="topic-details__title-icon"

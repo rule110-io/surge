@@ -1,6 +1,6 @@
 <template>
   <div
-    class="file-hash"
+    class="file-hash selectable"
     :class="copied ? 'file-hash_active' : null"
     data-label="Copied"
     v-tooltip="{

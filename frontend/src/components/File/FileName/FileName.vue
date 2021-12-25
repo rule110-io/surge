@@ -1,8 +1,8 @@
 <template>
-  <div class="file-name">
+  <div class="file-name selectable">
     <component v-if="!nameOnly" :is="icon" class="file-name__icon"></component>
     <div
-      class="file-name__title text_wrap_none"
+      class="file-name__title text_wrap_none selectable"
       v-tooltip="{
         classes: 'tooltip_left',
         content: file.FileName,

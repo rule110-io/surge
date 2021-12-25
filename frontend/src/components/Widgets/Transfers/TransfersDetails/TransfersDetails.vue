@@ -32,7 +32,7 @@
         <div class="transfers-details__info">
           <div class="transfers-details__info-item" style="grid-column: span 4">
             <div class="transfers-details__info-left">File Hash</div>
-            <div class="transfers-details__info-right">
+            <div class="transfers-details__info-right selectable">
               {{ activeFileDetails.FileHash }}
             </div>
           </div>
