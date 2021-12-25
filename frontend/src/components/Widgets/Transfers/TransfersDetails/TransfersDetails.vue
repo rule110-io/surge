@@ -174,7 +174,13 @@ export default {
       }
     },
   },
-  mounted() {},
+  mounted() {
+    if (this.selectedFiles.length) {
+      this.getActiveFileDetails(
+        this.selectedFiles[this.selectedFiles.length - 1]
+      );
+    }
+  },
   methods: {
     getActiveFileDetails(file) {
       window.go.surge.MiddlewareFunctions.GetFileDetails(file.FileHash).then(
