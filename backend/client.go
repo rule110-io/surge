@@ -389,6 +389,12 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 //SeedFilepath generates everything needed to seed a file
 func SeedFilepath(Path string, Topic string) bool {
 
+	permissions := GetTopicPermissions(Topic, GetAccountAddress())
+
+	if !permissions.CanWrite {
+		pushError("Seed File Error", "no write permission for this topic.")
+	}
+
 	log.Println("Seeding file", Path)
 
 	b := make([]byte, 16)
@@ -427,7 +433,7 @@ func SeedFilepath(Path string, Topic string) bool {
 	_, err = dbGetFile(localFile.FileHash)
 	if err == nil {
 		//File already seeding
-		pushError("Seed failed", fileName+" already seeding.")
+		pushError("Seed File Error", fileName+" already seeding.")
 		return false
 	}
 
