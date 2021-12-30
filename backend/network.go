@@ -246,7 +246,7 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 				seedWorkerNum := workerMap[downloadSeederAddr]
 				mutexes.WorkerMapLock.Unlock()
 
-				if seedWorkerNum >= constants.NumWorkers {
+				if seedWorkerNum >= getNumberWorkers() {
 					seederAlternator++
 					if seederAlternator > len(GetSeeders(fileID))-1 {
 						seederAlternator = 0

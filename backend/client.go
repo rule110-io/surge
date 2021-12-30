@@ -89,7 +89,7 @@ func InitializeClient(args []string) bool {
 	var err error
 
 	account := InitializeAccount()
-	client, err = nkn.NewMultiClient(account, "", constants.NumClients, false, &nkn.ClientConfig{
+	client, err = nkn.NewMultiClient(account, "", getNumberClients(), false, &nkn.ClientConfig{
 		ConnectRetries:    1000,
 		SeedRPCServerAddr: GetBootstrapRPC(),
 	})
@@ -443,17 +443,4 @@ func SeedFilepath(Path string, Topic string) bool {
 	go hashFile(randomHash)
 
 	return true
-}
-
-func getDownloadFolderPath() (string, error) {
-	folder, err := DbReadSetting("downloadFolder")
-	if err == nil && len(folder) > 0 {
-		return folder, nil
-	} else {
-		folder, err = platform.GetRemoteFolder()
-		if err == nil {
-			return folder, nil
-		}
-	}
-	return "", err
 }

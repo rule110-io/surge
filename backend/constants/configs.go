@@ -9,21 +9,20 @@
 
 package constants
 
-import "time"
-
 const (
 	//ChunkSize is size of chunk in bytes (1024 kB)
 	ChunkSize = 1024 * 1024
 
 	//NumClients is the number of NKN clients
-	NumClients = 8
+	NumClients    = 8
+	NumClientsMin = 1
+	NumClientsMax = 8
 
 	//NumWorkers is the total number of concurrent chunk fetches allowed
-	NumWorkers = 8
+	NumWorkers    = 8
+	NumWorkersMin = 1
+	NumWorkersMax = 12
 
 	//duration of a subscription blocktime is ~20sec
 	SubscriptionDuration = 180
-
-	//RescanPeerInterval the frequency of which subscriptions and file queries are polled
-	RescanPeerInterval = time.Minute
 )
