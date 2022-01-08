@@ -14,7 +14,7 @@ const (
 	ChunkSize = 1024 * 1024
 
 	//NumClients is the number of NKN clients
-	NumClients    = 8
+	NumClients    = 4
 	NumClientsMin = 1
 	NumClientsMax = 8
 

@@ -3,10 +3,12 @@ package main
 import (
 	"embed"
 	"os"
+	"strconv"
 
 	"log"
 
 	surge "github.com/rule110-io/surge/backend"
+	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/platform"
 	"github.com/wailsapp/wails/v2"
 	"github.com/wailsapp/wails/v2/pkg/logger"
@@ -60,6 +62,15 @@ func main() {
 		//set tour to active and default mode to light
 		surge.DbWriteSetting("Tour", "true")
 		surge.DbWriteSetting("DarkMode", "false")
+	}
+
+	//check if one of the v2 settings has been set.
+	_, err = surge.DbReadSetting("numClients")
+	if err != nil {
+		dFolder, _ := platform.GetRemoteFolder()
+		surge.DbWriteSetting("downloadFolder", dFolder)
+		surge.DbWriteSetting("numClients", strconv.Itoa(constants.NumClients))
+		surge.DbWriteSetting("numWorkers", strconv.Itoa(constants.NumWorkers))
 	}
 
 	surge.StartClient(arguments)

@@ -7,7 +7,8 @@ import (
 	"github.com/rule110-io/surge/backend/platform"
 )
 
-func getDownloadFolderPath() (string, error) {
+//GetDownloadFolderPath uses the folder setting, or default donwload folder fallback.
+func GetDownloadFolderPath() (string, error) {
 	folder, err := DbReadSetting("downloadFolder")
 	if err == nil && len(folder) > 0 {
 		return folder, nil
