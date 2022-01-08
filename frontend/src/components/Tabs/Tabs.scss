@@ -52,9 +52,5 @@
         background: $primary-gradient;
       }
     }
-
-    &:not(:last-child) {
-      margin-right: $padding-sm;
-    }
   }
 }

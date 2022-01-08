@@ -17,6 +17,7 @@ export default {
     this.$bus.$off(this.openModalEvent);
   },
   methods: {
+    clearModal() {},
     openModal() {
       this.showModal = true;
     },

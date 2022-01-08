@@ -11,6 +11,7 @@
     <AddTopicModal openModalEvent="openAddTopicModal" />
     <AddFileModal openModalEvent="openAddFileModal" />
     <RemoveFileModal openModalEvent="openRemoveFileModal" />
+    <SettingsModal openModalEvent="openSettingsModal" />
   </div>
 </template>
 
@@ -26,6 +27,7 @@ import NetworkStats from "@/components/NetworkStats/NetworkStats";
 import AddTopicModal from "@/components/Modals/AddTopicModal/AddTopicModal";
 import AddFileModal from "@/components/Modals/AddFileModal/AddFileModal";
 import RemoveFileModal from "@/components/Modals/RemoveFileModal/RemoveFileModal";
+import SettingsModal from "@/components/Modals/SettingsModal/SettingsModal";
 
 export default {
   components: {
@@ -34,6 +36,7 @@ export default {
     AddTopicModal,
     AddFileModal,
     RemoveFileModal,
+    SettingsModal,
   },
   data: () => {
     return {};

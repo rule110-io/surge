@@ -17,7 +17,11 @@
       />
       <div class="header__notifications-marker" v-show="counter"></div>
       <Notifications />
-      <Icon class="header__icon" icon="SettingsIcon" />
+      <Icon
+        @click.native="openSettingsModal"
+        class="header__icon"
+        icon="SettingsIcon"
+      />
     </div>
   </header>
 </template>
@@ -64,6 +68,9 @@ export default {
   methods: {
     openAddFileModal() {
       this.$bus.$emit("openAddFileModal");
+    },
+    openSettingsModal() {
+      this.$bus.$emit("openSettingsModal");
     },
     toggleNotifications() {
       this.$store.commit("notifications/toggleNotifications", !this.open);

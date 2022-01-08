@@ -9,6 +9,16 @@
     display: block;
   }
 
+  &__descr {
+    font-family: Inter;
+    font-style: normal;
+    font-weight: normal;
+    font-size: $fz-sm;
+    line-height: 16px;
+    color: $grey;
+    margin-bottom: $padding-md;
+  }
+
   &__row {
     display: flex;
     align-items: center;
