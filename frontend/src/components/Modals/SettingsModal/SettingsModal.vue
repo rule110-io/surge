@@ -155,7 +155,7 @@ export default {
       window.go.surge.MiddlewareFunctions.SetDownloadFolder();
     },
     getDownloadPath() {
-      window.go.surge.MiddlewareFunctions.ReadSetting("downloadPath").then(
+      window.go.surge.MiddlewareFunctions.ReadSetting("downloadFolder").then(
         (res) => {
           this.downloadPath = res;
           console.log(res);
