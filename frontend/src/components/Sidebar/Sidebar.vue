@@ -5,7 +5,7 @@
         <Icon class="sidebar__control-icon" icon="PlusIcon"></Icon>Add New Topic
       </div>
     </div>
-    <div class="sidebar__title">Subsribed</div>
+    <div class="sidebar__title">Subscribed</div>
 
     <div class="sidebar__items">
       <div
