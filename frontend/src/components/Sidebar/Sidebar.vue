@@ -10,7 +10,7 @@
     <div class="sidebar__items">
       <div
         class="sidebar__item"
-        v-for="(topic, i) in topics"
+        v-for="(topic, i) in topicNames"
         :key="i"
         @click="setRemoteFilesTopic(topic)"
         :class="
@@ -42,6 +42,9 @@ export default {
   computed: {
     ...mapState("topics", ["topics"]),
     ...mapState("files", ["remoteFilesConfig"]),
+    topicNames() {
+      return this._.map(this.topics, "Name");
+    },
   },
   mounted() {},
   methods: {

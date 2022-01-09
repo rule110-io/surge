@@ -5,7 +5,7 @@
       <ControlWrapper title="Topic name">
         <Select
           v-model="topicName"
-          :items="topics"
+          :items="allowedTopics"
           placeholder="Select topic"
         />
       </ControlWrapper>
@@ -45,6 +45,12 @@ export default {
     ...mapState("topics", ["topics"]),
     disabled() {
       return !this.topicName.length;
+    },
+    allowedTopics() {
+      return this._.map(
+        this._.filter(this.topics, ["Permissions.CanWrite", true]),
+        "Name"
+      );
     },
   },
   mounted() {},
