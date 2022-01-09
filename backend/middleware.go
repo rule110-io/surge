@@ -1,8 +1,6 @@
 package surge
 
 import (
-	"sort"
-
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
@@ -116,17 +114,8 @@ func (s *MiddlewareFunctions) UnsubscribeFromTopic(Topic string) {
 	unsubscribeFromSurgeTopic(Topic)
 }
 
-func (s *MiddlewareFunctions) GetTopicSubscriptions() []string {
-	topicNames := []string{}
-
-	mutexes.TopicsMapLock.Lock()
-	for _, v := range topicsMap {
-		topicNames = append(topicNames, v.Name)
-	}
-	mutexes.TopicsMapLock.Unlock()
-	sort.Strings(topicNames)
-
-	return topicNames
+func (s *MiddlewareFunctions) GetTopicSubscriptions() []models.TopicInfo {
+	return GetTopicsWithPermissions()
 }
 
 type FileDetails struct {

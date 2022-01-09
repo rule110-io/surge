@@ -3,6 +3,7 @@ package surge
 import (
 	"encoding/json"
 	"log"
+	"sort"
 
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
@@ -126,4 +127,28 @@ func GetTopicPermissions(topicName string, clientAddr string) models.TopicPermis
 			CanWrite: false,
 		}
 	}
+}
+
+func GetTopicsWithPermissions() []models.TopicInfo {
+	topicNames := []string{}
+
+	mutexes.TopicsMapLock.Lock()
+	for _, v := range topicsMap {
+		topicNames = append(topicNames, v.Name)
+	}
+	mutexes.TopicsMapLock.Unlock()
+	sort.Strings(topicNames)
+
+	//Get objects from names
+	modelData := []models.TopicInfo{}
+
+	for _, v := range topicNames {
+		entry := models.TopicInfo{
+			Name:        v,
+			Permissions: GetTopicPermissions(v, GetAccountAddress()),
+		}
+		modelData = append(modelData, entry)
+	}
+
+	return modelData
 }
