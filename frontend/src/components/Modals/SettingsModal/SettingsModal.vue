@@ -8,14 +8,11 @@
     <template slot="body">
       <ModalGrid>
         <ControlWrapper title="Download Folder">
-          <div class="settings__path">
+          <div class="settings__path" @click="setDownloadFolder">
             <div class="settings__path-control">
               {{ downloadPath || "No path specified" }}
             </div>
-            <PathIcon
-              @click.native="setDownloadFolder"
-              class="settings__path-icon"
-            />
+            <PathIcon class="settings__path-icon" />
           </div>
         </ControlWrapper>
         <ControlWrapper title="Workers per client">
@@ -152,13 +149,14 @@ export default {
       window.go.surge.MiddlewareFunctions.WriteSetting(`${k}`, `${v}`);
     },
     setDownloadFolder() {
-      window.go.surge.MiddlewareFunctions.SetDownloadFolder();
+      window.go.surge.MiddlewareFunctions.SetDownloadFolder().then(() => {
+        this.getDownloadPath();
+      });
     },
     getDownloadPath() {
       window.go.surge.MiddlewareFunctions.ReadSetting("downloadFolder").then(
         (res) => {
           this.downloadPath = res;
-          console.log(res);
         }
       );
     },
