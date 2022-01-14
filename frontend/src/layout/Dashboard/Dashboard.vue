@@ -1,12 +1,10 @@
 <template>
   <div class="main__wrapper">
-    <div class="main__tour" v-if="tour"></div>
+    <!-- <div class="main__tour" v-if="tour"></div> -->
     <Dashboard />
   </div>
 </template>
 <script>
-// const runtime = require("@wailsapp/runtime");
-
 import { mapState, mapActions } from "vuex";
 
 import Dashboard from "@/components/Dashboard/Dashboard";
