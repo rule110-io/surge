@@ -105,5 +105,23 @@
         border: $border-primary;
       }
     }
+
+    &_transparent {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: $white;
+
+      svg {
+        path {
+          stroke: $white;
+        }
+      }
+
+      &:hover {
+        color: $white;
+        background: $primary;
+        border: $border-primary;
+      }
+    }
   }
 }

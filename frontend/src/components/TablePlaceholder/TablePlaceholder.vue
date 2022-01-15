@@ -1,23 +1,17 @@
 <template>
   <div class="table-placeholder">
+    <TablePlaceholderIcon />
     <div class="table-placeholder__title">
-      <template v-if="type === 'transfer'">
-        No files are currently being transferred. <br />
-        Share something with the `+` icon below, or use search to browse.
-      </template>
-      <template v-if="type === 'search'">
-        No search results for '{{ search }}'. <br />
-        But you can share something with the `+` icon below.
-      </template>
-      <template v-if="type === 'local'">
-        Currently there are no local files. <br />
-        Share something with the `+` icon below, or use search to browse.
-      </template>
-      <template v-if="type === 'remote'">
-        Currently there are no remote files. <br />
-        Share something with the `+` icon below, or use search to browse.
-      </template>
+      Start by subscribing to channels and browsing files in the Discover
+      section
     </div>
+    <Button
+      @click="openDiscover"
+      theme="transparent"
+      size="md"
+      icon="DiscoverIcon"
+      >Discover</Button
+    >
   </div>
 </template>
 
@@ -26,27 +20,19 @@
 </style>
 
 <script>
-import { mapState } from "vuex";
+import TablePlaceholderIcon from "@/assets/icons/TablePlaceholderIcon.svg";
+import Button from "@/components/Button/Button";
 
 export default {
-  props: {
-    type: {
-      type: String,
-      default: "remote",
-    },
-  },
-  components: {},
-  computed: {
-    ...mapState("files", ["remoteFilesConfig", "localFilesConfig"]),
-    search() {
-      return this.$route.name === "download"
-        ? this.localFilesConfig.search
-        : this.remoteFilesConfig.search;
-    },
-  },
+  components: { TablePlaceholderIcon, Button },
+  computed: {},
   data: () => {
     return {};
   },
-  methods: {},
+  methods: {
+    openDiscover() {
+      this.$router.push("/discover");
+    },
+  },
 };
 </script>
