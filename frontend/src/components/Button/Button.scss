@@ -33,7 +33,8 @@
   &:disabled {
     color: rgba($white, 0.2) !important;
     cursor: not-allowed !important;
-    pointer-events: none;
+    background: initial !important;
+    border: 1px solid transparent !important;
   }
 
   &_size {

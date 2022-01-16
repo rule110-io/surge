@@ -17,6 +17,7 @@
         theme="default"
         size="md"
         @click="subscribeAndActivateTopic(topicName)"
+        :disabled="disabled"
         >Add New</Button
       >
     </template>
@@ -41,7 +42,11 @@ export default {
       topicName: "",
     };
   },
-
+  computed: {
+    disabled() {
+      return !this.topicName.length;
+    },
+  },
   mounted() {},
   methods: {
     ...mapActions({
