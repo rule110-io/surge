@@ -31,7 +31,7 @@ export default {
           icon: "TransfersIcon",
         },
         {
-          text: "Discover",
+          text: "Channels",
           route: "discover",
           icon: "DiscoverIcon",
         },

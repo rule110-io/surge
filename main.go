@@ -80,7 +80,7 @@ func main() {
 	wails.Run(&options.App{
 		Title:             "Surge",
 		Width:             1320,
-		Height:            570,
+		Height:            780,
 		MinWidth:          840,
 		MinHeight:         580,
 		DisableResize:     false,
