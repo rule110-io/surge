@@ -1,6 +1,6 @@
 <template>
   <Modal :show.sync="showModal" @closeAndClear="closeAndClearModal">
-    <template slot="title"> Add New Topic </template>
+    <template slot="title"> Add New Channel </template>
     <template slot="body">
       <ControlWrapper title="Topic name">
         <Input

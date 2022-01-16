@@ -2,11 +2,11 @@
   <Modal :show.sync="showModal" @closeAndClear="closeAndClearModal">
     <template slot="title"> Add New File </template>
     <template slot="body">
-      <ControlWrapper title="Topic name">
+      <ControlWrapper title="Channel name">
         <Select
           v-model="topicName"
           :items="allowedTopics"
-          placeholder="Select topic"
+          placeholder="Select Channel"
         />
       </ControlWrapper>
     </template>

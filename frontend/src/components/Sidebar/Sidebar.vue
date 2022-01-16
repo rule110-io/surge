@@ -2,10 +2,11 @@
   <div class="sidebar">
     <div class="sidebar__controls">
       <div class="sidebar__control" @click="openAddTopicModal">
-        <Icon class="sidebar__control-icon" icon="PlusIcon"></Icon>Add New Topic
+        <Icon class="sidebar__control-icon" icon="PlusIcon"></Icon>Add New
+        Channel
       </div>
     </div>
-    <div class="sidebar__title">Subscribed</div>
+    <div class="sidebar__title">Active</div>
 
     <div class="sidebar__items">
       <div
