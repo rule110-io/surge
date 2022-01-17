@@ -26,7 +26,11 @@
         >
           <Icon class="sidebar__stats-icon" :active="false" icon="LockIcon" />
         </div>
-        <div class="topic-details__stats-more" v-on-clickaway="closeDropdown">
+        <div
+          v-if="topicDetails.Name !== officialTopicName"
+          class="topic-details__stats-more"
+          v-on-clickaway="closeDropdown"
+        >
           <div class="topic-details__stats-more-btn" @click="toggleDropdown">
             <Icon class="topic-details__stats-more-icon" icon="MoreIcon" />
           </div>
