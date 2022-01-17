@@ -5,31 +5,17 @@
   display: flex;
   align-items: center;
 
-  &:after {
-    position: absolute;
-    top: -2px;
-    left: 0;
-    display: inline-block;
-    color: $primary;
-    white-space: nowrap;
-    text-align: center;
-    transform: translate3d(-50%, 0, 0);
-    -webkit-backface-visibility: hidden;
-    opacity: 0.001;
-    content: attr(data-label);
-    font-size: $fz-sm;
-  }
-
   &_active {
-    &:after {
-      animation: floatup 0.5s ease-in-out;
+    .file-hash__icon {
+      path,
+      circle {
+        stroke: $primary !important;
+      }
     }
   }
 
   &:hover & {
     &__icon {
-      transform: translateX(5px);
-
       path,
       circle {
         stroke: $white;
