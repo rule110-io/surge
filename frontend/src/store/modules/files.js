@@ -14,7 +14,7 @@ const getDefaultState = () => {
       orderBy: "FileName",
       isDesc: true,
       skip: 0,
-      get: 8,
+      get: 1000000,
     },
     remoteFilesConfig: {
       topicName: "",
@@ -22,7 +22,7 @@ const getDefaultState = () => {
       orderBy: "SeederCount",
       isDesc: true,
       skip: 0,
-      get: 8,
+      get: 1000000,
     },
     activeFile: {},
     selectedFiles: [],
