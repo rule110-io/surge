@@ -4,7 +4,7 @@
 
 
 ## About
-This is the code of [Surge](https://surge.rule110.io). Surge is a 100% decentralized and secure P2P file sharing client. It utilizes the [NKN blockchain network](https://nkn.org) to send, publish and receive files.  
+This is the code of [Surge](https://getsurge.io). Surge is a 100% decentralized and secure P2P file sharing client. It utilizes the [NKN blockchain network](https://nkn.org) to send, publish and receive files.  
 
 ## Anonymous P2P? Are you kidding me?!
 No, we are not :) 
