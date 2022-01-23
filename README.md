@@ -24,7 +24,7 @@ Besides using our pre-built executables you can build surge by your own.
 
 Prerequisites:
 - A running Golang environment
-- A running [Wails](https://wails.app/gettingstarted/) environment
+- A running [WailsV2](https://wails.io/docs/gettingstarted/installation/) environment
 
 1. clone this repository in your go projects
 2. run ``wails build -p``
