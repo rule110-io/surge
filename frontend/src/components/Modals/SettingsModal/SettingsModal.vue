@@ -17,7 +17,10 @@
         </ControlWrapper>
         <ControlWrapper title="Workers per client">
           <template slot="descr">
-            <div>Workers per client descr</div>
+            <div>
+              Number of parallel workers taking care of Surge tasks. Decreasing
+              can result in more stable connections. <b>(Default: 8)</b>
+            </div>
           </template>
           <div class="settings__slider">
             <VueSlider
@@ -41,7 +44,11 @@
 
         <ControlWrapper title="Number of NKN multiclients">
           <template slot="descr">
-            <div>Number of NKN multiclients descr</div>
+            <div>
+              Number of NKN clients used per thread. A higher number increases
+              reliability and reduces latency at the cost of more bandwidth
+              usage. <b>(Default: 4)</b>
+            </div>
           </template>
           <div class="settings__slider">
             <VueSlider
