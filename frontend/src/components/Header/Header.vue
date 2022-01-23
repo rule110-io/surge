@@ -1,60 +1,29 @@
 <template>
-  <div class="header">
+  <header class="header">
     <div class="header__left">
-      <div
-        :class="['header__search', focus ? 'header__search_active' : '']"
-        id="search_input"
-      >
-        <input
-          type="text"
-          class="header__search-input"
-          placeholder="Search for file name or hash..."
-          @focus="focus = true"
-          @blur="focus = false"
-          v-model.trim="searchQuery"
-          @input="
-            currentRoute === 'download'
-              ? localSearch(searchQuery)
-              : remoteSearch(searchQuery)
-          "
-        />
-        <div class="header__search-right">
-          <feather class="header__search-icon" type="search"></feather>
-        </div>
-      </div>
+      <Logo class="header__logo" />
+      <Navigation />
     </div>
+
     <div class="header__right">
-      <div class="header__item" @click="toggleTheme">
-        <feather
-          class="header__item-icon"
-          v-if="!darkTheme"
-          type="moon"
-        ></feather>
-        <feather class="header__item-icon" v-else type="sun"></feather>
-      </div>
-      <router-link to="/settings" class="header__item">
-        <feather class="header__item-icon" type="settings"></feather
-      ></router-link>
-      <div
-        class="header__item"
-        @click="toggleNotifications"
-        v-on-clickaway="closeNotifications"
+      <Button theme="primary" class="header__button" @click="openAddFileModal"
+        >Add file</Button
       >
-        <span
-          :class="['header__badge', counter > 0 ? 'header__badge_visible' : '']"
-          >{{ counter }}</span
-        >
-        <feather
-          :class="[
-            'header__item-icon',
-            open > 0 ? 'header__item-icon_active' : '',
-          ]"
-          type="bell"
-        ></feather>
-        <Notifications @click.native.stop.prevent />
-      </div>
+      <Divider />
+      <Icon
+        class="header__icon"
+        icon="NotificationsIcon"
+        @click.native.stop="toggleNotifications"
+      />
+      <div class="header__notifications-marker" v-show="counter"></div>
+      <Notifications />
+      <Icon
+        @click.native="openSettingsModal"
+        class="header__icon"
+        icon="SettingsIcon"
+      />
     </div>
-  </div>
+  </header>
 </template>
 
 <style lang="scss">
@@ -63,67 +32,48 @@
 
 <script>
 import { mapState } from "vuex";
-import { mixin as clickaway } from "vue-clickaway";
 
+import Navigation from "@/components/Navigation/Navigation";
 import Notifications from "@/components/Notifications/Notifications";
+import Button from "@/components/Button/Button";
+import Divider from "@/components/Divider/Divider";
+import Icon from "@/components/Icon/Icon";
+
+import Logo from "@/assets/icons/Logo.svg";
 
 export default {
-  components: { Notifications },
-  mixins: [clickaway],
+  components: {
+    Logo,
+    Navigation,
+    Button,
+    Divider,
+    Icon,
+    Notifications,
+  },
   data: () => {
     return {
+      topicName: null,
+      showAddFileModal: false,
       active: true,
       focus: false,
-      searchQuery: "",
-      remoteSearch: () => {},
-      localSearch: () => {},
     };
   },
   computed: {
     ...mapState("notifications", ["counter", "open"]),
     ...mapState("files", ["remoteFilesConfig", "localFilesConfig"]),
-    ...mapState("darkTheme", ["darkTheme"]),
     currentRoute() {
       return this.$route.name;
     },
   },
-  created() {
-    this.initRemoteSearch();
-    this.initLocalSearch();
-  },
   methods: {
-    initRemoteSearch() {
-      this.remoteSearch = this._.debounce((search) => {
-        if (this.currentRoute !== "search") {
-          this.$router.replace("/search");
-        }
-
-        let newConfig = Object.assign({}, this.remoteFilesConfig);
-        newConfig.skip = 0;
-        newConfig.search = search;
-
-        this.$store.commit("files/setRemoteFilesConfig", newConfig);
-        this.$store.dispatch("files/fetchRemoteFiles");
-      }, 500);
+    openAddFileModal() {
+      this.$bus.$emit("openAddFileModal");
     },
-    initLocalSearch() {
-      this.localSearch = this._.debounce((search) => {
-        let newConfig = Object.assign({}, this.localFilesConfig);
-        newConfig.skip = 0;
-        newConfig.search = search;
-
-        this.$store.commit("files/setLocalFilesConfig", newConfig);
-        this.$store.dispatch("files/fetchLocalFiles");
-      }, 500);
-    },
-    toggleTheme() {
-      this.$store.dispatch("darkTheme/toggleDarkTheme");
+    openSettingsModal() {
+      this.$bus.$emit("openSettingsModal");
     },
     toggleNotifications() {
       this.$store.commit("notifications/toggleNotifications", !this.open);
-    },
-    closeNotifications() {
-      this.$store.commit("notifications/toggleNotifications", false);
     },
   },
 };

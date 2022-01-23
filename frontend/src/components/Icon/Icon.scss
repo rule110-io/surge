@@ -1,0 +1,21 @@
+.icon {
+  height: initial;
+  width: initial;
+  transition: $transition-1;
+
+  path,
+  circle {
+    transition: $transition-1;
+  }
+
+  &_active {
+    cursor: pointer;
+
+    &:hover {
+      & path,
+      circle {
+        stroke: $white;
+      }
+    }
+  }
+}

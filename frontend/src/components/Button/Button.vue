@@ -1,39 +1,19 @@
 <template>
-  <button
-    v-if="type == 'button'"
+  <component
+    :is="type"
+    class="button"
     :class="[
-      'button',
-      theme ? `button_theme_${theme}` : null,
-      full ? `button_full` : null,
-      disabled === true ? 'button_disabled' : null,
+      `button_theme_${theme}`,
+      active ? `button_theme_${theme}_active` : null,
+      `button_size_${size}`,
     ]"
-    @click="onClickButton"
+    :to="to"
+    :disabled="disabled"
+    v-on="!disabled ? $listeners : false"
   >
-    <slot />
-  </button>
-  <a
-    v-else-if="type === 'link'"
-    :href="url"
-    target="_blank"
-    :class="[
-      'button',
-      theme ? `button_theme_${theme}` : null,
-      full ? `button_full` : null,
-    ]"
-  >
-    <slot />
-  </a>
-  <nuxt-link
-    v-else-if="type === 'router'"
-    :to="localePath(url)"
-    :class="[
-      'button',
-      theme ? `button_theme_${theme}` : null,
-      full ? `button_full` : null,
-    ]"
-  >
-    <slot />
-  </nuxt-link>
+    <Icon :icon="icon" v-if="icon" class="button__icon"> </Icon>
+    <slot></slot>
+  </component>
 </template>
 
 <style lang="scss">
@@ -41,12 +21,18 @@
 </style>
 
 <script>
+import Icon from "@/components/Icon/Icon";
+
 export default {
-  components: {},
+  components: { Icon },
   props: {
     theme: {
       type: String,
-      default: "primary",
+      default: "default",
+    },
+    size: {
+      type: String,
+      default: "lg",
     },
     disabled: {
       type: Boolean,
@@ -56,35 +42,23 @@ export default {
       type: String,
       default: "button",
     },
-    url: {
+    to: {
       type: String,
       default: "",
-    },
-    full: {
-      type: Boolean,
-      default: false,
     },
     icon: {
       type: String,
       default: "",
     },
-    click: {
-      type: Function,
-      default: () => {},
+    active: {
+      type: Boolean,
+      default: false,
     },
   },
   data: () => {
     return {};
   },
   mounted() {},
-  methods: {
-    onClickButton(event) {
-      if (this.disabled !== true) {
-        this.click();
-      } else {
-        event.preventDefault();
-      }
-    },
-  },
+  methods: {},
 };
 </script>

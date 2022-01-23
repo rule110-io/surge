@@ -1,31 +1,32 @@
 <template>
   <div class="main__wrapper">
-    <div class="main__tour" v-if="tour"></div>
-    <Sidebar />
+    <!-- <div class="main__tour" v-if="tour"></div> -->
     <Dashboard />
-    <Tour v-if="tour" />
   </div>
 </template>
 <script>
-const runtime = require("@wailsapp/runtime");
-
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
 import Dashboard from "@/components/Dashboard/Dashboard";
-import Sidebar from "@/components/Sidebar/Sidebar";
-import Tour from "@/components/Tour/Tour";
 
 export default {
   components: {
     Dashboard,
-    Sidebar,
-    Tour,
   },
   computed: {
     ...mapState("tour", ["tour"]),
+    ...mapState("files", ["remoteFilesConfig"]),
   },
   data: () => {
     return {};
+  },
+  watch: {
+    remoteFilesConfig: {
+      deep: true,
+      handler() {
+        this.fetchRemoteFiles();
+      },
+    },
   },
   destroyed() {
     clearInterval(this.remoteInterval);
@@ -39,6 +40,7 @@ export default {
     this.enableDarkThemeEvent();
 
     this.fetchLocalFiles();
+    this.fetchTopics();
     this.fetchRemoteFiles();
     this.fetchDarkTheme();
     this.fetchTour();
@@ -47,28 +49,38 @@ export default {
 
     this.getPublicKey();
 
+    this.getOfficialTopicName();
+
     this.remoteInterval = setInterval(this.fetchRemoteFiles, 10000);
     this.localInterval = setInterval(this.fetchLocalFiles, 10000);
   },
   methods: {
+    ...mapActions({
+      getOfficialTopicName: "topics/getOfficialTopicName",
+    }),
     getPublicKey() {
-      window.backend.getPublicKey().then((address) => {
+      window.go.surge.MiddlewareFunctions.GetPublicKey().then((address) => {
         this.$store.commit("pubKey/setPubKey", address);
       });
     },
     fetchLocalFiles() {
       this.$store.dispatch("files/fetchLocalFiles");
     },
+    fetchTopics() {
+      this.$store.dispatch("topics/fetchTopics");
+    },
     fetchRemoteFiles() {
       this.$store.dispatch("files/fetchRemoteFiles");
     },
     fetchDarkTheme() {
-      window.backend.readSetting("DarkMode").then((bool) => {
-        this.$store.commit("darkTheme/setDarkTheme", bool);
-      });
+      window.go.surge.MiddlewareFunctions.ReadSetting("DarkMode").then(
+        (bool) => {
+          this.$store.commit("darkTheme/setDarkTheme", bool);
+        }
+      );
     },
     fetchTour() {
-      window.backend.readSetting("Tour").then((bool) => {
+      window.go.surge.MiddlewareFunctions.ReadSetting("Tour").then((bool) => {
         this.$store.commit("tour/setTour", bool);
       });
     },
@@ -76,18 +88,18 @@ export default {
       this.$store.dispatch("version/updateRemoteVersion");
     },
     enableDarkThemeEvent() {
-      window.wails.Events.On("darkThemeEvent", (bool) => {
+      window.runtime.EventsOn("darkThemeEvent", (bool) => {
         this.$store.commit("darkTheme/setDarkTheme", bool);
       });
     },
     enableNotifications() {
-      window.wails.Events.On("notificationEvent", (title, text) => {
-        const notification = { title, text };
+      window.runtime.EventsOn("notificationEvent", (title, text, timestamp) => {
+        const notification = { title, text, timestamp };
         this.$store.commit("notifications/addNotification", notification);
       });
     },
     enableErrorEvents() {
-      window.wails.Events.On("errorEvent", (title, text) => {
+      window.runtime.EventsOn("errorEvent", (title, text) => {
         this.$store.dispatch("snackbar/updateSnack", {
           snack: `${title}: ${text}`,
           color: "error",
@@ -96,7 +108,7 @@ export default {
       });
     },
     enableGlobalBandwidthEvents() {
-      window.wails.Events.On(
+      window.runtime.EventsOn(
         "globalBandwidthUpdate",
         (statusBundle, totalDown, totalUp) => {
           this.$store.commit("globalBandwidth/addGlobalBandwidth", {
@@ -108,12 +120,12 @@ export default {
       );
     },
     enableClientStatusUpdate() {
-      const clientsStore = runtime.Store.New("numClients");
-      clientsStore.subscribe(({ Online }) => {
-        this.$store.commit("clientStatus/addClientStatus", {
-          online: Online,
-        });
-      });
+      // const clientsStore = runtime.Store.New("numClients");
+      // clientsStore.subscribe(({ Online }) => {
+      //   this.$store.commit("clientStatus/addClientStatus", {
+      //     online: Online,
+      //   });
+      // });
     },
   },
 };

@@ -1,6 +1,6 @@
 <template>
   <div
-    class="file-hash"
+    class="file-hash selectable"
     :class="copied ? 'file-hash_active' : null"
     data-label="Copied"
     v-tooltip="{
@@ -11,7 +11,7 @@
     v-clipboard:copy="hash"
     v-clipboard:success="onCopy"
   >
-    <feather class="file-hash__icon" type="copy"></feather>
+    <Icon icon="CopyIcon" class="file-hash__icon" />
     <div class="file-hash__text text_wrap_none">{{ hash }}</div>
   </div>
 </template>
@@ -21,8 +21,10 @@
 </style>
 
 <script>
+import Icon from "@/components/Icon/Icon";
+
 export default {
-  components: {},
+  components: { Icon },
   props: {
     hash: {
       type: String,
@@ -36,7 +38,10 @@ export default {
   },
   methods: {
     onCopy() {
-      this.copied = !this.copied;
+      this.copied = true;
+      this._.delay(() => {
+        this.copied = false;
+      }, 200);
     },
   },
 };

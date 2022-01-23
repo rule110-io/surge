@@ -1,159 +1,128 @@
 .button {
-  padding: $padding-lg $padding-big;
-  border-radius: $card-br;
+  border-radius: $br-md;
   text-align: center;
   transition: $transition-1;
   cursor: pointer !important;
   border: none;
   outline: none;
   text-decoration: none;
+  appearance: none;
   box-sizing: border-box;
+  font-weight: $fw-semi-bold;
+  font-size: $fz-sm;
+  line-height: 16px;
+  text-align: center;
+  letter-spacing: 0.1px;
+  font-feature-settings: "salt" on;
+  position: relative;
   display: flex;
   align-items: center;
-  background: white;
-  font-size: $fz-md;
-  justify-content: center;
 
   &__icon {
-    margin-right: 10px;
-    height: 18px;
+    margin-right: $padding-xs;
   }
 
-  &_disabled {
-    cursor: not-allowed !important;
-    color: $grey-darkest !important;
-    background: $base !important;
-
-    &:hover {
-      background: $base !important;
-    }
-
-    &:active {
-      background: $base !important;
-    }
-
-    .button__icon {
+  &:hover {
+    svg {
       path {
-        fill: $grey-darkest !important;
+        stroke: $white;
       }
+    }
+  }
 
-      color: $grey-darkest !important;
+  &:disabled {
+    color: rgba($white, 0.2) !important;
+    cursor: not-allowed !important;
+    background: initial !important;
+    border: 1px solid transparent !important;
+  }
+
+  &_size {
+    &_lg {
+      padding: $padding-md $padding-xl;
+    }
+
+    &_md {
+      padding: $padding-sm $padding-llg;
+      height: 40px;
     }
   }
 
   &_theme {
-    &_default {
-      color: $grey-darkest;
-
-      &:hover {
-        background: $base;
-      }
-
-      &:active {
-        background: darken($base, 10%);
-      }
-    }
-
-    &_success {
-      color: white;
-      background: $primary;
-
-      &:hover {
-        background: $primary-dark;
-      }
-
-      &:active {
-        background: $background;
-      }
-    }
-
-    &_error {
-      color: white;
-      background: $error;
-
-      &:hover {
-        background: lighten($error, 10%);
-      }
-
-      &:active {
-        background: darken($error, 10%);
-      }
-    }
-
-    &_secondary {
-      color: white;
-      background: $secondary;
-
-      &:hover {
-        background: lighten($secondary, 10%);
-      }
-
-      &:active {
-        background: darken($secondary, 10%);
-      }
-
-      .button__icon {
-        path {
-          fill: white;
-        }
-
-        color: white;
-      }
+    &_primary {
+      background: $primary-gradient;
+      color: $white;
     }
 
     &_text {
-      color: $grey-darkest;
-      border: none;
       background: transparent;
+      color: $white;
       padding: 0;
 
       &:hover {
-        color: $secondary;
-      }
-
-      &:active {
         color: $primary;
       }
     }
 
-    &_ghost {
-      color: white;
-      border: 2px solid $secondary;
-      background: transparent;
+    &_default {
+      background: #2a2a2c;
+      box-shadow: $shadow-2;
+      backdrop-filter: $blur-2;
+      color: $white;
+      border: 1px solid transparent;
 
-      &:hover {
-        color: $secondary;
-        background: white;
-        border-color: white;
+      &_icon {
+        color: $grey;
       }
 
-      &:active {
-        color: $secondary;
-        background: darken(white, 10%);
-        border-color: darken(white, 10%);
+      &:hover {
+        background: $primary;
+        border: $border-primary;
       }
     }
 
-    &_ghost-secondary {
-      color: $secondary;
-      border: 2px solid $secondary;
-      background: transparent;
+    &_icon {
+      background: #212123;
+      box-shadow: $shadow-2;
+      backdrop-filter: $blur-2;
+      color: $grey;
+      border: 1px solid transparent;
+
+      &_active {
+        background: $primary;
+        border: $border-primary;
+        color: $white;
+
+        svg {
+          path {
+            stroke: $white;
+          }
+        }
+      }
 
       &:hover {
-        color: white;
-        background: $secondary;
-        border-color: $secondary;
-      }
-
-      &:active {
-        color: white;
-        background: darken($secondary, 10%);
-        border-color: darken($secondary, 10%);
+        color: $white;
+        background: $primary;
+        border: $border-primary;
       }
     }
-  }
 
-  &_full {
-    width: 100%;
+    &_transparent {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: $white;
+
+      svg {
+        path {
+          stroke: $white;
+        }
+      }
+
+      &:hover {
+        color: $white;
+        background: $primary;
+        border: $border-primary;
+      }
+    }
   }
 }

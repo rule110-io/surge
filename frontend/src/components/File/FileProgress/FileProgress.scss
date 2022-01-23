@@ -1,0 +1,37 @@
+.progress-bar {
+  position: relative;
+  width: 134px;
+  background: $black-light;
+  box-shadow: $shadow-2;
+  backdrop-filter: $blur;
+  border-radius: $br-sm;
+  height: 20px;
+
+  &__value {
+    background: $primary-gradient;
+    border-radius: $br-sm;
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition: $transition-1;
+
+    &_error {
+      background: rgba(255, 255, 255, 0.03);
+    }
+  }
+
+  &__text {
+    color: $white;
+    font-weight: $fw-semi-bold;
+    font-size: $fz-xs;
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    text-align: center;
+    letter-spacing: 0.1px;
+    font-feature-settings: "salt" on;
+    height: 100%;
+    line-height: 20px;
+  }
+}

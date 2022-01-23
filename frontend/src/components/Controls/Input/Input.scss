@@ -1,0 +1,94 @@
+.input {
+  position: relative;
+  border-radius: $br-md;
+  backdrop-filter: $blur;
+  transition: $transition-1;
+  box-sizing: border-box;
+  border: 2px solid transparent;
+  display: flex;
+  align-items: center;
+  padding: $padding-sm $padding-md;
+  box-shadow: $shadow-5;
+
+  &_size {
+    &_lg {
+      height: 48px;
+    }
+
+    &_md {
+      height: 40px;
+    }
+  }
+
+  &_theme {
+    &_dark {
+      background: $dark;
+    }
+
+    &_light {
+      background: $dark-gradient;
+    }
+  }
+
+  &_readonly {
+    border-color: transparent !important;
+  }
+
+  &_focus {
+    border-color: $primary;
+  }
+
+  &__controller {
+    appearance: none;
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    transition: $transition-1;
+    font-size: $fz-md;
+    line-height: $fz-base;
+    font-family: $font-family;
+    color: $white;
+    border-radius: $br-md;
+    border: none;
+
+    &_theme {
+      &_dark {
+        background: transparent;
+      }
+
+      &_light {
+        background: transparent;
+      }
+    }
+
+    &_left {
+      padding-right: 58px;
+    }
+
+    &:focus {
+      outline: none;
+    }
+
+    &::placeholder {
+      color: $grey;
+      font-family: $font-family;
+    }
+
+    &:read-only {
+      cursor: default !important;
+    }
+  }
+
+  &__icon {
+    position: relative;
+    height: 24px;
+    width: 24px;
+    margin-right: $padding-md;
+  }
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}

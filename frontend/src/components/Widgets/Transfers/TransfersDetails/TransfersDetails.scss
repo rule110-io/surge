@@ -1,0 +1,97 @@
+.transfers-details {
+  &__tabs {
+    display: flex;
+    align-items: center;
+    gap: $padding-md;
+    position: relative;
+    top: 8px;
+    padding: 8px 0;
+  }
+
+  &__item {
+    align-items: center;
+    padding: 0 $padding-md $padding-md $padding-md;
+    cursor: pointer;
+    font-size: $fz-md;
+    position: relative;
+    transition: $transition-1;
+
+    &:after {
+      content: "";
+      display: block;
+      position: absolute;
+      bottom: 0;
+      height: 3px;
+      width: 100%;
+      background: transparent;
+      left: 0;
+      transition: $transition-1;
+      border-radius: $br-xs;
+    }
+
+    &:hover {
+      color: $white;
+    }
+
+    &_active {
+      color: $white;
+
+      &:after {
+        background: $primary-gradient;
+      }
+    }
+  }
+
+  &__chunks {
+    padding-bottom: $padding-llg;
+    border-bottom: $border;
+    margin-bottom: $padding-llg;
+  }
+
+  &__info {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: $padding-md;
+
+    &-item {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      font-size: $fz-md;
+      line-height: 16px;
+      gap: $padding-md;
+    }
+
+    &-left {
+      color: $text-white;
+    }
+
+    &-right {
+      color: $white;
+      font-weight: $fw-semi-bold;
+    }
+  }
+
+  &__seeders {
+    display: grid;
+    gap: 10px $padding-llg;
+    grid-template-columns: repeat(4, max-content);
+
+    &-value {
+      font-size: $fz-md;
+      line-height: 16px;
+      color: $white;
+      opacity: 0.8;
+    }
+
+    &-heading {
+      font-weight: $fw-bold;
+      font-size: $fz-xs;
+      line-height: 16px;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      font-feature-settings: "salt" on;
+      color: $grey;
+      margin-bottom: 6px;
+    }
+  }
+}

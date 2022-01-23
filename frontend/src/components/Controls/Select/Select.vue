@@ -1,38 +1,33 @@
 <template>
-  <div :class="`select__wrapper select__wrapper_${type}`">
+  <div class="select__wrapper" v-on-clickaway="closeSelect">
     <div
-      :class="[
-        'select__button',
-        open ? 'select__button_active' : null,
-        `select__button_${type}`,
-      ]"
+      :class="['select__button', open ? 'select__button_active' : null]"
       @click="toggleSelect()"
     >
-      {{ $t(activeItem) }}
       <span
-        :class="[
-          'select__icon fe fe-chevron-down',
-          open ? 'select__icon_open' : null,
-        ]"
+        v-if="!isPlaceholder"
+        class="select__value"
+        v-text="itemText ? value[itemText] : value"
+      />
+      <span class="select__placeholder" v-else>{{ placeholder }}</span>
+
+      <Icon
+        :class="['select__icon', open ? 'select__icon_open' : null]"
+        icon="SelectIcon"
       />
     </div>
 
-    <ul
-      :class="[
-        'select__list',
-        open ? 'select__list_open' : null,
-        `select__list_${type}`,
-      ]"
-    >
-      <li
-        v-for="item in items"
-        :key="item"
-        :class="`select__item select__item_${type}`"
-        @click="setSelect(item), toggleSelect()"
-      >
-        {{ $t(item) }}
-      </li>
-    </ul>
+    <Dropdown :open.sync="open" theme="light">
+      <ul class="select__list">
+        <li
+          v-for="item in items"
+          :key="item"
+          :class="`select__item`"
+          @click="setSelect(item), toggleSelect()"
+          v-text="itemText ? item[itemText] : item"
+        ></li>
+      </ul>
+    </Dropdown>
   </div>
 </template>
 
@@ -41,33 +36,62 @@
 </style>
 
 <script>
+import { mixin as clickaway } from "vue-clickaway";
+
+import Icon from "@/components/Icon/Icon";
+import Dropdown from "@/components/Dropdown/Dropdown";
+
 export default {
   props: {
     items: {
       type: Array,
       default: () => [],
     },
-    activeItem: {
+    value: {
       type: String,
       default: "",
     },
-    type: {
+    itemText: {
       type: String,
       default: "",
+    },
+    placeholder: {
+      type: String,
+      default: "Click to select",
     },
   },
+  components: { Icon, Dropdown },
+  mixins: [clickaway],
   data: () => {
     return {
       open: false,
     };
   },
-  computed: {},
+  computed: {
+    isPlaceholder() {
+      const { value, itemText } = this;
+
+      if (itemText.length) {
+        const hasValue = this._.has(value, itemText);
+        return hasValue
+          ? this._.isEmpty(this._.toString(value[itemText]))
+          : true;
+      } else {
+        return this._.isEmpty(this._.toString(value));
+      }
+    },
+  },
   methods: {
     toggleSelect() {
       this.open = !this.open;
     },
     setSelect(item) {
-      this.$emit("update", item);
+      this.$emit("input", item);
+    },
+    closeSelect() {
+      if (!this.open) return;
+
+      this.open = false;
     },
   },
 };

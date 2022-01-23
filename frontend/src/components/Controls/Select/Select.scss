@@ -3,43 +3,43 @@
   justify-content: space-between;
   align-items: center;
 
-  &__title {
-    letter-spacing: 0.06em;
-    font-weight: bold;
-    color: $grey-light;
-    text-transform: uppercase;
-    display: none;
+  &__value {
+    flex: 1;
   }
 
   &__button {
-    cursor: pointer;
-    background-color: transparent;
-    padding: $padding-lg $padding-normal;
-    outline: none;
-    border: 1px solid #e0e0e0;
     box-sizing: border-box;
-    border-radius: 4px;
+    transition: $transition-1;
+    font-size: $fz-md;
+    line-height: $fz-base;
+    font-family: $font-family;
+    color: $white;
+    border-radius: $br-md;
+    border: none;
+    background: transparent;
+    position: relative;
+    backdrop-filter: $blur;
+    border: 2px solid transparent;
     display: flex;
     align-items: center;
-    transition: $transition-1;
-    display: flex;
-    justify-content: space-between;
-
-    &_modal {
-      max-height: 49px;
-      border-radius: $card-br;
-      padding: $padding-default;
-      font-weight: $fw-normal;
-    }
+    padding: $padding-sm $padding-md;
+    cursor: pointer;
+    box-shadow: $shadow-5;
+    background: $dark-gradient;
+    width: 100%;
 
     &:hover {
-      border-color: $secondary;
+      border-color: $primary;
     }
 
     &_active {
-      border-color: $secondary;
-      color: $secondary;
+      border-color: $primary;
     }
+  }
+
+  &__placeholder {
+    flex: 1;
+    color: $grey;
   }
 
   &__icon {
@@ -48,7 +48,7 @@
 
     &_open {
       transform: scaleY(-1);
-      color: $secondary;
+      color: $primary;
     }
   }
 
@@ -57,60 +57,26 @@
     box-sizing: border-box;
     position: relative;
     font-weight: $fw-normal;
-    color: $text-dark;
-
-    &_modal {
-      margin-top: $padding-micro;
-    }
+    color: $primary;
   }
 
   &__list {
-    position: absolute;
-    top: 62px;
-    left: 0;
-    z-index: 3;
-    background: $white;
-    border: 1px solid #e0e0e0;
-    border-radius: 4px;
-    box-sizing: border-box;
-    opacity: 0;
-    transition: $transition-1;
-    width: 100%;
-    max-height: 160px;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    transition: transform 0.2s ease-in-out, opacity 0.2s ease-in-out,
-      width 0.2s ease-in-out, height 0.2s ease-in-out;
-    padding: 12px 0;
-    transform: translate3d(0, -10px, 0);
-    box-shadow: $shadow-3;
-    pointer-events: none;
-
-    &_modal {
-      top: 54px;
-      border-radius: $card-br;
-      padding: $padding-default 0;
-      font-weight: $fw-normal;
-    }
-
-    &_open {
-      transform: translateZ(0);
-      opacity: 1;
-      pointer-events: auto;
-    }
   }
 
   &__item {
-    padding: $padding-micro $padding-normal;
-    transition: $transition-1;
-    cursor: pointer;
+    font-size: $fz-md;
+    line-height: 16px;
+    color: $white;
 
-    &_modal {
-      padding: $padding-micro $padding-default;
+    cursor: pointer;
+    transition: $transition-1;
+
+    &:not(:last-child) {
+      margin-bottom: $padding-md;
     }
 
     &:hover {
-      color: $secondary;
+      color: $primary;
     }
   }
 }

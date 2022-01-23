@@ -1,28 +1,22 @@
 import Dashboard from "@/layout/Dashboard/Dashboard.vue";
-import Search from "@/pages/Search.vue";
-import Download from "@/pages/Download.vue";
-import Settings from "@/pages/Settings.vue";
+import Transfers from "@/pages/Transfers.vue";
+import Discover from "@/pages/Discover.vue";
 
 const routes = [
   {
     path: "/",
     component: Dashboard,
-    redirect: "/search",
+    redirect: "/transfers",
     children: [
       {
-        path: "search",
-        name: "search",
-        component: Search,
+        path: "transfers",
+        name: "transfers",
+        component: Transfers,
       },
       {
-        path: "download",
-        name: "download",
-        component: Download,
-      },
-      {
-        path: "settings",
-        name: "settings",
-        component: Settings,
+        path: "discover",
+        name: "discover",
+        component: Discover,
       },
     ],
   },

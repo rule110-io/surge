@@ -1,0 +1,55 @@
+.navigation {
+  display: flex;
+  margin-left: $padding-md;
+  position: relative;
+  top: 15px;
+
+  &__item {
+    display: flex;
+    align-items: center;
+    padding: 0 $padding-sm $padding-xl $padding-sm;
+    transition: $transition-1;
+    cursor: pointer;
+    position: relative;
+    font-weight: $fw-semi-bold;
+
+    &:after {
+      content: "";
+      display: block;
+      position: absolute;
+      bottom: 0;
+      height: 3px;
+      width: 100%;
+      background: transparent;
+      left: 0;
+      transition: $transition-1;
+      border-radius: $br-xs;
+    }
+
+    &:hover {
+      color: $white;
+
+      & path,
+      circle {
+        stroke: $white;
+      }
+    }
+
+    &.active {
+      color: $white;
+
+      &:after {
+        background: $primary-gradient;
+      }
+
+      & path,
+      circle {
+        stroke: $white;
+      }
+    }
+  }
+
+  &__icon {
+    margin-right: $padding-xs;
+  }
+}

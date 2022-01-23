@@ -1,49 +1,38 @@
 <template>
-  <div :class="['modal__wrapper', isOpen ? 'modal__wrapper_open' : null]">
-    <div class="modal">
-      <h2 class="modal__title">
-        Delete File
-      </h2>
-      <p class="modal__descr">
-        Attention! You are going to remove <b>{{ file.FileName }}</b> from Surge
-        - are you sure?
-      </p>
-      <div class="modal__footer modal__footer_end">
-        <div>
-          <Checkbox
-            class="modal__checkbox_footer"
-            name="fromDisk"
-            :value="fromDisk"
-            @change="changeFromDisk"
-          >
-            Delete from disk
-          </Checkbox>
-        </div>
-
-        <div class="modal__footer-controls">
-          <Button :click="closeModal" theme="default"> Cancel </Button>
-          <Button :click="removeFile" theme="error">
-            Delete
-          </Button>
-        </div>
+  <Modal :show.sync="showModal" @closeAndClear="closeAndClearModal">
+    <template slot="title"> Remove File </template>
+    <template slot="body">
+      <div v-if="activeFile" class="modal__descr modal__item">
+        Attention! You are going to remove <b>{{ activeFile.FileName }}</b> from
+        Surge - are you sure?
       </div>
-    </div>
-  </div>
+      <Checkbox
+        class="col_6"
+        v-model="fromDisk"
+        :value="fromDisk"
+        title="Delete from disk"
+      />
+    </template>
+    <template slot="footer">
+      <Button theme="text" size="md" @click="closeAndClearModal">Close</Button>
+      <Button theme="default" size="md" @click="removeFile">Remove file</Button>
+    </template>
+  </Modal>
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapActions } from "vuex";
 
+import FormMixin from "@/mixins/FormMixin.js";
+
+import Modal from "@/components/Modals/Modal/Modal";
 import Button from "@/components/Button/Button";
 import Checkbox from "@/components/Controls/Checkbox/Checkbox.vue";
 
 export default {
-  components: { Button, Checkbox },
+  mixins: [FormMixin],
+  components: { Modal, Button, Checkbox },
   props: {
-    open: {
-      type: Boolean,
-      default: false,
-    },
     file: {
       type: Object,
       default: () => {},
@@ -55,26 +44,28 @@ export default {
     };
   },
   computed: {
-    ...mapState("files", ["localFilesConfig"]),
-    isOpen() {
-      return this.open;
-    },
+    ...mapState("files", ["activeFile", "localFilesConfig"]),
   },
+  mounted() {},
   methods: {
-    changeFromDisk() {
-      this.fromDisk = !this.fromDisk;
-    },
-    closeModal() {
-      this.$emit("toggleRemoveFileModal", false);
+    ...mapActions({
+      clearSelectedFiles: "files/clearSelectedFiles",
+    }),
+    clearModal() {
+      this.fromDisk = false;
     },
     removeFile() {
-      window.backend.removeFile(this.file.FileHash, this.fromDisk).then(() => {
+      window.go.surge.MiddlewareFunctions.RemoveFile(
+        this.activeFile.FileHash,
+        this.fromDisk
+      ).then(() => {
+        this.clearSelectedFiles();
         let newConfig = Object.assign({}, this.localFilesConfig);
         newConfig.skip = 0;
         this.$store.commit("files/setLocalFilesConfig", newConfig);
-
         this.$store.dispatch("files/fetchLocalFiles");
         this.closeModal();
+        this.clearModal();
       });
     },
   },

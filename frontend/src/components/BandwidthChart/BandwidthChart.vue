@@ -1,9 +1,9 @@
 <template>
-  <line-chart
+  <LineChart
     class="bandwidth-chart"
     :chart-data="chartData"
     :options="options"
-  ></line-chart>
+  ></LineChart>
 </template>
 
 <style lang="scss">
@@ -16,11 +16,17 @@ import LineChart from "@/components/Charts/Bandwidth.js";
 import "@taeuk-gang/chartjs-plugin-streaming";
 
 export default {
+  props: {
+    file: {
+      type: Object,
+      default: () => {},
+    },
+  },
   components: {
     LineChart,
   },
   computed: {
-    ...mapState("globalBandwidth", ["statusBundle", "totalDown", "totalUp"]),
+    ...mapState("globalBandwidth", ["statusBundle"]),
   },
   watch: {},
   data() {
@@ -31,24 +37,27 @@ export default {
           {
             label: "down",
             data: [0],
-            backgroundColor: "rgba(44, 201, 144, 0.3)",
-            borderColor: "rgba(44, 201, 144, 1)",
-            borderWidth: 1,
+            backgroundColor: "#2CF2FF",
+            borderColor: "#2CF2FF",
+            borderWidth: 2,
+            fill: false,
           },
           {
             label: "up",
             data: [0],
-            backgroundColor: "rgba(91, 152, 220, 0.2)",
-            borderColor: "rgba(91, 152, 220, 1)",
-            borderWidth: 1,
+            backgroundColor: "#FB49C0",
+            borderColor: "#FB49C0",
+            borderWidth: 2,
+            fill: false,
           },
         ],
       },
       options: {
-        animation: {
-          duration: 0,
-        },
-        responsive: false,
+        maintainAspectRatio: false,
+        responsive: true,
+        // animation: {
+        //   duration: 0,
+        // },
         legend: {
           display: false,
         },
@@ -63,10 +72,25 @@ export default {
         scales: {
           yAxes: [
             {
-              display: false,
+              display: true,
+              stacked: true,
+              grid: {
+                display: true,
+              },
+              gridLines: {
+                borderDash: [4.8, 7.2],
+                borderDashOffset: 2,
+                color: "rgba(255,255,255,0.2)",
+                drawBorder: false,
+              },
               ticks: {
                 beginAtZero: true,
                 min: 0,
+                stepSize: 0.25,
+                fontColor: "#7B7D82",
+                callback: function (label) {
+                  return `${label} Mb/s `;
+                },
               },
             },
           ],
@@ -74,15 +98,30 @@ export default {
             {
               display: false,
               type: "realtime",
+              gridLines: {
+                zeroLineColor: "transparent",
+              },
             },
           ],
         },
         plugins: {
           streaming: {
             onRefresh: (chart) => {
-              chart.data.labels.push(Date.now());
-              chart.data.datasets[0].data.push(this.totalDown);
-              chart.data.datasets[1].data.push(this.totalUp);
+              if (!this.file) return;
+
+              const { FileHash } = this.file;
+              const newFileHash = this._.find(this.statusBundle, { FileHash });
+              const isNewFileHash = !this._.isEmpty(newFileHash);
+
+              if (isNewFileHash) {
+                chart.data.labels.push(Date.now());
+                chart.data.datasets[0].data.push(
+                  (newFileHash.DownloadBandwidth / 1000000).toFixed(2)
+                );
+                chart.data.datasets[1].data.push(
+                  (newFileHash.UploadBandwidth / 1000000).toFixed(2)
+                );
+              }
             },
             delay: 2000,
           },

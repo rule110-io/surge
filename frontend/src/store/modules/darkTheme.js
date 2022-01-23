@@ -21,7 +21,7 @@ const mutations = {
 const actions = {
   toggleDarkTheme({ commit, state }) {
     const bool = (!state.darkTheme).toString();
-    window.backend.writeSetting("DarkMode", bool).then(() => {
+    window.go.surge.MiddlewareFunctions.WriteSetting("DarkMode", bool).then(() => {
       commit("setDarkTheme", bool);
     });
   },

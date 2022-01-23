@@ -3,9 +3,7 @@
     <template v-if="uploadBandwidth > 0">
       {{ uploadBandwidth | prettyBytes(0) }}/s
     </template>
-    <template v-else>
-      -
-    </template>
+    <template v-else> - </template>
   </div>
 </template>
 
@@ -34,6 +32,8 @@ export default {
   },
   watch: {
     statusBundle(newEvent) {
+      if (!this.file) return;
+
       const { FileHash } = this.file;
       const newFileHash = this._.find(newEvent, { FileHash });
       const isNewFileHash = !this._.isEmpty(newFileHash);

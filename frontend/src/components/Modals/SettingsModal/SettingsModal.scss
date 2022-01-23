@@ -1,0 +1,90 @@
+.settings {
+  width: 592px;
+
+  &__tabs {
+    width: max-content;
+    margin-bottom: $padding-xl;
+  }
+
+  &__path {
+    display: grid;
+    align-items: center;
+    grid-template-columns: 1fr max-content;
+    grid-gap: $padding-llg;
+
+    &-control {
+      background: linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.03),
+        rgba(255, 255, 255, 0.03)
+      );
+      box-shadow: $shadow-5;
+      border-radius: 8px;
+      box-sizing: border-box;
+      padding: $padding-sm $padding-md;
+      font-size: $fz-sm;
+      line-height: 16px;
+      color: $white;
+      box-sizing: border-box;
+      height: 40px;
+    }
+
+    &-icon {
+      cursor: pointer;
+      transition: $transition-1;
+
+      path {
+        transition: $transition-1;
+      }
+
+      &:hover {
+        path {
+          stroke: $primary;
+        }
+      }
+    }
+  }
+
+  &__slider {
+    display: flex;
+    gap: $padding-llg;
+    align-items: center;
+
+    &-input {
+      width: 56px;
+      height: 40px;
+    }
+
+    &-control {
+      flex: 1;
+
+      .vue-slider {
+        &-rail {
+          border-radius: 0 !important;
+          background: #505052 !important;
+        }
+
+        &-dot {
+          background-color: unset !important;
+          background: linear-gradient(
+              0deg,
+              rgba(10, 151, 149, 0.2),
+              rgba(10, 151, 149, 0.2)
+            ),
+            #131416;
+          border: 1px solid $primary !important;
+          box-shadow: inset -1px 0px 1px rgba(255, 255, 255, 0.04),
+            inset 0px 0px 6px rgba(255, 255, 255, 0.03) !important;
+          backdrop-filter: $blur !important;
+          border-radius: 100%;
+          cursor: pointer;
+        }
+
+        &-process {
+          background: $primary !important;
+          border-radius: 0 !important;
+        }
+      }
+    }
+  }
+}

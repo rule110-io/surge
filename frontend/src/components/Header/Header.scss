@@ -1,245 +1,46 @@
 .header {
+  height: 88px;
+  padding: 0 $padding-llg;
   display: flex;
   align-items: center;
+  box-sizing: border-box;
+  border-bottom: $border;
+  position: fixed;
+  top: 0;
   justify-content: space-between;
-  padding: $padding-default $padding-big $padding-default $padding-big;
-  position: relative;
-  margin-left: -$padding-big;
-  background: white;
+  width: 100%;
+  z-index: 10;
 
-  @include dark-theme {
-    background: color(dark, base);
-  }
-
-  &:after {
-    content: "";
+  &__notifications-marker {
+    width: 8px;
+    height: 8px;
+    border-radius: 100px;
+    background: $danger;
     position: absolute;
-    height: 1px;
-    width: calc(100% + #{$padding-big});
-    bottom: 0;
-    left: -40px;
-    background: $grey-light;
-
-    @include dark-theme {
-      background: $divider-dark;
-    }
-  }
-
-  &__file {
-    flex: 1 1 40px;
-    box-sizing: border-box;
-    height: 40px;
-    width: 40px;
-    border-radius: 100%;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin-left: $padding-big;
-    margin-right: $padding-default;
-    border: 1px dashed $grey;
-    transition: $transition-1;
-    cursor: pointer;
-
-    &:hover {
-      border-color: $primary;
-    }
-
-    &:hover & {
-      &-icon {
-        color: $primary;
-      }
-    }
-
-    &-icon {
-      height: 14px;
-      color: $grey;
-      transition: $transition-1;
-    }
-  }
-
-  &__search {
-    align-items: center;
-    position: relative;
-    border-top-left-radius: $card-br;
-    border-top-right-radius: $card-br;
-    padding-right: 48px;
-    height: 40px;
-
-    @include dark-theme {
-    }
-
-    &_active {
-      @include dark-theme {
-        i {
-          color: $primary;
-        }
-      }
-    }
-
-    &-right {
-      box-sizing: border-box;
-      position: absolute;
-      top: 0;
-      right: 0px;
-      width: 56px;
-      border-top-right-radius: $card-br;
-      height: 40px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-bottom-right-radius: $card-br;
-      background: $primary;
-
-      @include dark-theme {
-        background: color(dark, darkest);
-      }
-    }
-
-    &-icon {
-      height: 22px;
-      width: 22px;
-      color: white;
-      padding-left: 6px;
-      transition: $transition-1;
-
-      @include dark-theme {
-      }
-    }
-
-    &-input {
-      position: relative;
-      z-index: 1;
-      border-radius: $card-br;
-      padding: $padding-small $padding-default;
-      transition: $transition-1;
-      appearance: none;
-      border: unset;
-      border: 0;
-      font-family: "Source Code Pro";
-      width: 440px;
-      font-size: $fz-md;
-      color: $grey;
-      outline: none;
-      box-sizing: border-box;
-      height: 40px;
-      background: $grey-light;
-
-      @include dark-theme {
-        color: white;
-        background: $card-dark;
-      }
-
-      &::placeholder {
-        opacity: 1;
-
-        @include dark-theme {
-          color: white;
-          color: color(dark, text-light);
-        }
-      }
-
-      &:focus {
-        border: none;
-      }
-    }
-  }
-
-  &__avatar {
-    flex: 1 1 40px;
-    height: 40px;
-    width: 40px;
-    border-radius: 100%;
-    background: $grey;
-    position: relative;
-  }
-
-  &__status {
-    height: 12px;
-    width: 12px;
-    border-radius: 100%;
-    position: absolute;
-    transition: $transition-1;
-    right: 0;
-    bottom: 0;
-
-    &_active {
-      background: $primary;
-    }
-
-    &_inactive {
-      color: $error;
-    }
+    right: 82px;
+    top: 32px;
   }
 
   &__left {
-    flex: 1;
     display: flex;
+    align-items: center;
+  }
+
+  &__button {
+    margin: 0 $padding-llg;
+  }
+
+  &__search {
+    width: 269px;
   }
 
   &__right {
+    height: 48px;
     display: flex;
     align-items: center;
-    padding-left: $padding-default;
   }
 
-  &__item {
-    flex: 1 1 22px;
-    color: $grey;
-    cursor: pointer;
-    position: relative;
-
-    @include dark-theme {
-      color: white;
-    }
-
-    &:not(:last-child) {
-      margin-right: $padding-normal;
-    }
-
-    &-icon {
-      height: 22px;
-      width: 22px;
-      transition: $transition-1;
-
-      &_active {
-        color: $primary;
-      }
-    }
-
-    &:hover & {
-      &-icon {
-        color: $primary;
-      }
-    }
-
-    &:active & {
-      &-icon {
-        color: $primary-dark;
-      }
-    }
-  }
-
-  &__badge {
-    position: absolute;
-    top: -7px;
-    right: -7px;
-    background: $accent;
-    padding: 4px 6px;
-    border-radius: 19px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-family: "Roboto";
-    font-size: $fz-xss;
-    opacity: 0;
-    visibility: hidden;
-    transition: $transition-1;
-
-    &_visible {
-      visibility: visible;
-      opacity: 1;
-    }
+  &__icon {
+    margin-left: $padding-xl;
   }
 }

@@ -1,87 +1,128 @@
 .sidebar {
   width: $sidebar-width;
-  position: absolute;
+  position: fixed;
   left: 0;
-  top: 0;
-  height: calc(100% - #{$padding-normal}* 2);
-  flex-flow: column wrap;
-  align-items: center;
-  justify-content: space-between;
-  display: flex;
-  padding: $padding-normal 0;
-  background: $primary;
+  height: calc(100% - 48px - 88px);
+  padding: $padding-llg 0;
+  border-right: $border;
+  box-sizing: border-box;
+  z-index: 1;
+  background: $darkest;
 
-  @include dark-theme {
-    background: color(dark, darkest);
+  &__control {
+    display: flex;
+    align-items: center;
+    gap: $padding-sm;
+    color: $text-white;
+    cursor: pointer;
+    font-size: $fz-md;
+    line-height: 16px;
+    font-feature-settings: "salt" on;
+    padding: $padding-sm 0;
+    transition: $transition-1;
+    position: relative;
+
+    &::after {
+      content: "";
+      position: absolute;
+      height: 40px;
+      width: 192px;
+      border-radius: $br-md;
+      transition: $transition-1;
+      left: -14px;
+    }
+
+    &:hover {
+      &::after {
+        background: $white-ghost;
+        box-shadow: $shadow-2;
+      }
+
+      svg {
+        path {
+          stroke: $white;
+        }
+      }
+    }
   }
 
-  &__logo {
-    height: $nav-size;
-    width: $nav-size;
-    border-radius: $card-br;
+  &__controls {
+    margin-bottom: $padding-md;
+    border-bottom: $border;
+    padding: 0 $padding-llg;
+    padding-bottom: $padding-md;
+  }
 
-    g {
-      fill: white;
-    }
+  &__title {
+    font-weight: $fw-bold;
+    font-size: $fz-xs;
+    line-height: 16px;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    font-feature-settings: "salt" on;
+    color: $grey-light;
+    padding: 0 $padding-llg;
+  }
+
+  &__items {
+    margin-top: $padding-sm;
+    overflow-y: scroll;
+    overflow-x: visible;
+    max-height: calc(100% - 104px);
+    padding: 0 $padding-llg;
   }
 
   &__item {
-    height: $nav-size;
-    width: $nav-size;
-    display: block;
-    background: $primary-dark;
-    border-radius: $card-br;
-    transition: $transition-1;
+    height: 40px;
+    width: 176px;
+    border-radius: $br-md;
     display: flex;
     align-items: center;
-    justify-content: center;
+    font-feature-settings: "salt" on;
+    color: $text-white;
+    font-size: 14px;
+    line-height: 16px;
+    box-sizing: border-box;
+    transition: $transition-1;
+    cursor: pointer;
+    position: relative;
 
-    @include dark-theme {
-      background: $card-dark;
-    }
-
-    &:hover & {
-      &-icon {
-        color: $primary;
-      }
-    }
-
-    &-icon {
-      height: 24px;
-      color: white;
+    &::after {
+      content: "";
+      position: absolute;
+      height: 40px;
+      width: 192px;
+      border-radius: $br-md;
       transition: $transition-1;
+      left: -14px;
     }
 
-    &.router-link-exact-active {
-      background: white;
-
-      @include dark-theme {
-        background: $primary;
-
-        i {
-          color: color(dark, darkest);
-        }
+    &_active {
+      &::after {
+        background: $white-ghost;
+        box-shadow: $shadow-2;
       }
+    }
 
-      i {
-        color: $primary;
+    &:hover {
+      &::after {
+        background: $white-ghost;
+        box-shadow: $shadow-2;
       }
     }
 
     &:not(:last-child) {
-      margin-bottom: $padding-default;
+      margin-bottom: $padding-xxs;
     }
 
-    &:hover {
-      background: white;
-
-      @include dark-theme {
-        background: $primary;
-
-        i {
-          color: color(dark, darkest);
-        }
-      }
+    &::before {
+      content: "";
+      display: block;
+      background: $success;
+      height: 8px;
+      width: 8px;
+      border-radius: 100%;
+      margin-right: $padding-sm;
     }
   }
 }

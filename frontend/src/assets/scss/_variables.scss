@@ -3,31 +3,42 @@ $size-lg: 1144px;
 
 // App Global Font Size
 $html-font-size: 16px;
+$font-family: "Inter", sans-serif;
 
 // Colors
-$background: #02a794;
-$base: #fcfcfc;
-$primary: #02d2b3;
-$primary-dark: #19bca4;
-$secondary: #dc6f23;
-$dark: #2e3542;
-$darkest: #1b2029;
-$grey: #7d7d7d;
-$grey-light: #ebebeb;
-$grey-darkest: #646b83;
-$error: #d63649;
-$accent: #fe030a;
-$divider-dark: #5a626f;
-$card-dark: #474f5f;
-
-$text-dark: #000;
-$text-light: #93a4bc;
-
+$darkest: #0e0e10;
+$dark: #131416;
+$dark-semi-light: #141416;
+$dark-light: #2d2e30;
+$dark-gradient: linear-gradient(
+  0deg,
+  rgba(255, 255, 255, 0.03),
+  rgba(255, 255, 255, 0.03)
+);
+$dark-gradient-static: #262629;
+$semi-dark: #212228;
+$dark-static: #161617;
+$white: #fff;
+$white-ghost: rgba(255, 255, 255, 0.05);
+$white-light: rgba(255, 255, 255, 0.15);
+$primary: #0a9795;
+$jade: #0aa292;
+$primary-gradient: linear-gradient(92.64deg, $jade 0.31%, #084b9c 129.25%);
+$grey: #7b7d82;
+$grey-light: #7e8084;
+$grey-dark: #28282d;
+$red: #eb5757;
+$danger: #ff3d48;
+$success: #48ff9c;
+$black-light: rgba(255, 255, 255, 0.03);
+$text-white: rgba(255, 255, 255, 0.8);
+$modal-bg: rgba(33, 33, 35, 0.83);
+$dropdown-dark: rgba(21, 21, 23, 0.83);
+$error-gradient: linear-gradient(0deg, #ff6d6d, #ff6d6d), #131416;
 $themes: (
   dark: (
     base: $dark,
     darkest: $darkest,
-    text-light: $text-light,
   ),
 );
 
@@ -35,7 +46,7 @@ $themes: (
 $fw-light: 300;
 $fw-normal: 400;
 $fw-semi-bold: 500;
-$fw-bold: 700;
+$fw-bold: 600;
 
 // Setting for the Typography elements
 $fz-xss: 0.5rem !default; // 8px
@@ -50,27 +61,46 @@ $fz-title: 2.25rem !default; // 36px
 // Transitions
 $transition-1: 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
 $transition-2: 0.3s ease all;
+$transition-3: 2s linear infinite;
 
 // Shadows
-$shadow-1: 0px 8px 32px rgba(36, 36, 36, 0.12);
-$shadow-2: 2px 12px 40px rgba(0, 0, 0, 0.24);
+$shadow-1: inset -1px 0px 1px rgba(255, 255, 255, 0.08),
+  inset 0px 0px 6px rgba(255, 255, 255, 0.06);
+$shadow-2: inset -1px 0px 1px rgba(255, 255, 255, 0.04),
+  inset 0px 0px 6px rgba(255, 255, 255, 0.03);
+$shadow-3: 0px 0px 0px 3px rgba(10, 158, 146, 0.12),
+  inset -1px 0px 1px rgba(10, 158, 146, 0.04),
+  inset 0px 0px 6px rgba(10, 158, 146, 0.03);
+$shadow-4: 0px 4px 4px rgba(0, 0, 0, 0.25);
+$shadow-5: inset -1px 0px 1px rgba(255, 255, 255, 0.04),
+  inset 0px 0px 6px rgba(255, 255, 255, 0.03);
+
+$blur: blur(17px);
+$blur-2: blur(14px);
 
 // App Spacing
-$padding-xs: 0.25rem; // 4px
-$padding-micro: 0.5rem; // 8px
-$padding-small: 0.75rem; // 12px
-$padding-default: 1rem; // 16px
+$padding-xxs: 0.25rem; // 4px
+$padding-xs: 0.5rem; // 8px
+$padding-sm: 0.75rem; // 12px
+$padding-md: 1rem; // 16px
 $padding-lg: 1.125rem; // 18px
-$padding-normal: 1.5rem; // 24px
-$padding-medium: 2rem; // 32px
-$padding-big: 2.5rem; // 40px
+$padding-llg: 1.5rem; // 24px
+$padding-xl: 2rem; // 32px
+$padding-xxl: 2.5rem; // 40px
 $padding-max: 4rem; // 64px
 
 // App settings
-$app-br: 36px;
-$app-width: 1024px;
-$app-height: 768px;
+$app-width: 1376px;
+$app-height: 880px;
 
-$card-br: 8px;
-$sidebar-width: 80px;
-$nav-size: 50px;
+$br-xxs: 2px;
+$br-xs: 4px;
+$br-sm: 5px;
+$br-md: 9px;
+$br-lg: 22px;
+
+$border: 1px solid $semi-dark;
+$border-transparent: 1px solid rgba(225, 225, 225, 0.1);
+$border-primary: 1px solid rgba(255, 255, 255, 0.07);
+
+$sidebar-width: 224px;

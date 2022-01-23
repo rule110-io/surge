@@ -1,13 +1,18 @@
 <template>
   <div class="dashboard">
-    <Snackbar />
     <Header />
-    <router-view
-      v-if="remoteFiles !== false && localFiles !== false"
-    ></router-view>
-    <Preloader v-else />
+    <div class="dashboard__content">
+      <router-view
+        v-if="remoteFiles !== false && localFiles !== false"
+      ></router-view>
+    </div>
+
     <NetworkStats />
-    <StartDownloadModal />
+    <AddTopicModal openModalEvent="openAddTopicModal" />
+    <AddFileModal openModalEvent="openAddFileModal" />
+    <RemoveFileModal openModalEvent="openRemoveFileModal" />
+    <SettingsModal openModalEvent="openSettingsModal" />
+    <UnsubscribeTopicModal openModalEvent="openUnsubscribeTopicModal" />
   </div>
 </template>
 
@@ -16,22 +21,54 @@
 </style>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations, mapActions } from "vuex";
 
 import Header from "@/components/Header/Header";
-import Preloader from "@/components/Preloader/Preloader";
 import NetworkStats from "@/components/NetworkStats/NetworkStats";
-import Snackbar from "@/components/Snackbar/Snackbar.vue";
-import StartDownloadModal from "@/components/Modals/StartDownloadModal/StartDownloadModal";
+import AddTopicModal from "@/components/Modals/AddTopicModal/AddTopicModal";
+import AddFileModal from "@/components/Modals/AddFileModal/AddFileModal";
+import RemoveFileModal from "@/components/Modals/RemoveFileModal/RemoveFileModal";
+import SettingsModal from "@/components/Modals/SettingsModal/SettingsModal";
+import UnsubscribeTopicModal from "@/components/Modals/UnsubscribeTopicModal/UnsubscribeTopicModal";
 
 export default {
-  components: { Header, Preloader, NetworkStats, Snackbar, StartDownloadModal },
+  components: {
+    Header,
+    NetworkStats,
+    AddTopicModal,
+    AddFileModal,
+    RemoveFileModal,
+    SettingsModal,
+    UnsubscribeTopicModal,
+  },
   data: () => {
     return {};
   },
   computed: {
-    ...mapState("files", ["remoteFiles", "localFiles"]),
+    ...mapState("files", ["remoteFiles", "localFiles", "selectedFiles"]),
   },
-  methods: {},
+  watch: {
+    selectedFiles(newFiles) {
+      if (!newFiles.length) {
+        this.closeDetails();
+      }
+    },
+    $route() {
+      this.closeDetails();
+    },
+  },
+  methods: {
+    ...mapMutations({
+      setFileDetails: "files/setFileDetails",
+      setFileSpeed: "files/setFileSpeed",
+    }),
+    ...mapActions({
+      clearSelectedFiles: "files/clearSelectedFiles",
+    }),
+    closeDetails() {
+      this.setFileDetails(false);
+      this.setFileSpeed(false);
+    },
+  },
 };
 </script>

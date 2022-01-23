@@ -1,18 +1,26 @@
 <template>
   <div class="sidebar">
-    <Logo v-if="!darkTheme" class="sidebar__logo" />
-    <LogoGradient v-else class="sidebar__logo" />
-    <div class="sidebar__nav">
-      <router-link to="/search" id="search" class="sidebar__item">
-        <feather class="sidebar__item-icon" type="search"></feather>
-      </router-link>
-      <router-link to="/download" id="download" class="sidebar__item">
-        <feather class="sidebar__item-icon" type="folder"></feather>
-      </router-link>
+    <div class="sidebar__controls">
+      <div class="sidebar__control" @click="openAddTopicModal">
+        <Icon class="sidebar__control-icon" icon="PlusIcon"></Icon>Add New
+        Channel
+      </div>
     </div>
-    <router-link to="/settings" id="settings" class="sidebar__item">
-      <feather class="sidebar__item-icon" type="settings"></feather>
-    </router-link>
+    <div class="sidebar__title">Active</div>
+
+    <div class="sidebar__items">
+      <div
+        class="sidebar__item"
+        v-for="(topic, i) in topicNames"
+        :key="i"
+        @click="setRemoteFilesTopic(topic)"
+        :class="
+          remoteFilesConfig.topicName === topic ? 'sidebar__item_active' : null
+        "
+      >
+        {{ topic }}
+      </div>
+    </div>
   </div>
 </template>
 
@@ -21,15 +29,32 @@
 </style>
 
 <script>
-import { mapState } from "vuex";
+import Icon from "@/components/Icon/Icon";
 
-import Logo from "@/assets/images/Logo.svg";
-import LogoGradient from "@/assets/images/LogoGradient.svg";
+import { mapState, mapMutations } from "vuex";
 
 export default {
-  components: { Logo, LogoGradient },
+  components: { Icon },
+  data: () => {
+    return {
+      topicName: "",
+    };
+  },
   computed: {
-    ...mapState("darkTheme", ["darkTheme"]),
+    ...mapState("topics", ["topics"]),
+    ...mapState("files", ["remoteFilesConfig"]),
+    topicNames() {
+      return this._.map(this.topics, "Name");
+    },
+  },
+  mounted() {},
+  methods: {
+    ...mapMutations({
+      setRemoteFilesTopic: "files/setRemoteFilesTopic",
+    }),
+    openAddTopicModal() {
+      this.$bus.$emit("openAddTopicModal");
+    },
   },
 };
 </script>

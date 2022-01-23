@@ -1,0 +1,42 @@
+.transfers-info-card {
+  position: absolute;
+  transition: $transition-1;
+  width: 100%;
+  background: $dark-static;
+  height: 410px;
+  left: 0;
+  bottom: 0;
+  transform: translateY(410px);
+  box-shadow: $shadow-5;
+  backdrop-filter: $blur-2;
+
+  &__title {
+    font-weight: $fw-bold;
+    font-size: 22px;
+    line-height: 32px;
+    font-feature-settings: "salt" on;
+    color: $white;
+  }
+
+  &__info {
+    margin-left: $padding-xxl;
+  }
+
+  &_active {
+    transform: translateY(0);
+  }
+
+  &__header {
+    padding: $padding-llg $padding-xxl 0;
+    display: flex;
+    align-items: center;
+  }
+
+  &__body {
+    padding: $padding-llg $padding-xxl;
+    height: 218px;
+    box-sizing: border-box;
+    overflow-y: auto;
+    position: relative;
+  }
+}

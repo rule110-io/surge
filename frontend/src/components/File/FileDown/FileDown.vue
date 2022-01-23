@@ -32,6 +32,8 @@ export default {
   },
   watch: {
     statusBundle(newEvent) {
+      if (!this.file) return;
+
       const { FileHash } = this.file;
       const newFileHash = this._.find(newEvent, { FileHash });
       const isNewFileHash = !this._.isEmpty(newFileHash);

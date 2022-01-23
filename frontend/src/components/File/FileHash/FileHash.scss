@@ -5,39 +5,30 @@
   display: flex;
   align-items: center;
 
-  &:after {
-    position: absolute;
-    top: -2px;
-    left: 0;
-    display: inline-block;
-    color: $primary;
-    white-space: nowrap;
-    text-align: center;
-    transform: translate3d(-50%, 0, 0);
-    -webkit-backface-visibility: hidden;
-    opacity: 0.001;
-    content: attr(data-label);
-    font-size: $fz-sm;
-  }
-
   &_active {
-    &:after {
-      animation: floatup 0.5s ease-in-out;
+    .file-hash__icon {
+      path,
+      circle {
+        stroke: $primary !important;
+      }
     }
   }
 
   &:hover & {
     &__icon {
-      color: $primary;
+      path,
+      circle {
+        stroke: $white;
+      }
     }
   }
 
   &__icon {
-    height: 14px;
-    width: 14px;
+    margin-right: $padding-xs;
+    height: 24px;
+    width: 24px;
     position: relative;
     transition: $transition-1;
-    margin-right: $padding-micro;
   }
 
   &__text {

@@ -1,24 +1,24 @@
 <template>
   <div class="network-stats">
-    <div class="network-stats__item text_wrap_none">
-      <span class="network-stats__status" v-if="online === 0">
-        <feather class="network-stats__loader" type="loader"></feather>
-        Discovering network...
-      </span>
-      <template v-else>Total clients connected: {{ online }} </template>
-    </div>
-    <div class="network-stats__file" @click="seedFile">
-      <div class="network-stats__file-wrapper">
-        <feather class="network-stats__file-icon" type="plus"></feather>
+    <div class="network-stats__left">
+      <div
+        v-tooltip="{
+          content: 'My NKN Public Key',
+          placement: 'top-center',
+          offset: 5,
+        }"
+        class="network-stats__address"
+      >
+        {{ publicKey }}
       </div>
     </div>
-    <BandwidthChart />
-
-    <div class="network-stats__item text_wrap_none">
-      <span class="network-stats__avg">
-        Avg Speed: {{ totalDown | prettyBytes(1) }}/s |
-        {{ totalUp | prettyBytes(1) }}/s</span
-      >
+    <div class="network-stats__right">
+      <div class="network-stats__item text_wrap_none">
+        Download: {{ totalDown | prettyBytes(1) }}/s
+      </div>
+      <div class="network-stats__item text_wrap_none">
+        Upload: {{ totalUp | prettyBytes(1) }}/s
+      </div>
     </div>
   </div>
 </template>
@@ -28,27 +28,25 @@
 </style>
 
 <script>
-import BandwidthChart from "@/components/BandwidthChart/BandwidthChart";
-
 import { mapState } from "vuex";
 
 export default {
-  components: {
-    BandwidthChart,
-  },
+  components: {},
   data: () => {
-    return {};
+    return {
+      publicKey: "",
+    };
   },
   computed: {
-    ...mapState("clientStatus", ["online"]),
     ...mapState("globalBandwidth", ["statusBundle", "totalDown", "totalUp"]),
   },
+  mounted() {
+    this.getPublicKey();
+  },
   methods: {
-    seedFile() {
-      window.backend.seedFile().then(() => {
-        this.$store.dispatch("files/fetchLocalFiles");
-        this.$store.dispatch("files/fetchRemoteFiles");
-        this.$router.replace("/download");
+    getPublicKey() {
+      window.go.surge.MiddlewareFunctions.GetPublicKey().then((res) => {
+        this.publicKey = res;
       });
     },
   },

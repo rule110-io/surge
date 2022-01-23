@@ -1,16 +1,10 @@
 .bandwidth-chart {
-  height: 40px;
-  margin-right: $padding-normal;
-  position: absolute;
+  height: 170px;
   width: 100%;
-  border-top-left-radius: 18px;
-  border-top-right-radius: 18px;
   overflow: hidden;
   left: 0;
   top: 0;
 
   canvas {
-    height: 40px;
-    width: 100%;
   }
 }
