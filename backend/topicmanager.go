@@ -115,8 +115,9 @@ func GetTopicPermissions(topicName string, clientAddr string) models.TopicPermis
 	}
 
 	//Check if user is from team
-	//TODO: make this onchain somehow
-	if clientAddr == "7a48870a43d1512e467e8df103b1dee8d908f297ffe1fb45e81317965597bc7c" {
+	if clientAddr == constants.TeamAddressA ||
+		clientAddr == constants.TeamAddressB ||
+		clientAddr == constants.TeamAddressC {
 		return models.TopicPermissions{
 			CanRead:  true,
 			CanWrite: true,

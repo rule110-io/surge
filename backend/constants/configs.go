@@ -25,4 +25,9 @@ const (
 
 	//duration of a subscription blocktime is ~20sec
 	SubscriptionDuration = 180
+
+	//official surge wallets
+	TeamAddressA = "7a48870a43d1512e467e8df103b1dee8d908f297ffe1fb45e81317965597bc7c"
+	TeamAddressB = "44734f736b31e522e9be64a812cf42d0822c765f4bc13404d3169ff8e3d54c9e"
+	TeamAddressC = "68a10e26288b9e97fc97362eb935574dd3db74004f0081918ee121d15ed1d29b"
 )
