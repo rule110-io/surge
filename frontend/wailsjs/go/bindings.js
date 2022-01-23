@@ -79,7 +79,7 @@ const go = {
       },
       /**
        * GetTopicSubscriptions
-       * @returns {Promise<Array<string>>}  - Go Type: []string
+       * @returns {Promise<Array<TopicInfo>>}  - Go Type: []models.TopicInfo
        */
       "GetTopicSubscriptions": () => {
         return window.go.surge.MiddlewareFunctions.GetTopicSubscriptions();

@@ -2,11 +2,11 @@
   <Modal :show.sync="showModal" @closeAndClear="closeAndClearModal">
     <template slot="title"> Add New File </template>
     <template slot="body">
-      <ControlWrapper title="Topic name">
+      <ControlWrapper title="Channel name">
         <Select
           v-model="topicName"
-          :items="topics"
-          placeholder="Select topic"
+          :items="allowedTopics"
+          placeholder="Select Channel"
         />
       </ControlWrapper>
     </template>
@@ -45,6 +45,12 @@ export default {
     ...mapState("topics", ["topics"]),
     disabled() {
       return !this.topicName.length;
+    },
+    allowedTopics() {
+      return this._.map(
+        this._.filter(this.topics, ["Permissions.CanWrite", true]),
+        "Name"
+      );
     },
   },
   mounted() {},

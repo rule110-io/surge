@@ -80,9 +80,9 @@ func main() {
 	wails.Run(&options.App{
 		Title:             "Surge",
 		Width:             1320,
-		Height:            570,
-		MinWidth:          1320,
-		MinHeight:         570,
+		Height:            780,
+		MinWidth:          840,
+		MinHeight:         580,
 		DisableResize:     false,
 		Fullscreen:        false,
 		Frameless:         false,
@@ -115,7 +115,7 @@ func main() {
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
 			About: &mac.AboutInfo{
-				Title:   "Surge v0.5 - P2P on steroids",
+				Title:   "Surge v1.0 - P2P on steroids",
 				Message: "© 2020-2022 rule110",
 			},
 		},

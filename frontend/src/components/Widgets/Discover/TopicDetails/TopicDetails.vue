@@ -26,17 +26,18 @@
         >
           <Icon class="sidebar__stats-icon" :active="false" icon="LockIcon" />
         </div>
-        <div class="topic-details__stats-more" v-on-clickaway="closeDropdown">
+        <div
+          v-if="topicDetails.Name !== officialTopicName"
+          class="topic-details__stats-more"
+          v-on-clickaway="closeDropdown"
+        >
           <div class="topic-details__stats-more-btn" @click="toggleDropdown">
             <Icon class="topic-details__stats-more-icon" icon="MoreIcon" />
           </div>
 
           <Dropdown class="topic-details__dropdown" :open.sync="dropdownOpen">
             <ul class="dropdown__list">
-              <li
-                class="dropdown__list-item"
-                @click="unsubscribe(topicDetails.Name)"
-              >
+              <li class="dropdown__list-item" @click="unsubscribe">
                 Unsubscribe
               </li>
             </ul>
@@ -98,16 +99,14 @@ export default {
   methods: {
     ...mapActions({
       getTopicDetails: "topics/getTopicDetails",
-      unsubscribeFromTopic: "topics/unsubscribeFromTopic",
       fetchRemoteFiles: "topics/fetchRemoteFiles",
     }),
     ...mapMutations({
-      setRemoteFilesTopic: "files/setRemoteFilesTopic",
       setRemoteFilesConfig: "files/setRemoteFilesConfig",
     }),
-    unsubscribe(topicName) {
-      this.unsubscribeFromTopic(topicName);
-      this.setRemoteFilesTopic("");
+    unsubscribe() {
+      this.$bus.$emit("openUnsubscribeTopicModal");
+      this.closeDropdown();
     },
     openDropdown() {
       this.dropdownOpen = true;

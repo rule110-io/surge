@@ -11,13 +11,13 @@
     </thead>
     <tbody>
       <tr v-for="file in remoteFiles" :key="file.FileHash">
-        <td>
+        <td class="text_wrap_none" style="max-width: 300px">
           <FileName name-only :file="file" />
         </td>
         <td class="text_align_right">
           <FileSize :file="file" />
         </td>
-        <td>
+        <td class="text_wrap_none" style="max-width: 230px">
           <FileHash :hash="file.FileHash" />
         </td>
         <td class="text_align_right">{{ file.NumSeeders }}</td>

@@ -2,15 +2,16 @@
   <div class="sidebar">
     <div class="sidebar__controls">
       <div class="sidebar__control" @click="openAddTopicModal">
-        <Icon class="sidebar__control-icon" icon="PlusIcon"></Icon>Add New Topic
+        <Icon class="sidebar__control-icon" icon="PlusIcon"></Icon>Add New
+        Channel
       </div>
     </div>
-    <div class="sidebar__title">Subscribed</div>
+    <div class="sidebar__title">Active</div>
 
     <div class="sidebar__items">
       <div
         class="sidebar__item"
-        v-for="(topic, i) in topics"
+        v-for="(topic, i) in topicNames"
         :key="i"
         @click="setRemoteFilesTopic(topic)"
         :class="
@@ -42,6 +43,9 @@ export default {
   computed: {
     ...mapState("topics", ["topics"]),
     ...mapState("files", ["remoteFilesConfig"]),
+    topicNames() {
+      return this._.map(this.topics, "Name");
+    },
   },
   mounted() {},
   methods: {

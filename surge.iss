@@ -2,9 +2,9 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "Surge"
-#define MyAppVersion "0.4.0-beta"
+#define MyAppVersion "1.0.0-beta"
 #define MyAppPublisher "Rule110"
-#define MyAppURL "http://rule110.io/"
+#define MyAppURL "https://getsurge.io/"
 #define MyAppExeName "surge.exe"
 
 [Setup]
@@ -13,7 +13,7 @@
 AppId={{3A9FAAC0-146B-446E-B2D7-54388E778260}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
-;AppVerName={#MyAppName} {#MyAppVersion}
+AppVerName={#MyAppName}
 AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
@@ -23,6 +23,10 @@ DisableProgramGroupPage=yes
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
+SetupIconFile="C:\Users\Christian Busch\go\src\github.com\rule110-io\surge\build\windows\icon.ico"
+OutputBaseFilename=surge-{#MyAppVersion}-setup
+UninstallDisplayIcon={app}\{#MyAppExeName}
+WizardImageFile="C:\Users\Christian Busch\go\src\github.com\rule110-io\surge\installer\100.bmp,C:\Users\Christian Busch\go\src\github.com\rule110-io\surge\installer\125.bmp,C:\Users\Christian Busch\go\src\github.com\rule110-io\surge\installer\150.bmp,C:\Users\Christian Busch\go\src\github.com\rule110-io\surge\installer\175.bmp,C:\Users\Christian Busch\go\src\github.com\rule110-io\surge\installer\200.bmp,C:\Users\Christian Busch\go\src\github.com\rule110-io\surge\installer\225.bmp,C:\Users\Christian Busch\go\src\github.com\rule110-io\surge\installer\250.bmp"
 
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
@@ -44,8 +48,8 @@ ChangesAssociations = yes
 Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
-Source: "C:\Users\christian\go-projects\src\github.com\rule110-io\surge\build\surge.exe"; DestDir: "{app}"; Flags: ignoreversion
-Source: "C:\Users\christian\go-projects\src\github.com\rule110-io\surge\appicon.png"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Christian Busch\go\src\github.com\rule110-io\surge\build\bin\surge.exe"; DestDir: "{app}"; Flags: ignoreversion
+Source: "C:\Users\Christian Busch\go\src\github.com\rule110-io\surge\appicon.png"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
 [Icons]
@@ -55,3 +59,17 @@ Name: "{autodesktop}\{#MyAppName}"; Filename: "{app}\{#MyAppExeName}"; Tasks: de
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "{cm:LaunchProgram,{#StringChange(MyAppName, '&', '&&')}}"; Flags: nowait postinstall skipifsilent
 
+[Code]
+ procedure CurUninstallStepChanged (CurUninstallStep: TUninstallStep);
+ var
+     mres : integer;
+ begin
+    case CurUninstallStep of                   
+      usPostUninstall:
+        begin
+          mres := MsgBox('Do you want to remove all of the Surge application files?', mbConfirmation, MB_YESNO or MB_DEFBUTTON2)
+          if mres = IDYES then
+            DelTree(ExpandConstant('{userappdata}\Surge'), True, True, True);
+        end;
+    end;
+ end;  

@@ -27,6 +27,10 @@ body {
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none;
   }
+
+  input {
+    -webkit-user-select: text;
+  }
 }
 
 b {
@@ -288,12 +292,7 @@ th {
 .table {
   &__row {
     &_active {
-      background: linear-gradient(
-          0deg,
-          rgba(10, 151, 149, 0.2),
-          rgba(10, 151, 149, 0.2)
-        ),
-        #131416;
+      background: linear-gradient(0deg, rgba(10, 151, 149, 0.2), rgba(10, 151, 149, 0.2)), #131416;
       background-blend-mode: normal;
 
       td {

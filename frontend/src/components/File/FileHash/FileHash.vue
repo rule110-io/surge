@@ -38,7 +38,10 @@ export default {
   },
   methods: {
     onCopy() {
-      this.copied = !this.copied;
+      this.copied = true;
+      this._.delay(() => {
+        this.copied = false;
+      }, 200);
     },
   },
 };

@@ -6,10 +6,10 @@
         <th class="text_align_right">size</th>
         <th class="text_align_left" style="width: 134px">progress</th>
         <th class="text_align_left" style="width: 120px">status</th>
-        <th class="text_align_center">seeds</th>
-        <th class="text_align_right">down</th>
-        <th class="text_align_right">UP</th>
-        <th class="text_align_right">ETA</th>
+        <th class="text_align_center" style="width: 100px">seeds</th>
+        <th class="text_align_right" style="width: 100px">down</th>
+        <th class="text_align_right" style="width: 100px">UP</th>
+        <th class="text_align_right" style="width: 100px">ETA</th>
         <th></th>
       </tr>
     </thead>
@@ -26,7 +26,7 @@
         @click.meta="updateSelectedFiles(file)"
         @click.exact="addSingleSelectedFile(file)"
       >
-        <td>
+        <td class="text_wrap_none" style="max-width: 285px">
           <FileName :file="file" />
         </td>
         <td class="text_align_right">

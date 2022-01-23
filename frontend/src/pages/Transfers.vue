@@ -2,6 +2,7 @@
   <ContentWrapper>
     <TransfersHeader />
     <TransfersTable />
+    <TablePlaceholder v-if="!localFiles.length" />
     <TransferControls v-show="selectedFiles.length" />
     <TransfersDetails />
     <TransfersSpeed />
@@ -16,6 +17,7 @@ import TransfersTable from "@/components/Widgets/Transfers/TransfersTable/Transf
 import TransferControls from "@/components/Widgets/Transfers/TransferControls/TransferControls";
 import TransfersDetails from "@/components/Widgets/Transfers/TransfersDetails/TransfersDetails";
 import TransfersSpeed from "@/components/Widgets/Transfers/TransfersSpeed/TransfersSpeed";
+import TablePlaceholder from "@/components/TablePlaceholder/TablePlaceholder";
 
 export default {
   name: "download",
@@ -26,6 +28,7 @@ export default {
     TransferControls,
     TransfersDetails,
     TransfersSpeed,
+    TablePlaceholder,
   },
   data: () => {
     return {

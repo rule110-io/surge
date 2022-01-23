@@ -1,11 +1,11 @@
 {
   "name": "Surge",
-  "description": "Enter your project description",
+  "description": "P2P on steroids",
   "author": {
     "name": "Christian Busch",
     "email": "kontakt@christian-busch.com"
   },
-  "version": "0.4.0-beta",
+  "version": "1.0.0-beta",
   "binaryname": "surge",
   "frontend": {
     "dir": "frontend",
