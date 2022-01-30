@@ -9,7 +9,6 @@
 package surge
 
 import (
-	"log"
 	"os"
 
 	bitmap "github.com/boljen/go-bitmap"
@@ -109,7 +108,6 @@ func RemoveFileByHash(Hash string, FromDisk bool) bool {
 
 	file, err := dbGetFile(Hash)
 	if !FromDisk && err != nil {
-		log.Println("Error on remove file (read db)", err.Error())
 		pushError("Error on remove file (read db)", err.Error())
 		return false
 	}
@@ -117,14 +115,12 @@ func RemoveFileByHash(Hash string, FromDisk bool) bool {
 	if FromDisk {
 		err = os.Remove(file.Path)
 		if err != nil {
-			log.Println("Error on remove file from disk", err.Error())
 			pushError("Error on remove file from disk", err.Error())
 		}
 	}
 
 	err = dbDeleteFile(Hash)
 	if err != nil {
-		log.Println("Error on remove file (read db)", err.Error())
 		pushError("Error on remove file (read db)", err.Error())
 		return false
 	}

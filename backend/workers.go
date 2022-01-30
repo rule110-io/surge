@@ -10,15 +10,12 @@
 package surge
 
 import (
-	"fmt"
-	"log"
 	"time"
 
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
 	"github.com/rule110-io/surge/backend/platform"
-	"github.com/rule110-io/surge/backend/sessionmanager"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -37,16 +34,6 @@ func updateFileDataWorker() {
 
 	for {
 		time.Sleep(time.Second)
-
-		mutexes.WorkerMapLock.Lock()
-		for k, v := range workerMap {
-			log.Println("Active Workers:", k, v)
-			fmt.Println("Active Workers:", k, v)
-		}
-		mutexes.WorkerMapLock.Unlock()
-
-		log.Println("Active Sessions:", sessionmanager.GetSessionLength())
-		fmt.Println("Active Sessions:", sessionmanager.GetSessionLength())
 
 		//Create session aggregate maps for file
 		fileProgressMap := make(map[string]float32)

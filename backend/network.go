@@ -185,9 +185,12 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 						sleepWorker = false
 						break
 					}
-					if receiveTimeoutCounter >= constants.WorkerChunkReceiveTimeout {
+
+					_, currentSessionExists := sessionmanager.GetExistingSessionWithoutClosing(downloadSeederAddr, constants.WorkerGetSessionTimeout)
+
+					if receiveTimeoutCounter >= constants.WorkerChunkReceiveTimeout && !currentSessionExists {
 						//if timeout is triggered, leave in transit.
-						fmt.Println(string("\033[36m"), "timeout is triggered, leave in transit.", string("\033[0m"))
+						log.Println(string("\033[36m"), "timeout is triggered, leave in transit.", string("\033[0m"))
 						inTransit = true
 						sleepWorker = false
 
@@ -198,7 +201,7 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 						if lastRecreateTime > lockTime {
 							//a new session was created.
 							requeue()
-							fmt.Println(string("\033[36m"), "using newly replaced session.", string("\033[0m"))
+							log.Println(string("\033[36m"), "using newly replaced session.", string("\033[0m"))
 							recreateSessionLock.Unlock()
 							return
 						}
@@ -208,9 +211,9 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 						recreateSessionLock.Unlock()
 
 						if err == nil {
-							fmt.Println(string("\033[36m"), "session was replaced, continue downloading.", string("\033[0m"))
+							log.Println(string("\033[36m"), "session was replaced, continue downloading.", string("\033[0m"))
 						} else {
-							fmt.Println(string("\033[36m"), "a new session could not be created, stop downloading.", string("\033[0m"))
+							log.Println(string("\033[36m"), "a new session could not be created, stop downloading.", string("\033[0m"))
 							//RemoveSeeder(downloadSeederAddr)
 							sessionmanager.CloseSession(downloadSeederAddr)
 							requeue()
@@ -338,11 +341,10 @@ func TransmitChunk(Session *sessionmanager.Session, FileID string, ChunkID int32
 	dbInsertFile(*fileInfo)
 	mutexes.FileWriteLock.Unlock()
 
-	file, err := os.Open(fileInfo.Path)
-
+	_, err = os.Stat(fileInfo.Path)
 	//When we have an OS read error on the file mark the file as missing, stop down and uploads on it
 	if err != nil {
-		log.Println("Error on transmit chunk - file read failure", err.Error())
+		log.Println("Error on transmit chunk - file no longer at path, stopping upload.", err.Error())
 
 		mutexes.FileWriteLock.Lock()
 		fileInfo.IsMissing = true
@@ -354,12 +356,18 @@ func TransmitChunk(Session *sessionmanager.Session, FileID string, ChunkID int32
 
 		return
 	}
-	defer file.Close()
+
+	file, err := os.Open(fileInfo.Path)
+	if err != nil {
+		log.Println("Error on transmit chunk - file read failure", err.Error())
+		return
+	}
 
 	//Read the requested chunk
 	chunkOffset := int64(ChunkID) * constants.ChunkSize
 	buffer := make([]byte, constants.ChunkSize)
 	bytesread, err := file.ReadAt(buffer, chunkOffset)
+	file.Close()
 
 	if err != nil {
 		if err != io.EOF {
@@ -442,7 +450,6 @@ func SessionRead(Session *sessionmanager.Session) (data []byte, ID byte, err err
 
 	//Get the packid
 	packID := headerBuffer[0]
-	log.Println(packID)
 
 	//Get the size from the bytes
 	sizeBytes := append(headerBuffer[:0], headerBuffer[1:]...)

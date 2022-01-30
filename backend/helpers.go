@@ -3,7 +3,6 @@ package surge
 import (
 	b64 "encoding/base64"
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
@@ -81,7 +80,6 @@ func hashFile(randomHash string) {
 
 	hashString, err := HashFile(dbFile.Path)
 	if err != nil {
-		log.Println(err)
 		pushError("File Hash Failed", "Could not hash file at "+dbFile.Path)
 	}
 
@@ -136,7 +134,6 @@ func ParsePayloadString(s string) []models.File {
 		}
 		mutexes.ListedFilesLock.Unlock()
 
-		log.Println("Program parameter new file: ", newListing.FileName)
 		files = append(files, newListing)
 	}
 	return files

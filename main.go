@@ -39,10 +39,7 @@ func main() {
 
 	//stats := &Stats{}
 
-	argsWithProg := os.Args
 	argsWithoutProg := os.Args[1:]
-	log.Println(argsWithProg)
-	log.Println(argsWithoutProg)
 
 	//invoked with a download
 	if len(argsWithoutProg) > 0 {

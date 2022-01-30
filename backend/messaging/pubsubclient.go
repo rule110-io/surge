@@ -66,8 +66,7 @@ func listen() {
 				log.Println("Received invalid message:", string(msg.Data), "from:", msg.Src, "error:", err)
 				fmt.Println("Received invalid message:", string(msg.Data), "from:", msg.Src, "error:", err)
 			} else if msg.Src == nknClient.Address() {
-				log.Println("Discard message received from self:", string(msg.Data), "from:", msg.Src, "error:", err)
-				fmt.Println("Discard message received from self:", string(msg.Data), "from:", msg.Src, "error:", err)
+				//We exclude messages from ourselves
 			} else {
 				msgObj.Sender = msg.Src
 				onMessageHandler(&msgObj)
