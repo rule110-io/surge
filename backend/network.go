@@ -207,7 +207,9 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 						}
 
 						_, err := sessionmanager.ReplaceSession(downloadSeederAddr)
-						lastRecreateTime = time.Now().Unix()
+						if err == nil {
+							lastRecreateTime = time.Now().Unix()
+						}
 						recreateSessionLock.Unlock()
 
 						if err == nil {
