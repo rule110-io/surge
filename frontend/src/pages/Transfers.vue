@@ -44,9 +44,7 @@ export default {
       "selectedFiles",
     ]),
   },
-  mounted() {
-    this.$store.dispatch("files/fetchLocalFiles");
-  },
+  mounted() {},
   methods: {
     setSorting(orderBy) {
       let newConfig = Object.assign({}, this.localFilesConfig);

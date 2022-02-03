@@ -96,7 +96,6 @@ export default {
     ]),
   },
   mounted() {
-    this.$store.dispatch("files/fetchLocalFiles");
     window.addEventListener("mouseup", this.stopDrag);
   },
   methods: {
