@@ -36,9 +36,9 @@ func WalletBalance() string {
 /*Wallet Features
 - Import wallet from private key
 - Export wallet private key
-- Send transaction with (amount, fee, toAddress)
-- WalletInfo (retrieve personal wallet address + wallet balance)
-- Set/Get transaction fee default
+- ✔ Send transaction with (amount, fee, toAddress)
+- ✔ WalletInfo (retrieve personal wallet address + wallet balance)
+- ✔ Set/Get transaction fee default
 
 
 - Optional:
