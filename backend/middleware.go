@@ -1,6 +1,7 @@
 package surge
 
 import (
+	"github.com/nknorg/nkn-sdk-go"
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
@@ -204,4 +205,17 @@ func (s *MiddlewareFunctions) SetDownloadFolder() bool {
 	}
 	DbWriteSetting("downloadFolder", path)
 	return true
+}
+
+func (s *MiddlewareFunctions) GetWalletAddress() string {
+	return WalletAddress()
+}
+
+func (s *MiddlewareFunctions) GetWalletBalance() string {
+	return WalletBalance()
+}
+func TransferToPk(PubKey string, Amount string, Fee string) string {
+	walletAddr, _ := nkn.ClientAddrToWalletAddr(PubKey)
+	_, hash := WalletTransfer(walletAddr, Amount, Fee)
+	return hash
 }
