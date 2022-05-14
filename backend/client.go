@@ -130,6 +130,14 @@ func InitializeClient(args []string) bool {
 	}
 
 	messaging.Initialize(client, client.Account(), MessageReceived)
+
+	//Get the transaction fee setting
+	TransactionFee, err = DbReadSetting("defaultTxFee")
+	if err != nil {
+		DbWriteSetting("defaultTxFee", "0")
+		TransactionFee = "0"
+	}
+
 	go autoSubscribeWorker()
 
 	go platform.WatchOSXHandler()

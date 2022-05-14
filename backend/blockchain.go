@@ -11,11 +11,17 @@ package surge
 import (
 	"log"
 
+	"github.com/nknorg/nkn-sdk-go"
 	"github.com/rule110-io/surge/backend/constants"
 )
 
+var TransactionFee string
+
 func subscribeToPubSub(topic string) {
-	txnHash, err := client.Subscribe("", topic, constants.SubscriptionDuration, "Surge Beta Client", nil)
+	config := &nkn.DefaultTransactionConfig
+	config.Fee = TransactionFee
+
+	txnHash, err := client.Subscribe("", topic, constants.SubscriptionDuration, "Surge Beta Client", config)
 	if err != nil {
 		log.Println("Probably already subscribed to:", topic, "error:", err)
 	} else {
@@ -24,7 +30,10 @@ func subscribeToPubSub(topic string) {
 }
 
 func unsubscribeToPubSub(topic string) {
-	txnHash, err := client.Unsubscribe("", topic, nil)
+	config := &nkn.DefaultTransactionConfig
+	config.Fee = TransactionFee
+
+	txnHash, err := client.Unsubscribe("", topic, config)
 	if err != nil {
 		log.Println("Probably not subscribed to:", topic, "error:", err)
 	} else {

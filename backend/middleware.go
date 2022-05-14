@@ -219,3 +219,12 @@ func TransferToPk(PubKey string, Amount string, Fee string) string {
 	_, hash := WalletTransfer(walletAddr, Amount, Fee)
 	return hash
 }
+
+func (s *MiddlewareFunctions) GetTxFee() string {
+	return TransactionFee
+}
+
+func (s *MiddlewareFunctions) SetTxFee(Fee string) {
+	TransactionFee = Fee
+	DbWriteSetting("defaultTxFee", Fee)
+}
