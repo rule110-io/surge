@@ -42,8 +42,8 @@ export default {
         this.progress = newFileHash.Progress * 100;
       }
     },
-    progress(x) {
-      if (x === 100) {
+    progress(x, oldVal) {
+      if (x === 100 && oldVal) {
         this.$store.dispatch("files/fetchLocalFiles");
       }
     },

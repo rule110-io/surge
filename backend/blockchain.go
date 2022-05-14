@@ -17,17 +17,17 @@ import (
 func subscribeToPubSub(topic string) {
 	txnHash, err := client.Subscribe("", topic, constants.SubscriptionDuration, "Surge Beta Client", nil)
 	if err != nil {
-		log.Println("Probably already subscribed", err)
+		log.Println("Probably already subscribed to:", topic, "error:", err)
 	} else {
-		log.Println("Subscribed: ", txnHash)
+		log.Println("Subscribed: ", topic, txnHash)
 	}
 }
 
 func unsubscribeToPubSub(topic string) {
 	txnHash, err := client.Unsubscribe("", topic, nil)
 	if err != nil {
-		log.Println("Probably already subscribed", err)
+		log.Println("Probably not subscribed to:", topic, "error:", err)
 	} else {
-		log.Println("Subscribed: ", txnHash)
+		log.Println("Unsubscribed: ", topic, txnHash)
 	}
 }

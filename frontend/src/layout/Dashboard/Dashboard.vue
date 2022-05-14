@@ -39,7 +39,6 @@ export default {
     this.enableErrorEvents();
     this.enableDarkThemeEvent();
 
-    this.fetchLocalFiles();
     this.fetchTopics();
     this.fetchRemoteFiles();
     this.fetchDarkTheme();

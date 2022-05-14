@@ -1,14 +1,14 @@
-export interface Position {
+interface Position {
     x: number;
     y: number;
 }
 
-export interface Size {
+interface Size {
     w: number;
     h: number;
 }
 
-export interface RGBA {
+interface RGBA {
     r: number;
     g: number;
     b: number;
@@ -16,7 +16,7 @@ export interface RGBA {
 }
 
 
-export interface runtime {
+interface runtime {
     EventsEmit(eventName: string, data?: any): void;
 
     EventsOn(eventName: string, callback: (data?: any) => void): void;
@@ -83,3 +83,5 @@ declare global {
         runtime: runtime;
     }
 }
+
+export { };

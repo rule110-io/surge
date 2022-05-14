@@ -2,7 +2,6 @@ package surge
 
 import (
 	"fmt"
-	"log"
 	"strconv"
 	"strings"
 
@@ -163,10 +162,6 @@ func processQueryResponse(seeder string, Data []byte) {
 
 		//We now add this seeder to our file seeders
 		AddFileSeeder(newListing.FileHash, seeder)
-
-		fmt.Println(string("\033[33m"), "Filename", newListing.FileName, "FileHash", newListing.FileHash, string("\033[0m"))
-
-		log.Println("Query response new file: ", newListing.FileName, " seeder: ", seeder)
 	}
 	mutexes.ListedFilesLock.Unlock()
 }
@@ -180,9 +175,6 @@ func getTopicPayload(topicEncoded string) string {
 		if TopicEncode(dbFile.Topic) != topicEncoded {
 			continue
 		}
-
-		magnet := surgeGenerateMagnetLink(dbFile.FileName, dbFile.FileSize, dbFile.FileHash, GetAccountAddress(), dbFile.Topic)
-		log.Println("Magnet:", magnet)
 
 		if dbFile.IsUploading {
 			//Add to payload
