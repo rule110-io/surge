@@ -20,10 +20,10 @@
         <ControlWrapper title="Transaction fee">
           <template slot="descr">
             <div>
-              <span> <b>Free:</b> 0 NKN</span><br />
-              <span> <b>Low:</b> ~{{ lowFee }} NKN</span><br />
-              <span> <b>Average:</b> ~{{ avgFee }} NKN</span><br />
-              <span> <b>High:</b> ~{{ highFee }} NKN</span>
+              <span> <b>Free:</b> {{ Number(0).toFixed(8) }} NKN</span><br />
+              <span> <b>Low:</b> ~{{ lowFee.toFixed(8) }} NKN</span><br />
+              <span> <b>Average:</b> ~{{ avgFee.toFixed(8) }} NKN</span><br />
+              <span> <b>High:</b> ~{{ highFee.toFixed(8) }} NKN</span>
             </div>
           </template>
           <div class="settings__slider">
