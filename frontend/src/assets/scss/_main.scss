@@ -61,6 +61,19 @@ a {
 }
 
 .text {
+  &_descr {
+    font-family: Inter;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 0.8125rem;
+    line-height: 16px;
+    color: #7b7d82;
+  }
+
+  &_select {
+    user-select: text;
+  }
+
   &_wrap {
     &_none {
       overflow: hidden;
@@ -292,7 +305,12 @@ th {
 .table {
   &__row {
     &_active {
-      background: linear-gradient(0deg, rgba(10, 151, 149, 0.2), rgba(10, 151, 149, 0.2)), #131416;
+      background: linear-gradient(
+          0deg,
+          rgba(10, 151, 149, 0.2),
+          rgba(10, 151, 149, 0.2)
+        ),
+        #131416;
       background-blend-mode: normal;
 
       td {

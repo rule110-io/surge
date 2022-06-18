@@ -22,6 +22,11 @@
         class="header__icon"
         icon="SettingsIcon"
       />
+      <Icon
+        @click.native="openUserWalletModal"
+        class="header__icon"
+        icon="WalletIcon"
+      />
     </div>
   </header>
 </template>
@@ -71,6 +76,9 @@ export default {
     },
     openSettingsModal() {
       this.$bus.$emit("openSettingsModal");
+    },
+    openUserWalletModal() {
+      this.$bus.$emit("openUserWalletModal");
     },
     toggleNotifications() {
       this.$store.commit("notifications/toggleNotifications", !this.open);
