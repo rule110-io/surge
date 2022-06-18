@@ -20,6 +20,7 @@
         <ControlWrapper title="Transaction fee">
           <template slot="descr">
             <div>
+              <span> <b>Free:</b> 0 NKN</span><br />
               <span> <b>Low:</b> ~{{ lowFee }} NKN</span><br />
               <span> <b>Average:</b> ~{{ avgFee }} NKN</span><br />
               <span> <b>High:</b> ~{{ highFee }} NKN</span>
@@ -83,8 +84,9 @@ export default {
         tooltip: false,
         interval: 1,
         marks: {
-          0: "Low",
-          50: "Average",
+          0: "Free",
+          33: "Low",
+          66: "Average",
           100: "High",
         },
         adsorb: true,
