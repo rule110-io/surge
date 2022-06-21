@@ -74,9 +74,9 @@ export default {
       walletAddress: "",
       walletBalance: 0,
       txFee: 0,
-      avgFee: "loading...",
-      lowFee: "loading...",
-      maxFee: "loading...",
+      avgFee: 0,
+      lowFee: 0,
+      highFee: 0,
       downloadPath: "",
       sliderOptions: {
         dotSize: 20,
