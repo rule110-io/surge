@@ -33,6 +33,7 @@ import ControlCloseIcon from "@/assets/icons/ControlCloseIcon.svg";
 import ControlPlayIcon from "@/assets/icons/ControlPlayIcon.svg";
 import ControlPauseIcon from "@/assets/icons/ControlPauseIcon.svg";
 import WalletIcon from "@/assets/icons/WalletIcon.svg";
+import TipIcon from "@/assets/icons/TipIcon.svg";
 
 export default {
   components: {
@@ -56,6 +57,7 @@ export default {
     ControlPlayIcon,
     ControlPauseIcon,
     WalletIcon,
+    TipIcon,
   },
   props: {
     icon: {

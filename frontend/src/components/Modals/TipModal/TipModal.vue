@@ -1,21 +1,22 @@
 <template>
-  <Modal
-    class="wallet"
-    :show.sync="showModal"
-    @closeAndClear="closeAndClearModal"
-  >
-    <template slot="title"> Wallet </template>
+  <Modal :show.sync="showModal" @closeAndClear="closeAndClearModal">
+    <template slot="title"> Tip seeders </template>
     <template slot="body">
+      <div v-if="activeFile" class="modal__descr modal__item">
+        You are going to tip <b>{{ activeFile.FileName }}</b> seeders. Please
+        set the tip amount to be splitted among all the seeders
+        <b>({{ activeFile.NumSeeders }})</b>.
+      </div>
       <ModalGrid>
-        <ControlWrapper title="Wallet address">
-          <div class="text_select text_descr" v-clipboard:copy="walletAddress">
-            {{ walletAddress }}
-          </div>
-        </ControlWrapper>
-        <ControlWrapper title="Wallet balance">
-          <div class="text_descr">
-            <b>{{ walletBalance.toFixed(8) }}</b> NKN
-          </div>
+        <ControlWrapper title="Total tip amount">
+          <Input
+            v-model="amount"
+            type="number"
+            theme="light"
+            size="md"
+            placeholder="1"
+            after="NKN"
+          />
         </ControlWrapper>
         <ControlWrapper title="Transaction fee">
           <template slot="descr">
@@ -38,46 +39,45 @@
       </ModalGrid>
     </template>
     <template slot="footer">
-      <Button theme="default" size="md" @click="closeModal">Close</Button>
+      <Button theme="text" size="md" @click="closeAndClearModal">Close</Button>
+      <Button theme="default" size="md" :disabled="amount <= 0" @click="tip"
+        >Tip seeders</Button
+      >
     </template>
   </Modal>
 </template>
 
-<style lang="scss">
-@import "./UserWalletModal.scss";
-</style>
-
 <script>
+import { mapState } from "vuex";
+
 import FormMixin from "@/mixins/FormMixin.js";
 
 import Modal from "@/components/Modals/Modal/Modal";
-import ControlWrapper from "@/components/Controls/ControlWrapper/ControlWrapper";
 import Button from "@/components/Button/Button";
 import ModalGrid from "@/components/Modals/ModalGrid/ModalGrid";
+import ControlWrapper from "@/components/Controls/ControlWrapper/ControlWrapper";
+import Input from "@/components/Controls/Input/Input";
+
 import VueSlider from "vue-slider-component";
 
 import axios from "axios";
 
-import {} from "vuex";
-
 export default {
   mixins: [FormMixin],
-  components: {
-    Modal,
-    ControlWrapper,
-    Button,
-    ModalGrid,
-    VueSlider,
+  components: { Modal, Button, ModalGrid, ControlWrapper, Input, VueSlider },
+  props: {
+    file: {
+      type: Object,
+      default: () => {},
+    },
   },
   data: () => {
     return {
-      walletAddress: "",
-      walletBalance: 0,
-      txFee: 0,
+      amount: 1,
+      txFee: 66,
       avgFee: 0,
       lowFee: 0,
       highFee: 0,
-      downloadPath: "",
       sliderOptions: {
         dotSize: 20,
         height: 2,
@@ -94,16 +94,29 @@ export default {
       },
     };
   },
+  computed: {
+    ...mapState("files", ["activeFile", "localFilesConfig"]),
+    selectedFee() {
+      let fee = 0.1;
+
+      switch (this.txFee) {
+        case 0:
+          fee = this.lowFee;
+          break;
+        case 50:
+          fee = this.avgFee;
+          break;
+        case 100:
+          fee = this.highFee;
+          break;
+      }
+
+      return fee;
+    },
+  },
   watch: {
     showModal() {
       this.getAvgTxFee();
-      this.getNumWorkers();
-      this.getWalletAddress();
-      this.getWalletBalance();
-      this.getTxFee();
-    },
-    txFee(newVal) {
-      this.setTxFee(newVal);
     },
   },
   mounted() {},
@@ -123,7 +136,7 @@ export default {
           this.lowFee = lowFee;
           this.highFee = highFee;
         })
-        .catch((err) => {
+        .catch(() => {
           this.$store.dispatch("snackbar/updateSnack", {
             snack: `Open API error`,
             color: "error",
@@ -131,30 +144,17 @@ export default {
           });
         });
     },
-    getTxFee() {
-      window.go.surge.MiddlewareFunctions.GetTxFee().then((resp) => {
-        this.txFee = parseFloat(resp);
+    clearModal() {},
+    tip() {
+      console.log(this.activeFile);
+      window.go.surge.MiddlewareFunctions.Tip(
+        this.activeFile.FileHash,
+        this.amount,
+        this.txFee
+      ).then(() => {
+        this.closeModal();
+        this.clearModal();
       });
-    },
-    setTxFee(fee) {
-      window.go.surge.MiddlewareFunctions.SetTxFee(fee.toString());
-    },
-    getWalletAddress() {
-      window.go.surge.MiddlewareFunctions.GetWalletAddress().then((resp) => {
-        this.walletAddress = resp;
-      });
-    },
-    getWalletBalance() {
-      window.go.surge.MiddlewareFunctions.GetWalletBalance().then((resp) => {
-        this.walletBalance = parseFloat(resp);
-      });
-    },
-    getNumWorkers() {
-      window.go.surge.MiddlewareFunctions.ReadSetting("numWorkers").then(
-        (res) => {
-          this.numWorkers = Number(res);
-        }
-      );
     },
   },
 };
