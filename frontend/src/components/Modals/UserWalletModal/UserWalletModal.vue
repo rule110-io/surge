@@ -125,7 +125,7 @@ export default {
         })
         .catch((err) => {
           this.$store.dispatch("snackbar/updateSnack", {
-            snack: `Open API error`,
+            snack: `Open API error: ` + err,
             color: "error",
             timeout: false,
           });

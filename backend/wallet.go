@@ -1,9 +1,12 @@
 package surge
 
 import (
+	"fmt"
 	"log"
+	"strconv"
 
 	nkn "github.com/nknorg/nkn-sdk-go"
+	"github.com/rule110-io/surge/backend/openapi"
 )
 
 func WalletAddress() string {
@@ -31,6 +34,28 @@ func WalletBalance() string {
 		return "-1"
 	}
 	return amount.String()
+}
+
+func CalculateFee(Fee string) string {
+	avgFee := openapi.GetAvgFee()
+	avgFeeFloat, _ := strconv.ParseFloat(avgFee, 64)
+
+	feePercent := 0.2
+	lowFee := avgFeeFloat - avgFeeFloat*feePercent
+	highFee := avgFeeFloat + avgFeeFloat*feePercent
+
+	switch Fee {
+	case "0":
+		return "0"
+	case "33":
+		return fmt.Sprintf("%f", lowFee)
+	case "66":
+		return avgFee
+	case "100":
+		return fmt.Sprintf("%f", highFee)
+	}
+
+	return "0"
 }
 
 /*Wallet Features

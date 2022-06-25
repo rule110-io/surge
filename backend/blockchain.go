@@ -19,24 +19,24 @@ var TransactionFee string
 
 func subscribeToPubSub(topic string) {
 	config := &nkn.DefaultTransactionConfig
-	config.Fee = TransactionFee
+	config.Fee = CalculateFee(TransactionFee)
 
 	txnHash, err := client.Subscribe("", topic, constants.SubscriptionDuration, "Surge Beta Client", config)
 	if err != nil {
 		log.Println("Probably already subscribed to:", topic, "error:", err)
 	} else {
-		log.Println("Subscribed: ", topic, txnHash)
+		log.Println("Subscribed: ", topic, txnHash, "fee paid:", config.Fee)
 	}
 }
 
 func unsubscribeToPubSub(topic string) {
 	config := &nkn.DefaultTransactionConfig
-	config.Fee = TransactionFee
+	config.Fee = CalculateFee(TransactionFee)
 
 	txnHash, err := client.Unsubscribe("", topic, config)
 	if err != nil {
 		log.Println("Probably not subscribed to:", topic, "error:", err)
 	} else {
-		log.Println("Unsubscribed: ", topic, txnHash)
+		log.Println("Unsubscribed: ", topic, txnHash, "fee paid:", config.Fee)
 	}
 }

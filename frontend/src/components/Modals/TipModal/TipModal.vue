@@ -149,8 +149,8 @@ export default {
       console.log(this.activeFile);
       window.go.surge.MiddlewareFunctions.Tip(
         this.activeFile.FileHash,
-        this.amount,
-        this.txFee
+        "" + this.amount,
+        "" + this.txFee
       ).then(() => {
         this.closeModal();
         this.clearModal();

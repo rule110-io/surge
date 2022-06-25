@@ -1,6 +1,9 @@
 package surge
 
 import (
+	"fmt"
+	"strconv"
+
 	"github.com/nknorg/nkn-sdk-go"
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
@@ -225,6 +228,31 @@ func (s *MiddlewareFunctions) GetTxFee() string {
 }
 
 func (s *MiddlewareFunctions) SetTxFee(Fee string) {
+	fmt.Println("tx fee set", Fee)
 	TransactionFee = Fee
 	DbWriteSetting("defaultTxFee", Fee)
+}
+
+func (s *MiddlewareFunctions) Tip(FileHash string, Amount string, Fee string) {
+	fmt.Println(FileHash, Amount, Fee)
+	amountFloat, err := strconv.ParseFloat(Amount, 64)
+	if err != nil {
+		pushError("Error on tip", "Invalid amount.")
+		return
+	}
+
+	seeders := GetSeeders(FileHash)
+	if len(seeders) == 0 {
+		pushError("Error on tip", "No seeders found to tip.")
+		return
+	}
+
+	share := amountFloat / float64(len(GetSeeders(FileHash)))
+	calculatedFee := CalculateFee(Fee)
+
+	for _, v := range seeders {
+		walletAddr, _ := nkn.ClientAddrToWalletAddr(v)
+		success, hash := WalletTransfer(walletAddr, fmt.Sprintf("%f", share), calculatedFee)
+		fmt.Println(success, hash, walletAddr, share)
+	}
 }
