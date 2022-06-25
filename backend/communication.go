@@ -24,7 +24,9 @@ func MessageReceived(msg *messaging.MessageReceivedObj) {
 
 	switch msg.Type {
 	case MessageIDAnnounceFiles:
-		SendAnnounceFilesReply(msg)
+		if msg.Sender != GetAccountAddress() {
+			SendAnnounceFilesReply(msg)
+		}
 		processQueryResponse(msg.Sender, msg.Data)
 	case MessageIDAnnounceFilesReply:
 		//process file data

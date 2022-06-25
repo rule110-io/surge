@@ -54,7 +54,7 @@ func (msgReceived MessageReceivedObj) Reply(msg *MessageObj) {
 }
 
 func listen() {
-	for true {
+	for {
 		//Wait for a message
 		msg := <-nknClient.OnMessage.C
 
@@ -65,7 +65,7 @@ func listen() {
 			if err != nil {
 				log.Println("Received invalid message:", string(msg.Data), "from:", msg.Src, "error:", err)
 				fmt.Println("Received invalid message:", string(msg.Data), "from:", msg.Src, "error:", err)
-			} else if msg.Src == nknClient.Address() {
+				//} else if msg.Src == nknClient.Address() {
 				//We exclude messages from ourselves
 			} else {
 				msgObj.Sender = msg.Src
