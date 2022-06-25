@@ -45,6 +45,8 @@ func pushNotification(title string, text string) {
 }
 
 func pushError(title string, text string) {
+	log.Println(title, text)
+
 	//If wails frontend is not yet bound, we wait in a task to not block main thread
 	if !FrontendReady {
 		waitAndPush := func() {
@@ -95,13 +97,11 @@ func WriteChunk(FileID string, ChunkID int32, Chunk []byte) {
 	}
 
 	chunkOffset := int64(ChunkID) * constants.ChunkSize
-	bytesWritten, err := osFile.WriteAt(Chunk, chunkOffset)
+	_, err = osFile.WriteAt(Chunk, chunkOffset)
 	if err != nil {
 		pushError("Error on write chunk (file write)", err.Error())
 		return
 	}
-	//Success
-	log.Println("Chunk written to disk: ", bytesWritten, " bytes")
 
 	//Update bitmap async as this has a lock in it but does not have to be waited for
 	setBitMap := func() {

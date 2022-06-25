@@ -187,7 +187,6 @@ func DownloadFileByHash(Hash string) bool {
 
 	remoteFolder, err := GetDownloadFolderPath()
 	if err != nil {
-		log.Println("Remote folder does not exist")
 		pushError("Error on download file", "Could not access download folder at path: "+remoteFolder)
 	}
 
