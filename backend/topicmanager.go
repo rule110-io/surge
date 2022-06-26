@@ -70,6 +70,8 @@ func subscribeToSurgeTopic(topicName string, applySafeLock bool) bool {
 	//Only announce files if the client is first starting up, or when we are newly subscribed.
 	if subscribeSuccess && (startupSubscribe || !subscriptionActive) {
 		AnnounceFiles(topicEncoded)
+		//first startup, were already subscribed, set the state.
+		updateTopicSubscriptionState(topicEncoded, 2)
 	}
 
 	return subscribeSuccess
