@@ -4,7 +4,6 @@
     position="bottom center"
     width="500"
     class="snackbar"
-    :duration="100000"
     animation-name="fade-bottom"
   >
     <template slot="body" slot-scope="props">
