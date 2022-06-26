@@ -45,11 +45,17 @@ func unsubscribeToPubSub(topic string) bool {
 	config := &nkn.DefaultTransactionConfig
 	config.Fee = CalculateFee(TransactionFee)
 
+	initialState := 0
+	currentState, exists := topicEncodedSubcribeStateMap[topic]
+	if exists {
+		initialState = currentState
+	}
+
 	feeFloat, _ := strconv.ParseFloat(config.Fee, 64)
 	hasBalance, _ := ValidateBalanceForTransaction(0, feeFloat, true)
 	if !hasBalance {
 		pushError("Error on unsubscribe to topic", "Not enough fee in wallet, consider depositing NKN or if possible lower transaction fees in the wallet settings.")
-		updateTopicSubscriptionState(topic, 2)
+		updateTopicSubscriptionState(topic, initialState)
 		return false
 	}
 	updateTopicSubscriptionState(topic, 1)
