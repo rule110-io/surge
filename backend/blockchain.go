@@ -41,7 +41,7 @@ func subscribeToPubSub(topic string) bool {
 	return true
 }
 
-func unsubscribeToPubSub(topic string) {
+func unsubscribeToPubSub(topic string) bool {
 	config := &nkn.DefaultTransactionConfig
 	config.Fee = CalculateFee(TransactionFee)
 
@@ -50,6 +50,7 @@ func unsubscribeToPubSub(topic string) {
 	if !hasBalance {
 		pushError("Error on unsubscribe to topic", "Not enough fee in wallet, consider depositing NKN or if possible lower transaction fees in the wallet settings.")
 		updateTopicSubscriptionState(topic, 2)
+		return false
 	}
 	updateTopicSubscriptionState(topic, 1)
 
@@ -60,4 +61,5 @@ func unsubscribeToPubSub(topic string) {
 		log.Println("Unsubscribed: ", topic, txnHash, "fee paid:", config.Fee)
 	}
 	updateTopicSubscriptionState(topic, 0)
+	return true
 }

@@ -33,7 +33,7 @@ func InitializeTopicsManager() {
 	}
 }
 
-func subscribeToSurgeTopic(topicName string, applySafeLock bool) {
+func subscribeToSurgeTopic(topicName string, applySafeLock bool) bool {
 
 	if applySafeLock {
 		mutexes.TopicsMapLock.Lock()
@@ -71,14 +71,19 @@ func subscribeToSurgeTopic(topicName string, applySafeLock bool) {
 	if subscribeSuccess && (startupSubscribe || !subscriptionActive) {
 		AnnounceFiles(topicEncoded)
 	}
+
+	return subscribeSuccess
 }
 
-func unsubscribeFromSurgeTopic(topicName string) {
+func unsubscribeFromSurgeTopic(topicName string) bool {
 	mutexes.TopicsMapLock.Lock()
 	defer mutexes.TopicsMapLock.Unlock()
 
 	if topic, ok := topicsMap[topicName]; ok {
-		unsubscribeToPubSub(topic.NameEncoded)
+		unsubSuccess := unsubscribeToPubSub(topic.NameEncoded)
+		if !unsubSuccess {
+			return false
+		}
 	}
 
 	//Delete from map
@@ -90,6 +95,8 @@ func unsubscribeFromSurgeTopic(topicName string) {
 		mapString := string(mapBytes)
 		DbWriteSetting(topicsMapBucketKey, mapString)
 	}
+
+	return true
 }
 
 func resubscribeToTopics() {

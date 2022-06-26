@@ -106,16 +106,17 @@ func (s *MiddlewareFunctions) StartDownloadMagnetLinks(Magnetlinks string) bool 
 }
 
 //SubscribeToTopic subscribes to given topic
-func (s *MiddlewareFunctions) SubscribeToTopic(Topic string) {
+func (s *MiddlewareFunctions) SubscribeToTopic(Topic string) bool {
 	if len(Topic) == 0 {
 		pushError("Error on Subscribe", "topic name of length zero.")
+		return false
 	} else {
-		subscribeToSurgeTopic(Topic, true)
+		return subscribeToSurgeTopic(Topic, true)
 	}
 }
 
-func (s *MiddlewareFunctions) UnsubscribeFromTopic(Topic string) {
-	unsubscribeFromSurgeTopic(Topic)
+func (s *MiddlewareFunctions) UnsubscribeFromTopic(Topic string) bool {
+	return unsubscribeFromSurgeTopic(Topic)
 }
 
 func (s *MiddlewareFunctions) GetTopicSubscriptions() []models.TopicInfo {
