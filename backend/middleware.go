@@ -250,9 +250,23 @@ func (s *MiddlewareFunctions) Tip(FileHash string, Amount string, Fee string) {
 	share := amountFloat / float64(len(GetSeeders(FileHash)))
 	calculatedFee := CalculateFee(Fee)
 
+	feePerTxFloat, _ := strconv.ParseFloat(calculatedFee, 64)
+	totalReservedAmount := amountFloat + (feePerTxFloat * float64(len(seeders)))
+	balance := WalletBalance()
+	balanceFloat, _ := strconv.ParseFloat(balance, 64)
+
+	if balanceFloat < totalReservedAmount {
+		pushError("Error on tip", "Not enough nkn available, required: "+fmt.Sprintf("%f", totalReservedAmount)+" available: "+balance)
+		return
+	}
+
 	for _, v := range seeders {
 		walletAddr, _ := nkn.ClientAddrToWalletAddr(v)
 		success, hash := WalletTransfer(walletAddr, fmt.Sprintf("%f", share), calculatedFee)
 		fmt.Println(success, hash, walletAddr, share)
+
+		if !success {
+			break
+		}
 	}
 }
