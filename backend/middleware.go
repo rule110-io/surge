@@ -217,6 +217,23 @@ func (s *MiddlewareFunctions) GetWalletBalance() string {
 	return WalletBalance()
 }
 func TransferToPk(PubKey string, Amount string, Fee string) string {
+	amountFloat, err := strconv.ParseFloat(Amount, 64)
+	if err != nil {
+		pushError("Error on transfer", err.Error())
+		return ""
+	}
+	feeFloat, err := strconv.ParseFloat(Amount, 64)
+	if err != nil {
+		pushError("Error on transfer", err.Error())
+		return ""
+	}
+
+	isEnough, balanceError := ValidateBalanceForTransaction(amountFloat, feeFloat, false)
+	if !isEnough {
+		pushError("Error on tip", balanceError.Error())
+		return ""
+	}
+
 	walletAddr, _ := nkn.ClientAddrToWalletAddr(PubKey)
 	_, hash := WalletTransfer(walletAddr, Amount, Fee)
 	return hash
@@ -258,7 +275,7 @@ func (s *MiddlewareFunctions) Tip(FileHash string, Amount string, Fee string) {
 	feePerTxFloat, _ := strconv.ParseFloat(calculatedFee, 64)
 	totalFeeFloat := feePerTxFloat * float64(len(seeders))
 
-	isEnough, balanceError := ValidateBalanceForTransaction(amountFloat, totalFeeFloat)
+	isEnough, balanceError := ValidateBalanceForTransaction(amountFloat, totalFeeFloat, false)
 	if !isEnough {
 		pushError("Error on tip", balanceError.Error())
 		return

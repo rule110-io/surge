@@ -23,7 +23,7 @@ func subscribeToPubSub(topic string) {
 	config.Fee = CalculateFee(TransactionFee)
 
 	feeFloat, _ := strconv.ParseFloat(config.Fee, 64)
-	hasBalance, _ := ValidateBalanceForTransaction(0, feeFloat)
+	hasBalance, _ := ValidateBalanceForTransaction(0, feeFloat, true)
 	if !hasBalance {
 		pushError("Error on subscribe to topic", "Not enough fee in wallet, consider depositing NKN or if possible lower transaction fees in the wallet settings.")
 		updateTopicSubscriptionState(topic, 0)
@@ -45,7 +45,7 @@ func unsubscribeToPubSub(topic string) {
 	config.Fee = CalculateFee(TransactionFee)
 
 	feeFloat, _ := strconv.ParseFloat(config.Fee, 64)
-	hasBalance, _ := ValidateBalanceForTransaction(0, feeFloat)
+	hasBalance, _ := ValidateBalanceForTransaction(0, feeFloat, true)
 	if !hasBalance {
 		pushError("Error on unsubscribe to topic", "Not enough fee in wallet, consider depositing NKN or if possible lower transaction fees in the wallet settings.")
 		updateTopicSubscriptionState(topic, 2)

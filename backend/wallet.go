@@ -60,8 +60,8 @@ func CalculateFee(Fee string) string {
 }
 
 //ValidateBalanceForTransaction returns a boolean for whether there is enough balance to make a transation
-func ValidateBalanceForTransaction(Amount float64, Fee float64) (bool, error) {
-	if Amount < 0.00000001 {
+func ValidateBalanceForTransaction(Amount float64, Fee float64, UtilTransaction bool) (bool, error) {
+	if UtilTransaction == false && Amount < 0.00000001 {
 		return false, errors.New("Minimum tip amount is 0.00000001")
 	}
 
