@@ -4,7 +4,7 @@
     <template slot="body">
       <div v-if="activeFile" class="modal__descr modal__item">
         You are going to tip <b>{{ activeFile.FileName }}</b> seeders. Please
-        set the tip amount to be splitted among all the seeders
+        set the tip amount to be split among all the seeders
         <b>({{ activeFile.NumSeeders }})</b>.
       </div>
       <ModalGrid>
