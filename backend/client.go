@@ -258,6 +258,12 @@ func restartDownload(Hash string) {
 		file.IsUploading = true
 		file.IsAvailable = true
 		dbInsertFile(*file)
+
+		dbFile, err := dbGetFile(file.FileHash)
+		if err == nil {
+			AnnounceNewFile(dbFile)
+		}
+
 		return
 	}
 
