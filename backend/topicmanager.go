@@ -2,20 +2,24 @@ package surge
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"sort"
 
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 var topicsMap map[string]models.Topic
+var topicEncodedSubcribeStateMap map[string]int
 
 const topicsMapBucketKey = "topicBucket"
 
 func InitializeTopicsManager() {
 	topicsMap = make(map[string]models.Topic)
+	topicEncodedSubcribeStateMap = make(map[string]int)
 
 	//Load from db
 	mapString, err := DbReadSetting(topicsMapBucketKey)
@@ -99,11 +103,20 @@ func GetTopicInfo(topicName string) models.TopicInfo {
 		fileCount += bitSetVar
 	}
 
+	state := 0
+
+	//get topic state
+	knownState, any := topicEncodedSubcribeStateMap[topicEncoded]
+	if any {
+		state = knownState
+	}
+
 	return models.TopicInfo{
-		Name:        topicName,
-		Subscribers: subCount,
-		FileCount:   fileCount,
-		Permissions: GetTopicPermissions(topicName, GetAccountAddress()),
+		Name:              topicName,
+		Subscribers:       subCount,
+		FileCount:         fileCount,
+		Permissions:       GetTopicPermissions(topicName, GetAccountAddress()),
+		SubscriptionState: state,
 	}
 }
 func GetTopicPermissions(topicName string, clientAddr string) models.TopicPermissions {
@@ -152,4 +165,11 @@ func GetTopicsWithPermissions() []models.TopicInfo {
 	}
 
 	return modelData
+}
+
+func updateTopicSubscriptionState(TopicEncoded string, NewState int) {
+	topicEncodedSubcribeStateMap[TopicEncoded] = NewState
+	runtime.EventsEmit(*wailsContext, "topicsUpdated")
+
+	fmt.Println("Subscription state updated", TopicEncoded, NewState)
 }

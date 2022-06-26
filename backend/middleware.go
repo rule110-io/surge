@@ -191,7 +191,6 @@ func (s *MiddlewareFunctions) GetFileDetails(FileHash string) FileDetails {
 	}
 }
 func (s *MiddlewareFunctions) GetTopicDetails(Topic string) models.TopicInfo {
-
 	return GetTopicInfo(Topic)
 }
 
@@ -257,12 +256,11 @@ func (s *MiddlewareFunctions) Tip(FileHash string, Amount string, Fee string) {
 	calculatedFee := CalculateFee(Fee)
 
 	feePerTxFloat, _ := strconv.ParseFloat(calculatedFee, 64)
-	totalReservedAmount := amountFloat + (feePerTxFloat * float64(len(seeders)))
-	balance := WalletBalance()
-	balanceFloat, _ := strconv.ParseFloat(balance, 64)
+	totalFeeFloat := feePerTxFloat * float64(len(seeders))
 
-	if balanceFloat < totalReservedAmount {
-		pushError("Error on tip", "Not enough nkn available, required: "+fmt.Sprintf("%f", totalReservedAmount)+" available: "+balance)
+	isEnough, balanceError := ValidateBalanceForTransaction(amountFloat, totalFeeFloat)
+	if !isEnough {
+		pushError("Error on tip", balanceError.Error())
 		return
 	}
 

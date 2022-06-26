@@ -1,6 +1,7 @@
 package surge
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strconv"
@@ -56,6 +57,22 @@ func CalculateFee(Fee string) string {
 	}
 
 	return "0"
+}
+
+//ValidateBalanceForTransaction returns a boolean for whether there is enough balance to make a transation
+func ValidateBalanceForTransaction(Amount float64, Fee float64) (bool, error) {
+	if Amount < 0.00000001 {
+		return false, errors.New("Minimum tip amount is 0.00000001")
+	}
+
+	balance := WalletBalance()
+	balanceFloat, _ := strconv.ParseFloat(balance, 64)
+
+	if Amount+Fee >= balanceFloat {
+		return false, errors.New("Not enough nkn available required: " + fmt.Sprintf("%f", Amount+Fee) + " available: " + balance)
+	}
+
+	return true, nil
 }
 
 /*Wallet Features
