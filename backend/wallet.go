@@ -61,15 +61,15 @@ func CalculateFee(Fee string) string {
 
 //ValidateBalanceForTransaction returns a boolean for whether there is enough balance to make a transation
 func ValidateBalanceForTransaction(Amount float64, Fee float64, UtilTransaction bool) (bool, error) {
-	if UtilTransaction == false && Amount < 0.00000001 {
-		return false, errors.New("Minimum tip amount is 0.00000001")
+	if !UtilTransaction && Amount < 0.00000001 {
+		return false, errors.New("minimum tip amount is 0.00000001")
 	}
 
 	balance := WalletBalance()
 	balanceFloat, _ := strconv.ParseFloat(balance, 64)
 
 	if Amount+Fee >= balanceFloat {
-		return false, errors.New("Not enough nkn available required: " + fmt.Sprintf("%f", Amount+Fee) + " available: " + balance)
+		return false, errors.New("not enough nkn available required: " + fmt.Sprintf("%f", Amount+Fee) + " available: " + balance)
 	}
 
 	return true, nil
