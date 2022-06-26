@@ -18,13 +18,33 @@
             after="NKN"
           />
         </ControlWrapper>
-        <ControlWrapper title="Transaction fee">
+        <ControlWrapper
+          :title="`Transaction fee (for ${activeFile.NumSeeders} seeders)`"
+        >
           <template slot="descr">
             <div>
-              <span> <b>Free:</b> {{ Number(0).toFixed(8) }} NKN</span><br />
-              <span> <b>Low:</b> ~{{ lowFee.toFixed(8) }} NKN</span><br />
-              <span> <b>Average:</b> ~{{ avgFee.toFixed(8) }} NKN</span><br />
-              <span> <b>High:</b> ~{{ highFee.toFixed(8) }} NKN</span>
+              <span>
+                <b>Free:</b>
+                {{ Number(0).toFixed(8) }} NKN</span
+              ><br />
+              <span>
+                <b>Low:</b> ~{{
+                  (lowFee * activeFile.NumSeeders).toFixed(8)
+                }}
+                NKN</span
+              ><br />
+              <span>
+                <b>Average:</b> ~{{
+                  (avgFee * activeFile.NumSeeders).toFixed(8)
+                }}
+                NKN</span
+              ><br />
+              <span>
+                <b>High:</b> ~{{
+                  (highFee * activeFile.NumSeeders).toFixed(8)
+                }}
+                NKN</span
+              >
             </div>
           </template>
           <div class="settings__slider">

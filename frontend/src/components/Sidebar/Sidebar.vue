@@ -47,11 +47,18 @@ export default {
       return this._.map(this.topics, "Name");
     },
   },
-  mounted() {},
+  mounted() {
+    this.setInitialTopic();
+  },
   methods: {
     ...mapMutations({
       setRemoteFilesTopic: "files/setRemoteFilesTopic",
     }),
+    setInitialTopic() {
+      if (this.topicNames.length > 0) {
+        this.setRemoteFilesTopic(this.topicNames[0]);
+      }
+    },
     openAddTopicModal() {
       this.$bus.$emit("openAddTopicModal");
     },
