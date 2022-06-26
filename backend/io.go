@@ -26,7 +26,7 @@ import (
 )
 
 func emitNotificationEvent(event string, title string, text string) {
-	runtime.EventsEmit(*wailsContext, "notificationEvent", title, text, time.Now().Unix())
+	runtime.EventsEmit(*wailsContext, event, title, text, time.Now().Unix())
 }
 
 func pushNotification(title string, text string) {
