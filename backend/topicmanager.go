@@ -59,13 +59,16 @@ func subscribeToSurgeTopic(topicName string, applySafeLock bool) {
 		}
 	}
 
+	subscribeSuccess := true
 	//If we dont have an active sub resubscribe.
 	if !subscriptionActive {
-		subscribeToPubSub(topicEncoded)
+		if !subscribeToPubSub(topicEncoded) {
+			subscribeSuccess = false
+		}
 	}
 
 	//Only announce files if the client is first starting up, or when we are newly subscribed.
-	if startupSubscribe || !subscriptionActive {
+	if subscribeSuccess && (startupSubscribe || !subscriptionActive) {
 		AnnounceFiles(topicEncoded)
 	}
 }
@@ -169,9 +172,18 @@ func GetTopicsWithPermissions() []models.TopicInfo {
 	modelData := []models.TopicInfo{}
 
 	for _, v := range topicNames {
+
+		state := 0
+		//get topic state
+		knownState, any := topicEncodedSubcribeStateMap[TopicEncode(v)]
+		if any {
+			state = knownState
+		}
+
 		entry := models.TopicInfo{
-			Name:        v,
-			Permissions: GetTopicPermissions(v, GetAccountAddress()),
+			Name:              v,
+			Permissions:       GetTopicPermissions(v, GetAccountAddress()),
+			SubscriptionState: state,
 		}
 		modelData = append(modelData, entry)
 	}
