@@ -6,19 +6,67 @@
         Channel
       </div>
     </div>
-    <div class="sidebar__title">Active</div>
-
-    <div class="sidebar__items">
-      <div
-        class="sidebar__item"
-        v-for="(topic, i) in topicNames"
-        :key="i"
-        @click="setRemoteFilesTopic(topic)"
-        :class="
-          remoteFilesConfig.topicName === topic ? 'sidebar__item_active' : null
-        "
-      >
-        {{ topic }}
+    <div class="sidebar__categories">
+      <div class="sidebar__category">
+        <div class="sidebar__title">Subscribed</div>
+        <div class="sidebar__descr" v-if="!subscribedTopics.length">
+          No topics
+        </div>
+        <div class="sidebar__items">
+          <div
+            class="sidebar__item sidebar__item_state_subscribed"
+            v-for="(topic, i) in subscribedTopics"
+            :key="i"
+            @click="setRemoteFilesTopic(topic.Name)"
+            :class="
+              remoteFilesConfig.topicName === topic.Name
+                ? 'sidebar__item_active'
+                : null
+            "
+          >
+            {{ topic.Name }}
+          </div>
+        </div>
+      </div>
+      <div class="sidebar__category">
+        <div class="sidebar__title">Pending</div>
+        <div class="sidebar__descr" v-if="!pendingTopics.length">No topics</div>
+        <div class="sidebar__items">
+          <div
+            class="sidebar__item sidebar__item_state_pending"
+            v-for="(topic, i) in pendingTopics"
+            :key="i"
+            @click="setRemoteFilesTopic(topic.Name)"
+            :class="
+              remoteFilesConfig.topicName === topic.Name
+                ? 'sidebar__item_active'
+                : null
+            "
+          >
+            {{ topic.Name }}
+          </div>
+        </div>
+      </div>
+      <div class="sidebar__category">
+        <div class="sidebar__title">Unsubscribed</div>
+        <div class="sidebar__descr" v-if="!unsubscribedTopics.length">
+          No topics
+        </div>
+        <div class="sidebar__items">
+          <div
+            class="sidebar__item sidebar__item_state_unsubscribed"
+            v-for="(topic, i) in unsubscribedTopics"
+            :key="i"
+            @click="setRemoteFilesTopic(topic.Name)"
+            :class="
+              remoteFilesConfig.topicName === topic.Name
+                ? 'sidebar__item_active'
+                : null
+            "
+          >
+            {{ topic.Name }}
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -43,8 +91,14 @@ export default {
   computed: {
     ...mapState("topics", ["topics"]),
     ...mapState("files", ["remoteFilesConfig"]),
-    topicNames() {
-      return this._.map(this.topics, "Name");
+    subscribedTopics() {
+      return this._.filter(this.topics, ["SubscriptionState", 2]);
+    },
+    pendingTopics() {
+      return this._.filter(this.topics, ["SubscriptionState", 1]);
+    },
+    unsubscribedTopics() {
+      return this._.filter(this.topics, ["SubscriptionState", 0]);
     },
   },
   mounted() {
@@ -55,8 +109,8 @@ export default {
       setRemoteFilesTopic: "files/setRemoteFilesTopic",
     }),
     setInitialTopic() {
-      if (this.topicNames.length > 0) {
-        this.setRemoteFilesTopic(this.topicNames[0]);
+      if (this.subscribedTopics.length > 0) {
+        this.setRemoteFilesTopic(this.subscribedTopics[0].Name);
       }
     },
     openAddTopicModal() {

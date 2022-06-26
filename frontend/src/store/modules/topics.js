@@ -31,6 +31,7 @@ const actions = {
     window.go.surge.MiddlewareFunctions.GetTopicSubscriptions().then(
       (topics) => {
         commit("setTopics", topics);
+        console.log(topics);
       }
     );
   },

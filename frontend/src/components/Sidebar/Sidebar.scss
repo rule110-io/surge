@@ -9,6 +9,28 @@
   z-index: 1;
   background: $darkest;
 
+  &__categories {
+    max-height: calc(100% - 104px);
+    overflow-y: scroll;
+    overflow-x: visible;
+  }
+
+  &__category {
+    &:not(:first-child) {
+      border-top: $border;
+      margin-top: $padding-md;
+      padding-top: $padding-md;
+    }
+  }
+
+  &__descr {
+    margin-top: $padding-md;
+    padding: 0 $padding-llg;
+    font-size: $fz-md;
+    line-height: 16px;
+    font-feature-settings: "salt" on;
+  }
+
   &__control {
     display: flex;
     align-items: center;
@@ -68,7 +90,7 @@
     margin-top: $padding-sm;
     overflow-y: scroll;
     overflow-x: visible;
-    max-height: calc(100% - 104px);
+    max-height: 172px;
     padding: 0 $padding-llg;
   }
 
@@ -86,6 +108,26 @@
     transition: $transition-1;
     cursor: pointer;
     position: relative;
+
+    &_state {
+      &_unsubscribed {
+        &::before {
+          background: $danger;
+        }
+      }
+
+      &_pending {
+        &::before {
+          background: $warning;
+        }
+      }
+
+      &_subscribed {
+        &::before {
+          background: $success;
+        }
+      }
+    }
 
     &::after {
       content: "";
@@ -118,7 +160,6 @@
     &::before {
       content: "";
       display: block;
-      background: $success;
       height: 8px;
       width: 8px;
       border-radius: 100%;

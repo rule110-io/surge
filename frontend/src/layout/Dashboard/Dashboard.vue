@@ -40,6 +40,7 @@ export default {
     this.enableGlobalBandwidthEvents();
     this.enableErrorEvents();
     this.enableDarkThemeEvent();
+    this.enableTopicsUpdate();
 
     this.fetchTopics();
     this.fetchRemoteFiles();
@@ -97,6 +98,11 @@ export default {
       window.runtime.EventsOn("notificationEvent", (title, text, timestamp) => {
         const notification = { title, text, timestamp };
         this.$store.commit("notifications/addNotification", notification);
+      });
+    },
+    enableTopicsUpdate() {
+      window.runtime.EventsOn("topicsUpdated", () => {
+        this.fetchTopics();
       });
     },
     enableErrorEvents() {
