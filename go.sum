@@ -424,8 +424,8 @@ github.com/valyala/fasttemplate v1.2.1/go.mod h1:KHLXt3tVN2HBp8eijSv/kGJopbvo7S+
 github.com/vultr/govultr v0.4.2/go.mod h1:TUuUizMOFc7z+PNMssb6iGjKjQfpw5arIaOLfocVudQ=
 github.com/wailsapp/mimetype v1.4.1 h1:pQN9ycO7uo4vsUUuPeHEYoUkLVkaRntMnHJxVwYhwHs=
 github.com/wailsapp/mimetype v1.4.1/go.mod h1:9aV5k31bBOv5z6u+QP8TltzvNGJPmNJD4XlAL3U+j3o=
-github.com/wailsapp/wails/v2 v2.0.0-beta.36 h1:Hz4KjdATFVvTGG2BYpye91PZy62JZfBLAkQwJKQzzRA=
-github.com/wailsapp/wails/v2 v2.0.0-beta.36/go.mod h1:dPVZfCu+SSg6HddAATME5Wj1ObXhSGIYDS7K88P383c=
+github.com/wailsapp/wails/v2 v2.0.0-beta.37 h1:LQpw4vXUl8v1tOyqIwbMVivclruUKpnYu8fRHIwcPkI=
+github.com/wailsapp/wails/v2 v2.0.0-beta.37/go.mod h1:dPVZfCu+SSg6HddAATME5Wj1ObXhSGIYDS7K88P383c=
 github.com/wzshiming/ctc v1.2.3/go.mod h1:2tVAtIY7SUyraSk0JxvwmONNPFL4ARavPuEsg5+KA28=
 github.com/wzshiming/winseq v0.0.0-20200112104235-db357dc107ae/go.mod h1:VTAq37rkGeV+WOybvZwjXiJOicICdpLCN8ifpISjK20=
 github.com/xanzy/ssh-agent v0.3.0/go.mod h1:3s9xbODqPuuhK9JV1R321M/FlMZSBvE5aY6eAcqrDh0=
