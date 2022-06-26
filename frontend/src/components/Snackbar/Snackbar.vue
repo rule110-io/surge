@@ -1,17 +1,24 @@
 <template>
-  <div
-    :class="[
-      'snackbar snackbar_color_' + color,
-      show ? 'snackbar_visible' : null,
-    ]"
+  <notifications
+    group="notifications"
+    position="bottom center"
+    width="500"
+    class="snackbar"
+    :duration="100000"
+    animation-name="fade-bottom"
   >
-    <p class="snackbar__text">
-      {{ message }}
-    </p>
-    <button class="snackbar__button" @click="close">
-      <Feather type="x" class="snackbar__close" />
-    </button>
-  </div>
+    <template slot="body" slot-scope="props">
+      <div
+        class="snackbar__body"
+        :class="`snackbar__body_type_${props.item.type}`"
+      >
+        <div class="snackbar__text">{{ props.item.text }}</div>
+        <div class="snackbar__close" @click="props.close">
+          <CloseIcon class="snackbar__close-icon" />
+        </div>
+      </div>
+    </template>
+  </notifications>
 </template>
 
 <style lang="scss">
@@ -19,50 +26,14 @@
 </style>
 
 <script>
+import CloseIcon from "@/assets/icons/CloseIcon.svg";
+
 export default {
+  components: {
+    CloseIcon,
+  },
   data() {
-    return {
-      show: false,
-      message: "",
-      color: "error",
-      timeout: false,
-    };
-  },
-  created() {
-    this.$store.watch(
-      (state) => state.snackbar.snack,
-      () => {
-        const message = this.$store.state.snackbar.snack;
-
-        if (message !== "") {
-          this.show = true;
-          this.color = this.$store.state.snackbar.color;
-          this.message = message;
-          this.timeout = this.$store.state.snackbar.timeout;
-          const self = this;
-
-          if (this.timeout === true) {
-            setTimeout(function() {
-              self.close();
-            }, 4000);
-          }
-        }
-      }
-    );
-  },
-  methods: {
-    close() {
-      this.show = false;
-      this.message = "";
-      this.color = "error";
-      this.timeout = false;
-
-      this.$store.dispatch("snackbar/updateSnack", {
-        snack: ``,
-        color: "error",
-        timeout: false,
-      });
-    },
+    return {};
   },
 };
 </script>

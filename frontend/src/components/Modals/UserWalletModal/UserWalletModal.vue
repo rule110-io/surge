@@ -124,10 +124,10 @@ export default {
           this.highFee = highFee;
         })
         .catch((err) => {
-          this.$store.dispatch("snackbar/updateSnack", {
-            snack: `Open API error: ` + err,
-            color: "error",
-            timeout: false,
+          this.$notify({
+            group: "notifications",
+            text: `Open API error: ` + err,
+            type: "error",
           });
         });
     },

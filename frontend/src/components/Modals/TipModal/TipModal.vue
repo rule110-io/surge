@@ -156,11 +156,11 @@ export default {
           this.lowFee = lowFee;
           this.highFee = highFee;
         })
-        .catch(() => {
-          this.$store.dispatch("snackbar/updateSnack", {
-            snack: `Open API error`,
-            color: "error",
-            timeout: false,
+        .catch((err) => {
+          this.$notify({
+            group: "notifications",
+            text: `Open API error: ` + err,
+            type: "error",
           });
         });
     },
