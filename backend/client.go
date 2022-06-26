@@ -252,18 +252,6 @@ func restartDownload(Hash string) {
 
 	//Nothing more to download
 	if numChunks == 0 {
-		platform.ShowNotification("Download Finished", "Download for "+file.FileName+" finished!")
-		pushNotification("Download Finished", file.FileName)
-		file.IsDownloading = false
-		file.IsUploading = true
-		file.IsAvailable = true
-		dbInsertFile(*file)
-
-		dbFile, err := dbGetFile(file.FileHash)
-		if err == nil {
-			AnnounceNewFile(dbFile)
-		}
-
 		return
 	}
 

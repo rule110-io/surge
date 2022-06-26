@@ -45,14 +45,14 @@ func updateFileDataWorker() {
 		//Insert uploads
 		allFiles := dbGetAllFiles()
 		for _, file := range allFiles {
+			if file.IsHashing {
+				continue
+			}
+
 			if file.IsUploading {
 				fileProgressMap[file.FileHash] = 1
 			}
 			key := file.FileHash
-
-			//if file.IsPaused {
-			//	continue
-			//}
 
 			if file.IsDownloading {
 				numChunksLocal := chunksDownloaded(file.ChunkMap, file.NumChunks)
@@ -60,17 +60,13 @@ func updateFileDataWorker() {
 				fileProgressMap[file.FileHash] = progress
 
 				if progress >= 1.0 {
-					platform.ShowNotification("Download Finished", "Download for "+file.FileName+" finished!")
-					pushNotification("Download Finished", file.FileName)
 					file.IsDownloading = false
-					file.IsUploading = true
-					file.IsAvailable = true
+					file.IsUploading = false
+					file.IsAvailable = false
+					file.IsHashing = true
 					dbInsertFile(file)
 
-					dbFile, err := dbGetFile(file.FileHash)
-					if err == nil {
-						AnnounceNewFile(dbFile)
-					}
+					go VerifyFile(file)
 				}
 			}
 
@@ -105,5 +101,36 @@ func updateFileDataWorker() {
 		}
 
 		zeroBandwidthMap["total"] = totalDown+totalUp == 0
+	}
+}
+
+func VerifyFile(file models.File) {
+	fileHash, err := HashFile(file.Path)
+
+	if err != nil {
+		pushError("Download Failed", "File hash could not be verified.")
+	} else {
+		if file.FileHash == fileHash {
+			file.IsDownloading = false
+			file.IsHashing = false
+			file.IsUploading = true
+			file.IsAvailable = true
+			dbInsertFile(file)
+
+			if err == nil {
+				AnnounceNewFile(&file)
+			}
+			platform.ShowNotification("Download Finished", "Download for "+file.FileName+" finished!")
+			pushNotification("Download Finished", file.FileName)
+
+		} else {
+			pushError("Download Failed", "File hash does not match local file.")
+			file.IsDownloading = false
+			file.IsHashing = false
+			file.IsUploading = false
+			file.IsAvailable = false
+			file.IsMissing = true
+			dbInsertFile(file)
+		}
 	}
 }
