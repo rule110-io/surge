@@ -236,8 +236,14 @@ func (s *MiddlewareFunctions) SetTxFee(Fee string) {
 func (s *MiddlewareFunctions) Tip(FileHash string, Amount string, Fee string) {
 	fmt.Println(FileHash, Amount, Fee)
 	amountFloat, err := strconv.ParseFloat(Amount, 64)
+
 	if err != nil {
 		pushError("Error on tip", "Invalid amount.")
+		return
+	}
+
+	if amountFloat < 0.00000001 {
+		pushError("Error on tip", "Minimum tip amount is 0.00000001")
 		return
 	}
 
