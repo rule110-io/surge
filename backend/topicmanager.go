@@ -14,6 +14,7 @@ import (
 
 var topicsMap map[string]models.Topic
 var topicEncodedSubcribeStateMap map[string]int
+var startupSubscribe = true
 
 const topicsMapBucketKey = "topicBucket"
 
@@ -40,6 +41,7 @@ func subscribeToSurgeTopic(topicName string, applySafeLock bool) {
 	}
 
 	topicEncoded := TopicEncode(topicName)
+	subscriptionActive := IsSubscriptionActive(topicEncoded)
 
 	if _, ok := topicsMap[topicName]; !ok {
 		topicModel := models.Topic{
@@ -56,8 +58,16 @@ func subscribeToSurgeTopic(topicName string, applySafeLock bool) {
 			DbWriteSetting(topicsMapBucketKey, mapString)
 		}
 	}
-	subscribeToPubSub(topicEncoded)
-	AnnounceFiles(topicEncoded)
+
+	//If we dont have an active sub resubscribe.
+	if !subscriptionActive {
+		subscribeToPubSub(topicEncoded)
+	}
+
+	//Only announce files if the client is first starting up, or when we are newly subscribed.
+	if startupSubscribe || !subscriptionActive {
+		AnnounceFiles(topicEncoded)
+	}
 }
 
 func unsubscribeFromSurgeTopic(topicName string) {
@@ -83,8 +93,10 @@ func resubscribeToTopics() {
 	mutexes.TopicsMapLock.Lock()
 	defer mutexes.TopicsMapLock.Unlock()
 	for _, topic := range topicsMap {
+
 		subscribeToSurgeTopic(topic.Name, false)
 	}
+	startupSubscribe = false
 }
 
 //GetTopicInfo returns info about the topic given

@@ -75,6 +75,27 @@ func ValidateBalanceForTransaction(Amount float64, Fee float64, UtilTransaction 
 	return true, nil
 }
 
+func IsSubscriptionActive(TopicEncoded string) bool {
+	subs, err := client.GetSubscribers(TopicEncoded, 0, 1000, false, true)
+	if err != nil {
+		pushError("Error on checking subscriptions", "could not verify state of subscription.")
+		return false
+	}
+
+	for sub := range subs.Subscribers.Map {
+		if sub == GetAccountAddress() {
+			return true
+		}
+	}
+
+	for sub := range subs.SubscribersInTxPool.Map {
+		if sub == GetAccountAddress() {
+			return true
+		}
+	}
+	return false
+}
+
 /*Wallet Features
 - Import wallet from private key
 - Export wallet private key

@@ -28,8 +28,6 @@ func Broadcast(msg *MessageObj) {
 		fmt.Println(err)
 	}
 
-	fmt.Println("Marshalled Bytes:", jsonObj)
-
 	err = nknClient.PublishBinary(msg.TopicEncoded, jsonObj, &nkn.MessageConfig{
 		TxPool: true,
 	})
@@ -45,8 +43,6 @@ func (msgReceived MessageReceivedObj) Reply(msg *MessageObj) {
 		fmt.Println(err)
 		return
 	}
-
-	fmt.Println("Marshalled Bytes:", jsonObj)
 
 	nknClient.SendBinary(nkn.NewStringArray(msgReceived.Sender), jsonObj, &nkn.MessageConfig{
 		TxPool: true,

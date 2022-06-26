@@ -12,7 +12,6 @@ package surge
 import (
 	"time"
 
-	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
 	"github.com/rule110-io/surge/backend/platform"
@@ -25,7 +24,7 @@ func autoSubscribeWorker() {
 	//As long as the client is running subscribe
 	for {
 		resubscribeToTopics()
-		time.Sleep(time.Second * 20 * constants.SubscriptionDuration)
+		time.Sleep(time.Second * 20)
 	}
 }
 

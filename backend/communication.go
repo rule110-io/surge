@@ -20,7 +20,6 @@ const (
 
 func MessageReceived(msg *messaging.MessageReceivedObj) {
 	fmt.Println(string("\033[36m"), "MESSAGE RECEIVED", string(msg.Data))
-	fmt.Println(msg.Data)
 
 	switch msg.Type {
 	case MessageIDAnnounceFiles:
