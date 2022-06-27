@@ -61,6 +61,8 @@ func subscribeToSurgeTopic(topicName string, applySafeLock bool) (bool, error) {
 		}
 	}
 
+	previousState := topicEncodedSubcribeStateMap[topicEncoded]
+
 	subscribeSuccess := true
 	//If we dont have an active sub resubscribe.
 	if !subscriptionActive {
@@ -73,7 +75,10 @@ func subscribeToSurgeTopic(topicName string, applySafeLock bool) (bool, error) {
 
 	//Only announce files if the client is first starting up, or when we are newly subscribed.
 	if subscribeSuccess {
-		AnnounceFiles(topicEncoded)
+
+		if previousState == 0 || previousState == 1 {
+			AnnounceFiles(topicEncoded)
+		}
 		//first startup, were already subscribed, set the state.
 		updateTopicSubscriptionState(topicEncoded, 2)
 	}
