@@ -20,7 +20,13 @@ var TransactionFee string
 
 func subscribeToPubSub(topic string) bool {
 	config := &nkn.DefaultTransactionConfig
-	config.Fee = CalculateFee(TransactionFee)
+
+	calculatedFee, err := CalculateFee(TransactionFee)
+	if err != nil {
+		pushError("Error on subscribe to topic", err.Error())
+		return false
+	}
+	config.Fee = calculatedFee
 
 	feeFloat, _ := strconv.ParseFloat(config.Fee, 64)
 	hasBalance, _ := ValidateBalanceForTransaction(0, feeFloat, true)
@@ -43,7 +49,13 @@ func subscribeToPubSub(topic string) bool {
 
 func unsubscribeToPubSub(topic string) bool {
 	config := &nkn.DefaultTransactionConfig
-	config.Fee = CalculateFee(TransactionFee)
+
+	var err error = nil
+	config.Fee, err = CalculateFee(TransactionFee)
+	if err != nil {
+		pushError("Error on unsubscribe to topic", err.Error())
+		return false
+	}
 
 	initialState := 0
 	currentState, exists := topicEncodedSubcribeStateMap[topic]

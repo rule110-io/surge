@@ -37,8 +37,12 @@ func WalletBalance() string {
 	return amount.String()
 }
 
-func CalculateFee(Fee string) string {
-	avgFee := openapi.GetAvgFee()
+func CalculateFee(Fee string) (string, error) {
+	avgFee, err := openapi.GetAvgFee()
+	if err != nil {
+		return "0.0", err
+	}
+
 	avgFeeFloat, _ := strconv.ParseFloat(avgFee, 64)
 
 	feePercent := 0.2
@@ -47,16 +51,16 @@ func CalculateFee(Fee string) string {
 
 	switch Fee {
 	case "0":
-		return "0"
+		return "0", nil
 	case "33":
-		return fmt.Sprintf("%f", lowFee)
+		return fmt.Sprintf("%f", lowFee), nil
 	case "66":
-		return avgFee
+		return avgFee, nil
 	case "100":
-		return fmt.Sprintf("%f", highFee)
+		return fmt.Sprintf("%f", highFee), nil
 	}
 
-	return "0"
+	return "0", nil
 }
 
 //ValidateBalanceForTransaction returns a boolean for whether there is enough balance to make a transation
@@ -75,25 +79,24 @@ func ValidateBalanceForTransaction(Amount float64, Fee float64, UtilTransaction 
 	return true, nil
 }
 
-func IsSubscriptionActive(TopicEncoded string) bool {
+func IsSubscriptionActive(TopicEncoded string) (bool, error) {
 	subs, err := client.GetSubscribers(TopicEncoded, 0, 1000, false, true)
 	if err != nil {
-		pushError("Error on checking subscriptions", "could not verify state of subscription.")
-		return false
+		return false, err
 	}
 
 	for sub := range subs.Subscribers.Map {
 		if sub == GetAccountAddress() {
-			return true
+			return true, nil
 		}
 	}
 
 	for sub := range subs.SubscribersInTxPool.Map {
 		if sub == GetAccountAddress() {
-			return true
+			return true, nil
 		}
 	}
-	return false
+	return false, nil
 }
 
 /*Wallet Features

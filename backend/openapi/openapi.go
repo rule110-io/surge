@@ -2,12 +2,11 @@ package openapi
 
 import (
 	"io/ioutil"
-	"log"
 	"net/http"
 	"time"
 )
 
-func GetAvgFee() string {
+func GetAvgFee() (string, error) {
 	url := "https://openapi.nkn.org/api/v1/statistics/avgtxfee"
 	client := http.Client{
 		Timeout: time.Second * 2, // Timeout after 2 seconds
@@ -15,12 +14,12 @@ func GetAvgFee() string {
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 
 	res, getErr := client.Do(req)
 	if getErr != nil {
-		log.Fatal(getErr)
+		return "", getErr
 	}
 
 	if res.Body != nil {
@@ -29,8 +28,8 @@ func GetAvgFee() string {
 
 	body, readErr := ioutil.ReadAll(res.Body)
 	if readErr != nil {
-		log.Fatal(readErr)
+		return "", readErr
 	}
 	result := string(body[:])
-	return result
+	return result, nil
 }

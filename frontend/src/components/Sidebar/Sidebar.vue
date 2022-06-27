@@ -13,7 +13,7 @@
           :class="{ sidebar__title_active: subscribedOpen }"
           @click="subscribedOpen = !subscribedOpen"
         >
-          Subscribed ({{ subscribedTopics.length }})
+          Connected ({{ subscribedTopics.length }})
           <Icon class="sidebar__title-icon" icon="DropdownIcon"></Icon>
         </div>
         <div
@@ -69,7 +69,7 @@
           :class="{ sidebar__title_active: unsubscribedOpen }"
           @click="unsubscribedOpen = !unsubscribedOpen"
         >
-          Unsubscribed ({{ unsubscribedTopics.length }})
+          Disconnected ({{ unsubscribedTopics.length }})
           <Icon class="sidebar__title-icon" icon="DropdownIcon"></Icon>
         </div>
         <div

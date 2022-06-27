@@ -112,7 +112,12 @@ func (s *MiddlewareFunctions) SubscribeToTopic(Topic string) bool {
 		pushError("Error on Subscribe", "topic name of length zero.")
 		return false
 	} else {
-		return subscribeToSurgeTopic(Topic, true)
+		result, err := subscribeToSurgeTopic(Topic, true)
+		if err != nil {
+			return false
+		} else {
+			return result
+		}
 	}
 }
 
@@ -238,7 +243,12 @@ func TransferToRecipient(Recipient string, Amount string, Fee string) string {
 		return ""
 	}
 
-	calculatedFee := CalculateFee(Fee)
+	calculatedFee, err := CalculateFee(Fee)
+	if err != nil {
+		pushError("Error on transfer", err.Error())
+		return ""
+	}
+
 	calculatedFeeFloat, err := strconv.ParseFloat(calculatedFee, 64)
 	if err != nil {
 		pushError("Error on transfer", "invalid fee: "+err.Error())
@@ -286,7 +296,11 @@ func (s *MiddlewareFunctions) Tip(FileHash string, Amount string, Fee string) {
 	}
 
 	share := amountFloat / float64(len(GetSeeders(FileHash)))
-	calculatedFee := CalculateFee(Fee)
+	calculatedFee, err := CalculateFee(Fee)
+	if err != nil {
+		pushError("Error on transfer", "invalid fee: "+err.Error())
+		return
+	}
 
 	feePerTxFloat, _ := strconv.ParseFloat(calculatedFee, 64)
 	totalFeeFloat := feePerTxFloat * float64(len(seeders))

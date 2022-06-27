@@ -14,7 +14,6 @@ import (
 
 var topicsMap map[string]models.Topic
 var topicEncodedSubcribeStateMap map[string]int
-var startupSubscribe = true
 
 const topicsMapBucketKey = "topicBucket"
 
@@ -33,7 +32,7 @@ func InitializeTopicsManager() {
 	}
 }
 
-func subscribeToSurgeTopic(topicName string, applySafeLock bool) bool {
+func subscribeToSurgeTopic(topicName string, applySafeLock bool) (bool, error) {
 
 	if applySafeLock {
 		mutexes.TopicsMapLock.Lock()
@@ -41,7 +40,10 @@ func subscribeToSurgeTopic(topicName string, applySafeLock bool) bool {
 	}
 
 	topicEncoded := TopicEncode(topicName)
-	subscriptionActive := IsSubscriptionActive(topicEncoded)
+	subscriptionActive, err := IsSubscriptionActive(topicEncoded)
+	if err != nil {
+		return false, err
+	}
 
 	if _, ok := topicsMap[topicName]; !ok {
 		topicModel := models.Topic{
@@ -65,16 +67,18 @@ func subscribeToSurgeTopic(topicName string, applySafeLock bool) bool {
 		if !subscribeToPubSub(topicEncoded) {
 			subscribeSuccess = false
 		}
+	} else {
+		updateTopicSubscriptionState(topicEncoded, 2)
 	}
 
 	//Only announce files if the client is first starting up, or when we are newly subscribed.
-	if subscribeSuccess && (startupSubscribe || !subscriptionActive) {
+	if subscribeSuccess {
 		AnnounceFiles(topicEncoded)
 		//first startup, were already subscribed, set the state.
 		updateTopicSubscriptionState(topicEncoded, 2)
 	}
 
-	return subscribeSuccess
+	return subscribeSuccess, nil
 }
 
 func unsubscribeFromSurgeTopic(topicName string) bool {
@@ -104,11 +108,20 @@ func unsubscribeFromSurgeTopic(topicName string) bool {
 func resubscribeToTopics() {
 	mutexes.TopicsMapLock.Lock()
 	defer mutexes.TopicsMapLock.Unlock()
-	for _, topic := range topicsMap {
 
-		subscribeToSurgeTopic(topic.Name, false)
+	for _, topic := range topicsMap {
+		_, err := subscribeToSurgeTopic(topic.Name, false)
+		if err != nil {
+
+			//set all topics to pending state
+			pushError("Topic connection error", err.Error())
+			for _, disableTopic := range topicsMap {
+				updateTopicSubscriptionState(disableTopic.NameEncoded, 1)
+			}
+
+			break
+		}
 	}
-	startupSubscribe = false
 }
 
 //GetTopicInfo returns info about the topic given
