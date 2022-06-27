@@ -202,7 +202,9 @@ func GetTopicsWithPermissions() []models.TopicInfo {
 
 func updateTopicSubscriptionState(TopicEncoded string, NewState int) {
 	topicEncodedSubcribeStateMap[TopicEncoded] = NewState
-	runtime.EventsEmit(*wailsContext, "topicsUpdated")
+	if FrontendReady {
+		runtime.EventsEmit(*wailsContext, "topicsUpdated")
+	}
 
 	fmt.Println("Subscription state updated", TopicEncoded, NewState)
 }
