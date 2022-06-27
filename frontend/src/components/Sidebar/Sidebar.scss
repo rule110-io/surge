@@ -18,7 +18,6 @@
   &__category {
     &:not(:first-child) {
       border-top: $border;
-      margin-top: $padding-md;
       padding-top: $padding-md;
     }
   }
@@ -84,14 +83,43 @@
     font-feature-settings: "salt" on;
     color: $grey-light;
     padding: 0 $padding-llg;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: $transition-1;
+    cursor: pointer;
+
+    &_active {
+      svg {
+        transform: scaleY(-1);
+      }
+    }
+
+    &:hover {
+      color: white;
+
+      svg {
+        path {
+          stroke: $white;
+        }
+      }
+    }
+
+    &-icon {
+      position: relative;
+      top: -1px;
+    }
   }
 
   &__items {
     margin-top: $padding-sm;
-    overflow-y: scroll;
-    overflow-x: visible;
-    max-height: 172px;
     padding: 0 $padding-llg;
+    max-height: 0;
+    overflow: hidden;
+
+    &_active {
+      max-height: unset;
+    }
   }
 
   &__item {
@@ -108,6 +136,10 @@
     transition: $transition-1;
     cursor: pointer;
     position: relative;
+
+    &:last-child {
+      margin-bottom: $padding-md;
+    }
 
     &_state {
       &_unsubscribed {
