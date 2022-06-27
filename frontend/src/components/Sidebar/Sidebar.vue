@@ -8,11 +8,18 @@
     </div>
     <div class="sidebar__categories">
       <div class="sidebar__category">
-        <div class="sidebar__title">Subscribed</div>
-        <div class="sidebar__descr" v-if="!subscribedTopics.length">
-          No topics
+        <div
+          class="sidebar__title"
+          :class="{ sidebar__title_active: subscribedOpen }"
+          @click="subscribedOpen = !subscribedOpen"
+        >
+          Subscribed ({{ subscribedTopics.length }})
+          <Icon class="sidebar__title-icon" icon="DropdownIcon"></Icon>
         </div>
-        <div class="sidebar__items">
+        <div
+          class="sidebar__items"
+          :class="{ sidebar__items_active: subscribedOpen }"
+        >
           <div
             class="sidebar__item sidebar__item_state_subscribed"
             v-for="(topic, i) in subscribedTopics"
@@ -29,9 +36,18 @@
         </div>
       </div>
       <div class="sidebar__category">
-        <div class="sidebar__title">Pending</div>
-        <div class="sidebar__descr" v-if="!pendingTopics.length">No topics</div>
-        <div class="sidebar__items">
+        <div
+          class="sidebar__title"
+          :class="{ sidebar__title_active: pendingOpen }"
+          @click="pendingOpen = !pendingOpen"
+        >
+          Pending ({{ pendingTopics.length }})
+          <Icon class="sidebar__title-icon" icon="DropdownIcon"></Icon>
+        </div>
+        <div
+          class="sidebar__items"
+          :class="{ sidebar__items_active: pendingOpen }"
+        >
           <div
             class="sidebar__item sidebar__item_state_pending"
             v-for="(topic, i) in pendingTopics"
@@ -48,11 +64,18 @@
         </div>
       </div>
       <div class="sidebar__category">
-        <div class="sidebar__title">Unsubscribed</div>
-        <div class="sidebar__descr" v-if="!unsubscribedTopics.length">
-          No topics
+        <div
+          class="sidebar__title"
+          :class="{ sidebar__title_active: unsubscribedOpen }"
+          @click="unsubscribedOpen = !unsubscribedOpen"
+        >
+          Unsubscribed ({{ unsubscribedTopics.length }})
+          <Icon class="sidebar__title-icon" icon="DropdownIcon"></Icon>
         </div>
-        <div class="sidebar__items">
+        <div
+          class="sidebar__items"
+          :class="{ sidebar__items_active: unsubscribedOpen }"
+        >
           <div
             class="sidebar__item sidebar__item_state_unsubscribed"
             v-for="(topic, i) in unsubscribedTopics"
@@ -86,6 +109,9 @@ export default {
   data: () => {
     return {
       topicName: "",
+      subscribedOpen: true,
+      pendingOpen: false,
+      unsubscribedOpen: false,
     };
   },
   computed: {
