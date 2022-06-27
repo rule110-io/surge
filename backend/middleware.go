@@ -3,6 +3,7 @@ package surge
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"github.com/nknorg/nkn-sdk-go"
 	"github.com/rule110-io/surge/backend/constants"
@@ -217,25 +218,39 @@ func (s *MiddlewareFunctions) GetWalletAddress() string {
 func (s *MiddlewareFunctions) GetWalletBalance() string {
 	return WalletBalance()
 }
-func TransferToPk(PubKey string, Amount string, Fee string) string {
+func TransferToRecipient(Recipient string, Amount string, Fee string) string {
+	//Validate recipient, can take both NKN address and PubKey (which we turn into NKN address)
+	walletAddr := ""
+	if strings.HasPrefix(Recipient, "NKN") {
+		walletAddr = Recipient
+	} else {
+		walletAddr, _ = nkn.ClientAddrToWalletAddr(Recipient)
+	}
+	err := nkn.VerifyWalletAddress(walletAddr)
+	if err != nil {
+		pushError("Transfer failed", "recipient address is not a valid nkn address.")
+	}
+
+	//Check amount is valid
 	amountFloat, err := strconv.ParseFloat(Amount, 64)
 	if err != nil {
-		pushError("Error on transfer", err.Error())
+		pushError("Error on transfer", "invalid amount: "+err.Error())
 		return ""
 	}
-	feeFloat, err := strconv.ParseFloat(Amount, 64)
+
+	calculatedFee := CalculateFee(Fee)
+	calculatedFeeFloat, err := strconv.ParseFloat(calculatedFee, 64)
 	if err != nil {
-		pushError("Error on transfer", err.Error())
+		pushError("Error on transfer", "invalid fee: "+err.Error())
 		return ""
 	}
 
-	isEnough, balanceError := ValidateBalanceForTransaction(amountFloat, feeFloat, false)
+	isEnough, balanceError := ValidateBalanceForTransaction(amountFloat, calculatedFeeFloat, false)
 	if !isEnough {
-		pushError("Error on tip", balanceError.Error())
+		pushError("Error on tip", "transaction failed: "+balanceError.Error())
 		return ""
 	}
 
-	walletAddr, _ := nkn.ClientAddrToWalletAddr(PubKey)
 	_, hash := WalletTransfer(walletAddr, Amount, Fee)
 	return hash
 }
