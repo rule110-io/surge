@@ -30,6 +30,7 @@ func emitNotificationEvent(event string, title string, text string) {
 }
 
 func pushNotification(title string, text string) {
+	log.Println(title, text)
 	//If wails frontend is not yet bound, we wait in a task to not block main thread
 	if !FrontendReady {
 		waitAndPush := func() {

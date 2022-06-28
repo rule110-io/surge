@@ -21,17 +21,15 @@ func MessageReceived(msg *messaging.MessageReceivedObj) {
 	switch msg.Type {
 	case MessageIDAnnounceFiles:
 		if msg.Sender != GetAccountAddress() {
-			SendAnnounceFilesReply(msg)
+			go SendAnnounceFilesReply(msg)
 		}
-		processQueryResponse(msg.Sender, msg.Data)
+		go processQueryResponse(msg.Sender, msg.Data)
 	case MessageIDAnnounceFilesReply:
-		//process file data
-		processQueryResponse(msg.Sender, msg.Data)
+		go processQueryResponse(msg.Sender, msg.Data)
 	case MessageIDAnnounceNewFile:
-		//process file data
-		processQueryResponse(msg.Sender, msg.Data)
+		go processQueryResponse(msg.Sender, msg.Data)
 	case MessageIDAnnounceRemoveFile:
-		processRemoveFile(string(msg.Data), msg.Sender)
+		go processRemoveFile(string(msg.Data), msg.Sender)
 	}
 
 }

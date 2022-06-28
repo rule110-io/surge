@@ -223,7 +223,6 @@ func updateTopicSubscriptionState(TopicEncoded string, NewState int) {
 	isChanged := !exists || previousValue != NewState
 
 	if isChanged {
-		log.Println("Subscription state updated", TopicEncoded, NewState)
 		topicEncodedSubcribeStateMap[TopicEncoded] = NewState
 		if FrontendReady {
 			runtime.EventsEmit(*wailsContext, "topicsUpdated")

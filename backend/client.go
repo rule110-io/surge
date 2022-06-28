@@ -72,7 +72,7 @@ func WailsBind(ctx *context.Context) {
 	for !clientInitialized {
 		time.Sleep(time.Second)
 		if tryCount%10 == 0 {
-			pushError("Connection to NKN not yet established 0", "do you have an active internet connection?")
+			pushError("Connection to NKN not yet established", "do you have an active internet connection?")
 		}
 		tryCount++
 	}
@@ -82,6 +82,7 @@ func WailsBind(ctx *context.Context) {
 	go updateFileDataWorker()
 
 	FrontendReady = true
+	log.Println("Frontend connected")
 }
 
 //InitializeClient Initiates the surge client and instantiates connection with the NKN network
@@ -210,7 +211,6 @@ func DownloadFileByHash(Hash string) bool {
 
 	//When downloading from remote enter file into db
 	_, err = dbGetFile(Hash)
-	log.Println(err.Error())
 	if err != nil {
 		file.Path = path
 		file.NumChunks = numChunks
@@ -294,7 +294,7 @@ func onClientConnected(session *sessionmanager.Session, isDialIn bool) {
 	go updateNumClientStore()
 	addr := session.Session.RemoteAddr().String()
 
-	fmt.Println(string("\033[36m"), "Client Connected", addr, string("\033[0m"))
+	log.Println("Client Connected", addr)
 
 	go listenToSession(session)
 }
@@ -305,12 +305,8 @@ func onClientDisconnected(addr string) {
 	mutexes.ListedFilesLock.Lock()
 	defer mutexes.ListedFilesLock.Unlock()
 
-	//Remove this address from remote file seeders
-	for i := 0; i < len(ListedFiles); i++ {
-		fmt.Println(string("\033[31m"), "onClientDisconnected", ListedFiles[i].FileName)
-	}
-
 	RemoveSeeder(addr)
+	log.Println("Client Disconnected", addr)
 
 	//Remove empty seeders listings
 	for i := 0; i < len(ListedFiles); i++ {
@@ -329,12 +325,10 @@ func listenToSession(Session *sessionmanager.Session) {
 
 	addr := Session.Session.RemoteAddr().String()
 
-	fmt.Println(string("\033[31m"), "Initiate Session", addr, string("\033[0m"))
+	log.Println("Initiate Session", addr)
 
 	for Session.Session != nil {
 		data, chunkType, err := SessionRead(Session)
-		fmt.Println(string("\033[31m"), "Read data from session", addr, string("\033[0m"))
-
 		if err != nil {
 			log.Println("Session read failed, closing session error:", err)
 			break
@@ -357,7 +351,6 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 	if err := proto.Unmarshal(Data, surgeMessage); err != nil {
 		log.Panic("Failed to parse surge message:", err)
 	}
-	fmt.Println(string("\033[31m"), "PROCESSING CHUNK", string("\033[0m"))
 
 	//Write add to download
 	mutexes.BandwidthAccumulatorMapLock.Lock()

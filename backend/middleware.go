@@ -270,13 +270,11 @@ func (s *MiddlewareFunctions) GetTxFee() string {
 }
 
 func (s *MiddlewareFunctions) SetTxFee(Fee string) {
-	fmt.Println("tx fee set", Fee)
 	TransactionFee = Fee
 	DbWriteSetting("defaultTxFee", Fee)
 }
 
 func (s *MiddlewareFunctions) Tip(FileHash string, Amount string, Fee string) {
-	fmt.Println(FileHash, Amount, Fee)
 	amountFloat, err := strconv.ParseFloat(Amount, 64)
 
 	if err != nil {
@@ -313,8 +311,7 @@ func (s *MiddlewareFunctions) Tip(FileHash string, Amount string, Fee string) {
 
 	for _, v := range seeders {
 		walletAddr, _ := nkn.ClientAddrToWalletAddr(v)
-		success, hash := WalletTransfer(walletAddr, fmt.Sprintf("%f", share), calculatedFee)
-		fmt.Println(success, hash, walletAddr, share)
+		success, _ := WalletTransfer(walletAddr, fmt.Sprintf("%f", share), calculatedFee)
 
 		if !success {
 			break

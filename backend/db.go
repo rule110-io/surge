@@ -77,7 +77,7 @@ func dbGetAllFiles() []models.File {
 
 			return nil
 		}); err != nil {
-		log.Println(err)
+		log.Println("Get all db files error:", err)
 	} else {
 		return files
 	}
@@ -137,7 +137,7 @@ func dbDeleteFile(Hash string) error {
 			}
 			return nil
 		}); err != nil {
-		log.Println(err)
+		log.Println("Db delete file", err)
 		return err
 	}
 	return nil
