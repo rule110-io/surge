@@ -1,7 +1,6 @@
 package surge
 
 import (
-	"fmt"
 	"strconv"
 	"strings"
 
@@ -19,8 +18,6 @@ const (
 )
 
 func MessageReceived(msg *messaging.MessageReceivedObj) {
-	fmt.Println(string("\033[36m"), "MESSAGE RECEIVED", string(msg.Data))
-
 	switch msg.Type {
 	case MessageIDAnnounceFiles:
 		if msg.Sender != GetAccountAddress() {
@@ -40,8 +37,6 @@ func MessageReceived(msg *messaging.MessageReceivedObj) {
 }
 
 func AnnounceFiles(topicEncoded string) {
-	fmt.Println(string("\033[36m"), "ANNOUNCING FILES FOR TOPIC", topicEncoded)
-
 	payload := getTopicPayload(topicEncoded)
 
 	dataObj := messaging.MessageObj{
@@ -54,8 +49,6 @@ func AnnounceFiles(topicEncoded string) {
 }
 
 func SendAnnounceFilesReply(msg *messaging.MessageReceivedObj) {
-	fmt.Println(string("\033[36m"), "SENDING FILE REQUEST REPLY", msg.TopicEncoded, msg.Sender)
-
 	payload := getTopicPayload(msg.TopicEncoded)
 
 	if len(payload) > 0 {
@@ -70,8 +63,6 @@ func SendAnnounceFilesReply(msg *messaging.MessageReceivedObj) {
 }
 
 func AnnounceNewFile(file *models.File) {
-	fmt.Println(string("\033[36m"), "ANNOUNCE NEW FILE FOR TOPIC", file.Topic)
-
 	//Create payload
 	payload := surgeGenerateTopicPayload(file.FileName, file.FileSize, file.FileHash, file.Topic)
 
@@ -86,8 +77,6 @@ func AnnounceNewFile(file *models.File) {
 }
 
 func AnnounceRemoveFile(topic string, fileHash string) {
-	fmt.Println(string("\033[36m"), "ANNOUNCE REMOVE FILE FOR TOPIC ", topic, " hash: ", fileHash)
-
 	//Create the data object
 	dataObj := messaging.MessageObj{
 		Type:         MessageIDAnnounceRemoveFile,
@@ -99,8 +88,6 @@ func AnnounceRemoveFile(topic string, fileHash string) {
 }
 
 func processRemoveFile(hash string, seeder string) {
-	fmt.Println(string("\033[36m"), "PROCESS REMOVE FILE FOR TOPIC, hash:", hash, " seeder: ", seeder)
-
 	RemoveFileSeeder(hash, seeder)
 
 	mutexes.ListedFilesLock.Lock()
@@ -122,8 +109,6 @@ func processQueryResponse(seeder string, Data []byte) {
 
 	//Try to parse SurgeMessage
 	s := string(Data)
-	fmt.Println(string("\033[36m"), "file query response received", seeder, string("\033[0m"))
-
 	mutexes.ListedFilesLock.Lock()
 
 	//Parse the response

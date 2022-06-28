@@ -261,7 +261,7 @@ func (s *MiddlewareFunctions) TransferToRecipient(Recipient string, Amount strin
 		return ""
 	}
 
-	_, hash := WalletTransfer(walletAddr, Amount, Fee)
+	_, hash := WalletTransfer(walletAddr, Amount, calculatedFee)
 	return hash
 }
 

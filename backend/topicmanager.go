@@ -2,7 +2,6 @@ package surge
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 	"sort"
 
@@ -219,10 +218,15 @@ func GetTopicsWithPermissions() []models.TopicInfo {
 }
 
 func updateTopicSubscriptionState(TopicEncoded string, NewState int) {
-	topicEncodedSubcribeStateMap[TopicEncoded] = NewState
-	if FrontendReady {
-		runtime.EventsEmit(*wailsContext, "topicsUpdated")
-	}
 
-	fmt.Println("Subscription state updated", TopicEncoded, NewState)
+	previousValue, exists := topicEncodedSubcribeStateMap[TopicEncoded]
+	isChanged := !exists || previousValue != NewState
+
+	if isChanged {
+		log.Println("Subscription state updated", TopicEncoded, NewState)
+		topicEncodedSubcribeStateMap[TopicEncoded] = NewState
+		if FrontendReady {
+			runtime.EventsEmit(*wailsContext, "topicsUpdated")
+		}
+	}
 }

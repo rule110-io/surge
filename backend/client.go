@@ -209,8 +209,8 @@ func DownloadFileByHash(Hash string) bool {
 	numChunks := int((file.FileSize-1)/int64(constants.ChunkSize)) + 1
 
 	//When downloading from remote enter file into db
-	dbFile, err := dbGetFile(Hash)
-	log.Println(dbFile)
+	_, err = dbGetFile(Hash)
+	log.Println(err.Error())
 	if err != nil {
 		file.Path = path
 		file.NumChunks = numChunks

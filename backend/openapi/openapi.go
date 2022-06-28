@@ -9,7 +9,7 @@ import (
 func GetAvgFee() (string, error) {
 	url := "https://openapi.nkn.org/api/v1/statistics/avgtxfee"
 	client := http.Client{
-		Timeout: time.Second * 2, // Timeout after 2 seconds
+		Timeout: time.Second * 10, // Timeout after 2 seconds
 	}
 
 	req, err := http.NewRequest(http.MethodGet, url, nil)
