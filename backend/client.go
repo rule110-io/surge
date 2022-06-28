@@ -225,7 +225,7 @@ func DownloadFileByHash(Hash string) bool {
 		randomChunks[i] = i
 	}
 	rand.Seed(time.Now().UnixNano())
-	rand.Shuffle(len(randomChunks), func(i, j int) { randomChunks[i], randomChunks[j] = randomChunks[j], randomChunks[i] })
+	//rand.Shuffle(len(randomChunks), func(i, j int) { randomChunks[i], randomChunks[j] = randomChunks[j], randomChunks[i] })
 
 	downloadChunks(file, randomChunks)
 
@@ -256,7 +256,7 @@ func restartDownload(Hash string) {
 	}
 
 	rand.Seed(time.Now().UnixNano())
-	rand.Shuffle(numChunks, func(i, j int) { missingChunks[i], missingChunks[j] = missingChunks[j], missingChunks[i] })
+	//rand.Shuffle(numChunks, func(i, j int) { missingChunks[i], missingChunks[j] = missingChunks[j], missingChunks[i] })
 
 	log.Println("Restarting Download for", file.FileName)
 
