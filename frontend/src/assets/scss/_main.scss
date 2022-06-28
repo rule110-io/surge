@@ -70,6 +70,17 @@ a {
     color: #7b7d82;
   }
 
+  &_link {
+    color: $primary;
+    text-decoration: underline;
+    transition: $transition-1;
+    cursor: pointer;
+
+    &:hover {
+      color: white;
+    }
+  }
+
   &_select {
     user-select: text;
   }

@@ -223,7 +223,7 @@ func (s *MiddlewareFunctions) GetWalletAddress() string {
 func (s *MiddlewareFunctions) GetWalletBalance() string {
 	return WalletBalance()
 }
-func TransferToRecipient(Recipient string, Amount string, Fee string) string {
+func (s *MiddlewareFunctions) TransferToRecipient(Recipient string, Amount string, Fee string) string {
 	//Validate recipient, can take both NKN address and PubKey (which we turn into NKN address)
 	walletAddr := ""
 	if strings.HasPrefix(Recipient, "NKN") {
