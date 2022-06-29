@@ -339,7 +339,7 @@ func listenToSession(Session *sessionmanager.Session) {
 		switch chunkType {
 		case constants.SurgeChunkID:
 			//Write add to download internally after parsing data
-			processChunk(Session, data)
+			go processChunk(Session, data)
 		}
 	}
 }
@@ -359,7 +359,7 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 
 	//Data nill means its a request for data
 	if surgeMessage.Data == nil {
-		go TransmitChunk(Session, surgeMessage.FileID, surgeMessage.ChunkID)
+		TransmitChunk(Session, surgeMessage.FileID, surgeMessage.ChunkID)
 	} else { //If data is not nill we are receiving data
 
 		//When we receive a chunk mark it as no longer in transit
@@ -376,7 +376,7 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 		}
 		mutexes.WorkerMapLock.Unlock()
 
-		go WriteChunk(surgeMessage.FileID, surgeMessage.ChunkID, surgeMessage.Data)
+		WriteChunk(surgeMessage.FileID, surgeMessage.ChunkID, surgeMessage.Data)
 	}
 }
 

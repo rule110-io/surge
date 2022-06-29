@@ -109,7 +109,7 @@ func (s *MiddlewareFunctions) StartDownloadMagnetLinks(Magnetlinks string) bool 
 //SubscribeToTopic subscribes to given topic
 func (s *MiddlewareFunctions) SubscribeToTopic(Topic string) bool {
 	if len(Topic) == 0 {
-		pushError("Error on Subscribe", "topic name of length zero.")
+		pushError("Error on Subscribe", "channel name of length zero.")
 		return false
 	} else {
 		result, err := subscribeToSurgeTopic(Topic, true)

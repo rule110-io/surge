@@ -2,12 +2,12 @@
   <Modal :show.sync="showModal" @closeAndClear="closeAndClearModal">
     <template slot="title"> Add New Channel </template>
     <template slot="body">
-      <ControlWrapper title="Topic name">
+      <ControlWrapper title="Channel name">
         <Input
           v-model="topicName"
           theme="light"
           size="md"
-          placeholder="Enter topic name here"
+          placeholder="Enter channel name here"
         />
       </ControlWrapper>
     </template>
