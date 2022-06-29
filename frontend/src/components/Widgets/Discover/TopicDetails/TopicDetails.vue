@@ -41,7 +41,7 @@
                 class="dropdown__list-item"
                 @click="resubscribe(topicDetails.Name)"
               >
-                Try to resubscribe
+                Resubscribe
               </li>
               <li class="dropdown__list-item" @click="unsubscribe">
                 Unsubscribe

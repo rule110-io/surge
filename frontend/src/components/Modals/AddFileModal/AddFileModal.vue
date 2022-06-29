@@ -64,6 +64,11 @@ export default {
       window.go.surge.MiddlewareFunctions.SeedFile(topicName).then(() => {
         this.$store.dispatch("files/fetchLocalFiles");
         this.$store.dispatch("files/fetchRemoteFiles");
+        this.$notify({
+          group: "notifications",
+          text: `File seeded in ${topicName}`,
+          type: "success",
+        });
       });
     },
     clearModal() {

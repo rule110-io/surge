@@ -6,6 +6,12 @@
     margin-bottom: $padding-xl;
   }
 
+  &__logs {
+    display: flex;
+    align-items: flex-start;
+    grid-gap: $padding-llg;
+  }
+
   &__path {
     display: grid;
     align-items: center;
