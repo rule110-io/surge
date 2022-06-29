@@ -9,6 +9,9 @@
       </div>
       <ModalGrid>
         <ControlWrapper title="Total tip amount">
+          <template slot="descr">
+            <div>Balance: {{ walletBalance.toFixed(8) }}</div>
+          </template>
           <Input
             v-model="amount"
             type="number"
@@ -60,7 +63,7 @@
     </template>
     <template slot="footer">
       <Button theme="text" size="md" @click="closeAndClearModal">Close</Button>
-      <Button theme="default" size="md" :disabled="amount <= 0" @click="tip"
+      <Button theme="default" size="md" :disabled="disabled" @click="tip"
         >Tip seeders</Button
       >
     </template>
@@ -93,6 +96,8 @@ export default {
   },
   data: () => {
     return {
+      loading: false,
+      walletBalance: 0,
       amount: 1,
       txFee: 66,
       avgFee: 0,
@@ -133,10 +138,18 @@ export default {
 
       return fee;
     },
+    disabled() {
+      if (this.amount <= 0 || this.loading) {
+        return true;
+      } else {
+        return false;
+      }
+    },
   },
   watch: {
     showModal() {
       this.getAvgTxFee();
+      this.getWalletBalance();
     },
   },
   mounted() {},
@@ -164,17 +177,33 @@ export default {
           });
         });
     },
+    getWalletBalance() {
+      window.go.surge.MiddlewareFunctions.GetWalletBalance().then((resp) => {
+        this.walletBalance = parseFloat(resp);
+      });
+    },
     clearModal() {},
     tip() {
-      console.log(this.activeFile);
+      this.loading = true;
+
       window.go.surge.MiddlewareFunctions.Tip(
         this.activeFile.FileHash,
-        "" + this.amount,
-        "" + this.txFee
-      ).then(() => {
-        this.closeModal();
-        this.clearModal();
-      });
+        this.amount.toString(),
+        this.txFee.toString()
+      )
+        .then(() => {
+          this.closeModal();
+          this.clearModal();
+
+          this.$notify({
+            group: "notifications",
+            text: `Tip successful`,
+            type: "success",
+          });
+        })
+        .finally(() => {
+          this.loading = false;
+        });
     },
   },
 };
