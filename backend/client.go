@@ -91,7 +91,7 @@ func InitializeClient(args []string) bool {
 
 	account := InitializeAccount()
 	client, err = nkn.NewMultiClient(account, "", getNumberClients(), false, &nkn.ClientConfig{
-		ConnectRetries:    1000,
+		ConnectRetries:    10,
 		SeedRPCServerAddr: GetBootstrapRPC(),
 	})
 	if err != nil {
