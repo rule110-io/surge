@@ -8,6 +8,7 @@ import (
 	"github.com/rule110-io/surge/backend/messaging"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
+	"github.com/rule110-io/surge/backend/sessionmanager"
 )
 
 const (
@@ -15,6 +16,7 @@ const (
 	MessageIDAnnounceFilesReply
 	MessageIDAnnounceNewFile
 	MessageIDAnnounceRemoveFile
+	MessageIDAnnounceDisconnect
 )
 
 func MessageReceived(msg *messaging.MessageReceivedObj) {
@@ -30,8 +32,9 @@ func MessageReceived(msg *messaging.MessageReceivedObj) {
 		go processQueryResponse(msg.Sender, msg.Data)
 	case MessageIDAnnounceRemoveFile:
 		go processRemoveFile(string(msg.Data), msg.Sender)
+	case MessageIDAnnounceDisconnect:
+		go sessionmanager.CloseSession(msg.Sender)
 	}
-
 }
 
 func AnnounceFiles(topicEncoded string) {
@@ -80,6 +83,16 @@ func AnnounceRemoveFile(topic string, fileHash string) {
 		Type:         MessageIDAnnounceRemoveFile,
 		TopicEncoded: TopicEncode(topic),
 		Data:         []byte(fileHash),
+	}
+
+	messaging.Broadcast(&dataObj)
+}
+
+func AnnounceDisconnect(topic string) {
+	//Create the data object
+	dataObj := messaging.MessageObj{
+		Type:         MessageIDAnnounceDisconnect,
+		TopicEncoded: TopicEncode(topic),
 	}
 
 	messaging.Broadcast(&dataObj)

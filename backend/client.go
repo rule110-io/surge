@@ -179,6 +179,10 @@ func StopClient() {
 	//Persist our connections for future bootstraps
 	PersistRPC(client)
 
+	for _, v := range topicsMap {
+		log.Println("Disconnecting from topic", v.Name)
+		AnnounceDisconnect(v.Name)
+	}
 	client.Close()
 }
 
