@@ -2,7 +2,6 @@ package messaging
 
 import (
 	"encoding/json"
-	"fmt"
 	"log"
 
 	nkn "github.com/nknorg/nkn-sdk-go"
@@ -25,16 +24,14 @@ func Initialize(client *nkn.MultiClient, account *nkn.Account, onMsgHandler func
 func Broadcast(msg *MessageObj) {
 	jsonObj, err := json.Marshal(msg)
 	if err != nil {
-		fmt.Println(err)
+		log.Println("Broadcast json marshal:", err)
 	}
-
-	fmt.Println("Marshalled Bytes:", jsonObj)
 
 	err = nknClient.PublishBinary(msg.TopicEncoded, jsonObj, &nkn.MessageConfig{
 		TxPool: true,
 	})
 	if err != nil {
-		fmt.Println(err)
+		log.Println("Broadcast send binary:", err)
 	}
 }
 
@@ -42,19 +39,22 @@ func (msgReceived MessageReceivedObj) Reply(msg *MessageObj) {
 	jsonObj, err := json.Marshal(msg)
 
 	if err != nil {
-		fmt.Println(err)
+		log.Println("Reply json marshal:", err)
 		return
 	}
 
-	fmt.Println("Marshalled Bytes:", jsonObj)
-
-	nknClient.SendBinary(nkn.NewStringArray(msgReceived.Sender), jsonObj, &nkn.MessageConfig{
+	_, err = nknClient.SendBinary(nkn.NewStringArray(msgReceived.Sender), jsonObj, &nkn.MessageConfig{
 		TxPool: true,
 	})
+	if err != nil {
+		log.Println("Reply send binary:", err)
+		return
+	}
+
 }
 
 func listen() {
-	for true {
+	for {
 		//Wait for a message
 		msg := <-nknClient.OnMessage.C
 
@@ -64,8 +64,7 @@ func listen() {
 			err := json.Unmarshal(msg.Data, &msgObj)
 			if err != nil {
 				log.Println("Received invalid message:", string(msg.Data), "from:", msg.Src, "error:", err)
-				fmt.Println("Received invalid message:", string(msg.Data), "from:", msg.Src, "error:", err)
-			} else if msg.Src == nknClient.Address() {
+				//} else if msg.Src == nknClient.Address() {
 				//We exclude messages from ourselves
 			} else {
 				msgObj.Sender = msg.Src

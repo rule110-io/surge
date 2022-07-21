@@ -26,10 +26,11 @@ import (
 )
 
 func emitNotificationEvent(event string, title string, text string) {
-	runtime.EventsEmit(*wailsContext, "notificationEvent", title, text, time.Now().Unix())
+	runtime.EventsEmit(*wailsContext, event, title, text, time.Now().Unix())
 }
 
 func pushNotification(title string, text string) {
+	log.Println(title, text)
 	//If wails frontend is not yet bound, we wait in a task to not block main thread
 	if !FrontendReady {
 		waitAndPush := func() {

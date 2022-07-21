@@ -15,6 +15,7 @@
       :class="[
         icon ? 'input__controller_icon' : null,
         `input__controller_theme_${theme}`,
+        after ? 'input__controller_after' : null,
       ]"
       :type="type"
       :placeholder="placeholder"
@@ -23,6 +24,7 @@
       @focus="focus = true"
       @blur="focus = false"
     />
+    <div v-if="after" class="input__after">{{ after }}</div>
   </div>
 </template>
 
@@ -59,6 +61,10 @@ export default {
     size: {
       type: String,
       default: "lg",
+    },
+    after: {
+      type: String,
+      default: "",
     },
   },
   data: () => {

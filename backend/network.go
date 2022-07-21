@@ -55,7 +55,9 @@ func fileBandwidth(FileID string) (Download int, Upload int) {
 	return int(fileBandwidthMap[FileID].Download.Avg()), int(fileBandwidthMap[FileID].Upload.Avg())
 }
 
-func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLock *sync.Mutex, activeSeeders *[]string) {
+func downloadChunks(file *models.File, randomChunks []int) {
+	log.Println("Starting download for file:", file.FileName, file.FileHash, "size:", file.FileSize)
+
 	fileID := file.FileHash
 
 	//todo: lock seeders
@@ -89,19 +91,7 @@ func downloadChunks(file *models.File, randomChunks []int) { //, mutateSeederLoc
 		defer terminate(terminateFlag)
 
 		for i := 0; i < numChunks; i++ {
-			fmt.Println(numChunks)
-			fmt.Println(string("\033[36m"), "Preparing Chunk Fetch", string("\033[0m"))
-
 			dbFile, err := dbGetFile(fileID)
-
-			//DEBUG CODE REMOVE THIS SUPER INEFFICIENT:
-			/*var missingChunks []int
-			for i := 0; i < dbFile.NumChunks; i++ {
-				if !bitmap.Get(dbFile.ChunkMap, i) {
-					missingChunks = append(missingChunks, i)
-				}
-			}
-			fmt.Println(missingChunks)*/
 
 			//Check if file is still tracked in surge
 			if err != nil {
@@ -443,10 +433,10 @@ func SessionRead(Session *sessionmanager.Session) (data []byte, ID byte, err err
 	_, err = io.ReadFull(Session.Reader, headerBuffer)
 	if err != nil {
 		if err.Error() == "session closed" {
-			log.Println(err)
+			log.Println("Session read", err)
 			return nil, 0x0, err
 		}
-		log.Println(err)
+		log.Println("Session read", err)
 		return nil, 0x0, err
 	}
 
@@ -463,7 +453,7 @@ func SessionRead(Session *sessionmanager.Session) (data []byte, ID byte, err err
 	// read the full message, or return an error
 	_, err = io.ReadFull(Session.Reader, data[:int(size)])
 	if err != nil {
-		log.Println(err)
+		log.Println("Session read", err)
 		return nil, 0x0, err
 	}
 

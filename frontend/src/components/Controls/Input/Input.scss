@@ -79,6 +79,28 @@
     }
   }
 
+  &__after {
+    position: absolute;
+    right: 16px;
+    top: 9px;
+    padding-left: 16px;
+    font-weight: 500;
+    min-width: 30px;
+    text-align: center;
+    color: $grey;
+
+    &::before {
+      content: "";
+      display: block;
+      width: 2px;
+      position: absolute;
+      top: -8px;
+      left: 0;
+      height: 34px;
+      background: #323232;
+    }
+  }
+
   &__icon {
     position: relative;
     height: 24px;

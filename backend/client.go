@@ -72,7 +72,7 @@ func WailsBind(ctx *context.Context) {
 	for !clientInitialized {
 		time.Sleep(time.Second)
 		if tryCount%10 == 0 {
-			pushError("Connection to NKN not yet established 0", "do you have an active internet connection?")
+			pushError("Connection to NKN not yet established", "do you have an active internet connection?")
 		}
 		tryCount++
 	}
@@ -82,6 +82,7 @@ func WailsBind(ctx *context.Context) {
 	go updateFileDataWorker()
 
 	FrontendReady = true
+	log.Println("Frontend connected")
 }
 
 //InitializeClient Initiates the surge client and instantiates connection with the NKN network
@@ -90,7 +91,7 @@ func InitializeClient(args []string) bool {
 
 	account := InitializeAccount()
 	client, err = nkn.NewMultiClient(account, "", getNumberClients(), false, &nkn.ClientConfig{
-		ConnectRetries:    1000,
+		ConnectRetries:    10,
 		SeedRPCServerAddr: GetBootstrapRPC(),
 	})
 	if err != nil {
@@ -130,6 +131,14 @@ func InitializeClient(args []string) bool {
 	}
 
 	messaging.Initialize(client, client.Account(), MessageReceived)
+
+	//Get the transaction fee setting
+	TransactionFee, err = DbReadSetting("defaultTxFee")
+	if err != nil {
+		DbWriteSetting("defaultTxFee", "0")
+		TransactionFee = "0"
+	}
+
 	go autoSubscribeWorker()
 
 	go platform.WatchOSXHandler()
@@ -170,6 +179,10 @@ func StopClient() {
 	//Persist our connections for future bootstraps
 	PersistRPC(client)
 
+	for _, v := range topicsMap {
+		log.Println("Disconnecting from topic", v.Name)
+		AnnounceDisconnect(v.Name)
+	}
 	client.Close()
 }
 
@@ -201,8 +214,7 @@ func DownloadFileByHash(Hash string) bool {
 	numChunks := int((file.FileSize-1)/int64(constants.ChunkSize)) + 1
 
 	//When downloading from remote enter file into db
-	dbFile, err := dbGetFile(Hash)
-	log.Println(dbFile)
+	_, err = dbGetFile(Hash)
 	if err != nil {
 		file.Path = path
 		file.NumChunks = numChunks
@@ -217,7 +229,7 @@ func DownloadFileByHash(Hash string) bool {
 		randomChunks[i] = i
 	}
 	rand.Seed(time.Now().UnixNano())
-	rand.Shuffle(len(randomChunks), func(i, j int) { randomChunks[i], randomChunks[j] = randomChunks[j], randomChunks[i] })
+	//rand.Shuffle(len(randomChunks), func(i, j int) { randomChunks[i], randomChunks[j] = randomChunks[j], randomChunks[i] })
 
 	downloadChunks(file, randomChunks)
 
@@ -244,17 +256,11 @@ func restartDownload(Hash string) {
 
 	//Nothing more to download
 	if numChunks == 0 {
-		platform.ShowNotification("Download Finished", "Download for "+file.FileName+" finished!")
-		pushNotification("Download Finished", file.FileName)
-		file.IsDownloading = false
-		file.IsUploading = true
-		file.IsAvailable = true
-		dbInsertFile(*file)
 		return
 	}
 
 	rand.Seed(time.Now().UnixNano())
-	rand.Shuffle(numChunks, func(i, j int) { missingChunks[i], missingChunks[j] = missingChunks[j], missingChunks[i] })
+	//rand.Shuffle(numChunks, func(i, j int) { missingChunks[i], missingChunks[j] = missingChunks[j], missingChunks[i] })
 
 	log.Println("Restarting Download for", file.FileName)
 
@@ -292,7 +298,7 @@ func onClientConnected(session *sessionmanager.Session, isDialIn bool) {
 	go updateNumClientStore()
 	addr := session.Session.RemoteAddr().String()
 
-	fmt.Println(string("\033[36m"), "Client Connected", addr, string("\033[0m"))
+	log.Println("Client Connected", addr)
 
 	go listenToSession(session)
 }
@@ -303,12 +309,8 @@ func onClientDisconnected(addr string) {
 	mutexes.ListedFilesLock.Lock()
 	defer mutexes.ListedFilesLock.Unlock()
 
-	//Remove this address from remote file seeders
-	for i := 0; i < len(ListedFiles); i++ {
-		fmt.Println(string("\033[31m"), "onClientDisconnected", ListedFiles[i].FileName)
-	}
-
 	RemoveSeeder(addr)
+	log.Println("Client Disconnected", addr)
 
 	//Remove empty seeders listings
 	for i := 0; i < len(ListedFiles); i++ {
@@ -327,12 +329,10 @@ func listenToSession(Session *sessionmanager.Session) {
 
 	addr := Session.Session.RemoteAddr().String()
 
-	fmt.Println(string("\033[31m"), "Initiate Session", addr, string("\033[0m"))
+	log.Println("Initiate Session", addr)
 
 	for Session.Session != nil {
 		data, chunkType, err := SessionRead(Session)
-		fmt.Println(string("\033[31m"), "Read data from session", addr, string("\033[0m"))
-
 		if err != nil {
 			log.Println("Session read failed, closing session error:", err)
 			break
@@ -343,7 +343,7 @@ func listenToSession(Session *sessionmanager.Session) {
 		switch chunkType {
 		case constants.SurgeChunkID:
 			//Write add to download internally after parsing data
-			processChunk(Session, data)
+			go processChunk(Session, data)
 		}
 	}
 }
@@ -355,7 +355,6 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 	if err := proto.Unmarshal(Data, surgeMessage); err != nil {
 		log.Panic("Failed to parse surge message:", err)
 	}
-	fmt.Println(string("\033[31m"), "PROCESSING CHUNK", string("\033[0m"))
 
 	//Write add to download
 	mutexes.BandwidthAccumulatorMapLock.Lock()
@@ -364,7 +363,7 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 
 	//Data nill means its a request for data
 	if surgeMessage.Data == nil {
-		go TransmitChunk(Session, surgeMessage.FileID, surgeMessage.ChunkID)
+		TransmitChunk(Session, surgeMessage.FileID, surgeMessage.ChunkID)
 	} else { //If data is not nill we are receiving data
 
 		//When we receive a chunk mark it as no longer in transit
@@ -381,7 +380,7 @@ func processChunk(Session *sessionmanager.Session, Data []byte) {
 		}
 		mutexes.WorkerMapLock.Unlock()
 
-		go WriteChunk(surgeMessage.FileID, surgeMessage.ChunkID, surgeMessage.Data)
+		WriteChunk(surgeMessage.FileID, surgeMessage.ChunkID, surgeMessage.Data)
 	}
 }
 

@@ -9,6 +9,7 @@
 package surge
 
 import (
+	"log"
 	"os"
 
 	bitmap "github.com/boljen/go-bitmap"
@@ -126,6 +127,7 @@ func RemoveFileByHash(Hash string, FromDisk bool) bool {
 	}
 	mutexes.FileWriteLock.Unlock()
 
+	log.Println("Removing file:", file.FileName, file.FileHash, "from disk:", FromDisk)
 	AnnounceRemoveFile(file.Topic, file.FileHash)
 	return true
 }

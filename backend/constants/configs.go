@@ -24,7 +24,7 @@ const (
 	NumWorkersMax = 12
 
 	//duration of a subscription blocktime is ~20sec
-	SubscriptionDuration = 180
+	SubscriptionDuration = 4000
 
 	//official surge wallets
 	TeamAddressA = "7a48870a43d1512e467e8df103b1dee8d908f297ffe1fb45e81317965597bc7c"

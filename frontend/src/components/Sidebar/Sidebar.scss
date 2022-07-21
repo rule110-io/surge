@@ -9,6 +9,27 @@
   z-index: 1;
   background: $darkest;
 
+  &__categories {
+    max-height: calc(100% - 104px);
+    overflow-y: scroll;
+    overflow-x: visible;
+  }
+
+  &__category {
+    &:not(:first-child) {
+      border-top: $border;
+      padding-top: $padding-md;
+    }
+  }
+
+  &__descr {
+    margin-top: $padding-md;
+    padding: 0 $padding-llg;
+    font-size: $fz-md;
+    line-height: 16px;
+    font-feature-settings: "salt" on;
+  }
+
   &__control {
     display: flex;
     align-items: center;
@@ -62,14 +83,43 @@
     font-feature-settings: "salt" on;
     color: $grey-light;
     padding: 0 $padding-llg;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    transition: $transition-1;
+    cursor: pointer;
+
+    &_active {
+      svg {
+        transform: scaleY(-1);
+      }
+    }
+
+    &:hover {
+      color: white;
+
+      svg {
+        path {
+          stroke: $white;
+        }
+      }
+    }
+
+    &-icon {
+      position: relative;
+      top: -1px;
+    }
   }
 
   &__items {
     margin-top: $padding-sm;
-    overflow-y: scroll;
-    overflow-x: visible;
-    max-height: calc(100% - 104px);
     padding: 0 $padding-llg;
+    max-height: 0;
+    overflow: hidden;
+
+    &_active {
+      max-height: unset;
+    }
   }
 
   &__item {
@@ -86,6 +136,30 @@
     transition: $transition-1;
     cursor: pointer;
     position: relative;
+
+    &:last-child {
+      margin-bottom: $padding-md;
+    }
+
+    &_state {
+      &_unsubscribed {
+        &::before {
+          background: $danger;
+        }
+      }
+
+      &_pending {
+        &::before {
+          background: $warning;
+        }
+      }
+
+      &_subscribed {
+        &::before {
+          background: $success;
+        }
+      }
+    }
 
     &::after {
       content: "";
@@ -118,7 +192,6 @@
     &::before {
       content: "";
       display: block;
-      background: $success;
       height: 8px;
       width: 8px;
       border-radius: 100%;

@@ -70,6 +70,7 @@ func main() {
 		surge.DbWriteSetting("numWorkers", strconv.Itoa(constants.NumWorkers))
 	}
 
+	log.Println("-= starting surge client =-")
 	surge.StartClient(arguments)
 
 	app := NewApp()

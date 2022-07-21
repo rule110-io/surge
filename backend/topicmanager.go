@@ -8,14 +8,17 @@ import (
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
+	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
 var topicsMap map[string]models.Topic
+var topicEncodedSubcribeStateMap map[string]int
 
 const topicsMapBucketKey = "topicBucket"
 
 func InitializeTopicsManager() {
 	topicsMap = make(map[string]models.Topic)
+	topicEncodedSubcribeStateMap = make(map[string]int)
 
 	//Load from db
 	mapString, err := DbReadSetting(topicsMapBucketKey)
@@ -28,7 +31,7 @@ func InitializeTopicsManager() {
 	}
 }
 
-func subscribeToSurgeTopic(topicName string, applySafeLock bool) {
+func subscribeToSurgeTopic(topicName string, applySafeLock bool) (bool, error) {
 
 	if applySafeLock {
 		mutexes.TopicsMapLock.Lock()
@@ -36,6 +39,10 @@ func subscribeToSurgeTopic(topicName string, applySafeLock bool) {
 	}
 
 	topicEncoded := TopicEncode(topicName)
+	subscriptionActive, err := IsSubscriptionActive(topicEncoded)
+	if err != nil {
+		return false, err
+	}
 
 	if _, ok := topicsMap[topicName]; !ok {
 		topicModel := models.Topic{
@@ -52,16 +59,40 @@ func subscribeToSurgeTopic(topicName string, applySafeLock bool) {
 			DbWriteSetting(topicsMapBucketKey, mapString)
 		}
 	}
-	subscribeToPubSub(topicEncoded)
-	AnnounceFiles(topicEncoded)
+
+	previousState := topicEncodedSubcribeStateMap[topicEncoded]
+
+	subscribeSuccess := true
+	//If we dont have an active sub resubscribe.
+	if !subscriptionActive {
+		if !subscribeToPubSub(topicEncoded) {
+			subscribeSuccess = false
+		}
+	} else {
+		updateTopicSubscriptionState(topicEncoded, 2)
+	}
+
+	//Only announce files if the client is first starting up, or when we are newly subscribed.
+	if subscribeSuccess {
+		if previousState == 0 || previousState == 1 {
+			AnnounceFiles(topicEncoded)
+		}
+		//first startup, were already subscribed, set the state.
+		updateTopicSubscriptionState(topicEncoded, 2)
+	}
+
+	return subscribeSuccess, nil
 }
 
-func unsubscribeFromSurgeTopic(topicName string) {
+func unsubscribeFromSurgeTopic(topicName string) bool {
 	mutexes.TopicsMapLock.Lock()
 	defer mutexes.TopicsMapLock.Unlock()
 
 	if topic, ok := topicsMap[topicName]; ok {
-		unsubscribeToPubSub(topic.NameEncoded)
+		unsubSuccess := unsubscribeToPubSub(topic.NameEncoded)
+		if !unsubSuccess {
+			return false
+		}
 	}
 
 	//Delete from map
@@ -73,13 +104,26 @@ func unsubscribeFromSurgeTopic(topicName string) {
 		mapString := string(mapBytes)
 		DbWriteSetting(topicsMapBucketKey, mapString)
 	}
+
+	return true
 }
 
 func resubscribeToTopics() {
 	mutexes.TopicsMapLock.Lock()
 	defer mutexes.TopicsMapLock.Unlock()
+
 	for _, topic := range topicsMap {
-		subscribeToSurgeTopic(topic.Name, false)
+		_, err := subscribeToSurgeTopic(topic.Name, false)
+		if err != nil {
+
+			//set all topics to pending state
+			pushError("Topic connection error", err.Error())
+			for _, disableTopic := range topicsMap {
+				updateTopicSubscriptionState(disableTopic.NameEncoded, 1)
+			}
+
+			break
+		}
 	}
 }
 
@@ -99,11 +143,20 @@ func GetTopicInfo(topicName string) models.TopicInfo {
 		fileCount += bitSetVar
 	}
 
+	state := 0
+
+	//get topic state
+	knownState, any := topicEncodedSubcribeStateMap[topicEncoded]
+	if any {
+		state = knownState
+	}
+
 	return models.TopicInfo{
-		Name:        topicName,
-		Subscribers: subCount,
-		FileCount:   fileCount,
-		Permissions: GetTopicPermissions(topicName, GetAccountAddress()),
+		Name:              topicName,
+		Subscribers:       subCount,
+		FileCount:         fileCount,
+		Permissions:       GetTopicPermissions(topicName, GetAccountAddress()),
+		SubscriptionState: state,
 	}
 }
 func GetTopicPermissions(topicName string, clientAddr string) models.TopicPermissions {
@@ -144,12 +197,34 @@ func GetTopicsWithPermissions() []models.TopicInfo {
 	modelData := []models.TopicInfo{}
 
 	for _, v := range topicNames {
+
+		state := 0
+		//get topic state
+		knownState, any := topicEncodedSubcribeStateMap[TopicEncode(v)]
+		if any {
+			state = knownState
+		}
+
 		entry := models.TopicInfo{
-			Name:        v,
-			Permissions: GetTopicPermissions(v, GetAccountAddress()),
+			Name:              v,
+			Permissions:       GetTopicPermissions(v, GetAccountAddress()),
+			SubscriptionState: state,
 		}
 		modelData = append(modelData, entry)
 	}
 
 	return modelData
+}
+
+func updateTopicSubscriptionState(TopicEncoded string, NewState int) {
+
+	previousValue, exists := topicEncodedSubcribeStateMap[TopicEncoded]
+	isChanged := !exists || previousValue != NewState
+
+	if isChanged {
+		topicEncodedSubcribeStateMap[TopicEncoded] = NewState
+		if FrontendReady {
+			runtime.EventsEmit(*wailsContext, "topicsUpdated")
+		}
+	}
 }

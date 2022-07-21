@@ -1,6 +1,11 @@
 package surge
 
 import (
+	"fmt"
+	"strconv"
+	"strings"
+
+	"github.com/nknorg/nkn-sdk-go"
 	"github.com/rule110-io/surge/backend/constants"
 	"github.com/rule110-io/surge/backend/models"
 	"github.com/rule110-io/surge/backend/mutexes"
@@ -102,16 +107,22 @@ func (s *MiddlewareFunctions) StartDownloadMagnetLinks(Magnetlinks string) bool 
 }
 
 //SubscribeToTopic subscribes to given topic
-func (s *MiddlewareFunctions) SubscribeToTopic(Topic string) {
+func (s *MiddlewareFunctions) SubscribeToTopic(Topic string) bool {
 	if len(Topic) == 0 {
-		pushError("Error on Subscribe", "topic name of length zero.")
+		pushError("Error on Subscribe", "channel name of length zero.")
+		return false
 	} else {
-		subscribeToSurgeTopic(Topic, true)
+		result, err := subscribeToSurgeTopic(Topic, true)
+		if err != nil {
+			return false
+		} else {
+			return result
+		}
 	}
 }
 
-func (s *MiddlewareFunctions) UnsubscribeFromTopic(Topic string) {
-	unsubscribeFromSurgeTopic(Topic)
+func (s *MiddlewareFunctions) UnsubscribeFromTopic(Topic string) bool {
+	return unsubscribeFromSurgeTopic(Topic)
 }
 
 func (s *MiddlewareFunctions) GetTopicSubscriptions() []models.TopicInfo {
@@ -187,7 +198,6 @@ func (s *MiddlewareFunctions) GetFileDetails(FileHash string) FileDetails {
 	}
 }
 func (s *MiddlewareFunctions) GetTopicDetails(Topic string) models.TopicInfo {
-
 	return GetTopicInfo(Topic)
 }
 
@@ -204,4 +214,107 @@ func (s *MiddlewareFunctions) SetDownloadFolder() bool {
 	}
 	DbWriteSetting("downloadFolder", path)
 	return true
+}
+
+func (s *MiddlewareFunctions) GetWalletAddress() string {
+	return WalletAddress()
+}
+
+func (s *MiddlewareFunctions) GetWalletBalance() string {
+	return WalletBalance()
+}
+func (s *MiddlewareFunctions) TransferToRecipient(Recipient string, Amount string, Fee string) string {
+	//Validate recipient, can take both NKN address and PubKey (which we turn into NKN address)
+	walletAddr := ""
+	if strings.HasPrefix(Recipient, "NKN") {
+		walletAddr = Recipient
+	} else {
+		walletAddr, _ = nkn.ClientAddrToWalletAddr(Recipient)
+	}
+	err := nkn.VerifyWalletAddress(walletAddr)
+	if err != nil {
+		pushError("Transfer failed", "recipient address is not a valid nkn address.")
+	}
+
+	//Check amount is valid
+	amountFloat, err := strconv.ParseFloat(Amount, 64)
+	if err != nil {
+		pushError("Error on transfer", "invalid amount: "+err.Error())
+		return ""
+	}
+
+	calculatedFee, err := CalculateFee(Fee)
+	if err != nil {
+		pushError("Error on transfer", err.Error())
+		return ""
+	}
+
+	calculatedFeeFloat, err := strconv.ParseFloat(calculatedFee, 64)
+	if err != nil {
+		pushError("Error on transfer", "invalid fee: "+err.Error())
+		return ""
+	}
+
+	isEnough, balanceError := ValidateBalanceForTransaction(amountFloat, calculatedFeeFloat, false)
+	if !isEnough {
+		pushError("Error on tip", "transaction failed: "+balanceError.Error())
+		return ""
+	}
+
+	_, hash := WalletTransfer(walletAddr, Amount, calculatedFee)
+	return hash
+}
+
+func (s *MiddlewareFunctions) GetTxFee() string {
+	return TransactionFee
+}
+
+func (s *MiddlewareFunctions) SetTxFee(Fee string) {
+	TransactionFee = Fee
+	DbWriteSetting("defaultTxFee", Fee)
+}
+
+func (s *MiddlewareFunctions) Tip(FileHash string, Amount string, Fee string) {
+	amountFloat, err := strconv.ParseFloat(Amount, 64)
+
+	if err != nil {
+		pushError("Error on tip", "Invalid amount.")
+		return
+	}
+
+	if amountFloat < 0.00000001 {
+		pushError("Error on tip", "Minimum tip amount is 0.00000001")
+		return
+	}
+
+	seeders := GetSeeders(FileHash)
+	if len(seeders) == 0 {
+		pushError("Error on tip", "No seeders found to tip.")
+		return
+	}
+
+	share := amountFloat / float64(len(GetSeeders(FileHash)))
+	calculatedFee, err := CalculateFee(Fee)
+	if err != nil {
+		pushError("Error on transfer", "invalid fee: "+err.Error())
+		return
+	}
+
+	feePerTxFloat, _ := strconv.ParseFloat(calculatedFee, 64)
+	totalFeeFloat := feePerTxFloat * float64(len(seeders))
+
+	isEnough, balanceError := ValidateBalanceForTransaction(amountFloat, totalFeeFloat, false)
+	if !isEnough {
+		pushError("Error on tip", balanceError.Error())
+		return
+	}
+
+	for _, v := range seeders {
+		walletAddr, _ := nkn.ClientAddrToWalletAddr(v)
+		success, _ := WalletTransfer(walletAddr, fmt.Sprintf("%f", share), calculatedFee)
+
+		if !success {
+			break
+		}
+	}
 }

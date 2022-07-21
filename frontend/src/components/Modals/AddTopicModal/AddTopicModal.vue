@@ -2,12 +2,12 @@
   <Modal :show.sync="showModal" @closeAndClear="closeAndClearModal">
     <template slot="title"> Add New Channel </template>
     <template slot="body">
-      <ControlWrapper title="Topic name">
+      <ControlWrapper title="Channel name">
         <Input
           v-model="topicName"
           theme="light"
           size="md"
-          placeholder="Enter topic name here"
+          placeholder="Enter channel name here"
         />
       </ControlWrapper>
     </template>
@@ -40,27 +40,39 @@ export default {
   data: () => {
     return {
       topicName: "",
+      loading: false,
     };
   },
   computed: {
     disabled() {
-      return !this.topicName.length;
+      if (!this.topicName.length || this.loading) {
+        return true;
+      } else {
+        return false;
+      }
     },
   },
   mounted() {},
   methods: {
     ...mapActions({
-      subscribeToTopic: "topics/subscribeToTopic",
+      fetchTopics: "topics/fetchTopics",
     }),
     ...mapMutations({
       setRemoteFilesTopic: "files/setRemoteFilesTopic",
     }),
 
     subscribeAndActivateTopic(topic) {
-      this.subscribeToTopic(topic);
-      this.setRemoteFilesTopic(topic);
-      this.closeModal();
-      this.clearModal();
+      this.loading = true;
+      window.go.surge.MiddlewareFunctions.SubscribeToTopic(topic).finally(
+        () => {
+          console.log(123);
+          this.loading = false;
+          this.setRemoteFilesTopic(topic);
+          this.fetchTopics();
+          this.closeModal();
+          this.clearModal();
+        }
+      );
     },
     clearModal() {
       this.topicName = "";

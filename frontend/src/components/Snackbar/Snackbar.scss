@@ -1,60 +1,107 @@
+.vue-notification-wrapper {
+  &:not(:last-child) {
+    margin-bottom: 1rem;
+  }
+}
+
+.fade-bottom-enter-active,
+.fade-bottom-leave-active,
+.fade-bottom-move {
+  transition: all 0.5s;
+}
+.fade-bottom-enter,
+.fade-bottom-leave-to {
+  opacity: 0;
+  transform: translateY(68px) scale(0.8);
+}
+
 .snackbar {
-  position: absolute;
-  bottom: 0;
-  box-shadow: $shadow-1;
-  width: calc(100% - 80px);
-  z-index: 10000;
-  border-top-left-radius: 18px;
-  border-top-right-radius: 18px;
-  height: 68px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: $padding-default;
-  box-sizing: border-box;
-  transition: $transition-1;
-  transform: translateY(200px);
-  box-shadow: $shadow-1;
+  position: fixed;
+  padding-bottom: 60px;
+  z-index: 100;
 
-  &_color {
-    &_error {
-      background-color: $error;
+  &__body {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #28282d;
+    opacity: 0.85;
+    box-shadow: 0 48px 100px rgba(17, 12, 46, 0.08);
+    border-radius: 8px;
+    color: #fff;
+    padding: 1.5rem 1.5rem 1.5rem 2rem;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+      content: "";
+      display: block;
+      position: absolute;
+      left: 0;
+      top: 0;
+      background: transparent;
+      height: 100%;
+      width: 8px;
     }
 
-    &_success {
-      background-color: $primary;
-    }
-  }
+    &_type {
+      &_error {
+        &::before {
+          background: $danger;
+        }
+      }
 
-  &_visible {
-    transform: translateY(0px);
-  }
-
-  &__button {
-    appearance: none;
-    border: none;
-    background: transparent;
-    outline: none;
-  }
-
-  &__close {
-    color: white;
-    font-size: 16px;
-    cursor: pointer;
-    transition: $transition-1;
-    height: 24px;
-    width: 24px;
-
-    &:hover {
-      opacity: 0.8;
-    }
-
-    &:active {
-      opacity: 0.7;
+      &_success {
+        &::before {
+          background: $success;
+        }
+      }
     }
   }
 
   &__text {
-    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 140%;
+  }
+
+  &__close {
+    cursor: pointer;
+    transition: $transition-1;
+    margin-left: 1rem;
+    position: relative;
+    height: 20px;
+    width: 20px;
+
+    &-icon {
+      height: 20px;
+      width: 20px;
+      left: -2px;
+      top: -2px;
+      position: relative;
+    }
+
+    &::before {
+      content: "";
+      display: block;
+      width: 36px;
+      height: 36px;
+      border-radius: 100%;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      transition: $transition-1;
+    }
+
+    &:hover {
+      &::before {
+        background: rgba(#fff, 0.1);
+      }
+    }
+
+    path {
+      fill: #fff;
+    }
   }
 }

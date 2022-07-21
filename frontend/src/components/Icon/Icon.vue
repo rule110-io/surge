@@ -32,6 +32,9 @@ import FolderIcon from "@/assets/icons/FolderIcon.svg";
 import ControlCloseIcon from "@/assets/icons/ControlCloseIcon.svg";
 import ControlPlayIcon from "@/assets/icons/ControlPlayIcon.svg";
 import ControlPauseIcon from "@/assets/icons/ControlPauseIcon.svg";
+import WalletIcon from "@/assets/icons/WalletIcon.svg";
+import TipIcon from "@/assets/icons/TipIcon.svg";
+import DropdownIcon from "@/assets/icons/DropdownIcon.svg";
 
 export default {
   components: {
@@ -54,6 +57,9 @@ export default {
     ControlCloseIcon,
     ControlPlayIcon,
     ControlPauseIcon,
+    WalletIcon,
+    TipIcon,
+    DropdownIcon,
   },
   props: {
     icon: {

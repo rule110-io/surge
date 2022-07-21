@@ -22,8 +22,15 @@
         </td>
         <td class="text_align_right">{{ file.NumSeeders }}</td>
         <td class="text_align_right">
-          <FileDownload v-if="!file.IsTracked" :hash="file.FileHash" />
-          <component v-else :is="getFileIcon(file)"></component>
+          <div class="discover-table__actions">
+            <Icon icon="TipIcon" @click.native="openTipModal(file)" />
+            <FileDownload v-if="!file.IsTracked" :hash="file.FileHash" />
+            <component
+              style="width: 24px"
+              v-else
+              :is="getFileIcon(file)"
+            ></component>
+          </div>
         </td>
       </tr>
     </tbody>
@@ -35,7 +42,7 @@
 </style>
 
 <script>
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 
 import FileName from "@/components/File/FileName/FileName";
 import FileSize from "@/components/File/FileSize/FileSize";
@@ -46,6 +53,8 @@ import DownloadIcon from "@/assets/icons/DownloadIcon.svg";
 import UploadIcon from "@/assets/icons/UploadIcon.svg";
 import CheckIcon from "@/assets/icons/CheckIcon.svg";
 
+import Icon from "@/components/Icon/Icon";
+
 export default {
   components: {
     FileName,
@@ -55,6 +64,7 @@ export default {
     DownloadIcon,
     UploadIcon,
     CheckIcon,
+    Icon,
   },
   data: () => {
     return {};
@@ -66,6 +76,13 @@ export default {
     this.$store.dispatch("files/fetchRemoteFiles");
   },
   methods: {
+    ...mapMutations({
+      setActiveFile: "files/setActiveFile",
+    }),
+    openTipModal(file) {
+      this.setActiveFile(file);
+      this.$bus.$emit("openTipModal");
+    },
     setSorting(orderBy) {
       let newConfig = Object.assign({}, this.remoteFilesConfig);
       const currentOrder = newConfig.orderBy;

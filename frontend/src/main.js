@@ -12,12 +12,14 @@ import VueTour from "vue-tour";
 import VTooltip from "v-tooltip";
 import VueClipboard from "vue-clipboard2";
 import VueBus from "vue-bus";
+import Notifications from "vue-notification/dist/ssr.js";
 
 import { store } from "./store/store.js";
 
 Vue.config.productionTip = false;
 Vue.config.devtools = true;
 
+Vue.use(Notifications);
 Vue.use(VueFeather);
 Vue.use(vueFilterPrettyBytes);
 Vue.use(VueMoment);
