@@ -37,7 +37,7 @@ func subscribeToPubSub(topic string) bool {
 	}
 
 	updateTopicSubscriptionState(topic, 1)
-	txnHash, err := client.Subscribe("", topic, constants.SubscriptionDuration, "Surge Beta Client", config)
+	txnHash, err := client.Subscribe("", topic, constants.SubscriptionDuration, constants.TransactionMeta, config)
 	if err != nil {
 		log.Println("Subsription transaction failed for topic:", topic, "error:", err)
 		updateTopicSubscriptionState(topic, 1)

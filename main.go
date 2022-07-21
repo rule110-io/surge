@@ -113,7 +113,7 @@ func main() {
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
 			About: &mac.AboutInfo{
-				Title:   "Surge v1.0 - P2P on steroids",
+				Title:   "Surge v2.0 - P2P on steroids",
 				Message: "© 2020-2022 rule110",
 			},
 		},
