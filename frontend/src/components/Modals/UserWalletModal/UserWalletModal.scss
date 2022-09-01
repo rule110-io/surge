@@ -1,0 +1,18 @@
+.wallet {
+  width: 540px;
+
+  &__tabs {
+    display: inline-flex;
+    margin-bottom: 32px;
+  }
+
+  &__max {
+    cursor: pointer;
+    color: $primary;
+    transition: $transition-1;
+
+    &:hover {
+      color: white;
+    }
+  }
+}

@@ -2,16 +2,19 @@
   <div class="main__wrapper">
     <!-- <div class="main__tour" v-if="tour"></div> -->
     <Dashboard />
+    <Snackbar />
   </div>
 </template>
 <script>
 import { mapState, mapActions } from "vuex";
 
 import Dashboard from "@/components/Dashboard/Dashboard";
+import Snackbar from "@/components/Snackbar/Snackbar";
 
 export default {
   components: {
     Dashboard,
+    Snackbar,
   },
   computed: {
     ...mapState("tour", ["tour"]),
@@ -34,10 +37,10 @@ export default {
   },
   mounted() {
     this.enableNotifications();
-    this.enableClientStatusUpdate();
     this.enableGlobalBandwidthEvents();
     this.enableErrorEvents();
     this.enableDarkThemeEvent();
+    this.enableTopicsUpdate();
 
     this.fetchTopics();
     this.fetchRemoteFiles();
@@ -97,12 +100,18 @@ export default {
         this.$store.commit("notifications/addNotification", notification);
       });
     },
+    enableTopicsUpdate() {
+      window.runtime.EventsOn("topicsUpdated", () => {
+        this.fetchTopics();
+      });
+    },
     enableErrorEvents() {
       window.runtime.EventsOn("errorEvent", (title, text) => {
-        this.$store.dispatch("snackbar/updateSnack", {
-          snack: `${title}: ${text}`,
-          color: "error",
-          timeout: false,
+        console.log(title);
+        this.$notify({
+          group: "notifications",
+          text: `${title}: ${text}`,
+          type: "error",
         });
       });
     },
@@ -117,14 +126,6 @@ export default {
           });
         }
       );
-    },
-    enableClientStatusUpdate() {
-      // const clientsStore = runtime.Store.New("numClients");
-      // clientsStore.subscribe(({ Online }) => {
-      //   this.$store.commit("clientStatus/addClientStatus", {
-      //     online: Online,
-      //   });
-      // });
     },
   },
 };

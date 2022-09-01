@@ -37,6 +37,12 @@
 
           <Dropdown class="topic-details__dropdown" :open.sync="dropdownOpen">
             <ul class="dropdown__list">
+              <li
+                class="dropdown__list-item"
+                @click="resubscribe(topicDetails.Name)"
+              >
+                Resubscribe
+              </li>
               <li class="dropdown__list-item" @click="unsubscribe">
                 Unsubscribe
               </li>
@@ -100,12 +106,17 @@ export default {
     ...mapActions({
       getTopicDetails: "topics/getTopicDetails",
       fetchRemoteFiles: "topics/fetchRemoteFiles",
+      subscribeToTopic: "topics/subscribeToTopic",
     }),
     ...mapMutations({
       setRemoteFilesConfig: "files/setRemoteFilesConfig",
     }),
     unsubscribe() {
       this.$bus.$emit("openUnsubscribeTopicModal");
+      this.closeDropdown();
+    },
+    resubscribe(topic) {
+      this.subscribeToTopic(topic);
       this.closeDropdown();
     },
     openDropdown() {

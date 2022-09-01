@@ -13,6 +13,8 @@
     <RemoveFileModal openModalEvent="openRemoveFileModal" />
     <SettingsModal openModalEvent="openSettingsModal" />
     <UnsubscribeTopicModal openModalEvent="openUnsubscribeTopicModal" />
+    <UserWalletModal openModalEvent="openUserWalletModal" />
+    <TipModal openModalEvent="openTipModal" />
   </div>
 </template>
 
@@ -30,6 +32,8 @@ import AddFileModal from "@/components/Modals/AddFileModal/AddFileModal";
 import RemoveFileModal from "@/components/Modals/RemoveFileModal/RemoveFileModal";
 import SettingsModal from "@/components/Modals/SettingsModal/SettingsModal";
 import UnsubscribeTopicModal from "@/components/Modals/UnsubscribeTopicModal/UnsubscribeTopicModal";
+import UserWalletModal from "@/components/Modals/UserWalletModal/UserWalletModal";
+import TipModal from "@/components/Modals/TipModal/TipModal";
 
 export default {
   components: {
@@ -40,6 +44,8 @@ export default {
     RemoveFileModal,
     SettingsModal,
     UnsubscribeTopicModal,
+    UserWalletModal,
+    TipModal,
   },
   data: () => {
     return {};

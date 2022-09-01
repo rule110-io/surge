@@ -3,7 +3,6 @@ import Vuex from "vuex";
 
 import Notifications from "./modules/notifications";
 import GlobalBandwidth from "./modules/globalBandwidth";
-import Snackbar from "./modules/snackbar";
 import DarkTheme from "./modules/darkTheme";
 import Version from "./modules/version";
 import PubKey from "./modules/pubKey";
@@ -20,7 +19,6 @@ export const store = new Vuex.Store({
     notifications: Notifications,
     globalBandwidth: GlobalBandwidth,
     files: Files,
-    snackbar: Snackbar,
     darkTheme: DarkTheme,
     version: Version,
     tour: Tour,

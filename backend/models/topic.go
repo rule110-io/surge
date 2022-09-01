@@ -6,8 +6,9 @@ type Topic struct {
 }
 
 type TopicInfo struct {
-	Name        string
-	Subscribers int
-	FileCount   int
-	Permissions TopicPermissions
+	Name              string
+	Subscribers       int
+	FileCount         int
+	Permissions       TopicPermissions
+	SubscriptionState int
 }

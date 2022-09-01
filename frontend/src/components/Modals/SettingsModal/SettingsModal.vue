@@ -69,6 +69,15 @@
             />
           </div>
         </ControlWrapper>
+        <ControlWrapper title="Logs">
+          <template slot="descr">
+            <div class="settings__logs">
+              You can look through the surge logs and get more information about
+              client processes.
+              <PathIcon @click="openLogs" class="settings__path-icon" />
+            </div>
+          </template>
+        </ControlWrapper>
       </ModalGrid>
     </template>
     <template slot="footer">
@@ -152,6 +161,9 @@ export default {
   },
   mounted() {},
   methods: {
+    openLogs() {
+      window.go.surge.MiddlewareFunctions.OpenLog();
+    },
     writeSetting(k, v) {
       window.go.surge.MiddlewareFunctions.WriteSetting(`${k}`, `${v}`);
     },
