@@ -3,15 +3,14 @@
     <template slot="title">Unsubscribe from channel</template>
     <template slot="body">
       <div v-if="topicDetails" class="modal__descr modal__item">
-        Attention! You are going to unsubscribe from
-        <b>#{{ topicDetails.Name }}</b> channel - are you sure?
+        Warning! You are going to unsubscribe from
+        <b>#{{ topicDetails.Name }}</b> channel. If you are hosting files to the topic you are unsubscribing from those
+        will no longer be visible until you resubscribe - are you sure?
       </div>
     </template>
     <template slot="footer">
       <Button theme="text" size="md" @click="closeAndClearModal">Close</Button>
-      <Button theme="default" size="md" @click="unsubscribe"
-        >Unsubscribe</Button
-      >
+      <Button theme="default" size="md" @click="unsubscribe">Unsubscribe</Button>
     </template>
   </Modal>
 </template>
@@ -30,7 +29,7 @@ export default {
   props: {
     file: {
       type: Object,
-      default: () => {},
+      default: () => { },
     },
   },
   data: () => {
@@ -42,7 +41,7 @@ export default {
     ...mapState("files", ["activeFile", "localFilesConfig"]),
     ...mapState("topics", ["topicDetails"]),
   },
-  mounted() {},
+  mounted() { },
   methods: {
     ...mapActions({
       unsubscribeFromTopic: "topics/unsubscribeFromTopic",

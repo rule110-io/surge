@@ -72,7 +72,7 @@ func ValidateBalanceForTransaction(Amount float64, Fee float64, UtilTransaction 
 	balance := WalletBalance()
 	balanceFloat, _ := strconv.ParseFloat(balance, 64)
 
-	if Amount+Fee >= balanceFloat {
+	if Amount+Fee > balanceFloat {
 		return false, errors.New("not enough nkn available required: " + fmt.Sprintf("%f", Amount+Fee) + " available: " + balance)
 	}
 

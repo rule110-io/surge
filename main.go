@@ -86,7 +86,6 @@ func main() {
 		Frameless:         false,
 		StartHidden:       false,
 		HideWindowOnClose: false,
-		RGBA:              &options.RGBA{R: 33, G: 37, B: 43, A: 255},
 		Assets:            assets,
 		LogLevel:          logger.DEBUG,
 		OnStartup:         app.startup,
@@ -113,8 +112,8 @@ func main() {
 			WebviewIsTransparent: true,
 			WindowIsTranslucent:  true,
 			About: &mac.AboutInfo{
-				Title:   "Surge v2.0 - P2P on steroids",
-				Message: "© 2020-2022 rule110",
+				Title:   "Surge v1.1.1 - P2P on steroids",
+				Message: "© 2020-2023 rule110",
 			},
 		},
 	})

@@ -2,7 +2,7 @@
   "name": "surge",
   "author": "Rule110",
   "private": true,
-  "version": "1.0.1-beta",
+  "version": "1.1.1-beta",
   "scripts": {
     "serve": "vue-cli-service build --watch --mode production",
     "build": "vue-cli-service build",

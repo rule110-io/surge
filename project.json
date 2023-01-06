@@ -2,10 +2,10 @@
   "name": "Surge",
   "description": "P2P on steroids",
   "author": {
-    "name": "Christian Busch",
-    "email": "kontakt@christian-busch.com"
+    "name": "WizardOfCodez",
+    "email": "wizardofcodez@proton.me"
   },
-  "version": "2.0.0",
+  "version": "1.1.1",
   "binaryname": "surge",
   "frontend": {
     "dir": "frontend",
