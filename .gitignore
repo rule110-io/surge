@@ -1,6 +1,5 @@
 ﻿local
 remote
-build
 account.surge
 *.proto
 db
@@ -11,3 +10,4 @@ wailsjs
 frontend/wailsjs
 wailsjs
 .env
+build/bin

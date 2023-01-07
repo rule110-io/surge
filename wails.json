@@ -17,5 +17,12 @@
   },
   "debounceMS": 100,
   "devserverurl": "http://localhost:34115",
-  "appargs": ""
+  "appargs": "",
+  "Info": {
+    "companyName": "Rule110",
+    "productName": "Surge",
+    "productVersion": "1.1.1",
+    "copyright": "Copyright 2023",
+    "comments": "P2P on steroids (...and NKN)"
+  }
 }

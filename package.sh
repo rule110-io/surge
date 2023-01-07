@@ -65,8 +65,8 @@ rm -rf ./build/bin
 
 #sed "s/0.0.0/${VERSION}/" ./build/darwin/Info.plist.src > ./build/darwin/Info.plist
 #CGO_LDFLAGS=-mmacosx-version-min=10.13 wails build -platform darwin/amd64 -o surge
-CGO_LDFLAGS=-mmacosx-version-min=10.13 wails build -platform darwin/arm64 -o surge
-#CGO_LDFLAGS=-mmacosx-version-min=10.13 wails build -platform darwin/universal -o surge
+#CGO_LDFLAGS=-mmacosx-version-min=10.13 wails build -platform darwin/arm64 -o surge
+CGO_LDFLAGS=-mmacosx-version-min=10.13 wails build -platform darwin/universal -o surge
 
 cd ./build/bin/
 
