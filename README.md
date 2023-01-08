@@ -45,4 +45,4 @@ For detailed explanation on how things work, checkout [Wails docs](https://wails
 
 ## Contribute
 
-Surge is an open source project so everyone is invited and welcome to help. If you want to get in contact with us just jump into the [NKN Discord](https://discord.gg/eDhBpfBC)
+Surge is an open source project so everyone is invited and welcome to help. If you want to get in contact with us just jump into the [NKN Discord](https://discord.gg/hAxzRUV7DN)
