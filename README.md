@@ -25,9 +25,14 @@ Besides using our pre-built executables you can build surge by your own.
 Prerequisites:
 - A running Golang environment
 - A running [WailsV2](https://wails.io/docs/gettingstarted/installation/) environment
+- Node.JS > 19.4
 
 1. clone this repository in your go projects
-2. run ``wails build -p``
+2. Build the frontend
+    1. ``cd frontend/``
+    2. ``npm install``
+    3. ``npm run build``
+2. Build the app in the root directory of the repository: ``wails build -p``
 3. check the ``build`` directory
 
 Other helpful commands
